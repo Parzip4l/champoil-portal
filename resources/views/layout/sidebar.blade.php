@@ -83,7 +83,7 @@
               <a href="{{ url('bank-account') }}" class="nav-link {{ active_class(['bank-account']) }}">Bank Account</a>
             </li>
             <li class="nav-item">
-              <a href="{{ url('payment-terms') }}" class="nav-link {{ active_class(['payment-terms']) }}">Payment Terms</a>
+              <a href="{{ url('terms-of-payment') }}" class="nav-link {{ active_class(['terms-of-payment']) }}">Payment Terms</a>
             </li>
             <li class="nav-item">
               <a href="{{ url('journal') }}" class="nav-link {{ active_class(['journal']) }}">Journal</a>

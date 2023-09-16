@@ -7,10 +7,13 @@ use App\Productcategory;
 use App\Product;
 use App\Uom;
 use App\Warehouseloc;
+use App\UserActivities;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
+
 
 class ProductController extends Controller
 {
@@ -92,6 +95,20 @@ class ProductController extends Controller
         $product->warehouse = $request->input('warehouse');
         $product->save();
 
+        $inputData = $request->all();
+        $uuid2 = Str::uuid()->toString();
+
+        $userActivity = new UserActivities();
+        $userActivity->id = $uuid2;
+        $userActivity->modul = 'Product'; 
+        $userActivity->id_item_modul = $product->id = $uuid;
+        $userActivity->username = Auth::user()->name; 
+        $userActivity->action = 'Created';
+        $userActivity->old_values = null; 
+        $userActivity->new_values = json_encode($inputData);
+
+        $userActivity->save();
+
         return redirect()->route('inventory-product.index')->with('success', 'Inventory Successfully Added');
     }
 
@@ -123,11 +140,16 @@ class ProductController extends Controller
 
         $perPage = 5;
         $historyQuery = DB::table('inventory_histories')
-        ->where('product_id', $id)
-        ->orderBy('created_at', 'desc')
-        ->paginate($perPage);
+            ->where('product_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+
+        $userActivities = UserActivities::where('modul', 'Product') // Sesuaikan dengan modul yang sesuai
+            ->where('id_item_modul', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
         
-        return view('pages.inventory.details', ['product' => $query, 'history' => $historyQuery]);
+        return view('pages.inventory.details', ['product' => $query, 'history' => $historyQuery, 'userActivities' => $userActivities]);
     }
 
     public function getProductsByCategory($category_id)

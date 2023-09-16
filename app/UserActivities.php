@@ -5,12 +5,11 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Journal extends Model
+class UserActivities extends Model
 {
     use HasFactory;
-
-    protected $table = 'journal';
+    protected $table = 'user_activities';
     protected $keyType = 'string'; // Menentukan tipe kunci sebagai string (UUID)
     public $incrementing = false; // Non-incrementing UUID
-    protected $fillable = ['id','name', 'type', 'short_code', 'default_account'];
+    protected $fillable = ['id','modul','username','action'];
 }

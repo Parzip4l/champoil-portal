@@ -107,6 +107,7 @@
                                 <input type="hidden" name="purchase_details" value="{{ json_encode($productDetails) }}">
                                 <input type="hidden" name="payment_status" value="Not Paid">
                                 <input type="hidden" name="status" value="Posted">
+                                <input type="hidden" name="created_by" value="{{ auth()->user()->name }}">
                         <div class="col-md-12 mb-2">
                         @php
                             $existingVendorBill = \App\VendorBill::where('purchase_id', $purchase->id)->first();

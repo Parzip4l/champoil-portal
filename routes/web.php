@@ -13,37 +13,45 @@
 
 
 Route::resource('/', DashboardController::class);
+Route::resource('dashboard', DashboardController::class);
+Route::resource('sales', SalesController::class);
+Route::resource('delivery-orders', DeliveryorderController::class);
+// Purchase
+Route::resource('purchase', PurchaseController::class);
+Route::get('purchase/receive/{id}', 'PurchaseController@receiveProduct')->name('purchase.receive');
+// Send Purchase To Slack
+Route::post('/send-purchase-to-slack/{purchase}', 'PurchaseController@sendToSlack')->name('purchase.sendToSlack');
+// Payment Regist
+Route::resource('payment-regist', PaymentRegistController::class);
+Route::resource('journal', JournalController::class);
+// Warehouse
+Route::resource('uom-categories', UomCategoryController::class);
+Route::resource('uom', UomController::class);
+Route::resource('warehouse-location', WarehouselokController::class);
+Route::resource('inventory-product', ProductController::class);
 
+Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
+Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
+Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
-    Route::resource('dashboard', DashboardController::class);
+    
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
-    Route::resource('sales', SalesController::class);
-    Route::resource('delivery-orders', DeliveryorderController::class);
+    
 });
 
 Route::middleware(['auth', 'permission:purchase_access'])->group(function () {
-    // Purchase
-    Route::resource('purchase', PurchaseController::class);
-    Route::get('purchase/receive/{id}', 'PurchaseController@receiveProduct')->name('purchase.receive');
-    // Send Purchase To Slack
-    Route::post('/send-purchase-to-slack/{purchase}', 'PurchaseController@sendToSlack')->name('purchase.sendToSlack');
-    // Payment Regist
-    Route::resource('payment-regist', PaymentRegistController::class);
+    
+});
+
+Route::middleware(['auth', 'permission:accounting_access'])->group(function () {
+    
 });
 
 Route::middleware(['auth', 'permission:inventory_access'])->group(function () {
-    // Warehouse
-    Route::resource('uom-categories', UomCategoryController::class);
-    Route::resource('uom', UomController::class);
-    Route::resource('warehouse-location', WarehouselokController::class);
-    Route::resource('inventory-product', ProductController::class);
-
-    Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
-    Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
-    Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
+    
 });
 
 // Growth

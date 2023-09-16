@@ -16,7 +16,7 @@
 </nav>
 
 <div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
+  <div class="col-md-6 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
         <div class="card-title">
@@ -30,7 +30,7 @@
         <!-- Content -->
         <div class="detail-contact-wrap">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <h3 class="mb-3">{{$product->name}}</h3>
                     <div class="address mb-3 d-flex">
                         <label for="" class="me-3">Product Code</label>
@@ -69,68 +69,104 @@
                         <p class="text-muted">{{ $product->onhand }} {{ $product->uom_name }}</p>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <h4 class="mb-3">Moving Product History</h4>
-                    <hr>
-                    <div class="row moving-history">
-                        <div class="col-md-3">
-                            <div class="to">
-                                Date
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="from">
-                                From
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="to">
-                                To
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="to">
-                                Qty
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row ">
-                        @foreach($history as $moving)
-                        <div class="col-md-3 mb-2">
-                            <div class="to">
-                                {{ \Carbon\Carbon::parse($moving->created_at)->format('d M Y') }}
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <div class="from">
-                                {{$moving->modul}}
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <div class="to">
-                                @if ($moving->modul == 'Sales')
-                                    Customers
-                                @else
-                                    {{ $product->warehouse_name }}
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <div class="to {{ $moving->action === 'in' ? 'text-success' : 'text-danger' }}">
-                                {{$moving->quantity}} {{ $product->uom_name }}
-                            </div>
-                        </div>
-                        @endforeach
-                        {{ $history->links() }}
-                    </div>
-                </div>
+                
             </div>
         </div>
         <!-- End Content -->
       </div>
     </div>
   </div>
+  <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Moving History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">User Activities</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="lineTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
+                        <div class="row moving-history">
+                            <div class="col-md-3">
+                                <div class="to">
+                                    Date
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="from">
+                                    From
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="to">
+                                    To
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="to">
+                                    Qty
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row ">
+                            @foreach($history as $moving)
+                            <div class="col-md-3 mb-2">
+                                <div class="to">
+                                    {{ \Carbon\Carbon::parse($moving->created_at)->format('d M Y') }}
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <div class="from">
+                                    {{$moving->modul}}
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <div class="to">
+                                    @if ($moving->modul == 'Sales')
+                                        Customers
+                                    @else
+                                        {{ $product->warehouse_name }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <div class="to {{ $moving->action === 'in' ? 'text-success' : 'text-danger' }}">
+                                    {{$moving->quantity}} {{ $product->uom_name }}
+                                </div>
+                            </div>
+                            @endforeach
+                            {{ $history->links() }}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
+                        <div class="user-activities-data">
+                            @foreach($userActivities as $item) 
+                            <div class="item">
+                                <div class="created-date text-muted mb-1">
+                                    {{$item->created_at}}
+                                </div>
+                                <div class="name mb-1">
+                                    <h5>{{$item->username}}</h5>
+                                </div>
+                                <span class="badge @if ($item->action === 'Created') bg-success @elseif ($item->action === 'Deleted') bg-danger @elseif ($item->action === 'Updated') bg-warning @endif">{{$item->action}} Data</span>
+                                <hr>    
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    
 </div>
 
 @endsection
@@ -210,14 +246,14 @@
 </script>
 <style>
     label.me-3 {
-        width : 25%;
+        width : 40%;
     }
     .detail-contact-wrap p.text-muted {
-        width : 80%;
+        width : 60%;
     }
 
     .accounting-wrap label.me-3 {
-        width : 25%;
+        width : 45%;
     }
 
     @media (max-width : 678px){

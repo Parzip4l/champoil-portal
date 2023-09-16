@@ -23,7 +23,6 @@
                     <h6 class="card-title">Contacts</h6>
                 </div>
                 <div class="col-md-6 text-right align-self-center">
-                {{ auth()->user()->permission }}
                     <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target=".contact">Add A Contact</a>
                 </div>
             </div>

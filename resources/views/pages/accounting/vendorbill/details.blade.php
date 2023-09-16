@@ -155,7 +155,11 @@
             </div>
             <div class="card-body">
                 <div class="history">
-                    Created By - {{$vendor_bills->created_by}} - {{ $vendor_bills->created_at }}
+                    @foreach($userActivities as $item)
+                    <div class="item">
+                        <span class="@if ($item->action === 'Created') text-success @elseif ($item->action === 'Deleted') text-danger @elseif ($item->action === 'Updated') text-warning @endif">{{ $item->action }} By</span> - {{ $item->username }} - {{ $item->created_at }}
+                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>

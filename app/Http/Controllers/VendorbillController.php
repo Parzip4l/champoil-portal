@@ -7,10 +7,12 @@ use App\VendorBill;
 use App\Purchase;
 use App\ContactM;
 use App\Product;
+use App\UserActivities;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class VendorbillController extends Controller
 {
@@ -165,8 +167,23 @@ class VendorbillController extends Controller
             $bills->payment_status = $request->payment_status;
             $bills->status = $request->status;
             $bills->journal = $request->journal;
+            $bills->created_by = $request->created_by;
             
             $bills->save();
+
+            $inputData = $request->all();
+            $uuid2 = Str::uuid()->toString();
+
+            $userActivity = new UserActivities();
+            $userActivity->id = $uuid2;
+            $userActivity->modul = 'Vendor Bills'; 
+            $userActivity->id_item_modul = $bills->id = $uuid;
+            $userActivity->username = Auth::user()->name; 
+            $userActivity->action = 'Created';
+            $userActivity->old_values = null; 
+            $userActivity->new_values = json_encode($inputData);
+
+            $userActivity->save();
     
             return redirect()->route('vendor-bills.index')->with('success', 'Vendor Bills Succesfully Created.');
         } catch (\Exception $e) {
@@ -198,8 +215,14 @@ class VendorbillController extends Controller
             // Handle when the product with the given ID is not found
             abort(404);
         }
+
+        $perPage = 5;
+        $userActivities = UserActivities::where('modul', 'Vendor Bills') // Sesuaikan dengan modul yang sesuai
+            ->where('id_item_modul', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
         
-        return view('pages.accounting.vendorbill.details', ['vendor_bills' => $query]);
+        return view('pages.accounting.vendorbill.details', ['vendor_bills' => $query, 'userActivities' => $userActivities]);
     }
 
     /**

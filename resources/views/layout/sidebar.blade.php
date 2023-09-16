@@ -85,6 +85,9 @@
             <li class="nav-item">
               <a href="{{ url('payment-terms') }}" class="nav-link {{ active_class(['payment-terms']) }}">Payment Terms</a>
             </li>
+            <li class="nav-item">
+              <a href="{{ url('journal') }}" class="nav-link {{ active_class(['journal']) }}">Journal</a>
+            </li>
           </ul>
         </div>
       </li>

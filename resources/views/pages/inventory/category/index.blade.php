@@ -31,23 +31,28 @@
           <table id="dataTableExample" class="table">
             <thead>
               <tr>
-                <th>#</th>
                 <th>Name</th>
+                <th>Code</th>
                 <th>Income Account</th>
                 <th>Expense Account</th>
+                <th>Journal</th>
+                <th>Valuation</th>
+                <th>Output</th>
+                <th>Input</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-                @php 
-                    $nomor = 1;
-                @endphp
                 @foreach ($category as $data)
                 <tr>
-                    <td> {{ $nomor++ }} </td>
                     <td> {{ $data->name }} </td>
-                    <td> {{ $data->income_account }} </td>
-                    <td> {{ $data->expanse_account }} </td>
+                    <td> {{ $data->short_code }} </td>
+                    <td> {{ $data->accountname }} </td>
+                    <td> {{ $data->expense_accountname }} </td>
+                    <td> {{ $data->journalname }} </td>
+                    <td> {{ $data->valuation_accountname }} </td>
+                    <td> {{ $data->input_accountname }} </td>
+                    <td> {{ $data->output_accountname }} </td>
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

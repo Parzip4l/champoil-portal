@@ -8,6 +8,7 @@ use App\CoaM;
 use App\Journal;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 
 class ProductCategoryController extends Controller
 {
@@ -18,9 +19,32 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        $category = Productcategory::all();
         $at = CoaM::all();
         $journal = Journal::all();
+        $query = DB::table('product_category')
+            ->join('coa', 'product_category.income_account', '=', 'coa.id')
+            ->join('coa AS coa_expense', 'product_category.expanse_account', '=', 'coa_expense.id')
+            ->join('journal', 'product_category.journal', '=', 'journal.id')
+            ->join('coa AS coa_valuation', 'product_category.valuation_account', '=', 'coa_valuation.id')
+            ->join('coa AS coa_input', 'product_category.input_account', '=', 'coa_input.id')
+            ->join('coa AS coa_output', 'product_category.output_account', '=', 'coa_output.id')
+            ->select(
+                'product_category.*',
+                'coa.name as accountname',
+                'coa_expense.name as expense_accountname',
+                'journal.name as journalname',
+                'coa_valuation.name as valuation_accountname',
+                'coa_input.name as input_accountname',
+                'coa_output.name as output_accountname',
+            )
+            ->get();
+
+        if (!$query) {
+            // Handle when the product with the given ID is not found
+            abort(404);
+        }
+
+        $category = $query;
         return view ('pages.inventory.category.index', compact('category','at','journal'));
     }
 

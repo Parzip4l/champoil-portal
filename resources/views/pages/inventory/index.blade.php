@@ -157,7 +157,7 @@
                             <select name="category" id="product_category" class="form-control" required>
                                 <option value="-">Select Product</option>
                                 @foreach($category as $cat)
-                                    <option value="{{ $cat->id }}">{{$cat->name}}</option>
+                                    <option value="{{ $cat->id }}">{{$cat->short_code}}</option>
                                 @endforeach
                             </select>
                             <input type="hidden" name="onhand" value="0">

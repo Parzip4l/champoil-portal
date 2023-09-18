@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Productcategory;
 use App\Product;
 use App\Uom;
-use App\Warehouseloc;
+use App\WarehouseLoc;
 use App\UserActivities;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,7 +27,7 @@ class ProductController extends Controller
         $uom = Uom::all();
         $purchaseuom = Uom::all();
         $category = Productcategory::all();
-        $warehouse = Warehouseloc::all();
+        $warehouse = WarehouseLoc::all();
         $query = DB::table('product')
         ->join('product_category', 'product.category', '=', 'product_category.id')
         ->join('uom', 'product.uom', '=', 'uom.id')

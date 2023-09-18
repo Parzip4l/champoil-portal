@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <!--
-Template Name: NobleUI - Laravel Admin Dashboard Template
-Author: NobleUI
-Website: https://www.nobleui.com
-Portfolio: https://themeforest.net/user/nobleui/portfolio
-Contact: nobleui123@gmail.com
-Purchase: https://1.envato.market/nobleui_laravel
-License: For each use you must have a valid license purchased only from above link in order to legally use the theme for your project.
+Template Name: Champoil Portal - Admin Champoil Super Apps
+Author: RinableCreative
+Website: https://www.rinablecreative.com
+Portfolio: https://behance.net/muhamadsobirin3
 -->
 <html>
 <head>
   <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="description" content="Responsive Laravel Admin Dashboard Template based on Bootstrap 5">
-	<meta name="author" content="NobleUI">
-	<meta name="keywords" content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, laravel, theme, front-end, ui kit, web">
+  <meta name="description" content="Champoil Super Apps">
+	<meta name="author" content="Rinable Creative">
+	<meta name="keywords" content="rinable, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, laravel, theme, front-end, ui kit, web">
 
   <title>CHAMPOIL PORTAL - CHAMPOIL SMART INDUSTRY</title>
 

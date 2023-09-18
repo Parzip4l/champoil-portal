@@ -38,20 +38,20 @@
         </a>
       </li>
       <li class="nav-item {{ active_class(['apps/calendar']) }}">
-        <a href="{{ url('/apps/calendar') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="target"></i>
           <span class="link-title">Target</span>
         </a>
       </li>
       <li class="nav-item nav-category">Accounting</li>
       <li class="nav-item {{ active_class(['apps/chat']) }}">
-        <a href="{{ url('/apps/chat') }}" class="nav-link">
+        <a href="{{ url('#) }}" class="nav-link">
           <i class="link-icon" data-feather="bar-chart"></i>
           <span class="link-title">Accounting</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['apps/calendar']) }}">
-        <a href="{{ url('/apps/calendar') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="file"></i>
           <span class="link-title">Invoices</span>
         </a>
@@ -96,20 +96,20 @@
       </li>
       <li class="nav-item nav-category">Operational</li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="tool"></i>
           <span class="link-title">Manufacture</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="truck"></i>
           <span class="link-title">Delivery Sistem</span>
         </a>
       </li>
       <li class="nav-item nav-category">HC & Sustain</li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="users"></i>
           <span class="link-title">Employee</span>
         </a>
@@ -121,13 +121,13 @@
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/#') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="file-text"></i>
           <span class="link-title">FPTK</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/#') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="user-check"></i>
           <span class="link-title">HRIS</span>
         </a>
@@ -165,13 +165,13 @@
       </li>
       <li class="nav-item nav-category">Maintenance</li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/#') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="briefcase"></i>
           <span class="link-title">Maintenance History</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="check"></i>
           <span class="link-title">Assets</span>
         </a>
@@ -185,19 +185,19 @@
       </li>
       <li class="nav-item nav-category">Apps Settings</li>
       <li class="nav-item">
-        <a href="https://www.nobleui.com/laravel/documentation/docs.html" target="_blank" class="nav-link">
+        <a href="#" target="_blank" class="nav-link">
           <i class="link-icon" data-feather="hash"></i>
           <span class="link-title">Documentation</span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="https://www.nobleui.com/laravel/documentation/docs.html" target="_blank" class="nav-link">
+        <a href="#" target="_blank" class="nav-link">
           <i class="link-icon" data-feather="hash"></i>
           <span class="link-title">Apps Settings</span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="https://www.nobleui.com/laravel/documentation/docs.html" target="_blank" class="nav-link">
+        <a href="#" target="_blank" class="nav-link">
           <i class="link-icon" data-feather="hash"></i>
           <span class="link-title">Users</span>
         </a>

@@ -121,19 +121,19 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Address</label>
-                            <input type="text" name="address" class="form-control" placeholder="Address"> 
+                            <input type="text" name="address" class="form-control" placeholder="Address" required> 
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="exampleInputUsername1" class="form-label">City</label>
-                            <input type="text" name="city" class="form-control" placeholder="City">
+                            <input type="text" name="city" class="form-control" placeholder="City" required>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="exampleInputUsername1" class="form-label">State</label>
-                            <input type="text" name="state" class="form-control" placeholder="State">
+                            <input type="text" name="state" class="form-control" placeholder="State" required>
                         </div>
                     </div>
                 </div>
@@ -141,19 +141,19 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" placeholder="Email">
+                            <input type="email" name="email" class="form-control" placeholder="Email" required>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Phone</label>
-                            <input type="number" name="phone" class="form-control" placeholder="Phone">
+                            <input type="number" name="phone" class="form-control" placeholder="Phone" required>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Mobile</label>
-                            <input type="number" name="mobile" class="form-control" placeholder="Mobile">
+                            <input type="number" name="mobile" class="form-control" placeholder="Mobile" required>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -166,6 +166,50 @@
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Tags</label>
                             <input type="text" name="tags" class="form-control" placeholder="Tags">
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">Accounting</h5>
+                    <hr>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Account Receivable</label>
+                            <select name="account_receive" id="" class="form-control" required>
+                                @foreach($coa as $coadata)
+                                <option value="{{$coadata->id}}">{{$coadata->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Account Payable</label>
+                            <select name="account_pay" id="" class="form-control" required>
+                                @foreach($coa as $coadata)
+                                    <option value="{{$coadata->id}}">{{$coadata->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">Bank Information</h5>
+                    <hr>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Bank</label>
+                            <input type="text" class="form-control" name="bank" placeholder="BCA">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Bank Account Name</label>
+                            <input type="text" class="form-control" name="bank_name" placeholder="Account Name">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Bank Account Number</label>
+                            <input type="number" class="form-control" name="bank_number" placeholder="0029XXXXX">
                         </div>
                     </div>
                 </div>

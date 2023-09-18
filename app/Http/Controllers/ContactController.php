@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\ContactM;
+use App\CoaM;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -17,7 +18,8 @@ class ContactController extends Controller
     public function index()
     {
         $contact = ContactM::all();
-        return view ('pages.contact.index', compact('contact'));
+        $coa = CoaM::all();
+        return view ('pages.contact.index', compact('contact','coa'));
     }
 
     /**
@@ -58,6 +60,11 @@ class ContactController extends Controller
         $contact->mobile = $request->input('mobile');
         $contact->website = $request->input('website');
         $contact->tags = $request->input('tags');
+        $contact->bank = $request->input('bank');
+        $contact->bank_name = $request->input('bank_name');
+        $contact->bank_number = $request->input('bank_number');
+        $contact->account_pay = $request->input('account_pay');
+        $contact->account_receive = $request->input('account_receive');
         $contact->save();
 
         return redirect()->route('contact.index')->with('success', 'Contact Successfully Added');

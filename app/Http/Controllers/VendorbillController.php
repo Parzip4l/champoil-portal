@@ -8,6 +8,7 @@ use App\Purchase;
 use App\ContactM;
 use App\Product;
 use App\UserActivities;
+use App\JournalItem;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Validator;
@@ -184,6 +185,48 @@ class VendorbillController extends Controller
             $userActivity->new_values = json_encode($inputData);
 
             $userActivity->save();
+
+            $totalSubtotal = 0;
+
+        $purchaseDetails = json_decode($request->purchase_details, true);
+        foreach ($purchaseDetails as $item) {
+            $totalSubtotal += $item['subtotal'];
+            $taxData = $item['tax'];
+            $productNameData = $item['name'];
+
+            // Generate UUID for credit entry
+            $uuidcredit = Str::uuid()->toString();
+            $creditEntry = new JournalItem();
+            $creditEntry->id = $uuidcredit;
+            $creditEntry->journal = 'Vendor Bills';
+            $creditEntry->journal_entry = $uuid;
+            $creditEntry->account = '';
+            $creditEntry->partner = $request->vendor;
+            $creditEntry->label = $request->code;
+            $creditEntry->debit = '0';
+            $creditEntry->credit = $item['subtotal']; // Credit amount for this product
+            $creditEntry->tax = $taxData;
+            $creditEntry->product = $productNameData;
+            $creditEntry->balance = -$totalSubtotal; // Balance for this entry
+            $creditEntry->save();
+
+            // Generate UUID for debit entry
+            $uuiddebit = Str::uuid()->toString();
+            $debitEntry = new JournalItem();
+            $debitEntry->id = $uuiddebit;
+            $debitEntry->journal = 'Vendor Bills';
+            $debitEntry->journal_entry = $uuid;
+            $debitEntry->account = '';
+            $debitEntry->partner = $request->vendor;
+            $debitEntry->label = $request->code;
+            $debitEntry->debit = $item['subtotal']; // Debit amount for this product
+            $debitEntry->credit = '0';
+            $debitEntry->tax = $taxData;
+            $debitEntry->product = $productNameData;
+            $debitEntry->balance = $totalSubtotal; // Balance for this entry
+            $debitEntry->save();
+        }
+
     
             return redirect()->route('vendor-bills.index')->with('success', 'Vendor Bills Succesfully Created.');
         } catch (\Exception $e) {

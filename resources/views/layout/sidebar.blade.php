@@ -37,7 +37,7 @@
           <span class="link-title">Contacts</span>
         </a>
       </li>
-      <li class="nav-item {{ active_class(['apps/calendar']) }}">
+      <li class="nav-item {{ active_class(['']) }}">
         <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="target"></i>
           <span class="link-title">Target</span>
@@ -45,12 +45,12 @@
       </li>
       <li class="nav-item nav-category">Accounting</li>
       <li class="nav-item {{ active_class(['apps/chat']) }}">
-        <a href="{{ url('#) }}" class="nav-link">
+        <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="bar-chart"></i>
           <span class="link-title">Accounting</span>
         </a>
       </li>
-      <li class="nav-item {{ active_class(['apps/calendar']) }}">
+      <li class="nav-item {{ active_class(['#']) }}">
         <a href="{{ url('#') }}" class="nav-link">
           <i class="link-icon" data-feather="file"></i>
           <span class="link-title">Invoices</span>
@@ -96,38 +96,38 @@
       </li>
       <li class="nav-item nav-category">Operational</li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+        <a href="{{ url('/#') }}" class="nav-link">
           <i class="link-icon" data-feather="tool"></i>
           <span class="link-title">Manufacture</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+        <a href="{{ url('/#') }}" class="nav-link">
           <i class="link-icon" data-feather="truck"></i>
           <span class="link-title">Delivery Sistem</span>
         </a>
       </li>
       <li class="nav-item nav-category">HC & Sustain</li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+        <a href="{{ url('/#') }}" class="nav-link">
           <i class="link-icon" data-feather="users"></i>
           <span class="link-title">Employee</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+        <a href="{{ url('/#') }}" class="nav-link">
           <i class="link-icon" data-feather="folder"></i>
           <span class="link-title">Document Controls</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+        <a href="{{ url('/#') }}" class="nav-link">
           <i class="link-icon" data-feather="file-text"></i>
           <span class="link-title">FPTK</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+        <a href="{{ url('/#') }}" class="nav-link">
           <i class="link-icon" data-feather="user-check"></i>
           <span class="link-title">HRIS</span>
         </a>

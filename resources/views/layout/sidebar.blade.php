@@ -14,7 +14,7 @@
       <li class="nav-item nav-category">Main</li>
       <li class="nav-item {{ active_class(['/dashboard']) }}">
         <a href="{{ url('/dashboard') }}" class="nav-link">
-          <i class="link-icon" data-feather="box"></i>
+          <i class="link-icon" data-feather="pie-chart"></i>
           <span class="link-title">Dashboard</span>
         </a>
       </li>
@@ -46,25 +46,25 @@
       <li class="nav-item nav-category">Accounting</li>
       <li class="nav-item {{ active_class(['apps/chat']) }}">
         <a href="{{ url('/apps/chat') }}" class="nav-link">
-          <i class="link-icon" data-feather="message-square"></i>
+          <i class="link-icon" data-feather="bar-chart"></i>
           <span class="link-title">Accounting</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['apps/calendar']) }}">
         <a href="{{ url('/apps/calendar') }}" class="nav-link">
-          <i class="link-icon" data-feather="calendar"></i>
+          <i class="link-icon" data-feather="file"></i>
           <span class="link-title">Invoices</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['vendor-bills']) }}">
         <a href="{{ url('/vendor-bills') }}" class="nav-link">
-          <i class="link-icon" data-feather="calendar"></i>
+          <i class="link-icon" data-feather="link"></i>
           <span class="link-title">Vendor Bills</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['coa']) }}">
         <a class="nav-link" data-bs-toggle="collapse" href="#coacomponent" role="button" aria-expanded="{{ is_active_route(['coa']) }}" aria-controls="coacomponent">
-          <i class="link-icon" data-feather="file-text"></i>
+          <i class="link-icon" data-feather="settings"></i>
           <span class="link-title">Settings</span>
           <i class="link-arrow" data-feather="chevron-down"></i>
         </a>
@@ -88,19 +88,22 @@
             <li class="nav-item">
               <a href="{{ url('journal') }}" class="nav-link {{ active_class(['journal']) }}">Journal</a>
             </li>
+            <li class="nav-item">
+              <a href="{{ url('journal-item') }}" class="nav-link {{ active_class(['journal-item']) }}">Journal Item</a>
+            </li>
           </ul>
         </div>
       </li>
       <li class="nav-item nav-category">Operational</li>
       <li class="nav-item {{ active_class(['']) }}">
         <a href="{{ url('/growth') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+          <i class="link-icon" data-feather="tool"></i>
           <span class="link-title">Manufacture</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
         <a href="{{ url('/growth') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+          <i class="link-icon" data-feather="truck"></i>
           <span class="link-title">Delivery Sistem</span>
         </a>
       </li>
@@ -112,28 +115,34 @@
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+        <a href="{{ url('#') }}" class="nav-link">
+          <i class="link-icon" data-feather="folder"></i>
           <span class="link-title">Document Controls</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+        <a href="{{ url('/#') }}" class="nav-link">
+          <i class="link-icon" data-feather="file-text"></i>
           <span class="link-title">FPTK</span>
+        </a>
+      </li>
+      <li class="nav-item {{ active_class(['']) }}">
+        <a href="{{ url('/#') }}" class="nav-link">
+          <i class="link-icon" data-feather="user-check"></i>
+          <span class="link-title">HRIS</span>
         </a>
       </li>
       
       <li class="nav-item nav-category">Warehouse Management</li>
       <li class="nav-item {{ active_class(['inventory-product']) }}">
         <a href="{{ url('/inventory-product') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+          <i class="link-icon" data-feather="package"></i>
           <span class="link-title">Inventory</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
         <a class="nav-link" data-bs-toggle="collapse" href="#productcategory" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="productcategory">
-          <i class="link-icon" data-feather="file-text"></i>
+          <i class="link-icon" data-feather="settings"></i>
           <span class="link-title">Settings</span>
           <i class="link-arrow" data-feather="chevron-down"></i>
         </a>
@@ -156,21 +165,21 @@
       </li>
       <li class="nav-item nav-category">Maintenance</li>
       <li class="nav-item {{ active_class(['']) }}">
-        <a href="{{ url('/growth') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+        <a href="{{ url('/#') }}" class="nav-link">
+          <i class="link-icon" data-feather="briefcase"></i>
           <span class="link-title">Maintenance History</span>
         </a>
       </li>
       <li class="nav-item {{ active_class(['']) }}">
         <a href="{{ url('/growth') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+          <i class="link-icon" data-feather="check"></i>
           <span class="link-title">Assets</span>
         </a>
       </li>
       <li class="nav-item nav-category">Purchasing</li>
       <li class="nav-item {{ active_class(['purchase']) }}">
         <a href="{{ url('/purchase') }}" class="nav-link">
-          <i class="link-icon" data-feather="users"></i>
+          <i class="link-icon" data-feather="credit-card"></i>
           <span class="link-title">Purchase</span>
         </a>
       </li>

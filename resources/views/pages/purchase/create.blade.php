@@ -75,6 +75,7 @@
                 <th>Unit Price</th>
                 <th>Quantity</th>
                 <th>UOM</th>
+                <th>Category</th>
                 <th>Taxes</th>
                 <th>Aksi</th>
             </tr>
@@ -113,18 +114,22 @@
                     <select name="product[]" class="js-example-basic-single form-select product-select">
                         <option value="">Select Product</option>
                         @foreach($product2 as $product)
-                            <option value="{{ $product->id }}" data-purchase-uom="{{ $product->purchase_uom }}">{{ $product->name }}</option>
+                            <option value="{{ $product->id }}" data-purchase-uom="{{ $product->purchase_uom }}" data-purchase-categories="{{ $product->category }}">{{ $product->name }}</option>
                         @endforeach
                     </select>
+                    <input type="hidden" name="product_categories[]" class="product-categories">
                 </td>
                 <td>
                     <input type="number" name="unit_price[]" placeholder="Unit Price" class="form-control">
                 </td>
                 <td>
-                    <input type="number" name="quantity[]" placeholder="Quantity" class="form-control">
+                    <input type="number" name="quantity[]" placeholder="Quantity" class="form-control">  
                 </td>
                 <td class="purchase-uom-td">
                     <!-- Ini adalah tempat di mana Purchase UOM akan ditampilkan -->
+                </td>
+                <td class="product-categories-td">
+                    <!-- Ini adalah tempat di mana Product Categories akan ditampilkan -->
                 </td>
                 <td>
                     <select name="tax[]" class="js-example-basic-single form-select">
@@ -140,6 +145,8 @@
             </tr>
         `;
         document.querySelector('#productTable tbody').insertAdjacentHTML('beforeend', newRow);
+
+        updateProductCategory(document.querySelector('#productTable tbody').lastElementChild.querySelector('.product-select'));
     }
 
     function removeProductRow(button) {
@@ -166,7 +173,23 @@
         }
     });
 
+    function updateProductCategory(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        const productCategoryTd = select.closest('tr').querySelector('.product-categories-td');
+
+        // Reset isi kolom Product Categories
+        productCategoryTd.textContent = '';
+
+        // Cek apakah produk dipilih
+        if (selectedOption) {
+            const productCategories = selectedOption.getAttribute('data-purchase-categories');
+            productCategoryTd.textContent = productCategories;
+        }
+    }
+
     document.getElementById('addProduct').addEventListener('click', addProductRow);
+
+
 </script>
 @endpush
 

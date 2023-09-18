@@ -56,6 +56,8 @@ Route::middleware(['auth', 'permission:inventory_access'])->group(function () {
 
 // Top
 Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentController::class);
+// Journal Item
+Route::resource('journal-item', App\Http\Controllers\Journal\JournalItemsController::class);
 // Growth
 Route::resource('growth', GrowthController::class);
 // Contact

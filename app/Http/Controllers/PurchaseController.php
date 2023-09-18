@@ -211,6 +211,7 @@ class PurchaseController extends Controller
                 $product_id = $request->product[$i];
                 $unit_price = $request->unit_price[$i];
                 $quantity = $request->quantity[$i];
+                $category = $request->product_categories[$i];
                 $tax = $request->tax[$i];
                 // Hitung subtotal
                 $subtotal = ($unit_price * $quantity) * (1 + $tax);
@@ -221,6 +222,7 @@ class PurchaseController extends Controller
                     'unit_price' => $unit_price,
                     'quantity' => $quantity,
                     'tax' => $tax,
+                    'category' => $category,
                     'subtotal' => $subtotal,
                 ];
     

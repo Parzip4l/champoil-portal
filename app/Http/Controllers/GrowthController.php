@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\GrowthM;
+use App\UserActivities;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class GrowthController extends Controller
 {
@@ -17,7 +21,24 @@ class GrowthController extends Controller
     public function index()
     {
         $team = GrowthM::all();
-        return view('pages.growth.index', compact('team'));
+        $latestRecord = GrowthM::latest()->first();
+
+        $nextCodeNumber = 1;
+
+        if ($latestRecord) {
+            // Jika ada entri terbaru, ambil nomor urut dari kode terbaru, tambahkan 1
+            $latestCode = $latestRecord->team_code;
+            $latestCodeParts = explode('-', $latestCode);
+            $nomorurut = end($latestCodeParts);
+            $nomorurut = ltrim($nomorurut, '0');
+            $lastCodeNumber = (int)$nomorurut;
+            $nextCodeNumber = $lastCodeNumber + 1;
+        }
+
+        // Format ulang nomor urut dengan panjang 5 digit
+        $formattedCodeNumber = str_pad($nextCodeNumber, 5, '0', STR_PAD_LEFT);
+        $generatedCode = "AM-CHMP-$formattedCodeNumber";
+        return view('pages.growth.index', compact('team', 'generatedCode'));
     }
 
     /**
@@ -39,31 +60,34 @@ class GrowthController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'namapemohon' => 'required',
-            'rw' => 'required',
-            'permasalahan' => 'required',
-            'urusan' => 'required',
-            'usulan' => 'required',
-            'lokasi' => 'required',
-            'dokumen_pendukung' => 'required|max:5048',
-            'status_pengajuan' => 'required'
+            'team_name' => 'required',
+            'team_code' => 'required'
         ]);
 
         $uuid = Str::uuid()->toString();
         
-        $sibangenan = new Sibangenan();
-        $sibangenan->id = $uuid;
-        $sibangenan->namapemohon = $request->input('namapemohon');
-        $sibangenan->rw = $request->input('rw');
-        $sibangenan->permasalahan = $request->input('permasalahan');
-        $sibangenan->urusan = $request->input('urusan');
-        $sibangenan->suburusan = $request->input('suburusan');
-        $sibangenan->usulan = $request->input('usulan');
-        $sibangenan->lokasi = $request->input('lokasi');
-        $sibangenan->status_pengajuan = $request->input('status_pengajuan');        
-        $sibangenan->save();
+        $growth = new GrowthM();
+        $growth->id = $uuid;
+        $growth->team_name = $request->input('team_name');
+        $growth->team_code = $request->input('team_code');       
+        $growth->save();
 
-        return redirect()->route('growth.index')->with('success', 'Pengajuan Berhasil Dibuat');
+        // User Activity
+        $inputData = $request->all();
+        $uuid2 = Str::uuid()->toString();
+
+        $userActivity = new UserActivities();
+        $userActivity->id = $uuid2;
+        $userActivity->modul = 'Growth_Team'; 
+        $userActivity->id_item_modul = $growth->id = $uuid;
+        $userActivity->username = Auth::user()->name; 
+        $userActivity->action = 'Created';
+        $userActivity->old_values = null; 
+        $userActivity->new_values = json_encode($inputData);
+
+        $userActivity->save();
+
+        return redirect()->route('growth.index')->with('success', 'Team Succesfully Created');
     }
 
     /**

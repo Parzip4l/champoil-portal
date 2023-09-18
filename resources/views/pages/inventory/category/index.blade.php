@@ -87,10 +87,16 @@
             <form class="forms-sample" action="{{ route('product-category.store') }}" method="POST" enctype="multipart/form-data"> 
                 @csrf 
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <label for="exampleInputUsername1" class="form-label">Name</label>
                             <input type="text" class="form-control" id="exampleInputUsername1" autocomplete="off" name="name" placeholder="Full Name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputUsername1" class="form-label">Short Code</label>
+                            <input type="text" class="form-control" id="exampleInputUsername1" autocomplete="off" name="short_code" placeholder="Eg; FNG" required>
                         </div>
                     </div>
                 </div>
@@ -101,7 +107,7 @@
                             <select name="income_account" id="" class="form-control" required>
                                 <option value="-">Select Category Account</option>
                                 @foreach($at as $dd)
-                                <option value="{{$dd->name}}">{{$dd->code}}-{{$dd->name}}</option>
+                                <option value="{{$dd->id}}">{{$dd->code}}-{{$dd->name}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -112,7 +118,54 @@
                             <select name="expanse_account" id="" class="form-control" required>
                                 <option value="-">Select Category Account</option>
                                 @foreach($at as $dd)
-                                <option value="{{$dd->name}}">{{$dd->code}}-{{$dd->name}}</option>
+                                <option value="{{$dd->id}}">{{$dd->code}}-{{$dd->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">ACCOUNT STOCK PROPERTIES</h5>
+                    <hr>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Stock Journal</label>
+                            <select name="journal" id="" class="form-control" required>
+                                <option value="-">Select Journal Account</option>
+                                @foreach($journal as $journal)
+                                <option value="{{$journal->id}}">{{$journal->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Stock Valuation Account</label>
+                            <select name="valuation_account" id="" class="form-control" required>
+                                <option value="-">Select Stock Valuation Account</option>
+                                @foreach($at as $dd)
+                                <option value="{{$dd->id}}">{{$dd->code}}-{{$dd->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Stock Output Account</label>
+                            <select name="output_account" id="" class="form-control" required>
+                                <option value="-">Select Stock Output Account</option>
+                                @foreach($at as $dd)
+                                <option value="{{$dd->id}}">{{$dd->code}}-{{$dd->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Stock Input Account</label>
+                            <select name="input_account" id="" class="form-control" required>
+                                <option value="-">Select Stock Input Account</option>
+                                @foreach($at as $dd)
+                                <option value="{{$dd->id}}">{{$dd->code}}-{{$dd->name}}</option>
                                 @endforeach
                             </select>
                         </div>

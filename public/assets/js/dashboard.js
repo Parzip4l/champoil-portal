@@ -534,7 +534,7 @@ $(function() {
       stroke: {
         lineCap: "round",
       },
-      labels: ["Storage Used"]
+      labels: ["Sales Data"]
     };
     
     var chart = new ApexCharts(document.querySelector("#storageChart"), options);

@@ -5,6 +5,13 @@ namespace App\Http\Controllers\Journal;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\JournalItem;
+use App\CoaM;
+use App\ContactM;
+use App\Journal;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class JournalItemsController extends Controller
 {
@@ -15,7 +22,22 @@ class JournalItemsController extends Controller
      */
     public function index()
     {
-        $journal = JournalItem::all();
+        $query = DB::table('journal_item')
+            ->join('contact', 'journal_item.partner', '=', 'contact.id')
+            ->join('coa', 'journal_item.account', '=', 'coa.id')
+            ->select(
+                'journal_item.*',
+                'contact.name as partnername',
+                'coa.name as accountname'
+            )
+            ->get();
+
+        if (!$query) {
+            // Handle when the product with the given ID is not found
+            abort(404);
+        }
+
+        $journal = $query;
         return view('pages.accounting.journal.journal-item',compact('journal'));
     }
 

@@ -54,6 +54,10 @@ Route::middleware(['auth', 'permission:inventory_access'])->group(function () {
     
 });
 
+
+// Purchase Daily
+Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
+
 // Top
 Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentController::class);
 // Journal Item

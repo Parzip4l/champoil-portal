@@ -102,32 +102,29 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-baseline">
-              <h6 class="card-title mb-0">Growth</h6>
+              <h6 class="card-title mb-0" id="purchaseTitle">Purchase</h6>
               <div class="dropdown mb-2">
                 <button class="btn btn-link p-0" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
                   <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View</span></a>
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span></a>
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="printer" class="icon-sm me-2"></i> <span class="">Print</span></a>
                   <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="download" class="icon-sm me-2"></i> <span class="">Download</span></a>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-6 col-md-12 col-xl-5">
-                <h3 class="mb-2">89.87%</h3>
+                <h3 class="mb-2">Rp. {{number_format($totalPembelianBulanIni, 0,',','.')}}</h3>
                 <div class="d-flex align-items-baseline">
-                  <p class="text-success">
-                    <span>+2.8%</span>
-                    <i data-feather="arrow-up" class="icon-sm mb-1"></i>
+                  <p class="{{$textClass}}">
+                    <span>{{ number_format($percentageChange, 2) }}%</span>
+                    <i data-feather="{{$arrowIcon}}" class="icon-sm mb-1"></i>
                   </p>
                 </div>
               </div>
               <div class="col-6 col-md-12 col-xl-7">
-                <div id="growthChart" class="mt-md-3 mt-xl-0"></div>
+                <div id="PurchaseChart" class="mt-md-3 mt-xl-0"></div>
               </div>
             </div>
           </div>
@@ -222,18 +219,18 @@
           <div class="col-6 d-flex justify-content-end">
             <div>
               <label class="d-flex align-items-center justify-content-end tx-10 text-uppercase fw-bolder">Total Sales <span class="p-1 ms-1 rounded-circle bg-secondary"></span></label>
-              <h5 class="fw-bolder mb-0 text-end">8TB</h5>
+              <h5 class="fw-bolder mb-0 text-end">100%</h5>
             </div>
           </div>
           <div class="col-6">
             <div>
-              <label class="d-flex align-items-center tx-10 text-uppercase fw-bolder"><span class="p-1 me-1 rounded-circle bg-primary"></span> Used storage</label>
-              <h5 class="fw-bolder mb-0">~5TB</h5>
+              <label class="d-flex align-items-center tx-10 text-uppercase fw-bolder"><span class="p-1 me-1 rounded-circle bg-primary"></span> Sales Now</label>
+              <h5 class="fw-bolder mb-0">67%</h5>
             </div>
           </div>
         </div>
         <div class="d-grid">
-          <button class="btn btn-primary">Upgrade storage</button>
+          <button class="btn btn-primary">View Sales Detail</button>
         </div>
       </div>
     </div>
@@ -248,4 +245,65 @@
 
 @push('custom-scripts')
   <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+  <script>
+    var salesData = {!! json_encode($salesData) !!};
+    var salesDates = salesData.map(item => item.date);
+    var salesValues = salesData.map(item => item.total_sales);
+    var primary = "#6571ff";
+
+    var options3 = {
+        chart: {
+            type: "line",
+            height: 60,
+            sparkline: {
+                enabled: true
+            }
+        },
+        series: [{
+            name: '',
+            data: salesValues
+        }],
+        xaxis: {
+            type: 'datetime',
+            categories: salesDates
+        },
+        stroke: {
+            width: 2,
+            curve: "smooth"
+        },
+        markers: {
+            size: 0
+        },
+        colors: [primary],
+        tooltip: {
+          enabled: true,
+        custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+            var formattedDate = new Date(salesDates[dataPointIndex]).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            var formattedValue = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(parseFloat(series[seriesIndex][dataPointIndex]));
+
+            return '<div class="tooltip">' +
+                '<div class="date">' + formattedDate + '</div>' +
+                '<div class="value">' + formattedValue + '</div>' +
+                '</div>';
+        }
+    }
+    };
+    new ApexCharts(document.querySelector("#PurchaseChart"), options3).render();
+</script>
+
+<script>
+    // Get Bulan
+    var currentMonth = new Date().toLocaleString('default', { month: 'long' });
+
+    // Ganti Text
+    document.getElementById('purchaseTitle').innerText = 'Purchase ' + currentMonth;
+</script>
+<style>
+  div.apexcharts-canvas .apexcharts-tooltip * {
+    opacity: 1!important;
+  }
+</style>
 @endpush

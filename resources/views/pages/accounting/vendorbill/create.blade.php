@@ -68,7 +68,8 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="code" class="form-label">Vendor Name</label>
-                                <input type="text" class="form-control" name="vendor" value="{{$vendor->name}}" readonly required>
+                                <input type="text" class="form-control" value="{{$vendor->name}}" readonly required>
+                                <input type="hidden" class="form-control" name="vendor" value="{{$vendor->id}}" readonly required>
                             </div>
                         </div>
                         <div class="col-md-6">

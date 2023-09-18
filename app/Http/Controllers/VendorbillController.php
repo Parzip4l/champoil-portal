@@ -7,6 +7,7 @@ use App\VendorBill;
 use App\Purchase;
 use App\ContactM;
 use App\Product;
+use App\Productcategory;
 use App\UserActivities;
 use App\JournalItem;
 use Illuminate\Support\Str;
@@ -73,6 +74,7 @@ class VendorbillController extends Controller
                 $quantity = $detail['quantity'];
                 $unit_price = $detail['unit_price'];
                 $tax = $detail['tax'];
+                $category = $detail['category'];
                 $subtotal = $detail['subtotal'];
 
         
@@ -86,6 +88,7 @@ class VendorbillController extends Controller
                         'quantity' => $quantity,
                         'tax' => $tax,
                         'unit_price' => $unit_price,
+                        'category' => $category,
                         'subtotal' => $subtotal,
                     ];
                 } else {
@@ -172,6 +175,10 @@ class VendorbillController extends Controller
             
             $bills->save();
 
+            // Get Data Account Item Vendor 
+            
+
+
             $inputData = $request->all();
             $uuid2 = Str::uuid()->toString();
 
@@ -193,30 +200,40 @@ class VendorbillController extends Controller
             $totalSubtotal += $item['subtotal'];
             $taxData = $item['tax'];
             $productNameData = $item['name'];
+            $productCategories = $item['category'];
 
-            // Generate UUID for credit entry
-            $uuidcredit = Str::uuid()->toString();
-            $creditEntry = new JournalItem();
-            $creditEntry->id = $uuidcredit;
-            $creditEntry->journal = 'Vendor Bills';
-            $creditEntry->journal_entry = $uuid;
-            $creditEntry->account = '';
-            $creditEntry->partner = $request->vendor;
-            $creditEntry->label = $request->code;
-            $creditEntry->debit = '0';
-            $creditEntry->credit = $item['subtotal']; // Credit amount for this product
-            $creditEntry->tax = $taxData;
-            $creditEntry->product = $productNameData;
-            $creditEntry->balance = -$totalSubtotal; // Balance for this entry
-            $creditEntry->save();
+            $productCategory = Productcategory::where('id', $productCategories)->first();
+            if ($productCategory) {
+                $vendorData = $request->vendor;
+                $AccountData = ContactM::where('id', $vendorData)->first();
+                $accountPay = $AccountData->account_pay;
+
+                $inputAccount = $productCategory->input_account;
+                $JournalAccount = $productCategory->journal;
+                // Generate UUID for credit entry
+                $uuidcredit = Str::uuid()->toString();
+                $creditEntry = new JournalItem();
+                $creditEntry->id = $uuidcredit;
+                $creditEntry->journal = $JournalAccount;
+                $creditEntry->journal_entry = $uuid;
+                $creditEntry->account = $accountPay;
+                $creditEntry->partner = $request->vendor;
+                $creditEntry->label = $request->code;
+                $creditEntry->debit = '0';
+                $creditEntry->credit = $item['subtotal']; // Credit amount for this product
+                $creditEntry->tax = $taxData;
+                $creditEntry->product = $productNameData;
+                $creditEntry->balance = -$totalSubtotal; // Balance for this entry
+                $creditEntry->save();
+            }
 
             // Generate UUID for debit entry
             $uuiddebit = Str::uuid()->toString();
             $debitEntry = new JournalItem();
             $debitEntry->id = $uuiddebit;
-            $debitEntry->journal = 'Vendor Bills';
+            $debitEntry->journal = $JournalAccount;
             $debitEntry->journal_entry = $uuid;
-            $debitEntry->account = '';
+            $debitEntry->account = $inputAccount;
             $debitEntry->partner = $request->vendor;
             $debitEntry->label = $request->code;
             $debitEntry->debit = $item['subtotal']; // Debit amount for this product

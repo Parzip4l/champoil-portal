@@ -75,7 +75,7 @@
                 <th>Unit Price</th>
                 <th>Quantity</th>
                 <th>UOM</th>
-                <th>Category</th>
+                <th class="categories">Category</th>
                 <th>Taxes</th>
                 <th>Aksi</th>
             </tr>
@@ -117,7 +117,6 @@
                             <option value="{{ $product->id }}" data-purchase-uom="{{ $product->purchase_uom }}" data-purchase-categories="{{ $product->category }}">{{ $product->name }}</option>
                         @endforeach
                     </select>
-                    <input type="hidden" name="product_categories[]" class="product-categories">
                 </td>
                 <td>
                     <input type="number" name="unit_price[]" placeholder="Unit Price" class="form-control">
@@ -174,23 +173,41 @@
     });
 
     function updateProductCategory(select) {
-        const selectedOption = select.options[select.selectedIndex];
-        const productCategoryTd = select.closest('tr').querySelector('.product-categories-td');
+    const selectedOption = select.options[select.selectedIndex];
+    const productCategoryTd = select.closest('tr').querySelector('.product-categories-td');
 
-        // Reset isi kolom Product Categories
-        productCategoryTd.textContent = '';
+    // Reset isi kolom Product Categories
+    productCategoryTd.textContent = '';
 
-        // Cek apakah produk dipilih
-        if (selectedOption) {
-            const productCategories = selectedOption.getAttribute('data-purchase-categories');
-            productCategoryTd.textContent = productCategories;
-        }
+    // Cek apakah produk dipilih
+    if (selectedOption) {
+        const productCategories = selectedOption.getAttribute('data-purchase-categories');
+
+        // Buat elemen input
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.name = 'product_categories[]';
+        inputElement.value = productCategories;
+
+        // Tambahkan elemen input ke dalam kolom Product Categories
+        productCategoryTd.appendChild(inputElement);
     }
+}
 
+$(document).on('change', '.product-select', function () {
+    updateProductCategory(this);
+});
     document.getElementById('addProduct').addEventListener('click', addProductRow);
-
-
 </script>
+
+<style>
+    td.product-categories-td {
+        display : none;
+    }
+    th.categories {
+    display: none;
+}
+</style>
 @endpush
 
 @push('plugin-scripts')

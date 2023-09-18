@@ -44,8 +44,8 @@
                 <tr>
                     <td> {{ \Carbon\Carbon::parse($data->created_at)->format('d F Y') }} </td>
                     <td> <a href="{{ route('vendor-bills.show', $data->journal_entry) }}">{{ $data->label }}</a></td>
-                    <td> {{ $data->account }} </td>
-                    <td> {{ $data->partner }} </td>
+                    <td> {{ $data->accountname }} </td>
+                    <td> {{ $data->partnername }} </td>
                     <td> {{ $data->label }} </td>
                     <td> Rp. {{ number_format($data->debit, 0, '.', '.') }} </td>
                     <td> Rp. {{ number_format($data->credit, 0, '.', '.') }} </td>

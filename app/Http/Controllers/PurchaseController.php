@@ -9,6 +9,7 @@ use App\Product;
 use App\ContactM;
 use App\WarehouseLoc;
 use App\Tax;
+use App\AnalyticsAccount;
 use App\ProductHistory;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,6 +47,7 @@ class PurchaseController extends Controller
         $product2 = Product::all();
         $tax = Tax::all();
         $tax2 = Tax::all();
+        $accountAnalytics = AnalyticsAccount::all();
 
         $currentYear = now()->year;
         $currentMonth = now()->format('m');
@@ -75,7 +77,7 @@ class PurchaseController extends Controller
         // Buat kode PO dengan format yang sesuai
         $purchaseCode = "PO-IDGM-$currentYear-$currentMonth-$formattedCodeNumber";
 
-        return view('pages.purchase.create',compact('contact','warehouse','product','product2','tax','tax2','purchaseCode'));
+        return view('pages.purchase.create',compact('contact','warehouse','product','product2','tax','tax2','purchaseCode','accountAnalytics'));
     }
 
     public function sendToSlack(Purchase $purchase)
@@ -213,6 +215,7 @@ class PurchaseController extends Controller
                 $quantity = $request->quantity[$i];
                 $category = $request->product_categories[$i];
                 $tax = $request->tax[$i];
+                $analytics = $request->analytics[$i];
                 // Hitung subtotal
                 $subtotal = ($unit_price * $quantity) * (1 + $tax);
                 
@@ -224,6 +227,7 @@ class PurchaseController extends Controller
                     'tax' => $tax,
                     'category' => $category,
                     'subtotal' => $subtotal,
+                    'analytics' => $analytics,
                 ];
     
                 $total += $subtotal;
@@ -255,6 +259,91 @@ class PurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+     public function receiveProductShow($id)
+    {
+        try {
+            // Temukan pembelian berdasarkan ID
+            $purchase = Purchase::find($id);
+
+            if (!$purchase) {
+                // Handle jika pembelian tidak ditemukan
+                return redirect()->route('purchase.index')->with('error', 'Purchase order not found.');
+            }
+
+            // Decode data pembelian menjadi array
+            $purchaseDetails = json_decode($purchase->data_product, true);
+
+            return view('pages.purchase.receive', compact('purchase', 'purchaseDetails'));
+        } catch (\Exception $e) {
+            // Tangani kesalahan yang mungkin terjadi
+            return redirect()->route('purchase.index')->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function partialReceive(Request $request, $id)
+{
+    try {
+        // Temukan pembelian berdasarkan ID
+        $purchase = Purchase::find($id);
+
+        if (!$purchase) {
+            // Handle jika pembelian tidak ditemukan
+            return redirect()->route('purchase.index')->with('error', 'Purchase order not found.');
+        }
+
+        // Decode data pembelian menjadi array
+        $purchaseDetails = json_decode($purchase->data_product, true);
+
+        foreach ($purchaseDetails as $detail) {
+            $product_id = $detail['product_id'];
+            $received_quantity = $request->input('received_quantity.' . $product_id, 0);
+
+            // Update stok inventaris
+            $inventory = Product::where('id', $product_id)->first();
+            if ($inventory) {
+                // Assuming 'onhand' is the column for stock quantity
+                $inventory->onhand += $received_quantity;
+                $inventory->save();
+            } else {
+                // Buat entri inventaris baru jika belum ada
+                $newInventory = new Inventory();
+                $newInventory->product_id = $product_id;
+                $newInventory->onhand = $received_quantity; // Adjust to your column name
+                $newInventory->save();
+            }
+
+            // Update sisa kuantitas pada detail pembelian
+            $detail['remaining_quantity'] = $detail['quantity'] - $received_quantity;
+
+            // Update status receipt product
+            $detail['receipt_status'] = $detail['remaining_quantity'] === 0 ? 'Received' : 'Partially Received';
+        }
+
+        // Tandai pembelian sebagai "Received" jika semua produk telah diterima
+        $allReceived = true;
+        foreach ($purchaseDetails as $detail) {
+            $product_id = $detail['product_id'];
+            $received_quantity = $request->input('received_quantity.' . $product_id, 0);
+
+            if ($received_quantity < $detail['quantity']) {
+                $allReceived = false;
+                break;
+            }
+        }
+
+        if ($allReceived) {
+            $purchase->status = 'Received';
+            $purchase->save();
+        }
+
+        return redirect()->route('purchase.index')->with('success', 'Purchase order has been received partially.');
+    } catch (\Exception $e) {
+        // Tangani kesalahan yang mungkin terjadi
+        return redirect()->route('purchase.index')->with('error', 'An error occurred while partially receiving the purchase order: ' . $e->getMessage());
+    }
+}
+
 
      public function receiveProduct($id)
      {

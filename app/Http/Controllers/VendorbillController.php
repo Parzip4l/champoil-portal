@@ -75,6 +75,7 @@ class VendorbillController extends Controller
                 $unit_price = $detail['unit_price'];
                 $tax = $detail['tax'];
                 $category = $detail['category'];
+                $analytics = $detail['analytics'];
                 $subtotal = $detail['subtotal'];
 
         
@@ -89,6 +90,7 @@ class VendorbillController extends Controller
                         'tax' => $tax,
                         'unit_price' => $unit_price,
                         'category' => $category,
+                        'analytics' => $analytics,
                         'subtotal' => $subtotal,
                     ];
                 } else {
@@ -156,6 +158,7 @@ class VendorbillController extends Controller
         }
 
         try {
+            DB::beginTransaction();
             // Simpan data pembelian
             $uuid = Str::uuid()->toString();
             $bills = new VendorBill();
@@ -201,6 +204,7 @@ class VendorbillController extends Controller
             $taxData = $item['tax'];
             $productNameData = $item['name'];
             $productCategories = $item['category'];
+            $productAnalytics = $item['analytics'];
 
             $productCategory = Productcategory::where('id', $productCategories)->first();
             if ($productCategory) {
@@ -223,30 +227,33 @@ class VendorbillController extends Controller
                 $creditEntry->credit = $item['subtotal']; // Credit amount for this product
                 $creditEntry->tax = $taxData;
                 $creditEntry->product = $productNameData;
+                $creditEntry->analytics = $productAnalytics;
                 $creditEntry->balance = -$totalSubtotal; // Balance for this entry
                 $creditEntry->save();
             }
 
-            // Generate UUID for debit entry
-            $uuiddebit = Str::uuid()->toString();
-            $debitEntry = new JournalItem();
-            $debitEntry->id = $uuiddebit;
-            $debitEntry->journal = $JournalAccount;
-            $debitEntry->journal_entry = $uuid;
-            $debitEntry->account = $inputAccount;
-            $debitEntry->partner = $request->vendor;
-            $debitEntry->label = $request->code;
-            $debitEntry->debit = $item['subtotal']; // Debit amount for this product
-            $debitEntry->credit = '0';
-            $debitEntry->tax = $taxData;
-            $debitEntry->product = $productNameData;
-            $debitEntry->balance = $totalSubtotal; // Balance for this entry
-            $debitEntry->save();
+                // Generate UUID for debit entry
+                $uuiddebit = Str::uuid()->toString();
+                $debitEntry = new JournalItem();
+                $debitEntry->id = $uuiddebit;
+                $debitEntry->journal = $JournalAccount;
+                $debitEntry->journal_entry = $uuid;
+                $debitEntry->account = $inputAccount;
+                $debitEntry->partner = $request->vendor;
+                $debitEntry->label = $request->code;
+                $debitEntry->debit = $item['subtotal']; // Debit amount for this product
+                $debitEntry->credit = '0';
+                $debitEntry->tax = $taxData;
+                $debitEntry->product = $productNameData;
+                $debitEntry->analytics = $productAnalytics;
+                $debitEntry->balance = $totalSubtotal; // Balance for this entry
+                $debitEntry->save();
         }
 
-    
+            DB::commit();
             return redirect()->route('vendor-bills.index')->with('success', 'Vendor Bills Succesfully Created.');
         } catch (\Exception $e) {
+            DB::rollback();
             // Tangani kesalahan yang mungkin terjadi
             return redirect()->back()->with('error', 'Error When Created Vendor Bills.' . $e->getMessage());
         }

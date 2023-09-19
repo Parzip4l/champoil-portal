@@ -144,6 +144,7 @@
                                                 <th>Quantity</th>
                                                 <th>UOM</th>
                                                 <th>Tax</th>
+                                                <th>Analytics</th>
                                                 <th>Subtotal</th>
                                             </tr>
                                         </thead>
@@ -155,6 +156,7 @@
                                                 <td>{{ $detail['quantity'] }}</td>
                                                 <td>{{ $detail['uom'] }}</td>
                                                 <td>{{ $detail['tax'] }}</td>
+                                                <td>{{ $detail['analytics'] }}</td>
                                                 <td>{{ $detail['subtotal'] }}</td>
                                             </tr>
                                             @endforeach

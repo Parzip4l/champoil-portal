@@ -53,6 +53,10 @@
                             <label for="" class="me-3">Delivery Date</label>
                             <p class="text-muted">{{ $sales->delivery_date }}</p>
                         </div>
+                        <div class="address mb-3 d-flex">
+                            <label for="" class="me-3">Payment Terms</label>
+                            <p class="text-muted">{{ $sales->payment_terms }}</p>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-2" style="text-align:right">
                         <div class="row">
@@ -64,7 +68,7 @@
                             @endif
                             </div>
                             <div class="col-md-4">
-                                <a href="{{ route('vendor-bills.create', ['purchase_id' => $sales->id]) }}" class="btn btn-primary w-100">Create Invoice</a>
+                                <a href="#" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#invoiceTypeModal">Create Invoice</a>
                             </div>
                             <div class="col-md-4">
                                 <form method="POST" action="{{ route('purchase.sendToSlack', ['purchase' => $sales->id]) }}">
@@ -118,6 +122,23 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for Invoice Type -->
+<div class="modal fade" id="invoiceTypeModal" tabindex="-1" aria-labelledby="invoiceTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="invoiceTypeModalLabel">Select Invoice Type</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button class="btn btn-primary w-100 mb-2" onclick="createRegularInvoice()">Regular Invoice</button>
+                <button class="btn btn-primary w-100 mb-2" onclick="createDpPercentageInvoice()">DP (Percentage)</button>
+                <button class="btn btn-primary w-100 mb-2" onclick="createDpFixedAmountInvoice()">DP (Fixed Amount)</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('plugin-scripts')
@@ -129,6 +150,22 @@
 @push('custom-scripts')
 <script src="{{ asset('assets/js/select2.js') }}"></script>
 <script src="{{ asset('assets/js/flatpickr.js') }}"></script>
+<script>
+    function createRegularInvoice() {
+        // Redirect to regular invoice creation page with necessary data
+        window.location.href = "{{ route('invoice.create', ['sales_id' => $sales->id]) }}";
+    }
+
+    function createDpPercentageInvoice() {
+        // Redirect to DP (Percentage) invoice creation page with necessary data
+        window.location.href = "{{ route('invoice.create', ['sales_id' => $sales->id, 'invoice_type' => 'dp_percentage']) }}";
+    }
+
+    function createDpFixedAmountInvoice() {
+        // Redirect to DP (Fixed Amount) invoice creation page with necessary data
+        window.location.href = "{{ route('invoice.create', ['sales_id' => $sales->id, 'invoice_type' => 'dp_fixed_amount']) }}";
+    }
+</script>
 <style>
     label.me-3 {
         width : 25%;

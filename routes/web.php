@@ -18,12 +18,12 @@ Route::resource('sales', SalesController::class);
 Route::resource('delivery-orders', DeliveryorderController::class);
 // Purchase
 Route::resource('purchase', PurchaseController::class);
-Route::get('purchase/receive/{id}', 'PurchaseController@receiveProduct')->name('purchase.receive');
+Route::get('purchase/receive/{id}', 'PurchaseController@receiveProductShow')->name('purchase.receive');
 // Send Purchase To Slack
 Route::post('/send-purchase-to-slack/{purchase}', 'PurchaseController@sendToSlack')->name('purchase.sendToSlack');
 // Payment Regist
 Route::resource('payment-regist', PaymentRegistController::class);
-Route::resource('journal', JournalController::class);
+Route::resource('journal', JournalController::class);   
 // Warehouse
 Route::resource('uom-categories', UomCategoryController::class);
 Route::resource('uom', UomController::class);
@@ -54,7 +54,16 @@ Route::middleware(['auth', 'permission:inventory_access'])->group(function () {
     
 });
 
+Route::post('/purchase/{id}/partial_receive', 'PurchaseController@partialReceive')->name('purchase.partial_receive');
 
+// Analytics Plans
+Route::resource('analytics-plans', App\Http\Controllers\Analytics\AnalyticsPlansController::class);
+
+// Analytics Account
+Route::resource('analytics-account', App\Http\Controllers\Analytics\AnalyticsAccountController::class);
+
+// Invoice
+Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
 // Purchase Daily
 Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
 

@@ -40,11 +40,11 @@
             <form method="post" action="{{ route('purchase.store') }}">
         @csrf
         <div class="form-group mb-3">
-            <label for="code">Kode:</label>
+            <label for="code" class="form-label">Code :</label>
             <input type="text" class="form-control" name="code" value="{{$purchaseCode}}"required>
         </div>
         <div class="form-group mb-3">
-            <label for="vendor">Vendor:</label>
+            <label for="vendor" class="form-label">Vendor :</label>
             <select name="vendor" class="form-control" id="">
                 @foreach($contact as $data)
                 <option value="{{$data->id}}">{{$data->name}}</option>
@@ -52,15 +52,15 @@
             </select>
         </div>
         <div class="form-group mb-3">
-            <label for="expected_arrival">Tiba Tanggal:</label>
+            <label for="expected_arrival" class="form-label">Estimate Arrival Date :</label>
             <div class="input-group flatpickr" id="flatpickr-date">
-                <input type="text" class="form-control" placeholder="Select date" name="expected_arrival" data-input>
+                <input type="text" class="form-control" placeholder="Select date" name="expected_arrival" data-input required>
                 <span class="input-group-text input-group-addon" data-toggle><i data-feather="calendar"></i></span>
                 <input type="hidden" class="form-control" name="status" value="OnDelivery" required>
             </div>
         </div>
         <div class="form-group mb-3">
-            <label for="warehouse">Gudang:</label>
+            <label for="warehouse" class="form-label">Warehouse :</label>
             <select name="warehouse" class="form-control" id="">
                 @foreach($warehouse as $data)
                 <option value="{{$data->id}}">{{$data->name}}</option>
@@ -75,6 +75,7 @@
                 <th>Unit Price</th>
                 <th>Quantity</th>
                 <th>UOM</th>
+                <th>Analytics</th>
                 <th class="categories">Category</th>
                 <th>Taxes</th>
                 <th>Aksi</th>
@@ -126,6 +127,14 @@
                 </td>
                 <td class="purchase-uom-td">
                     <!-- Ini adalah tempat di mana Purchase UOM akan ditampilkan -->
+                </td>
+                <td>
+                    <select name="analytics[]" class="js-example-basic-single form-select">
+                        <option value="">Select Analytics</option>
+                        @foreach($accountAnalytics as $account)
+                            <option value="{{ $account->id }}">{{ $account->name }}</option>
+                        @endforeach
+                    </select>  
                 </td>
                 <td class="product-categories-td">
                     <!-- Ini adalah tempat di mana Product Categories akan ditampilkan -->

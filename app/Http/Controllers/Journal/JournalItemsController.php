@@ -25,10 +25,12 @@ class JournalItemsController extends Controller
         $query = DB::table('journal_item')
             ->join('contact', 'journal_item.partner', '=', 'contact.id')
             ->join('coa', 'journal_item.account', '=', 'coa.id')
+            ->join('analytics_account', 'journal_item.analytics', '=', 'analytics_account.id')
             ->select(
                 'journal_item.*',
                 'contact.name as partnername',
-                'coa.name as accountname'
+                'coa.name as accountname',
+                'analytics_account.name as analyticsname',
             )
             ->get();
 

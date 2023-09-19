@@ -11,6 +11,7 @@ use App\Product;
 use App\Tax;
 use App\GrowthM;
 use App\ProductHistory;
+use App\Paymentterms;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Validator;
@@ -48,6 +49,7 @@ class SalesController extends Controller
         $tax = Tax::all();
         $tax2 = Tax::all();
         $salesteam = GrowthM::all();
+        $top = Paymentterms::all();
 
         $currentYear = now()->year;
         $currentMonth = now()->format('m');
@@ -80,7 +82,7 @@ class SalesController extends Controller
         // Tanggal Pembelian
         $orderdate = Carbon::now()->toDateString();
         return view('pages.sales.create',compact('purchaseCode','contact','warehouse','product','tax','product2','tax2','salesteam',
-        'orderdate'
+        'orderdate','top'
     ));
     }
 

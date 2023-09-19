@@ -101,8 +101,8 @@
                             <div class="form-group mb-3">
                                 <label for="vendor" class="form-label">Payment Terms :</label>
                                 <select name="payment_terms" class="form-control" id="">
-                                    @foreach($contact as $data)
-                                    <option value="{{$data->id}}">{{$data->name}}</option>
+                                    @foreach($top as $data)
+                                        <option value="{{$data->id}}">{{$data->name}}</option>
                                     @endforeach
                                 </select>
                             </div>

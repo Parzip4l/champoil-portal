@@ -53,7 +53,6 @@
                                 <label for="code" class="form-label">Vendor Bill</label>
                                 @php
                                     $existingBill = \App\VendorBill::where('code', $billCode)->first();
-                                    // Jika sudah ada, gunakan kode yang ada di database
                                     if ($existingBill) {
                                         $billCodeFromDatabase = $existingBill->code;
                                     } else {

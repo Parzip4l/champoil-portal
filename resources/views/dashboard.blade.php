@@ -67,32 +67,50 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-baseline">
-              <h6 class="card-title mb-0">New Orders</h6>
+              <h6 class="card-title mb-0" id="Orders">Orders</h6>
               <div class="dropdown mb-2">
                 <button class="btn btn-link p-0" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View</span></a>
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span></a>
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="printer" class="icon-sm me-2"></i> <span class="">Print</span></a>
+                  <a class="dropdown-item d-flex align-items-center" href="{{route('sales.index')}}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View</span></a>
                   <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="download" class="icon-sm me-2"></i> <span class="">Download</span></a>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-6 col-md-12 col-xl-5">
-                <h3 class="mb-2">35,084</h3>
+                <h4 class="mb-2">
+                    @php 
+                        function formatNumber($number) {
+                            $suffix = '';
+                            if ($number >= 1000000000000) {
+                                $number = $number / 1000000000000;
+                                $suffix = 'T';
+                            } elseif ($number >= 1000000000) {
+                                $number = $number / 1000000000;
+                                $suffix = 'B';
+                            } elseif ($number >= 1000000) {
+                                $number = $number / 1000000;
+                                $suffix = 'M';
+                            } elseif ($number >= 1000) {
+                                $number = $number / 1000;
+                                $suffix = 'K';
+                            }
+                            return number_format($number, 2, '.', ',') . $suffix;
+                        }
+                    @endphp
+                    {{ formatNumber($TotalSales) }}
+                </h4>
                 <div class="d-flex align-items-baseline">
-                  <p class="text-danger">
-                    <span>-2.8%</span>
-                    <i data-feather="arrow-down" class="icon-sm mb-1"></i>
+                  <p class="{{$textClass2}}">
+                    <span>{{ number_format($PersentaseSales, 2) }}%</span>
+                    <i data-feather="{{$arrowIcon2}}" class="icon-sm mb-1"></i>
                   </p>
                 </div>
               </div>
               <div class="col-6 col-md-12 col-xl-7">
-                <div id="ordersChart" class="mt-md-3 mt-xl-0"></div>
+                <div id="SalesChart" class="mt-md-3 mt-xl-0"></div>
               </div>
             </div>
           </div>
@@ -108,14 +126,16 @@
                   <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                  <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View</span></a>
+                  <a class="dropdown-item d-flex align-items-center" href="{{route('purchase.index')}}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View</span></a>
                   <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i data-feather="download" class="icon-sm me-2"></i> <span class="">Download</span></a>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-6 col-md-12 col-xl-5">
-                <h3 class="mb-2">Rp. {{number_format($totalPembelianBulanIni, 0,',','.')}}</h3>
+                <h4 class="mb-2">
+                    {{ formatNumber($totalPembelianBulanIni) }}
+                </h4>
                 <div class="d-flex align-items-baseline">
                   <p class="{{$textClass}}">
                     <span>{{ number_format($percentageChange, 2) }}%</span>
@@ -293,6 +313,54 @@
     };
     new ApexCharts(document.querySelector("#PurchaseChart"), options3).render();
 </script>
+<script>
+    var salesData2 = {!! json_encode($salesData2) !!};
+    var salesDates2 = salesData2.map(item => item.date2);
+    var salesValues2 = salesData2.map(item => item.total_sales2);
+    var primary = "#6571ff";
+
+    var options3 = {
+        chart: {
+            type: "bar",
+            height: 60,
+            sparkline: {
+                enabled: true
+            }
+        },
+        series: [{
+            name: '',
+            data: salesValues2
+        }],
+        xaxis: {
+            type: 'datetime',
+            categories: salesDates2
+        },
+        stroke: {
+            width: 2,
+            curve: "smooth"
+        },
+        markers: {
+            size: 0
+        },
+        colors: [primary],
+        tooltip: {
+          enabled: true,
+        custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+            var formattedDate = new Date(salesDates[dataPointIndex]).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            var formattedValue = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(parseFloat(series[seriesIndex][dataPointIndex]));
+
+            return '<div class="tooltip">' +
+                '<div class="date">' + formattedDate + '</div>' +
+                '<div class="value">' + formattedValue + '</div>' +
+                '</div>';
+        }
+    }
+    };
+    new ApexCharts(document.querySelector("#SalesChart"), options3).render();
+</script>
 
 <script>
     // Get Bulan
@@ -300,6 +368,7 @@
 
     // Ganti Text
     document.getElementById('purchaseTitle').innerText = 'Purchase ' + currentMonth;
+    document.getElementById('Orders').innerText = 'Orders ' + currentMonth;
 </script>
 <style>
   div.apexcharts-canvas .apexcharts-tooltip * {

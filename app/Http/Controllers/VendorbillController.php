@@ -179,8 +179,6 @@ class VendorbillController extends Controller
             $bills->save();
 
             // Get Data Account Item Vendor 
-            
-
 
             $inputData = $request->all();
             $uuid2 = Str::uuid()->toString();

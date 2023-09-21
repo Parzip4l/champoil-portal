@@ -41,13 +41,19 @@
             <tbody>
                 @foreach ($invoice as $data)
                 <tr>
-                    <td> {{ $data->code }} </td>
+                    <td> <a href="{{route('invoice.show', $data->id)}}">{{ $data->code }}</a></td>
                     <td> {{ $data->customer }} </td>
                     <td> {{ $data->invoice_date }} </td>
                     <td> {{ $data->due_date }} </td>
-                    <td> {{ $data->total }} </td>
-                    <td> {{ $data->payment_status }} </td>
-                    <td> {{ $data->invoice_status }} </td>
+                    <td>Rp. {{ number_format($data->total, 0, ',', '.') }}</td>
+                    <td> 
+                       <span class="badge {{ $data->payment_status === 'Not Paid' ? 'bg-danger' : 'bg-success'}}">
+                       {{ $data->payment_status }}
+                       </span>  
+                    </td>
+                    <td> 
+                        <span class="badge {{ $data->invoice_status === 'Posted' ? 'bg-success' : 'bg-danger' }}">{{ $data->invoice_status }}</span>    
+                    </td>
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

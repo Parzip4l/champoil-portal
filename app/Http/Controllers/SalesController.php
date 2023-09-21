@@ -11,6 +11,7 @@ use App\Product;
 use App\Tax;
 use App\GrowthM;
 use App\ProductHistory;
+use App\AnalyticsAccount;
 use App\Paymentterms;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,6 +51,7 @@ class SalesController extends Controller
         $tax2 = Tax::all();
         $salesteam = GrowthM::all();
         $top = Paymentterms::all();
+        $accountAnalytics = AnalyticsAccount::all();
 
         $currentYear = now()->year;
         $currentMonth = now()->format('m');
@@ -82,7 +84,7 @@ class SalesController extends Controller
         // Tanggal Pembelian
         $orderdate = Carbon::now()->toDateString();
         return view('pages.sales.create',compact('purchaseCode','contact','warehouse','product','tax','product2','tax2','salesteam',
-        'orderdate','top'
+        'orderdate','top','accountAnalytics'
     ));
     }
 
@@ -118,6 +120,7 @@ class SalesController extends Controller
                 $unit_price = $request->unit_price[$i];
                 $quantity = $request->quantity[$i];
                 $tax = $request->tax[$i];
+                $analytics = $request->analytics[$i];
                 // Hitung subtotal
                 $subtotal = ($unit_price * $quantity) * (1 + $tax);
                 
@@ -127,6 +130,7 @@ class SalesController extends Controller
                     'unit_price' => $unit_price,
                     'quantity' => $quantity,
                     'tax' => $tax,
+                    'analytics' => $analytics,
                     'subtotal' => $subtotal,
                 ];
 

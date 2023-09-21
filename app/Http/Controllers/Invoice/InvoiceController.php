@@ -9,10 +9,12 @@ use App\Sales;
 use App\Product;
 use App\Journal;
 use App\ContactM;
+use App\AnalyticsAccount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class InvoiceController extends Controller
 {
@@ -38,7 +40,7 @@ class InvoiceController extends Controller
         $SalesData = Sales::findOrFail($SalesID);
 
         $journal = Journal::where('type','Sales')->first();
-        $ExistingCode = Invoice::where('so_code', $SalesID)->first();
+        $ExistingCode = Invoice::where('so_code', $SalesID)->get();
 
         if ($SalesData) {
             $vendor = ContactM::where('id', $SalesData->customer)->first();
@@ -57,6 +59,7 @@ class InvoiceController extends Controller
                 $quantity = $detail['quantity'];
                 $unit_price = $detail['unit_price'];
                 $tax = $detail['tax'];
+                $analytics = $detail['analytics'];
                 $subtotal = $detail['subtotal'];
 
         
@@ -70,6 +73,7 @@ class InvoiceController extends Controller
                         'quantity' => $quantity,
                         'tax' => $tax,
                         'unit_price' => $unit_price,
+                        'analytics' => $analytics,
                         'subtotal' => $subtotal,
                     ];
                 } else {
@@ -122,7 +126,45 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'code' => 'required',
+            'customer' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+
+            DB::beginTransaction();
+    
+            // Simpan data Invoice
+            $uuid = Str::uuid()->toString();
+            $invoice = new Invoice();
+            $invoice->id = $uuid; // Generate UUID
+            $invoice->code = $request->code;
+            $invoice->customer = $request->customer;
+            $invoice->type = 'Regular';
+            $invoice->product_data = $request->product_data;
+            $invoice->invoice_date = $request->invoice_date;
+            $invoice->due_date = $request->due_date;
+            $invoice->total = $request->total;
+            $invoice->payment_status = 'Not Paid';
+            $invoice->invoice_status = 'Posted';
+            $invoice->sales_team = $request->sales_team;
+            $invoice->created_by = Auth::user()->name;
+            $invoice->so_code = $request->so_code;
+            $invoice->journal = $request->journal;
+            $invoice->save();
+            
+            DB::commit();
+            return redirect()->route('invoice.index')->with('success', 'Inovice Succesfully Created.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            // Tangani kesalahan yang mungkin terjadi
+            return redirect()->back()->with('error', 'Error When Created Invoice : ' . $e->getMessage());
+        }
     }
 
     /**
@@ -133,7 +175,10 @@ class InvoiceController extends Controller
      */
     public function show($id)
     {
-        //
+        $invoice = Invoice::findOrFail($id);
+
+        $datainvoice = Invoice::where('id', $id)->get();
+        return view('pages.accounting.invoice.details', compact('datainvoice'));
     }
 
     /**

@@ -10,7 +10,7 @@
 <nav class="page-breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="#">Accounting</a></li>
-    <li class="breadcrumb-item"><a href="{{route('vendor-bills.index')}}">Invoice</a></li>
+    <li class="breadcrumb-item"><a href="{{route('invoice.index')}}">Invoice</a></li>
     <li class="breadcrumb-item active" aria-current="page">Create Invoice</li>
   </ol>
 </nav>
@@ -40,7 +40,7 @@
         <div class="card-body-wrap">
             <div class="form p-2">
                 <!-- Data Form -->
-                <form action="{{route('invoice.store')}}" method="POST">
+                <form action="{{ route('invoice.store') }}" method="POST">
                     @csrf
                     <div class="row">
                         <div class="col-md-12 mb-4">
@@ -61,7 +61,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group mb-3">
-                                <h3>{{$InvoiceCode}}</h3>
+                                <h3>{{ $ExistingCode ? $ExistingCode->code : $InvoiceCode }}</h3>
                                 <input type="hidden" class="form-control" name="code" value="{{$InvoiceCode}}" readonly required>
                             </div>
                         </div>
@@ -71,11 +71,13 @@
                             <div class="form-group mb-3">
                                 <label for="" class="form-label">Customer</label>
                                 <input type="text" class="form-control" value="{{$vendor->name}}">
-                                <input type="hidden" name="customer" class="form-control" value="{{$vendor->name}}">
+                                <input type="hidden" name="customer" class="form-control" value="{{$vendor->id}}">
                             </div>
                             <div class="form-group mb-3">
                                 <label for="" class="form-label">Invoice Date</label>
                                 <input type="date" name="invoice_date" class="form-control" required>
+                                <input type="hidden" name="total" class="form-control" value="{{$SalesData->total}}">
+                                <input type="hidden" name="sales_team" class="form-control" value="{{$SalesData->sales_team}}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -86,7 +88,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label for="" class="form-label">Due Date</label>
-                                <input type="date" name="invoice_date" class="form-control" required>
+                                <input type="date" name="due_date" class="form-control" required>
+                                <input type="hidden" value="{{ json_encode($productDetails) }}" name="product_data">
                             </div>
                             <div class="form-group mb-3">
                                 <label for="" class="form-label">Journal</label>
@@ -123,6 +126,7 @@
                                                     <th>Quantity</th>
                                                     <th>UOM</th>
                                                     <th>Tax</th>
+                                                    <th>Analytics</th>
                                                     <th>Subtotal</th>
                                                 </tr>
                                             </thead>
@@ -134,6 +138,12 @@
                                                     <td>{{ $detail['quantity'] }}</td>
                                                     <td>{{ $detail['uom'] }}</td>
                                                     <td>{{ $detail['tax'] }}</td>
+                                                    <td>
+                                                        @php 
+                                                            $Analytics = \App\AnalyticsAccount::find($detail['analytics'])->name;
+                                                        @endphp
+                                                        {{ $Analytics }}
+                                                    </td>
                                                     <td>{{ $detail['subtotal'] }}</td>
                                                 </tr>
                                                 @endforeach

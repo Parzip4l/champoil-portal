@@ -44,14 +44,8 @@
         </a>
       </li>
       <li class="nav-item nav-category">Accounting</li>
-      <li class="nav-item {{ active_class(['apps/chat']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
-          <i class="link-icon" data-feather="bar-chart"></i>
-          <span class="link-title">Accounting</span>
-        </a>
-      </li>
-      <li class="nav-item {{ active_class(['#']) }}">
-        <a href="{{ url('#') }}" class="nav-link">
+      <li class="nav-item {{ active_class(['invoice']) }}">
+        <a href="{{ url('/invoice') }}" class="nav-link">
           <i class="link-icon" data-feather="file"></i>
           <span class="link-title">Invoices</span>
         </a>

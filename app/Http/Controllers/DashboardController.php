@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Purchase;
+use App\Sales;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -52,13 +53,49 @@ class DashboardController extends Controller
             $textClass = 'text-muted';
         }
 
-        // Ambil data penjualan perhari bulan ini
+        // Ambil data Pembelian perhari bulan ini
         $salesData = Purchase::whereMonth('created_at', now()->month)
                              ->selectRaw('date(created_at) as date, sum(total) as total_sales')
                              ->groupBy('date')
                              ->get();
+
+        // Orderan Data
+        $TotalSales = Sales::whereMonth('created_at', $currentMonth)
+                                 ->whereYear('created_at', $currentYear)
+                                 ->sum('total');
+
+        $TotalSalesLatest = Sales::whereMonth('created_at', $lastMonth)
+        ->whereYear('created_at', $lastYear)
+        ->sum('total');
+
+        if ($TotalSalesLatest != 0) {
+            $PersentaseSales = (($TotalSales - $TotalSalesLatest) / $TotalSalesLatest) * 100;
         
-        return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData'));
+            // Tentukan pesan dan tanda panah berdasarkan perubahan
+            if ($PersentaseSales > 0) {
+                $arrowIcon2 = 'arrow-up';
+                $textClass2 = 'text-success';
+            } else if ($PersentaseSales < 0) {
+                $arrowIcon2 = 'arrow-down';
+                $textClass2 = 'text-danger';
+            } else {
+                $arrowIcon2 = 'arrow-right';
+                $textClass2 = 'text-secondary';
+            }
+        } else {
+            $PersentaseSales = null;
+            $arrowIcon2 = 'minus';
+            $textClass2 = 'text-muted';
+        }
+
+        $salesData2 = Sales::whereMonth('created_at', now()->month)
+                             ->selectRaw('date(created_at) as date2, sum(total) as total_sales2')
+                             ->groupBy('date2')
+                             ->get();
+        
+        return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2'
+        ));
     }
 
     public function getSalesData()

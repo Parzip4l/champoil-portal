@@ -89,6 +89,7 @@
                                     <th>Unit Price</th>
                                     <th>Quantity</th>
                                     <th>Tax</th>
+                                    <th>Analytics</th>
                                     <th>Subtotal</th>
                                 </tr>
                             </thead>
@@ -102,6 +103,7 @@
                                     <td>Rp. {{ number_format($details['unit_price'], 0, ',', '.') }}</td>
                                     <td>{{$details['quantity']}}</td>
                                     <td>{{$details['tax']}}</td>
+                                    <td>{{$details['analytics']}}</td>
                                     <td>Rp. {{ number_format($details['subtotal'], 0, ',', '.') }}</td>
                                 </tr>
                                 @endforeach

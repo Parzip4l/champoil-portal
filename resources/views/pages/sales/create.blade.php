@@ -126,6 +126,7 @@
                                     <th>Unit Price</th>
                                     <th>Quantity</th>
                                     <th>UOM</th>
+                                    <th>Analytics</th>
                                     <th>Taxes</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -175,6 +176,14 @@
                 </td>
                 <td class="purchase-uom-td">
                     <!-- Ini adalah tempat di mana Purchase UOM akan ditampilkan -->
+                </td>
+                <td>
+                    <select name="analytics[]" class="js-example-basic-single form-select">
+                        <option value="">Select Analytics</option>
+                        @foreach($accountAnalytics as $account)
+                            <option value="{{ $account->id }}">{{ $account->name }}</option>
+                        @endforeach
+                    </select>  
                 </td>
                 <td>
                     <select name="tax[]" class="js-example-basic-single form-select">

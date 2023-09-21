@@ -42,7 +42,13 @@
                             <div class="col-md-6">
                                 <div class="address mb-3 d-flex">
                                     <label for="" class="me-3">Vendor Name</label>
-                                    <p class="text-muted">{{ $vendor_bills->vendor }}</p>
+                                    <p class="text-muted">
+                                        @php
+                                            // Ambil nama produk berdasarkan product_id
+                                            $VendorName = \App\ContactM::find($vendor_bills->vendor)->name;
+                                        @endphp 
+                                        {{ $VendorName }}
+                                    </p>
                                 </div>
                             </div>
                             <div class="col-md-6">

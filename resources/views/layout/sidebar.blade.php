@@ -92,6 +92,9 @@
               <a href="{{ url('journal-item') }}" class="nav-link {{ active_class(['journal-item']) }}">Journal Item</a>
             </li>
             <li class="nav-item">
+              <a href="{{ url('journal-entry') }}" class="nav-link {{ active_class(['journal-entry']) }}">Journal Entry</a>
+            </li>
+            <li class="nav-item">
               <a href="{{ url('analytics-account') }}" class="nav-link {{ active_class(['analytics-account']) }}">Analytics Account</a>
             </li>
             <li class="nav-item">

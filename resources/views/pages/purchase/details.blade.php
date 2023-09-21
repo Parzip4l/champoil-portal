@@ -60,11 +60,7 @@
                                 <a href="{{ route('vendor-bills.create', ['purchase_id' => $purchase->id]) }}" class="btn btn-primary w-100" disable>Vendor Bills</a>
                             </div>
                             <div class="col-md-4">
-                            @if ($purchase->status === 'Received')
-                                <a href="{{ route('purchase.receive', ['id' => $purchase->id]) }}" class="btn btn-primary mb-2 w-100 btn-disabled">Receipt Product</a>
-                            @elseif ($purchase->status === 'OnDelivery')
                                 <a href="{{ route('purchase.receive', ['id' => $purchase->id]) }}" class="btn btn-primary mb-2 w-100">Receipt Product</a>
-                            @endif
                             </div>
                             <div class="col-md-4">
                                 <form method="POST" action="{{ route('purchase.sendToSlack', ['purchase' => $purchase->id]) }}">
@@ -99,7 +95,12 @@
                                     <td>Rp. {{number_format($details['unit_price'], 0,',','.')}}</td>
                                     <td>{{$details['quantity']}}</td>
                                     <td>{{$details['tax']}}</td>
-                                    <td>{{$details['analytics']}}</td>
+                                    <td>
+                                        @php
+                                            // Ambil nama produk berdasarkan product_id
+                                            $AnalyticsName = \App\AnalyticsAccount::find($details['analytics'])->name;
+                                        @endphp
+                                        {{$AnalyticsName}}</td>
                                     <td>Rp. {{ number_format($details['subtotal'], 0, ',', '.') }}</td>
                                 </tr>
                                 @endforeach

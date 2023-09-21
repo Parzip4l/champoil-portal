@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 use App\Purchase;
 use App\Purchasedetails;
 use App\Product;
+use App\Productcategory;
 use App\ContactM;
+use App\PurchaseReceipt;
 use App\WarehouseLoc;
 use App\Tax;
+use App\JournalItem;
+use App\JournalEntry;
 use App\AnalyticsAccount;
 use App\ProductHistory;
 use Illuminate\Support\Str;
@@ -17,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -81,107 +86,107 @@ class PurchaseController extends Controller
     }
 
     public function sendToSlack(Purchase $purchase)
-{
-    $slackWebhookUrl = 'https://hooks.slack.com/services/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';
+    {
+        $slackWebhookUrl = 'https://hooks.slack.com/services/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';
 
 
-    $purchaseDetails = json_decode($purchase->data_product, true);
-    foreach ($purchaseDetails as &$detail) {
-        $product_id = $detail['product_id'];
-        $unit_price = $detail['unit_price'];
-        $quantity = $detail['quantity'];
-        $tax = $detail['tax'];
-        
-        // Fetch product name using Eloquent (replace 'Product' with your actual model name)
-        $product = Product::find($product_id);
+        $purchaseDetails = json_decode($purchase->data_product, true);
+        foreach ($purchaseDetails as &$detail) {
+            $product_id = $detail['product_id'];
+            $unit_price = $detail['unit_price'];
+            $quantity = $detail['quantity'];
+            $tax = $detail['tax'];
+            
+            // Fetch product name using Eloquent (replace 'Product' with your actual model name)
+            $product = Product::find($product_id);
 
-        if ($product) {
-            $detail['product_name'] = $product->name;
-        } else {
-            $detail['product_name'] = 'Product Not Found'; // Handle case when product is not found
+            if ($product) {
+                $detail['product_name'] = $product->name;
+            } else {
+                $detail['product_name'] = 'Product Not Found'; // Handle case when product is not found
+            }
         }
-    }
 
-    $data = [
-        'text' => "Pembelian dengan kode: *{$purchase->code}* telah diterima!",
-        'attachments' => [
-            [
-                'title' => 'Detail Pembelian',
-                'fields' => [
-                    [
-                        'title' => 'Purchase Code',
-                        'value' => $purchase->code,
-                        'short' => true,
+        $data = [
+            'text' => "Pembelian dengan kode: *{$purchase->code}* telah diterima!",
+            'attachments' => [
+                [
+                    'title' => 'Detail Pembelian',
+                    'fields' => [
+                        [
+                            'title' => 'Purchase Code',
+                            'value' => $purchase->code,
+                            'short' => true,
+                        ],
+                        [
+                            'title' => 'Product Name',
+                            'value' => $product->name,
+                            'short' => true,
+                        ],
+                        [
+                            'title' => 'Unit Price',
+                            'value' => 'Rp. '.number_format($unit_price, 2),
+                            'short' => true,
+                        ],
+                        [
+                            'title' => 'Quantity',
+                            'value' => $quantity,
+                            'short' => true,
+                        ],
+                        [
+                            'title' => 'Tax',
+                            'value' => $tax,
+                            'short' => true,
+                        ],
+                        [
+                            'title' => 'Total',
+                            'value' => 'Rp. '.number_format($purchase->total, 2),
+                            'short' => true,
+                        ],
+                        [
+                            'title' => 'Kunjungi Situs Kami',
+                            'value' => '(https://www.contoh.com)',
+                            'short' => true,
+                        ]
                     ],
-                    [
-                        'title' => 'Product Name',
-                        'value' => $product->name,
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Unit Price',
-                        'value' => 'Rp. '.number_format($unit_price, 2),
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Quantity',
-                        'value' => $quantity,
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Tax',
-                        'value' => $tax,
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Total',
-                        'value' => 'Rp. '.number_format($purchase->total, 2),
-                        'short' => true,
-                    ],
-                    [
-                        'title' => 'Kunjungi Situs Kami',
-                        'value' => '(https://www.contoh.com)',
-                        'short' => true,
-                    ]
                 ],
             ],
-        ],
-        
-    ];
+            
+        ];
 
-    $data_string = json_encode($data);
+        $data_string = json_encode($data);
 
-    $ch = curl_init($slackWebhookUrl);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Content-Length: ' . strlen($data_string),
-    ]);
+        $ch = curl_init($slackWebhookUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data_string),
+        ]);
 
-    $result = curl_exec($ch);
+        $result = curl_exec($ch);
 
-    if ($result === false) {
-        // Penanganan kesalahan jika Curl gagal
-        $error = curl_error($ch);
-        // Handle the error here
-        return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+        if ($result === false) {
+            // Penanganan kesalahan jika Curl gagal
+            $error = curl_error($ch);
+            // Handle the error here
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+        }
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($httpCode !== 200) {
+            // Penanganan kesalahan jika Slack merespons selain status 200 OK
+            // Handle the error here
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+        }
+
+        curl_close($ch);
+
+        // Handle the success response from Slack
+        return redirect()->back()->with('success', 'Data berhasil dikirim ke Slack.');
     }
-
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    if ($httpCode !== 200) {
-        // Penanganan kesalahan jika Slack merespons selain status 200 OK
-        // Handle the error here
-        return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
-    }
-
-    curl_close($ch);
-
-    // Handle the success response from Slack
-    return redirect()->back()->with('success', 'Data berhasil dikirim ke Slack.');
-}
 
     /**
      * Store a newly created resource in storage.
@@ -228,6 +233,8 @@ class PurchaseController extends Controller
                     'category' => $category,
                     'subtotal' => $subtotal,
                     'analytics' => $analytics,
+                    'received_quantity' => 0, 
+                    'remaining_quantity' => $quantity
                 ];
     
                 $total += $subtotal;
@@ -260,89 +267,237 @@ class PurchaseController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function receiveProductShow($id)
+    public function receiveProductShow($id)
     {
         try {
             // Temukan pembelian berdasarkan ID
             $purchase = Purchase::find($id);
-
+    
             if (!$purchase) {
                 // Handle jika pembelian tidak ditemukan
                 return redirect()->route('purchase.index')->with('error', 'Purchase order not found.');
             }
-
+    
             // Decode data pembelian menjadi array
             $purchaseDetails = json_decode($purchase->data_product, true);
-
-            return view('pages.purchase.receive', compact('purchase', 'purchaseDetails'));
+    
+            // Inisialisasi array kosong untuk menyimpan informasi produk dan kode pembelian
+            $productInfo = [];
+    
+            // Loop melalui setiap item dalam $purchaseDetails
+            foreach ($purchaseDetails as $detail) {
+                // Ambil nama produk berdasarkan id_product
+                $product = Product::find($detail['product_id']);
+                // Jika produk ditemukan, tambahkan informasi ke array
+                if ($product) {
+                    $productInfo[] = [
+                        'product_name' => $product->product_name,
+                        'purchase_code' => $purchase->purchase_code,
+                    ];
+                }
+            }
+    
+            $purchaseReceipts = PurchaseReceipt::where('purchase_id', $id)->get();
+    
+            return view('pages.purchase.receive', compact('purchase', 'productInfo', 'purchaseReceipts','purchaseDetails'));
         } catch (\Exception $e) {
             // Tangani kesalahan yang mungkin terjadi
             return redirect()->route('purchase.index')->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+     
 
     public function partialReceive(Request $request, $id)
-{
-    try {
-        // Temukan pembelian berdasarkan ID
-        $purchase = Purchase::find($id);
+    {
+        try {
+            // Temukan pembelian berdasarkan ID
+            $purchase = Purchase::find($id);
+    
+            if (!$purchase) {
+                // Handle jika pembelian tidak ditemukan
+                return redirect()->route('purchase.index')->with('error', 'Purchase order not found.');
+            }
 
-        if (!$purchase) {
-            // Handle jika pembelian tidak ditemukan
-            return redirect()->route('purchase.index')->with('error', 'Purchase order not found.');
-        }
+            $totalCredit = 0;
+            $totalDebit = 0;
+            $totalSubtotal = 0;
+            $totalJournalAmount = 0;
+            // Decode data pembelian menjadi array
+            $purchaseDetails = json_decode($purchase->data_product, true);
+            foreach ($purchaseDetails as $item) {
+                $totalSubtotal += $item['subtotal'];
+                $taxData = $item['tax'];
+                $productNameData = $item['product_id'];
+                $productCategories = $item['category'];
+                $productAnalytics = $item['analytics'];
+    
+                $productCategory = Productcategory::where('id', $productCategories)->first();
+                    
+            }
+    
+            $totalReceivedQuantity = 0; // Total received quantity for all products
+    
+            foreach ($purchaseDetails as $key => $detail) {
+                $product_id = $detail['product_id'];
+                $received_quantity = $request->input('received_quantity.' . $product_id, 0);
+    
+                // Check if received quantity exceeds the remaining quantity
+                if ($received_quantity > $detail['remaining_quantity']) {
+                    return redirect()->route('purchase.index')->with('error', 'Received quantity exceeds remaining quantity for product ID: ' . $product_id);
+                }
+                
+    
+                $totalReceivedQuantity += $received_quantity;
+                $totalJournalAmount += $received_quantity * $detail['unit_price'];
 
-        // Decode data pembelian menjadi array
-        $purchaseDetails = json_decode($purchase->data_product, true);
+                if ($totalReceivedQuantity > 0) {
+                    $vendorData = $purchase->vendor;
+                    $AccountData = ContactM::where('id', $vendorData)->first();
+                    $accountPay = $AccountData->account_pay;
+                    $inputAccount = $productCategory->input_account;
+                    $JournalAccount = $productCategory->journal;
+                    // Generate UUID for credit entry
+                    $uuidcredit = Str::uuid()->toString();
+                    $creditEntry = new JournalItem();
+                    $creditEntry->id = $uuidcredit;
+                    $creditEntry->journal = $JournalAccount;
+                    $creditEntry->journal_entry = $purchase->id;
+                    $creditEntry->account = $accountPay;
+                    $creditEntry->partner = $purchase->vendor;
+                    $creditEntry->label = $purchase->code;
+                    $creditEntry->debit = '0';
+                    $creditEntry->credit = $totalJournalAmount; // Credit amount for this product
+                    $creditEntry->tax = $taxData;
+                    $creditEntry->product = $productNameData;
+                    $creditEntry->analytics = $productAnalytics;
+                    $creditEntry->balance = -$totalJournalAmount; // Balance for this entry
+                    $creditEntry->save();
 
-        foreach ($purchaseDetails as $detail) {
-            $product_id = $detail['product_id'];
-            $received_quantity = $request->input('received_quantity.' . $product_id, 0);
+                    // Generate UUID for debit entry
+                    $uuiddebit = Str::uuid()->toString();
+                    $debitEntry = new JournalItem();
+                    $debitEntry->id = $uuiddebit;
+                    $debitEntry->journal = $JournalAccount;
+                    $debitEntry->journal_entry = $purchase->id;
+                    $debitEntry->account = $inputAccount;
+                    $debitEntry->partner = $purchase->vendor;
+                    $debitEntry->label = $purchase->code;
+                    $debitEntry->debit = $totalJournalAmount; // Debit amount for this product
+                    $debitEntry->credit = '0';
+                    $debitEntry->tax = $taxData;
+                    $debitEntry->product = $productNameData;
+                    $debitEntry->analytics = $productAnalytics;
+                    $debitEntry->balance = $totalJournalAmount; // Balance for this entry
+                    $debitEntry->save();
 
-            // Update stok inventaris
-            $inventory = Product::where('id', $product_id)->first();
-            if ($inventory) {
-                // Assuming 'onhand' is the column for stock quantity
-                $inventory->onhand += $received_quantity;
-                $inventory->save();
+                    // Code Entry
+                    $currentYear = now()->year;
+                    $currentMonth = now()->format('m');
+
+                    // Temukan entri terbaru dengan kode yang sesuai
+                    $latestEntry = JournalEntry::whereYear('created_at', $currentYear)
+                        ->whereMonth('created_at', $currentMonth)
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+
+                    // Inisialisasi nomor urut
+                    $nextCodeNumber = 1;
+
+                    if ($latestEntry) {
+                        // Jika ada entri terbaru, ambil nomor urut dari kode terbaru, tambahkan 1
+                        $latestCode = $latestEntry->code;
+                        $latestCodeParts = explode('-', $latestCode);
+                        $nomorurut = end($latestCodeParts);
+                        $nomorurut = ltrim($nomorurut, '0');
+                        $lastCodeNumber = (int)$nomorurut;
+                        $nextCodeNumber = $lastCodeNumber + 1;
+                    }
+
+                    // Format ulang nomor urut dengan panjang 5 digit
+                    $formattedCodeNumber = str_pad($nextCodeNumber, 5, '0', STR_PAD_LEFT);
+
+                    // Buat kode PO dengan format yang sesuai
+                    $EntryCode = "STJ-$currentYear-$currentMonth-$formattedCodeNumber";
+
+                    // Journal Entry
+                    $uuidjournal = Str::uuid()->toString();
+                    $journalentry = new JournalEntry();
+                    $journalentry->id = $uuidjournal;
+                    $journalentry->code = $EntryCode;
+                    $journalentry->partner = $purchase->vendor;
+                    $journalentry->reference = $purchase->id;
+                    $journalentry->journal = $JournalAccount;
+                    $journalentry->total = $totalJournalAmount;
+                    $journalentry->status = 'Posted';
+                    $journalentry->save();
+                }
+    
+                // Update stok inventaris dan sisa kuantitas pada detail pembelian
+                $inventory = Product::where('id', $product_id)->first();
+                if ($inventory) {
+                    $inventory->onhand += $received_quantity;
+                    $inventory->save();
+
+                    $idhistory = Str::uuid()->toString();
+                    $inventoryHistory = new ProductHistory();
+                    $inventoryHistory->id = $idhistory;
+                    $inventoryHistory->product_id = $product_id;
+                    $inventoryHistory->quantity = $received_quantity;
+                    $inventoryHistory->modul = 'Purchase';
+                    $inventoryHistory->action = 'in';
+                    $inventoryHistory->save();
+    
+                    // Update sisa kuantitas pada detail pembelian
+                    $DataSimpan = $purchaseDetails[$key]['remaining_quantity'] -= $received_quantity;
+                    $purchase->data_product = json_encode($purchaseDetails);
+                    // Simpan perubahan pada status pembelian
+                    $purchase->save();
+
+                    if ($DataSimpan === 0)
+                    {
+                        $purchase->status = 'Received';
+                        $purchase->save();
+                    }
+                }
+    
+                // Simpan riwayat receipt
+                $receipt = new PurchaseReceipt();
+                $receipt->purchase_id = $purchase->id;
+                $receipt->product_id = $product_id;
+                $receipt->received_quantity = $received_quantity;
+                $receipt->received_by = Auth::user()->name;
+                $receipt->save();
+            }
+    
+            // Tandai pembelian sebagai "Received" jika semua produk telah diterima
+            if ($totalReceivedQuantity === array_sum(array_column($purchaseDetails, 'quantity'))) {
+                $purchase->status = 'Received';
             } else {
-                // Buat entri inventaris baru jika belum ada
-                $newInventory = new Inventory();
-                $newInventory->product_id = $product_id;
-                $newInventory->onhand = $received_quantity; // Adjust to your column name
-                $newInventory->save();
+                $purchase->status = 'Partially Received';
             }
 
-            // Update sisa kuantitas pada detail pembelian
-            $detail['remaining_quantity'] = $detail['quantity'] - $received_quantity;
-
-            // Update status receipt product
-            $detail['receipt_status'] = $detail['remaining_quantity'] === 0 ? 'Received' : 'Partially Received';
-        }
-
-        // Tandai pembelian sebagai "Received" jika semua produk telah diterima
-        $allReceived = true;
-        foreach ($purchaseDetails as $detail) {
-            $product_id = $detail['product_id'];
-            $received_quantity = $request->input('received_quantity.' . $product_id, 0);
-
-            if ($received_quantity < $detail['quantity']) {
-                $allReceived = false;
-                break;
+            $sisaQuantitasProduk = array_column($purchaseDetails, 'remaining_quantity');
+            if (array_sum($sisaQuantitasProduk) === 0) {
+                $purchase->status = 'Received';
+            } else {
+                $purchase->status = 'Partially Received';
             }
-        }
-
-        if ($allReceived) {
-            $purchase->status = 'Received';
+    
+            // Simpan perubahan pada status pembelian
             $purchase->save();
+    
+            if ($totalReceivedQuantity === array_sum(array_column($purchaseDetails, 'quantity'))) {
+                // Full received
+                return redirect()->back()->with('success', 'Purchase order has been received in full.');
+            } else {
+                // Partially received
+                return redirect()->back()->with('success', 'Purchase order has been received partially.');
+            }
+        } catch (\Exception $e) {
+            // Tangani kesalahan yang mungkin terjadi
+            return redirect()->route('purchase.index')->with('error', 'An error occurred while partially receiving the purchase order: ' . $e->getMessage());
         }
-
-        return redirect()->route('purchase.index')->with('success', 'Purchase order has been received partially.');
-    } catch (\Exception $e) {
-        // Tangani kesalahan yang mungkin terjadi
-        return redirect()->route('purchase.index')->with('error', 'An error occurred while partially receiving the purchase order: ' . $e->getMessage());
     }
-}
 
 
      public function receiveProduct($id)

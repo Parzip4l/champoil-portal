@@ -156,7 +156,13 @@
                                                 <td>{{ $detail['quantity'] }}</td>
                                                 <td>{{ $detail['uom'] }}</td>
                                                 <td>{{ $detail['tax'] }}</td>
-                                                <td>{{ $detail['analytics'] }}</td>
+                                                <td>
+                                                    @php
+                                                        // Ambil nama produk berdasarkan product_id
+                                                        $AnalyticsName = \App\AnalyticsAccount::find($detail['analytics'])->name;
+                                                    @endphp
+                                                    {{ $AnalyticsName }}
+                                                </td>
                                                 <td>{{ $detail['subtotal'] }}</td>
                                             </tr>
                                             @endforeach

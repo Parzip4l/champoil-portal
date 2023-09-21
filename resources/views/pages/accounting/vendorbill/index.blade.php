@@ -47,7 +47,13 @@
                 <tr>
                     <td> {{ $nomor++ }} </td>
                     <td><a href="{{ route('vendor-bills.show', $data->id) }}">{{ $data->code }}</a></td>
-                    <td> {{ $data->vendor }} </td>
+                    <td>
+                    @php
+                        // Ambil nama produk berdasarkan product_id
+                        $VendorName = \App\ContactM::find($data->vendor)->name;
+                    @endphp 
+                        {{ $VendorName }} 
+                    </td>
                     <td> {{ $data->bill_date }} </td>
                     <td> 
                         <span class="{{ strtotime($data->due_date) < strtotime('today') && $data->payment_status == 'Not Paid' ? 'text-danger' : '' }}">

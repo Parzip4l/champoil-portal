@@ -4,7 +4,15 @@ namespace App\Http\Controllers\Journal;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\JournalEntry;
+use App\Purchase;
+use App\CoaM;
+use App\ContactM;
+use App\Journal;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 class JournalEntryController extends Controller
 {
     /**
@@ -14,7 +22,18 @@ class JournalEntryController extends Controller
      */
     public function index()
     {
-        //
+        $journal = DB::table('journal_entry')
+            ->join('contact', 'journal_entry.partner', '=', 'contact.id')
+            ->join('purchase', 'journal_entry.reference', '=', 'purchase.id')
+            ->join('journal', 'journal_entry.journal', '=', 'journal.id')
+            ->select('journal_entry.*', 'contact.name as partnername', 'purchase.code as purchasecode', 'journal.name as journalname')
+            ->get();
+
+        if (!$journal) {
+            // Handle when the product with the given ID is not found
+            abort(404);
+        }
+        return view('pages.accounting.journal.journal-entry',compact('journal'));
     }
 
     /**

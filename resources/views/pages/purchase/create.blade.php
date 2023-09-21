@@ -56,7 +56,7 @@
             <div class="input-group flatpickr" id="flatpickr-date">
                 <input type="text" class="form-control" placeholder="Select date" name="expected_arrival" data-input required>
                 <span class="input-group-text input-group-addon" data-toggle><i data-feather="calendar"></i></span>
-                <input type="hidden" class="form-control" name="status" value="OnDelivery" required>
+                <input type="hidden" class="form-control" name="status" value="Not Received" required>
             </div>
         </div>
         <div class="form-group mb-3">

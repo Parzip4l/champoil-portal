@@ -139,7 +139,6 @@
                                 </div>
                             </div>
                             @endforeach
-                            {{ $history->links() }}
                         </div>
                     </div>
                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">

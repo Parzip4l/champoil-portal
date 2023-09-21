@@ -205,49 +205,6 @@ class VendorbillController extends Controller
             $productNameData = $item['name'];
             $productCategories = $item['category'];
             $productAnalytics = $item['analytics'];
-
-            $productCategory = Productcategory::where('id', $productCategories)->first();
-            if ($productCategory) {
-                $vendorData = $request->vendor;
-                $AccountData = ContactM::where('id', $vendorData)->first();
-                $accountPay = $AccountData->account_pay;
-
-                $inputAccount = $productCategory->input_account;
-                $JournalAccount = $productCategory->journal;
-                // Generate UUID for credit entry
-                $uuidcredit = Str::uuid()->toString();
-                $creditEntry = new JournalItem();
-                $creditEntry->id = $uuidcredit;
-                $creditEntry->journal = $JournalAccount;
-                $creditEntry->journal_entry = $uuid;
-                $creditEntry->account = $accountPay;
-                $creditEntry->partner = $request->vendor;
-                $creditEntry->label = $request->code;
-                $creditEntry->debit = '0';
-                $creditEntry->credit = $item['subtotal']; // Credit amount for this product
-                $creditEntry->tax = $taxData;
-                $creditEntry->product = $productNameData;
-                $creditEntry->analytics = $productAnalytics;
-                $creditEntry->balance = -$totalSubtotal; // Balance for this entry
-                $creditEntry->save();
-            }
-
-                // Generate UUID for debit entry
-                $uuiddebit = Str::uuid()->toString();
-                $debitEntry = new JournalItem();
-                $debitEntry->id = $uuiddebit;
-                $debitEntry->journal = $JournalAccount;
-                $debitEntry->journal_entry = $uuid;
-                $debitEntry->account = $inputAccount;
-                $debitEntry->partner = $request->vendor;
-                $debitEntry->label = $request->code;
-                $debitEntry->debit = $item['subtotal']; // Debit amount for this product
-                $debitEntry->credit = '0';
-                $debitEntry->tax = $taxData;
-                $debitEntry->product = $productNameData;
-                $debitEntry->analytics = $productAnalytics;
-                $debitEntry->balance = $totalSubtotal; // Balance for this entry
-                $debitEntry->save();
         }
 
             DB::commit();

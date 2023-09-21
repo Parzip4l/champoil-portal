@@ -22,24 +22,17 @@ class JournalItemsController extends Controller
      */
     public function index()
     {
-        $query = DB::table('journal_item')
+        $journal = DB::table('journal_item')
             ->join('contact', 'journal_item.partner', '=', 'contact.id')
             ->join('coa', 'journal_item.account', '=', 'coa.id')
             ->join('analytics_account', 'journal_item.analytics', '=', 'analytics_account.id')
-            ->select(
-                'journal_item.*',
-                'contact.name as partnername',
-                'coa.name as accountname',
-                'analytics_account.name as analyticsname',
-            )
+            ->select('journal_item.*', 'contact.name as partnername', 'coa.name as accountname', 'analytics_account.name as analyticsname')
             ->get();
 
-        if (!$query) {
+        if (!$journal) {
             // Handle when the product with the given ID is not found
             abort(404);
         }
-
-        $journal = $query;
         return view('pages.accounting.journal.journal-item',compact('journal'));
     }
 

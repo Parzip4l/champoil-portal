@@ -71,6 +71,7 @@ Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-
 Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentController::class);
 // Journal Item
 Route::resource('journal-item', App\Http\Controllers\Journal\JournalItemsController::class);
+Route::resource('journal-entry', App\Http\Controllers\Journal\JournalEntryController::class);
 // Growth
 Route::resource('growth', GrowthController::class);
 // Contact

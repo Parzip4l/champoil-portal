@@ -8,6 +8,8 @@ use App\AnalyticsAccount;
 use App\AnalyticsPlans;
 use App\UserActivities;
 use App\JournalItem;
+use App\Purchase;
+use App\VendorBill;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -90,7 +92,16 @@ class AnalyticsAccountController extends Controller
      */
     public function show($id)
     {
-        //
+        $account = AnalyticsAccount::find($id);
+
+        $dataaccount = AnalyticsAccount::where('id', $id)->first();
+        if ($account) {
+            $vendorBills = VendorBill::whereJsonContains('purchase_details', ['analytics' => $id])->get();
+            $Purchase = Purchase::whereJsonContains('data_product', ['analytics' => $id])->get();
+        } else {
+            abort(404);
+        }
+        return view('pages.accounting.analytics.detailsaccount',compact('dataaccount','vendorBills','Purchase'));
     }
 
     /**

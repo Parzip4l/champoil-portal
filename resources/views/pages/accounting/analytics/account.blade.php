@@ -47,7 +47,7 @@
                 @endphp
                 @foreach ($data as $data)
                 <tr>
-                    <td> {{ $data->name }} </td>
+                    <td> <a href="{{route('analytics-account.show', $data->id)}}">{{ $data->name }}</a> </td>
                     <td> {{ $data->code }} </td>
                     <td> {{ $data->plansname }} </td>
                     @php

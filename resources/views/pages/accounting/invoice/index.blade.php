@@ -42,7 +42,13 @@
                 @foreach ($invoice as $data)
                 <tr>
                     <td> <a href="{{route('invoice.show', $data->id)}}">{{ $data->code }}</a></td>
-                    <td> {{ $data->customer }} </td>
+                    <td> 
+                        @php
+                            // Get Customer Name
+                            $CustomerName = \App\ContactM::find($data->customer)->name;
+                        @endphp
+                        {{ $CustomerName }} 
+                    </td>
                     <td> {{ $data->invoice_date }} </td>
                     <td> {{ $data->due_date }} </td>
                     <td>Rp. {{ number_format($data->total, 0, ',', '.') }}</td>

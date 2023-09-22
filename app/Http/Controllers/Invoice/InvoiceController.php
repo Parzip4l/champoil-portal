@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Invoice;
 use App\Sales;
 use App\Product;
+use App\Productcategory;
 use App\Journal;
+use App\JournalItem;
 use App\ContactM;
 use App\AnalyticsAccount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -68,7 +70,9 @@ class InvoiceController extends Controller
         
                 if ($product) {
                     $productDetails[] = [
+                        'product_id' => $product->id,
                         'name' => $product->name,
+                        'category' => $product->category,
                         'uom' => $product->purchase_uom, 
                         'quantity' => $quantity,
                         'tax' => $tax,
@@ -135,6 +139,25 @@ class InvoiceController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $totalSubtotal = 0;
+
+        $productData = json_decode($request->product_data, true);
+        foreach ($productData as $dataProduct){
+                $totalSubtotal += $dataProduct['subtotal'];
+                $taxData = $dataProduct['tax'];
+                $productNameData = $dataProduct['product_id'];
+                $productCategories = $dataProduct['category'];
+                $productAnalytics = $dataProduct['analytics'];
+
+                $productCategory = Productcategory::where('id', $productCategories)->first();
+        }
+
+        $vendorData = $request->customer;
+        $AccountData = ContactM::where('id', $vendorData)->first();
+        $accountPay = $AccountData->account_receive;
+        $incomeAccount = $productCategory->income_account;
+        $JournalAccount = $productCategory->journal;
+
         try {
 
             DB::beginTransaction();
@@ -157,6 +180,46 @@ class InvoiceController extends Controller
             $invoice->so_code = $request->so_code;
             $invoice->journal = $request->journal;
             $invoice->save();
+
+            // Credit Entry
+            $uuidcredit = Str::uuid()->toString();
+            $creditEntry = new JournalItem();
+            $creditEntry->id = $uuidcredit;
+            $creditEntry->journal = $JournalAccount;
+            $creditEntry->journal_entry = $uuid;
+            $creditEntry->account = $accountPay;
+            $creditEntry->partner = $request->customer;
+            $creditEntry->label = $request->code;
+            $creditEntry->debit = '0';
+            $creditEntry->credit = $request->total; // Credit amount for this product
+            $creditEntry->tax = $taxData;
+            $creditEntry->product = $productNameData;
+            $creditEntry->analytics = $productAnalytics;
+            $creditEntry->balance = -$request->total; // Balance for this entry
+            $creditEntry->save();
+
+            // Generate UUID for debit entry
+            $uuiddebit = Str::uuid()->toString();
+            $debitEntry = new JournalItem();
+            $debitEntry->id = $uuiddebit;
+            $debitEntry->journal = $JournalAccount;
+            $debitEntry->journal_entry = $uuid;
+            $debitEntry->account = $incomeAccount;
+            $debitEntry->partner = $request->customer;
+            $debitEntry->label = $request->code;
+            $debitEntry->debit = $request->total; // Debit amount for this product
+            $debitEntry->credit = '0';
+            $debitEntry->tax = $taxData;
+            $debitEntry->product = $productNameData;
+            $debitEntry->analytics = $productAnalytics;
+            $debitEntry->balance = $request->total; // Balance for this entry
+            $debitEntry->save();
+
+            $sales = Sales::where('id', $request->so_code)->first();
+                if ($sales) {
+                    $sales->invoice_status = 'Fully Invoiced';
+                    $sales->save();
+                }
             
             DB::commit();
             return redirect()->route('invoice.index')->with('success', 'Inovice Succesfully Created.');

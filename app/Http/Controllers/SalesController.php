@@ -120,6 +120,7 @@ class SalesController extends Controller
                 $unit_price = $request->unit_price[$i];
                 $quantity = $request->quantity[$i];
                 $tax = $request->tax[$i];
+                $category = $request->product_categories[$i];
                 $analytics = $request->analytics[$i];
                 // Hitung subtotal
                 $subtotal = ($unit_price * $quantity) * (1 + $tax);
@@ -130,6 +131,7 @@ class SalesController extends Controller
                     'unit_price' => $unit_price,
                     'quantity' => $quantity,
                     'tax' => $tax,
+                    'category' => $category,
                     'analytics' => $analytics,
                     'subtotal' => $subtotal,
                 ];

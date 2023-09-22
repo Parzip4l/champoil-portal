@@ -127,6 +127,7 @@
                                     <th>Quantity</th>
                                     <th>UOM</th>
                                     <th>Analytics</th>
+                                    <th class="categories">Category</th>
                                     <th>Taxes</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -164,7 +165,7 @@
                     <select name="product[]" class="js-example-basic-single form-select product-select">
                         <option value="">Select Product</option>
                         @foreach($product2 as $product)
-                            <option value="{{ $product->id }}" data-purchase-uom="{{ $product->purchase_uom }}">{{ $product->name }}</option>
+                            <option value="{{ $product->id }}" data-purchase-uom="{{ $product->purchase_uom }}" data-purchase-categories="{{ $product->category }}">{{ $product->name }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -184,6 +185,9 @@
                             <option value="{{ $account->id }}">{{ $account->name }}</option>
                         @endforeach
                     </select>  
+                </td>
+                <td class="product-categories-td">
+                    <!-- Ini adalah tempat di mana Product Categories akan ditampilkan -->
                 </td>
                 <td>
                     <select name="tax[]" class="js-example-basic-single form-select">
@@ -226,7 +230,41 @@
     });
 
     document.getElementById('addProduct').addEventListener('click', addProductRow);
+    function updateProductCategory(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    const productCategoryTd = select.closest('tr').querySelector('.product-categories-td');
+
+    // Reset isi kolom Product Categories
+    productCategoryTd.textContent = '';
+
+    // Cek apakah produk dipilih
+    if (selectedOption) {
+        const productCategories = selectedOption.getAttribute('data-purchase-categories');
+
+        // Buat elemen input
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.name = 'product_categories[]';
+        inputElement.value = productCategories;
+
+        // Tambahkan elemen input ke dalam kolom Product Categories
+        productCategoryTd.appendChild(inputElement);
+    }
+}
+
+$(document).on('change', '.product-select', function () {
+    updateProductCategory(this);
+});
+    document.getElementById('addProduct').addEventListener('click', addProductRow);
 </script>
+<style>
+    td.product-categories-td {
+        display : none;
+    }
+    th.categories {
+    display: none;
+}
+</style>
 @endpush
 
 @push('plugin-scripts')

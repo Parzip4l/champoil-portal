@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Purchase;
 use App\Sales;
+use App\Invoice;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -34,11 +35,11 @@ class DashboardController extends Controller
         
             // Tentukan pesan dan tanda panah berdasarkan perubahan
             if ($percentageChange > 0) {
-                $changeMessage = 'Lebih tinggi';
+                $changeMessage = 'Lebih Ringgi Dari Bulan Lalu';
                 $arrowIcon = 'arrow-up';
                 $textClass = 'text-success';
             } else if ($percentageChange < 0) {
-                $changeMessage = 'Lebih rendah';
+                $changeMessage = 'Lebih Rendah Dari Bulan Lalu';
                 $arrowIcon = 'arrow-down';
                 $textClass = 'text-danger';
             } else {
@@ -48,7 +49,7 @@ class DashboardController extends Controller
             }
         } else {
             $percentageChange = null;
-            $changeMessage = 'Total pembelian bulan lalu adalah 0';
+            $changeMessage = 'Tidak ada pembelian bulan lalu ';
             $arrowIcon = 'minus';
             $textClass = 'text-muted';
         }
@@ -60,11 +61,11 @@ class DashboardController extends Controller
                              ->get();
 
         // Orderan Data
-        $TotalSales = Sales::whereMonth('created_at', $currentMonth)
+        $TotalSales = Invoice::whereMonth('created_at', $currentMonth)
                                  ->whereYear('created_at', $currentYear)
                                  ->sum('total');
 
-        $TotalSalesLatest = Sales::whereMonth('created_at', $lastMonth)
+        $TotalSalesLatest = Invoice::whereMonth('created_at', $lastMonth)
         ->whereYear('created_at', $lastYear)
         ->sum('total');
 
@@ -75,12 +76,15 @@ class DashboardController extends Controller
             if ($PersentaseSales > 0) {
                 $arrowIcon2 = 'arrow-up';
                 $textClass2 = 'text-success';
+                $changeMessage2 = 'Lebih Tinggi Dari Bulan Lalu';
             } else if ($PersentaseSales < 0) {
                 $arrowIcon2 = 'arrow-down';
                 $textClass2 = 'text-danger';
+                $changeMessage2 = 'Lebih Rendah Dari Bulan Lalu';
             } else {
                 $arrowIcon2 = 'arrow-right';
                 $textClass2 = 'text-secondary';
+                $changeMessage2 = 'Tidak Ada Perubahan';
             }
         } else {
             $PersentaseSales = null;
@@ -88,13 +92,18 @@ class DashboardController extends Controller
             $textClass2 = 'text-muted';
         }
 
-        $salesData2 = Sales::whereMonth('created_at', now()->month)
+        $salesData2 = Invoice::whereMonth('created_at', now()->month)
                              ->selectRaw('date(created_at) as date2, sum(total) as total_sales2')
                              ->groupBy('date2')
                              ->get();
         
+        $YearlySales = Invoice::whereYear('created_at', now()->year)
+                            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, sum(total) as total_sales')
+                            ->groupBy('year', 'month')
+                            ->get();
+        
         return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2'
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2'
         ));
     }
 

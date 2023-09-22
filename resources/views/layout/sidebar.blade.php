@@ -56,6 +56,23 @@
           <span class="link-title">Vendor Bills</span>
         </a>
       </li>
+      <li class="nav-item {{ active_class(['report']) }}">
+        <a class="nav-link" data-bs-toggle="collapse" href="#reportcomponent" role="button" aria-expanded="{{ is_active_route(['coa']) }}" aria-controls="reportcomponent">
+          <i class="link-icon" data-feather="file"></i>
+          <span class="link-title">Report</span>
+          <i class="link-arrow" data-feather="chevron-down"></i>
+        </a>
+        <div class="collapse {{ show_class(['report']) }}" id="reportcomponent">
+          <ul class="nav sub-menu">
+            <li class="nav-item">
+              <a href="{{ url('coa') }}" class="nav-link {{ active_class(['coa']) }}">Balance Sheet</a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('coa') }}" class="nav-link {{ active_class(['coa']) }}">Profit & Loss</a>
+            </li>
+          </ul>
+        </div>
+      </li>
       <li class="nav-item {{ active_class(['coa']) }}">
         <a class="nav-link" data-bs-toggle="collapse" href="#coacomponent" role="button" aria-expanded="{{ is_active_route(['coa']) }}" aria-controls="coacomponent">
           <i class="link-icon" data-feather="settings"></i>

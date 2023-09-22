@@ -15,8 +15,8 @@ $(function() {
     dark           : "#060c17",
     muted          : "#7987a1",
     gridBorder     : "rgba(77, 138, 240, .15)",
-    bodyColor      : "#b8c3d9",
-    cardBg         : "#0c1427"
+    bodyColor      : "#000",
+    cardBg         : "#fff"
   }
 
   var fontFamily = "'Roboto', Helvetica, sans-serif"
@@ -37,10 +37,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.primary, colors.danger, colors.warning],
       grid: {
@@ -122,10 +122,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.primary],    
       grid: {
@@ -196,10 +196,10 @@ $(function() {
         stacked: true,
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.danger, colors.info],
       stroke: {
@@ -316,10 +316,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.danger, colors.info],
       grid: {
@@ -426,10 +426,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       stroke: {
         colors: ['rgba(0,0,0,0)']
@@ -472,10 +472,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.primary,colors.warning,colors.danger, colors.info],
       legend: {
@@ -535,10 +535,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       grid: {
         borderColor: colors.gridBorder,
@@ -667,10 +667,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       grid: {
         padding: {
@@ -765,10 +765,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.primary, colors.warning, colors.danger],
       grid: {
@@ -856,10 +856,10 @@ $(function() {
         },
       },
       theme: {
-        mode: 'dark'
+        mode: 'light'
       },
       tooltip: {
-        theme: 'dark'
+        theme: 'light'
       },
       colors: [colors.primary, colors.warning, colors.danger, colors.info],
       fill: {

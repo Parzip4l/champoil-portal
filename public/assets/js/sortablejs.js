@@ -10,7 +10,7 @@ $(function() {
     var simpleList = document.querySelector("#simple-list");
     new Sortable(simpleList, {
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 
@@ -22,7 +22,7 @@ $(function() {
     new Sortable(handleExample, {
       handle: '.handle', // handle's class
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 
@@ -34,7 +34,7 @@ $(function() {
     new Sortable(sharedListLeft, {
       group: 'shared', // set both lists to same group
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
   if ($("#shared-list-right").length) {
@@ -42,7 +42,7 @@ $(function() {
     new Sortable(sharedListRight, {
       group: 'shared', // set both lists to same group
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 
@@ -57,7 +57,7 @@ $(function() {
         pull: 'clone' // To clone: set pull to 'clone'
       },
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
   if ($("#shared-list-2-right").length) {
@@ -68,7 +68,7 @@ $(function() {
         pull: 'clone' // To clone: set pull to 'clone'
       },
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 
@@ -84,7 +84,7 @@ $(function() {
         put: false // Do not allow items to be put into this list
       },
       animation: 150,
-      ghostClass: 'bg-dark',
+      ghostClass: 'bg-light',
       sort: false // To disable sorting: set sort to false
     });
   }
@@ -95,7 +95,7 @@ $(function() {
         name: 'shared3',
       },
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 
@@ -107,7 +107,7 @@ $(function() {
     new Sortable(filterExample, {
       filter: '.filtered', // 'filtered' class is not draggable
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 
@@ -118,7 +118,7 @@ $(function() {
     var gridExample = document.querySelector("#grid-example");
     new Sortable(gridExample, {
       animation: 150,
-      ghostClass: 'bg-dark'
+      ghostClass: 'bg-light'
     });
   }
 

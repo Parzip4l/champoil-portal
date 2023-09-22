@@ -12,9 +12,9 @@ Portfolio: https://behance.net/muhamadsobirin3
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="description" content="Champoil Super Apps">
 	<meta name="author" content="Rinable Creative">
-	<meta name="keywords" content="rinable, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, laravel, theme, front-end, ui kit, web">
+	<meta name="keywords" content="superapp, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, laravel, theme, front-end, ui kit, web">
 
-  <title>CHAMPOIL PORTAL - CHAMPOIL SMART INDUSTRY</title>
+  <title>CHAMPOIL - Portal Super Apps</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,9 +45,8 @@ Portfolio: https://behance.net/muhamadsobirin3
   <script src="{{ asset('assets/js/spinner.js') }}"></script>
 
   <div class="main-wrapper" id="app">
-    @include('layout.sidebar')
+  @include('layout.header')
     <div class="page-wrapper">
-      @include('layout.header')
       <div class="page-content">
         @yield('content')
       </div>

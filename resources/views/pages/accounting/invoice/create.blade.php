@@ -90,9 +90,6 @@
                                 <label for="" class="form-label">Due Date</label>
                                 <input type="date" name="due_date" class="form-control" required>
                                 <input type="hidden" value="{{ json_encode($productDetails) }}" name="product_data">
-                                @php
-                                    var_dump(json_encode($productDetails));
-                                @endphp
                             </div>
                             <div class="form-group mb-3">
                                 <label for="" class="form-label">Journal</label>

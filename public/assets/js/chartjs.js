@@ -16,8 +16,8 @@ $(function() {
     dark           : "#060c17",
     muted          : "#7987a1",
     gridBorder     : "rgba(77, 138, 240, .15)",
-    bodyColor      : "#b8c3d9",
-    cardBg         : "#0c1427"
+    bodyColor      : "#000",
+    cardBg         : "#fff"
   }
 
   var fontFamily = "'Roboto', Helvetica, sans-serif"

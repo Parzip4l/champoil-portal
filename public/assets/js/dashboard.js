@@ -14,8 +14,8 @@ $(function() {
     dark           : "#060c17",
     muted          : "#7987a1",
     gridBorder     : "rgba(77, 138, 240, .15)",
-    bodyColor      : "#b8c3d9",
-    cardBg         : "#0c1427"
+    bodyColor      : "#000",
+    cardBg         : "#fff"
   }
 
   var fontFamily = "'Roboto', Helvetica, sans-serif"
@@ -507,7 +507,7 @@ $(function() {
           },
           track: {
             show: true,
-            background: colors.dark,
+            background: colors.light,
             strokeWidth: '100%',
             opacity: 1,
             margin: 5, 
@@ -534,7 +534,7 @@ $(function() {
       stroke: {
         lineCap: "round",
       },
-      labels: ["Sales Data"]
+      labels: ["Storage Used"]
     };
     
     var chart = new ApexCharts(document.querySelector("#storageChart"), options);

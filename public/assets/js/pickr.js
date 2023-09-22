@@ -6,7 +6,6 @@ $(function() {
 
   // Simple example, see optional options for more configuration.
   // Pickr1
-  console.log("hhiii");
   const pickr1 = Pickr.create({
     el: '#pickr_1',
     theme: 'classic', // or 'monolith', or 'nano',

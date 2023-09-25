@@ -68,7 +68,97 @@
                                 @endphp
                                 <input type="text" class="form-control" name="code" value="{{ $existingDelivery ? $existingDelivery->code : $billCode }}" readonly required>
                                 <input type="hidden" name="so_id" value="{{$Sales->id}}">
+                                <input type="hidden" name="so_code" value="{{$Sales->code}}">
+                                <input type="hidden" name="order_details" value="{{ json_encode($productDetails) }}">
                             </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="" class="form-label">Sales Team</label>
+                                <input type="text" class="form-control" name="sales_team" value="{{$Sales->sales_team}}" readonly required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="" class="form-label">Customer</label>
+                                <input type="text" class="form-control" name="customer_id" value="{{$Sales->customer}}" readonly required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="" class="form-label">Delivery Address</label>
+                                @php
+                                    // Ambil nama produk berdasarkan product_id
+                                    $addresdelivery = \App\ContactM::find($Sales->customer)->address;
+                                @endphp
+                                <input type="text" class="form-control" name="delivery_address" value="{{$addresdelivery}}" readonly required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="" class="form-label">Delivery Date</label>
+                                <input type="text" class="form-control" name="delivery_date" value="{{$Sales->delivery_date}}" readonly required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="" class="form-label">Expedition</label>
+                                <input type="text" class="form-control" name="expedition" value="{{$Sales->ekspedition}}" readonly required>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="productTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Unit Price</th>
+                                            <th>Quantity Bought</th>
+                                            <th>Remaining Quantity to Send</th>
+                                            <th>Tax</th>
+                                            <th>Qty to Send</th>
+                                            <th>Analytics</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($productDetails as $index => $details)
+                                        <tr>
+                                                @php
+                                                    // Mengambil product_id dari $details
+                                                    $product_id = isset($details['product_id']) ? $details['product_id'] : null;
+
+                                                    // Mengambil remaining_quantity dari tabel delivery_orders berdasarkan product_id
+                                                    $deliveryOrder = \App\Sales::whereJsonContains('data_product', [['product_id' => $product_id]])->first();
+
+                                                    $dataDetails = json_decode($deliveryOrder['data_product'], true);
+                                                    
+                                                    // Menentukan remaining quantity
+                                                    $remainingQuantity = isset($dataDetails[0]['remaining_quantity']) ? $dataDetails[0]['remaining_quantity'] : $details['quantity'];
+                                                    $qtySend = $dataDetails[0]['sent_quantity']
+                                                @endphp
+                                            <td>{{$details['name']}}</td>
+                                            <td>Rp. {{number_format($details['unit_price'], 0,',','.')}}</td>
+                                            <td>{{$details['quantity']}}</td>
+                                            <td>
+                                                {{$remainingQuantity}}
+                                            </td>
+                                            <td>{{$details['tax']}}</td>
+                                            <td><input type="number" class="form-control" name="qtysend[{{$index}}]" min="0" max="{{ $remainingQuantity }}"></td>
+                                            <td>
+                                                @php
+                                                    // Ambil nama produk berdasarkan product_id
+                                                    $AnalyticsName = \App\AnalyticsAccount::find($details['analytics'])->name;
+                                                    echo $AnalyticsName;
+                                                @endphp
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-4">
+                            <button class="btn btn-primary">Create Delivery Orders</button>
                         </div>
                     </div>    
                 </form>

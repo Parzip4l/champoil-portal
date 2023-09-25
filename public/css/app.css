@@ -2014,6 +2014,10 @@ progress {
   border-color: var(--bs-table-border-color);
 }
 
+.text-right {
+  text-align: right;
+}
+
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

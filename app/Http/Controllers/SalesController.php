@@ -113,6 +113,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             // Hitung total
             $total = 0;
+            $remaining_quantity = 0;
             $purchaseDetails = [];
     
             for ($i = 0; $i < count($request->product); $i++) {

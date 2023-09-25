@@ -22,7 +22,7 @@
                 <div class="col-md-6">
                     <h6 class="card-title">Sales Orders</h6>
                 </div>
-                <div class="col-md-6 text-right align-self-center">
+                <div class="col-md-6 text-right align-self-center text-right">
                     <a href="{{route('sales.create')}}" class="btn btn-sm btn-primary">New SO</a>
                 </div>
             </div>

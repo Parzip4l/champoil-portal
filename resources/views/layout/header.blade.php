@@ -202,6 +202,7 @@
                                 <div class="col-md-6">
                                     <li class="nav-item"><a href="{{ url('/uom') }}" class="nav-link {{ active_class(['uom']) }}">Uom</a></li>
                                     <li class="nav-item"><a href="{{ url('/uom-categories') }}" class="nav-link {{ active_class(['uom-categories']) }}">Uom Categories</a></li>
+                                    <li class="nav-item"><a href="{{ url('/warehouse-stock') }}" class="nav-link {{ active_class(['warehouse-stock']) }}">Warehouse Stock</a></li>
                                 </div>
                             </div>
                         </ul>

@@ -44,7 +44,11 @@
                     <td> {{ \Carbon\Carbon::parse($data->created_at)->format('d F Y') }} </td>
                     <td> {{ $data->code }} </td>
                     <td> {{ $data->partnername }} </td>
-                    <td> <a href="{{ route('purchase.show', $data->reference) }}">{{ $data->purchasecode }}</a></td>
+                    @if($data->purchasecode)
+                        <td><a href="{{ route('purchase.show', $data->reference) }}">{{ $data->purchasecode }}</a></td>
+                    @else
+                        <td><a href="{{ route('invoice.show', $data->reference) }}">{{ $data->salescode }}</a></td>
+                    @endif
                     <td> {{ $data->journalname }} </td>
                     <td> Rp. {{ number_format($data->total, 0, '.', '.') }} </td>
                     <td>

@@ -9,6 +9,7 @@ use App\Sales;
 use App\Product;
 use App\Productcategory;
 use App\Journal;
+use App\JournalEntry;
 use App\JournalItem;
 use App\ContactM;
 use App\AnalyticsAccount;
@@ -220,6 +221,46 @@ class InvoiceController extends Controller
                     $sales->invoice_status = 'Fully Invoiced';
                     $sales->save();
                 }
+
+            // Code Entry
+            $currentYear = now()->year;
+            $currentMonth = now()->format('m');
+
+            // Temukan entri terbaru dengan kode yang sesuai
+            $latestEntry = JournalEntry::whereYear('created_at', $currentYear)
+                ->whereMonth('created_at', $currentMonth)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            // Inisialisasi nomor urut
+            $nextCodeNumber = 1;
+
+            if ($latestEntry) {
+                // Jika ada entri terbaru, ambil nomor urut dari kode terbaru, tambahkan 1
+                $latestCode = $latestEntry->code;
+                $latestCodeParts = explode('-', $latestCode);
+                $nomorurut = end($latestCodeParts);
+                $nomorurut = ltrim($nomorurut, '0');
+                $lastCodeNumber = (int)$nomorurut;
+                $nextCodeNumber = $lastCodeNumber + 1;
+            }
+
+            // Format ulang nomor urut dengan panjang 5 digit
+            $formattedCodeNumber = str_pad($nextCodeNumber, 5, '0', STR_PAD_LEFT);
+
+            // Buat kode PO dengan format yang sesuai
+            $EntryCode = "STJ-$currentYear-$currentMonth-$formattedCodeNumber";
+            // Journal Entry
+            $uuidjournal = Str::uuid()->toString();
+            $journalentry = new JournalEntry();
+            $journalentry->id = $uuidjournal;
+            $journalentry->code = $EntryCode;
+            $journalentry->partner = $request->customer;
+            $journalentry->reference = $uuid;
+            $journalentry->journal = $JournalAccount;
+            $journalentry->total = $request->total;
+            $journalentry->status = 'Posted';
+            $journalentry->save();
             
             DB::commit();
             return redirect()->route('invoice.index')->with('success', 'Inovice Succesfully Created.');

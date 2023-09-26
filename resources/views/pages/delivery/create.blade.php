@@ -134,7 +134,7 @@
                                                             
                                                             // Menentukan remaining quantity
                                                             $remainingQuantity = isset($dataDetails[0]['remaining_quantity']) ? $dataDetails[0]['remaining_quantity'] : $details['quantity'];
-                                                            $qtySend = $dataDetails[0]['sent_quantity']
+                                                            $qtySend = $dataDetails[0]['sent_quantity'];
                                                         @endphp
                                                     <td>{{$details['name']}}</td>
                                                     <td>Rp. {{number_format($details['unit_price'], 0,',','.')}}</td>

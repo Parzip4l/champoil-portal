@@ -113,7 +113,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             // Hitung total
             $total = 0;
-            $remaining_quantity = 0;
+            $sent_quantity = 0;
             $purchaseDetails = [];
     
             for ($i = 0; $i < count($request->product); $i++) {
@@ -122,6 +122,7 @@ class SalesController extends Controller
                 $quantity = $request->quantity[$i];
                 $tax = $request->tax[$i];
                 $category = $request->product_categories[$i];
+                $remaining_quantity = $request->quantity[$i];
                 $analytics = $request->analytics[$i];
                 // Hitung subtotal
                 $subtotal = ($unit_price * $quantity) * (1 + $tax);
@@ -135,6 +136,8 @@ class SalesController extends Controller
                     'category' => $category,
                     'analytics' => $analytics,
                     'subtotal' => $subtotal,
+                    'remaining_quantity' => $remaining_quantity,
+                    'sent_quantity' => $sent_quantity,
                 ];
 
                 $product = Product::find($product_id);

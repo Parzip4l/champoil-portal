@@ -144,8 +144,8 @@ class PurchaseController extends Controller
                             'short' => true,
                         ],
                         [
-                            'title' => 'Kunjungi Situs Kami',
-                            'value' => '(https://www.contoh.com)',
+                            'title' => 'Lihat Detail Data Di Champoil Portal',
+                            'value' => '(http://127.0.0.1:8000/warehouse-stock)',
                             'short' => true,
                         ]
                     ],
@@ -512,7 +512,7 @@ class PurchaseController extends Controller
              }
      
              // Perbarui status pembelian menjadi "Received"
-             $purchase->status = 'Received';
+             $purchase->status = 'ReceiFved';
              $purchase->save();
      
              // Decode data pembelian menjadi array

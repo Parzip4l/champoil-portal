@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Journal;
+namespace App\Http\Controllers\AccountingReports;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\JournalEntry;
-use App\Purchase;
+use App\JournalItem;
 use App\CoaM;
-use App\ContactM;
-use App\Journal;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-class JournalEntryController extends Controller
+use Illuminate\Support\Str;
+
+class ProfitlossController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,19 +21,14 @@ class JournalEntryController extends Controller
      */
     public function index()
     {
-        $journal = DB::table('journal_entry')
-                ->join('contact', 'journal_entry.partner', '=', 'contact.id')
-                ->leftJoin('purchase', 'journal_entry.reference', '=', 'purchase.id')
-                ->leftJoin('invoice', 'journal_entry.reference', '=', 'invoice.id')
-                ->join('journal', 'journal_entry.journal', '=', 'journal.id')
-                ->select('journal_entry.*', 'contact.name as partnername', 'invoice.code as salescode', 'purchase.code as purchasecode', 'journal.name as journalname')
-                ->get();
+        $incomeAccounts = DB::table('journal_item')
+            ->join('coa', 'journal_item.account', '=', 'coa.id')
+            ->select('coa.type', 'coa.name', DB::raw('SUM(journal_item.debit) as total_debit'))
+            ->where('coa.type', '46c8e893-9dbe-4fb4-bd53-ee3bedd75a59')
+            ->groupBy('coa.type','coa.name')
+            ->get();
 
-        if (!$journal) {
-            // Handle when the product with the given ID is not found
-            abort(404);
-        }
-        return view('pages.accounting.journal.journal-entry',compact('journal'));
+        return view('pages.accounting.report.profitloss', compact('incomeAccounts'));
     }
 
     /**

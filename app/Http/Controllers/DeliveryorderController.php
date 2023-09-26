@@ -33,7 +33,7 @@ class DeliveryorderController extends Controller
         $Sales = Sales::find($salesId);
 
         $existingDelivery = Deliverysales::where('so_id', $salesId)->first();
-        $HistoryDelivery = Deliverysales::where('so_id', $salesId)->get();
+        $HistoryDelivery = Deliverysales::where('so_id', $salesId)->orderBy('created_at', 'desc')->get();
         if ($Sales) {
             $customers = ContactM::where('id', $Sales->customer_id)->first();
             $customersname = $customers ? $customers->name : 'Vendor Not Found'; // Handle jika vendor tidak ditemukan
@@ -155,6 +155,7 @@ class DeliveryorderController extends Controller
         
                 // Update remaining quantity in the original order details
                 $order_details[$index]['remaining_quantity'] = $remainingQuantity;
+                $order_details[$index]['sent_quantity'] = $quantitySent;
             }
         
             // Simpan pesanan pengiriman

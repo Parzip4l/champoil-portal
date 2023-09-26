@@ -72,6 +72,10 @@ Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentCo
 // Journal Item
 Route::resource('journal-item', App\Http\Controllers\Journal\JournalItemsController::class);
 Route::resource('journal-entry', App\Http\Controllers\Journal\JournalEntryController::class);
+Route::resource('profit-loss', App\Http\Controllers\AccountingReports\ProfitlossController::class);
+Route::resource('warehouse-stock', App\Http\Controllers\Warehousestock\FngController::class);
+Route::resource('warehouse-stock-pck', App\Http\Controllers\Warehousestock\PckController::class);
+Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaController::class);
 // Growth
 Route::resource('growth', GrowthController::class);
 // Contact

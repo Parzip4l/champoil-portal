@@ -33,7 +33,7 @@ class DeliveryorderController extends Controller
         $Sales = Sales::find($salesId);
 
         $existingDelivery = Deliverysales::where('so_id', $salesId)->first();
-
+        $HistoryDelivery = Deliverysales::where('so_id', $salesId)->get();
         if ($Sales) {
             $customers = ContactM::where('id', $Sales->customer_id)->first();
             $customersname = $customers ? $customers->name : 'Vendor Not Found'; // Handle jika vendor tidak ditemukan
@@ -115,7 +115,7 @@ class DeliveryorderController extends Controller
 
         // Buat kode PO dengan format yang sesuai
         $billCode = "FNG-OUT-$currentYear-$currentMonth-$formattedCodeNumber";
-        return view('pages.delivery.create', compact('billCode','Sales','customers','productDetails','existingDelivery'));
+        return view('pages.delivery.create', compact('billCode','Sales','customers','productDetails','existingDelivery','HistoryDelivery'));
     }
 
     public function store(Request $request)

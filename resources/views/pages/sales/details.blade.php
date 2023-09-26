@@ -61,11 +61,7 @@
                     <div class="col-md-6 mb-2" style="text-align:right">
                         <div class="row">
                             <div class="col-md-4">
-                            @if ($sales->delivery_status === 'Delivered')
-                                <a href="{{ route('delivery-orders.create', ['sales_id' => $sales->id]) }}" class="btn btn-primary w-100 btn-disabled">Delivery</a>
-                            @elseif ($sales->delivery_status === 'To Delivery')
                                 <a href="{{ route('delivery-orders.create', ['sales_id' => $sales->id]) }}" class="btn btn-primary w-100">Delivery</a>
-                            @endif
                             </div>
                             <div class="col-md-4">
                                 <a href="#" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#invoiceTypeModal">Create Invoice</a>
@@ -90,12 +86,13 @@
                                     <th>Quantity</th>
                                     <th>Tax</th>
                                     <th>Analytics</th>
+                                    <th>Delivery Status</th>
                                     <th>Subtotal</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php 
-                                $dataProduct = json_decode($sales->data_product, true);
+                                    $dataProduct = json_decode($sales->data_product, true);
                                 @endphp
                                 @foreach($salesDetails as $details)
                                 <tr>
@@ -104,6 +101,11 @@
                                     <td>{{$details['quantity']}}</td>
                                     <td>{{$details['tax']}}</td>
                                     <td>{{$details['analytics']}}</td>
+                                    <td>
+                                        <span class="badge {{ $sales->delivery_status === 'Full Delivery' ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $sales->delivery_status }}
+                                        </span> 
+                                    </td>
                                     <td>Rp. {{ number_format($details['subtotal'], 0, ',', '.') }}</td>
                                 </tr>
                                 @endforeach

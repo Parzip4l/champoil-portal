@@ -76,6 +76,8 @@ Route::resource('profit-loss', App\Http\Controllers\AccountingReports\Profitloss
 Route::resource('warehouse-stock', App\Http\Controllers\Warehousestock\FngController::class);
 Route::resource('warehouse-stock-pck', App\Http\Controllers\Warehousestock\PckController::class);
 Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaController::class);
+Route::resource('rnd-check', App\Http\Controllers\Rnd\PenetrasiController::class);
+Route::resource('rnd-check-kuhl', App\Http\Controllers\Rnd\KuhlController::class);
 // Growth
 Route::resource('growth', GrowthController::class);
 // Contact

@@ -286,12 +286,14 @@
         <li class="nav-item {{ active_class(['general/*', 'error/*', 'auth/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="filter"></i>
-                <span class="menu-title">RnD</span>
+                    <span class="menu-title">RnD</span>
                 <i class="link-arrow"></i>
             </a>
             <div class="submenu">
                 <ul class="submenu-item">
-                <li class="nav-item"><a href="{{ url('/#') }}" class="nav-link {{ active_class(['#']) }}">Quality Check</a></li>
+                    <li class="nav-item"><a href="{{ url('/#') }}" class="nav-link {{ active_class(['#']) }}">Quality Check</a></li>
+                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">Ph KUHL</a></li>
+                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">Penetrasi Product</a></li>
                 </ul>
             </div>
         </li>

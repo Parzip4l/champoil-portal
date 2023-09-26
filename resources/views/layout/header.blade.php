@@ -292,13 +292,12 @@
             <div class="submenu">
                 <ul class="submenu-item">
                     <li class="nav-item"><a href="{{ url('/#') }}" class="nav-link {{ active_class(['#']) }}">Quality Check</a></li>
-                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">Ph KUHL</a></li>
-                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">Penetrasi Product</a></li>
+                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">Penetrasi Check</a></li>
                 </ul>
             </div>
         </li>
         <li class="nav-item">
-          <a href="https://www.nobleui.com/laravel/documentation/docs.html" target="_blank" class="nav-link">
+          <a href="{{ url('slack-account') }}" class="nav-link">
             <i class="link-icon" data-feather="settings"></i>
             <span class="menu-title">Apps Settings</span></a>
         </li>

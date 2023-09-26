@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rnd;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Kuhl;
+use App\Slack;
 
 class KuhlController extends Controller
 {
@@ -45,7 +46,8 @@ class KuhlController extends Controller
             $purchase->checker = $request->checker;
             $purchase->save();
 
-            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
+            $slackChannel = Slack::where('channel', 'Formulation')->first();
+            $slackWebhookUrl = $slackChannel->url;
             $today = now()->toDateString();
             $data = [
                 'text' => "Update Penetrasi Produksi {$today}",

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\FngM;
 use App\RmaM;
 use App\PckM;
+use App\Slack;
 
 class FngController extends Controller
 {
@@ -59,7 +60,8 @@ class FngController extends Controller
             $purchase->active_10 = $request->active_10;
             $purchase->save();
 
-            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
+            $slackChannel = Slack::where('channel', 'Warehouse')->first();
+            $slackWebhookUrl = $slackChannel->url;
             $today = now()->toDateString();
             $data = [
                 'text' => "Update Finish Goods Stock {$today}",

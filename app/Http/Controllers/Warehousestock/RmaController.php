@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Warehousestock;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\RmaM;
+use App\Slack;
 
 class RmaController extends Controller
 {
@@ -59,7 +60,9 @@ class RmaController extends Controller
             $purchase->soda_ash = $request->soda_ash;
             $purchase->save();
 
-            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
+            $slackChannel = Slack::where('channel', 'Warehouse')->first();
+            $slackWebhookUrl = $slackChannel->url;
+
             $today = now()->toDateString();
             $data = [
                 'text' => "Update Raw Material Stock {$today}",

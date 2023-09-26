@@ -55,7 +55,7 @@ class PckController extends Controller
             $purchase->active_10 = $request->active_10;
             $purchase->save();
 
-            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
+            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
             $today = now()->toDateString();
             $data = [
                 'text' => "Update Packaging Stock {$today}",
@@ -125,7 +125,7 @@ class PckController extends Controller
                             ],
                             [
                                 'title' => 'Lihat Detail Data Di Champoil Portal',
-                                'value' => '(http://127.0.0.1:8000/warehouse-stock)',
+                                'value' => '(https://portal.champoil.co.id/warehouse-stock)',
                                 'short' => true,
                             ]
                         ],

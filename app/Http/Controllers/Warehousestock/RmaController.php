@@ -59,7 +59,7 @@ class RmaController extends Controller
             $purchase->soda_ash = $request->soda_ash;
             $purchase->save();
 
-            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
+            $slackWebhookUrl = 'https://hooks.slack.com/services/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';
             $today = now()->toDateString();
             $data = [
                 'text' => "Update Raw Material Stock {$today}",
@@ -159,7 +159,7 @@ class RmaController extends Controller
                             ],
                             [
                                 'title' => 'Lihat Detail Data Di Champoil Portal',
-                                'value' => '(http://127.0.0.1:8000/warehouse-stock)',
+                                'value' => '(https://portal.champoil.co.id/warehouse-stock)',
                                 'short' => true,
                             ]
                         ],

@@ -79,6 +79,7 @@ Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaCo
 Route::resource('rnd-check', App\Http\Controllers\Rnd\PenetrasiController::class);
 Route::resource('rnd-check-kuhl', App\Http\Controllers\Rnd\KuhlController::class);
 Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
+Route::resource('manual-delivery', ManualDeliveryController::class);
 // Growth
 Route::resource('growth', GrowthController::class);
 // Contact

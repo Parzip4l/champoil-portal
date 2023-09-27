@@ -224,7 +224,7 @@
                     <div class="col-group col-md-4">
                         <p class="category-heading">Delivery System</p>
                         <ul class="submenu-item">
-                            <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Delivery Orders</a></li>
+                            <li class="nav-item"><a href="{{ url('manual-delivery') }}" class="nav-link {{ active_class(['manual-delivery']) }}">Delivery Orders</a></li>
                         </ul>
                     </div>
                 </div>

@@ -1,0 +1,202 @@
+@extends('layout.master')
+
+@push('plugin-styles')
+  <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+@endpush
+
+@section('content')
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-header mb-2">
+            <div class="row">
+                <div class="col-md-6 align-self-center">
+                    <h6 class="card-title mb-0">Jadwal Pengiriman</h6>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kuhlModal">Tambah Data Baru</a>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+          <table id="dataTableExample" class="table">
+            <thead>
+              <tr>
+                <th>Delivery Date</th>
+                <th>SO Number</th>
+                <th>Customer Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+                @foreach($data as $data)
+                <tr>
+                    <td>{{$data->tanggal_kirim}}</td>
+                    <td>{{$data->nomor_so}}</td>
+                    <td>{{$data->customer}}</td>
+                    <td>{{$data->status}}</td>
+                </tr>
+                @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="kuhlModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Buat Data Pengiriman</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('manual-delivery.store')}}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Tanggal Order</label>
+                            <input type="date" class="form-control" name="tanggal_order" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Tanggal Kirim</label>
+                            <input type="date" class="form-control" name="tanggal_kirim" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Customer</label>
+                            <input type="text" class="form-control" name="customer" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Nomor SO</label>
+                            <input type="text" class="form-control" name="nomor_so" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Ekspedisi</label>
+                            <input type="text" class="form-control" name="ekspedisi" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Nama Barang</label>
+                            <input type="text" class="form-control" name="nama_barang" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Total Order</label>
+                            <input type="text" class="form-control" name="total_order" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Sisa Order</label>
+                            <input type="text" class="form-control" name="sisa_order">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Driver</label>
+                            <select name="driver" class="form-control" id="">
+                                <option value="Adi Rusman">Adi Rusman</option>
+                                <option value="Aas">Aas</option>
+                                <option value="Febri Andrianto">Febri Andrianto</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Status</label>
+                            <select name="status" class="form-control" id="">
+                                <option value="Done">Done</option>
+                                <option value="On Progress">On Progress</option>
+                                <option value="On Delivery">On Delivery</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="Cancel">Cancel</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Dikirim Sebagian">Dikirim Sebagian</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Keterangan</label>
+                            <input type="text" class="form-control" name="keterangan">
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('plugin-scripts')
+  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+  <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+@endpush
+
+@push('custom-scripts')
+  <script src="{{ asset('assets/js/data-table.js') }}"></script>
+  <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+  <script>
+    function showDeleteDataDialog(id) {
+        Swal.fire({
+            title: 'Hapus Data',
+            text: 'Anda Yakin Akan Menghapus Data Ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform the delete action here (e.g., send a request to delete the data)
+                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
+                const deleteUrl = "{{ route('contact.destroy', ':id') }}".replace(':id', id);
+                fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                }).then((response) => {
+                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Contact Successfully Deleted',
+                            icon: 'success',
+                        }).then(() => {
+                            window.location.reload(); // Refresh halaman setelah menutup alert
+                        });
+                    } else {
+                        // Handle error response if needed
+                        Swal.fire({
+                            title: 'Contact Failed to Delete',
+                            text: 'An error occurred while deleting data.',
+                            icon: 'error',
+                        });
+                    }
+                }).catch((error) => {
+                    // Handle fetch error if needed
+                    Swal.fire({
+                        title: 'Contact Failed to Delete',
+                        text: 'An error occurred while deleting data.',
+                        icon: 'error',
+                    });
+                });
+            }
+        });
+    }
+</script>
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ session('success') }}',
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session('error') }}',
+        });
+    @endif
+</script>
+@endpush

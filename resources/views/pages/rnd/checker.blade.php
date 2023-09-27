@@ -79,7 +79,7 @@
                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="row">
                             <div class="col-md-12">
-                            <a href="" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#kuhlModal">Tambah Data Baru</a>
+                                <a href="" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#kuhlModal">Tambah Data Baru</a>
                             </div>
                         </div>
                         <div class="table-responsive">

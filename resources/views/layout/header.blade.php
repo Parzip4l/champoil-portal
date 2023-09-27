@@ -297,9 +297,16 @@
             </div>
         </li>
         <li class="nav-item">
-          <a href="{{ url('slack-account') }}" class="nav-link">
-            <i class="link-icon" data-feather="settings"></i>
-            <span class="menu-title">Apps Settings</span></a>
+            <a href="{{ url('') }}" class="nav-link">
+                <i class="link-icon" data-feather="settings"></i>
+                    <span class="menu-title">Apps Settings</span>
+                <i class="link-arrow"></i>
+            </a>
+            <div class="submenu">
+                <ul class="submenu-item">
+                    <li class="nav-item"><a href="{{ url('slack-account') }}" class="nav-link {{ active_class(['slack-account']) }}">Automation</a></li>
+                </ul>
+            </div>
         </li>
       </ul>
     </div>

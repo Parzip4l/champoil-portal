@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Slack;
+namespace App\Http\Controllers\Automatisasi;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Slack;
 use App\Artikel;
 
-class SlackController extends Controller
+class ArtikelController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,9 +15,7 @@ class SlackController extends Controller
      */
     public function index()
     {
-        $slack = Slack::all();
-        $artikel = Artikel::all();
-        return view('pages.slack.index',compact('slack','artikel'));
+        //
     }
 
     /**
@@ -40,17 +37,17 @@ class SlackController extends Controller
     public function store(Request $request)
     {
         try {
-            $purchase = new Slack(); // Generate UUID
-            $purchase->channel = $request->channel;
-            $purchase->url = $request->url;
-            $purchase->save();
+            $artikel = new Artikel(); // Generate UUID
+            $artikel->title = $request->title;
+            $artikel->url = $request->url;
+            $artikel->tanggal_kirim = $request->tanggal_kirim;
+            $artikel->save();
 
             return redirect()->route('slack-account.index')->with('success', 'Data berhasil disimpan.');
         } catch (\Exception $e) {
             // Tangani kesalahan yang mungkin terjadi
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan Data: ' . $e->getMessage());
         }
-
     }
 
     /**

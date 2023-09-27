@@ -298,6 +298,12 @@
         </li>
         <li class="nav-item">
             <a href="{{ url('') }}" class="nav-link">
+                <i class="link-icon" data-feather="coffee"></i>
+                    <span class="menu-title">Creative</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('') }}" class="nav-link">
                 <i class="link-icon" data-feather="settings"></i>
                     <span class="menu-title">Apps Settings</span>
                 <i class="link-arrow"></i>

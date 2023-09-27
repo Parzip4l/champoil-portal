@@ -71,62 +71,62 @@ class FngController extends Controller
                         'fields' => [
                             [
                                 'title' => 'Supreme 15Kg',
-                                'value' => $request->supreme_15,
+                                'value' => $request->supreme_15 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Supreme 4Kg',
-                                'value' => $request->supreme_4,
+                                'value' => $request->supreme_4 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Optima 15Kg',
-                                'value' => $request->optima_15,
+                                'value' => $request->optima_15 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Super',
-                                'value' => $request->super,
+                                'value' => $request->super . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'F 300',
-                                'value' => $request->f300,
+                                'value' => $request->f300 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Heavy Loader',
-                                'value' => $request->heavy_loader,
+                                'value' => $request->heavy_loader . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Xtreme',
-                                'value' => $request->xtreme,
+                                'value' => $request->xtreme . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Power 15Kg',
-                                'value' => $request->power_15,
+                                'value' => $request->power_15 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Power 10Kg',
-                                'value' => $request->power_10,
+                                'value' => $request->power_10 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Power 4Kg',
-                                'value' => $request->power_4,
+                                'value' => $request->power_4 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'WH 300',
-                                'value' => $request->wh300,
+                                'value' => $request->wh300 . ' Pail',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Active 10Kg',
-                                'value' => $request->active_10,
+                                'value' => $request->active_10 . ' Pail',
                                 'short' => true,
                             ],
                             [

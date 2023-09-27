@@ -38,7 +38,7 @@ class SendArtikel extends Command
 
         // Loop melalui setiap artikel dan kirim ke Slack
         foreach ($artikelHariIni as $artikel) {
-            $slackChannel = Slack::where('channel', 'Testing Channel')->first();
+            $slackChannel = Slack::where('channel', 'Management')->first();
             $slackWebhookUrl = $slackChannel->url;
 
             $data = [

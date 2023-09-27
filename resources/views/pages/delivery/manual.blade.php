@@ -22,26 +22,41 @@
             </div>
         </div>
         <div class="table-responsive">
-          <table id="dataTableExample" class="table">
-            <thead>
-              <tr>
-                <th>Delivery Date</th>
-                <th>SO Number</th>
-                <th>Customer Name</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-                @foreach($data as $data)
+            <table id="dataTableExample" class="table">
+                <thead>
                 <tr>
-                    <td>{{$data->tanggal_kirim}}</td>
-                    <td>{{$data->nomor_so}}</td>
-                    <td>{{$data->customer}}</td>
-                    <td>{{$data->status}}</td>
+                    <th>Delivery Date</th>
+                    <th>SO Number</th>
+                    <th>Customer Name</th>
+                    <th>Status</th>
                 </tr>
-                @endforeach
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                    @foreach($data as $data)
+                    <tr>
+                        <td>{{$data->tanggal_kirim}}</td>
+                        <td>{{$data->nomor_so}}</td>
+                        <td>{{$data->customer}}</td>
+                        <td>
+                            <form action="{{ route('manual-delivery.update', $data->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <select name="status" class="form-control">
+                                    <option value="Done" {{$data->status == 'Done' ? 'selected' : ''}}>Done</option>
+                                    <option value="On Progress" {{$data->status == 'On Progress' ? 'selected' : ''}}>On Progress</option>
+                                    <option value="On Delivery" {{$data->status == 'On Delivery' ? 'selected' : ''}}>On Delivery</option>
+                                    <option value="Delayed" {{$data->status == 'Delayed' ? 'selected' : ''}}>Delayed</option>
+                                    <option value="Cancel" {{$data->status == 'Cancel' ? 'selected' : ''}}>Cancel</option>
+                                    <option value="On Hold" {{$data->status == 'On Hold' ? 'selected' : ''}}>On Hold</option>
+                                    <option value="Dikirim Sebagian" {{$data->status == 'Dikirim Sebagian' ? 'selected' : ''}}>Dikirim Sebagian</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary w-100 mt-2">Update Status</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
       </div>
     </div>
@@ -127,9 +142,10 @@
 @endsection
 
 @push('plugin-scripts')
-  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
-  <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
-  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
@@ -198,5 +214,39 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    $(document).ready(function() {
+    // Listen for changes in the status dropdown
+    $('select.status-dropdown').change(function() {
+        const status = $(this).val();
+        const dataId = $(this).data('id');
+        
+        // Get the CSRF token from the meta tag
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        
+        // Send an AJAX request to update the status
+        $.ajax({
+            url: '/update-status',
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                id: dataId,
+                status: status
+            },
+            success: function(response) {
+                // Handle the response from the server if needed
+                console.log('Status updated successfully:', response);
+            },
+            error: function(error) {
+                console.error('Error updating status:', error);
+                console.error('XHR status:', status);
+                console.error('XHR response:', xhr.responseText);
+            }
+        });
+    });
+});
 </script>
 @endpush

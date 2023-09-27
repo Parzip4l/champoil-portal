@@ -30,6 +30,11 @@ class ManualDeliveryController extends Controller
         //
     }
 
+    public function updateStatus(Request $request)
+    {
+        
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -171,7 +176,92 @@ class ManualDeliveryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $delivery = ManualDelivery::find($id);
+        $status = $request->input('status');
+        if (!$delivery) {
+            return response()->json(['error' => 'Delivery not found.'], 404);
+        }
+
+        // Update the status
+        $delivery->status = $status;
+        $delivery->save();
+
+        $slackChannel = Slack::where('channel', 'Jadwal Pengiriman')->first();
+            $slackWebhookUrl = $slackChannel->url;
+            $today = now()->toDateString();
+            $data = [
+                'text' => "Orderan {$delivery->customer} Pada Tanggal {$delivery->tanggal_order}",
+                'attachments' => [
+                    [
+                        'title' => 'Data Orderan ' . $delivery->customer,
+                        'fields' => [
+                            [
+                                'title' => 'Nomor SO',
+                                'value' => $delivery->nomor_so,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Nama Barang',
+                                'value' => $delivery->nama_barang,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Total Order',
+                                'value' => $delivery->total_order,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Status Pengiriman',
+                                'value' => $status,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Keterangan',
+                                'value' => $delivery->keterangan,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Lihat Detail Data Di Champoil Portal',
+                                'value' => '(https://portal.champoil.co.id/manual-delivery)',
+                                'short' => true,
+                            ]
+                        ],
+                    ],
+                ],
+                
+            ];
+
+            $data_string = json_encode($data);
+
+            $ch = curl_init($slackWebhookUrl);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data_string),
+            ]);
+
+            $result = curl_exec($ch);
+
+            if ($result === false) {
+                // Penanganan kesalahan jika Curl gagal
+                $error = curl_error($ch);
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+            }
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($httpCode !== 200) {
+                // Penanganan kesalahan jika Slack merespons selain status 200 OK
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+            }
+
+            curl_close($ch);
+
+        return redirect()->back()->with('success', 'Status updated successfully.');
     }
 
     /**

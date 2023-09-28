@@ -11,11 +11,16 @@
 |
 */
 
-Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
+
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('dashboard', DashboardController::class);
     Route::resource('/', DashboardController::class);
+    Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
+    Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
+    Route::resource('isi-survei', SurveyController::class);
+    Route::resource('purchase', PurchaseController::class);
+    Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
@@ -96,7 +101,7 @@ Route::middleware(['auth', 'permission:ops_access'])->group(function () {
 });
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
-    
+    Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
 });
 
 Route::middleware(['auth', 'permission:creative_access'])->group(function () {
@@ -108,11 +113,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
     Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
+    Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
 });
 
-// Purchase Daily
-Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
-Route::resource('isi-survei', SurveyController::class);
 
 
 // Login

@@ -40,10 +40,7 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('users.edit', $data->id)}}">
-                                                <i data-feather="edit-2" class="icon-sm me-2"></i>
-                                                <span class="">Edit</span>
-                                            </a>
+                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ModalEditPass{{$data->id}}"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Ganti Password</span></a>
                                             <a class="dropdown-item d-flex align-items-center" href="{{ route('users.edit', $data->id)}}">
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
@@ -113,6 +110,48 @@
                                         <label class="form-check-label">Inventory Access</label>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="ops_access">
+                                        <label class="form-check-label">Ops Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="sales_access">
+                                        <label class="form-check-label">Sales Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access">
+                                        <label class="form-check-label">HR Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="formulation_access">
+                                        <label class="form-check-label">Formulation Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="creative_access">
+                                        <label class="form-check-label">Creative Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="maintenance_access">
+                                        <label class="form-check-label">Maintenance Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="purchase_access">
+                                        <label class="form-check-label">Purchase Access</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -124,6 +163,36 @@
         </div>
     </div>
 </div>
+
+@foreach($users as $d)
+<div class="modal fade bd-example-modal-lg" id="ModalEditPass{{$d->id}}" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content p-4">
+        <h4 class="pb-2">Ganti Password Pemilik Akun Dengan Username {{$d->name}}</h4>
+        <hr>
+        <form class="forms-sample" action="{{ route('pass.update', $d->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label for="exampleInputUsername1" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control" id="passwordInput" autocomplete="off" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="authCheck">
+                        <label class="form-check-label" for="authCheck">
+                            Show Password
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary me-2">Submit</button>    
+        </form>
+    </div>
+  </div>
+</div>
+@endforeach
 <!-- End Modal -->
 @endsection
 
@@ -152,5 +221,17 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+  const authCheck = document.getElementById('authCheck');
+  const passwordInput = document.getElementById('passwordInput');
+
+  authCheck.addEventListener('change', function() {
+    if (authCheck.checked) {
+      passwordInput.type = 'text';
+    } else {
+      passwordInput.type = 'password';
+    }
+  });
 </script>
 @endpush

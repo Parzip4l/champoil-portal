@@ -20,19 +20,19 @@ class CheckPermission
         if (Auth::check()) {
             // Mengecek izin akses pengguna
             $userPermissions = json_decode(Auth::user()->permission, true);
-
+        
             if (!is_array($userPermissions)) {
                 abort(500, 'Invalid user permissions format.');
             }
-
+        
             foreach ($userPermissions as $data) {
-                if (in_array($data, $userPermissions)) {
+                if ($data === $permission) {
                     return $next($request);
                 }
             }
-
+        
             abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
-        }
+        }        
 
         return redirect('/login');
     }

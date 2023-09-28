@@ -31,9 +31,7 @@ class UserController extends Controller
             'permissions' => 'required|array',
         ]);
 
-        $uuid = Str::uuid()->toString();
         $user = new User();
-        $user->id = $uuid;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
@@ -46,6 +44,20 @@ class UserController extends Controller
     public function edit(User $user)
     {
         return view('users.edit', compact('user'));
+    }
+
+    public function changePassword(Request $request, $id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->update([
+                'password' => bcrypt($request->input('password')),
+            ]);
+    
+            return redirect()->back()->with('success', 'Password Berhasil Diupdate.');
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors());
+        }
     }
 
     public function update(Request $request, User $user)

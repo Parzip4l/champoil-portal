@@ -11,99 +11,109 @@
 |
 */
 
-
-
-
-Route::resource('sales', SalesController::class);
-Route::resource('delivery-orders', DeliveryorderController::class);
-// Purchase
-Route::resource('purchase', PurchaseController::class);
-Route::get('purchase/receive/{id}', 'PurchaseController@receiveProductShow')->name('purchase.receive');
-// Send Purchase To Slack
-Route::post('/send-purchase-to-slack/{purchase}', 'PurchaseController@sendToSlack')->name('purchase.sendToSlack');
-// Payment Regist
-Route::resource('payment-regist', PaymentRegistController::class);
-Route::resource('journal', JournalController::class);   
-// Warehouse
-Route::resource('uom-categories', UomCategoryController::class);
-Route::resource('uom', UomController::class);
-Route::resource('warehouse-location', WarehouselokController::class);
-Route::resource('inventory-product', ProductController::class);
-
 Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
-Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
-Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
 // Dashboard
-Route::middleware(['auth', 'permission:dashboard_access,accounting_access,inventory_access'])->group(function () {
+Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('dashboard', DashboardController::class);
     Route::resource('/', DashboardController::class);
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
-    
+    Route::resource('sales', SalesController::class);
+    Route::resource('delivery-orders', DeliveryorderController::class);
+    // Growth
+    Route::resource('growth', GrowthController::class);
+    // Contact
+    Route::resource('contact', ContactController::class);
 });
 
 Route::middleware(['auth', 'permission:purchase_access'])->group(function () {
-    
+    Route::resource('purchase', PurchaseController::class);
+    Route::get('purchase/receive/{id}', 'PurchaseController@receiveProductShow')->name('purchase.receive');
+    Route::post('/send-purchase-to-slack/{purchase}', 'PurchaseController@sendToSlack')->name('purchase.sendToSlack');
+    Route::post('/purchase/{id}/partial_receive', 'PurchaseController@partialReceive')->name('purchase.partial_receive');
 });
 
 Route::middleware(['auth', 'permission:accounting_access'])->group(function () {
-    
+    Route::resource('payment-regist', PaymentRegistController::class);
+    Route::resource('journal', JournalController::class); 
+    Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
+    Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
+    Route::resource('uom-categories', UomCategoryController::class);
+    Route::resource('uom', UomController::class);
+    Route::resource('warehouse-location', WarehouselokController::class);
+    Route::resource('inventory-product', ProductController::class);
+    Route::resource('analytics-plans', App\Http\Controllers\Analytics\AnalyticsPlansController::class);
+    Route::resource('contact', ContactController::class);
+
+    // Analytics Account
+    Route::resource('analytics-account', App\Http\Controllers\Analytics\AnalyticsAccountController::class);
+
+    // Invoice
+    Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
+
+    // Top
+    Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentController::class);
+    // Journal Item
+    Route::resource('journal-item', App\Http\Controllers\Journal\JournalItemsController::class);
+    Route::resource('journal-entry', App\Http\Controllers\Journal\JournalEntryController::class);
+    Route::resource('profit-loss', App\Http\Controllers\AccountingReports\ProfitlossController::class);
+
+    // Accounting 
+    Route::resource('coa', CoaController::class);
+    Route::resource('account-type', AccountTypeController::class);
+
+    // Vendor Bills
+    Route::resource('vendor-bills', VendorbillController::class);
+    Route::resource('product-category', ProductCategoryController::class);
+
+    Route::resource('tax', TaxController::class);
 });
 
 Route::middleware(['auth', 'permission:inventory_access'])->group(function () {
+    Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
+    Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
+    Route::resource('product-category', ProductCategoryController::class);
+    Route::resource('inventory-product', ProductController::class);
+});
+
+Route::middleware(['auth', 'permission:formulation_access'])->group(function () {
+    Route::resource('rnd-check', App\Http\Controllers\Rnd\PenetrasiController::class);
+    Route::resource('rnd-check-kuhl', App\Http\Controllers\Rnd\KuhlController::class);
+});
+
+Route::middleware(['auth', 'permission:ops_access'])->group(function () {
+    Route::resource('uom-categories', UomCategoryController::class);
+    Route::resource('uom', UomController::class);
+    Route::resource('warehouse-location', WarehouselokController::class);
+    Route::resource('inventory-product', ProductController::class);
+    Route::resource('warehouse-stock', App\Http\Controllers\Warehousestock\FngController::class);
+    Route::resource('warehouse-stock-pck', App\Http\Controllers\Warehousestock\PckController::class);
+    Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaController::class);
+    Route::resource('manual-delivery', ManualDeliveryController::class);
+    Route::post('/update-status', 'ManualDeliveryController@updateStatus')->name('delivery.updateStatus');
+    Route::resource('product-category', ProductCategoryController::class);
+});
+
+Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     
 });
 
-Route::post('/purchase/{id}/partial_receive', 'PurchaseController@partialReceive')->name('purchase.partial_receive');
+Route::middleware(['auth', 'permission:creative_access'])->group(function () {
+    
+});
 
-// Analytics Plans
-Route::resource('analytics-plans', App\Http\Controllers\Analytics\AnalyticsPlansController::class);
+Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
+    Route::resource('users', UserController::class);
+    Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
+    Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
+    Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
+});
 
-// Analytics Account
-Route::resource('analytics-account', App\Http\Controllers\Analytics\AnalyticsAccountController::class);
-
-// Invoice
-Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
 // Purchase Daily
 Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
-
-// Top
-Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentController::class);
-// Journal Item
-Route::resource('journal-item', App\Http\Controllers\Journal\JournalItemsController::class);
-Route::resource('journal-entry', App\Http\Controllers\Journal\JournalEntryController::class);
-Route::resource('profit-loss', App\Http\Controllers\AccountingReports\ProfitlossController::class);
-Route::resource('warehouse-stock', App\Http\Controllers\Warehousestock\FngController::class);
-Route::resource('warehouse-stock-pck', App\Http\Controllers\Warehousestock\PckController::class);
-Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaController::class);
-Route::resource('rnd-check', App\Http\Controllers\Rnd\PenetrasiController::class);
-Route::resource('rnd-check-kuhl', App\Http\Controllers\Rnd\KuhlController::class);
-Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
-Route::resource('manual-delivery', ManualDeliveryController::class);
 Route::resource('isi-survei', SurveyController::class);
-Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
 
-Route::post('/update-status', 'ManualDeliveryController@updateStatus')->name('delivery.updateStatus');
-// Growth
-Route::resource('growth', GrowthController::class);
-// Contact
-Route::resource('contact', ContactController::class);
-// Product Category
-Route::resource('product-category', ProductCategoryController::class);
-
-// Accounting 
-Route::resource('coa', CoaController::class);
-Route::resource('account-type', AccountTypeController::class);
-
-// Vendor Bills
-Route::resource('vendor-bills', VendorbillController::class);
-
-// User
-Route::resource('users', UserController::class);
-
-// Tax
-Route::resource('tax', TaxController::class);
 
 // Login
 Route::controller(LoginController::class)->group(function(){
@@ -111,91 +121,10 @@ Route::controller(LoginController::class)->group(function(){
     Route::post('login/proses','proses');
 });
 
-Route::get('/logout', 'LoginController@logout')->name('logout');
-
-
-Route::group(['prefix' => 'email'], function(){
-    Route::get('inbox', function () { return view('pages.email.inbox'); });
-    Route::get('read', function () { return view('pages.email.read'); });
-    Route::get('compose', function () { return view('pages.email.compose'); });
-});
-
-Route::group(['prefix' => 'apps'], function(){
-    Route::get('chat', function () { return view('pages.apps.chat'); });
-    Route::get('calendar', function () { return view('pages.apps.calendar'); });
-});
-
-Route::group(['prefix' => 'ui-components'], function(){
-    Route::get('accordion', function () { return view('pages.ui-components.accordion'); });
-    Route::get('alerts', function () { return view('pages.ui-components.alerts'); });
-    Route::get('badges', function () { return view('pages.ui-components.badges'); });
-    Route::get('breadcrumbs', function () { return view('pages.ui-components.breadcrumbs'); });
-    Route::get('buttons', function () { return view('pages.ui-components.buttons'); });
-    Route::get('button-group', function () { return view('pages.ui-components.button-group'); });
-    Route::get('cards', function () { return view('pages.ui-components.cards'); });
-    Route::get('carousel', function () { return view('pages.ui-components.carousel'); });
-    Route::get('collapse', function () { return view('pages.ui-components.collapse'); });
-    Route::get('dropdowns', function () { return view('pages.ui-components.dropdowns'); });
-    Route::get('list-group', function () { return view('pages.ui-components.list-group'); });
-    Route::get('media-object', function () { return view('pages.ui-components.media-object'); });
-    Route::get('modal', function () { return view('pages.ui-components.modal'); });
-    Route::get('navs', function () { return view('pages.ui-components.navs'); });
-    Route::get('navbar', function () { return view('pages.ui-components.navbar'); });
-    Route::get('pagination', function () { return view('pages.ui-components.pagination'); });
-    Route::get('popovers', function () { return view('pages.ui-components.popovers'); });
-    Route::get('progress', function () { return view('pages.ui-components.progress'); });
-    Route::get('scrollbar', function () { return view('pages.ui-components.scrollbar'); });
-    Route::get('scrollspy', function () { return view('pages.ui-components.scrollspy'); });
-    Route::get('spinners', function () { return view('pages.ui-components.spinners'); });
-    Route::get('tabs', function () { return view('pages.ui-components.tabs'); });
-    Route::get('tooltips', function () { return view('pages.ui-components.tooltips'); });
-});
-
-Route::group(['prefix' => 'advanced-ui'], function(){
-    Route::get('cropper', function () { return view('pages.advanced-ui.cropper'); });
-    Route::get('owl-carousel', function () { return view('pages.advanced-ui.owl-carousel'); });
-    Route::get('sortablejs', function () { return view('pages.advanced-ui.sortablejs'); });
-    Route::get('sweet-alert', function () { return view('pages.advanced-ui.sweet-alert'); });
-});
-
-Route::group(['prefix' => 'forms'], function(){
-    Route::get('basic-elements', function () { return view('pages.forms.basic-elements'); });
-    Route::get('advanced-elements', function () { return view('pages.forms.advanced-elements'); });
-    Route::get('editors', function () { return view('pages.forms.editors'); });
-    Route::get('wizard', function () { return view('pages.forms.wizard'); });
-});
-
-Route::group(['prefix' => 'charts'], function(){
-    Route::get('apex', function () { return view('pages.charts.apex'); });
-    Route::get('chartjs', function () { return view('pages.charts.chartjs'); });
-    Route::get('flot', function () { return view('pages.charts.flot'); });
-    Route::get('peity', function () { return view('pages.charts.peity'); });
-    Route::get('sparkline', function () { return view('pages.charts.sparkline'); });
-});
-
-Route::group(['prefix' => 'tables'], function(){
-    Route::get('basic-tables', function () { return view('pages.tables.basic-tables'); });
-    Route::get('data-table', function () { return view('pages.tables.data-table'); });
-});
-
-Route::group(['prefix' => 'icons'], function(){
-    Route::get('feather-icons', function () { return view('pages.icons.feather-icons'); });
-    Route::get('mdi-icons', function () { return view('pages.icons.mdi-icons'); });
-});
-
-Route::group(['prefix' => 'general'], function(){
-    Route::get('blank-page', function () { return view('pages.general.blank-page'); });
-    Route::get('faq', function () { return view('pages.general.faq'); });
-    Route::get('invoice', function () { return view('pages.general.invoice'); });
-    Route::get('profile', function () { return view('pages.general.profile'); });
-    Route::get('pricing', function () { return view('pages.general.pricing'); });
-    Route::get('timeline', function () { return view('pages.general.timeline'); });
-});
-
-Route::group(['prefix' => 'auth'], function(){
-    Route::get('login', function () { return view('pages.auth.login'); });
-    Route::get('register', function () { return view('pages.auth.register'); });
-});
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('login');
+})->name('logout');
 
 Route::group(['prefix' => 'error'], function(){
     Route::get('404', function () { return view('pages.error.404'); });

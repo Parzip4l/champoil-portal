@@ -33,8 +33,8 @@
                     <img class="wd-80 ht-80 rounded-circle" src="{{ url('https://via.placeholder.com/80x80') }}" alt="">
                     </div>
                     <div class="text-center">
-                    <p class="tx-16 fw-bolder">Amiah Burton</p>
-                    <p class="tx-12 text-muted">amiahburton@gmail.com</p>
+                    <p class="tx-16 fw-bolder">{{ Auth::user()->name }}</p>
+                    <p class="tx-12 text-muted">{{ Auth::user()->email }}</p>
                     </div>
                 </div>
                 <ul class="list-unstyled p-1">
@@ -57,10 +57,13 @@
                     </a>
                     </li>
                     <li class="dropdown-item py-2">
-                    <a href="javascript:;" class="text-body ms-0">
-                        <i class="me-2 icon-md" data-feather="log-out"></i>
-                        <span>Log Out</span>
-                    </a>
+                        <form action="{{ route('logout') }}" method="POST" id="logout_admin">
+                            @csrf
+                            <a href="#" class="text-body ms-0" onClick="submitForm()">
+                                <i class="me-2 icon-md" data-feather="log-out"></i>
+                                <span>Log Out</span>
+                            </a>
+                        </form>
                     </li>
                 </ul>
                 </div>
@@ -72,15 +75,21 @@
       </div>
     </div>
   </nav>
+  @php 
+    $dataLogin = json_decode(Auth::user()->permission);
+  @endphp 
   <nav class="bottom-navbar">
     <div class="container">
       <ul class="nav page-navigation">
+      @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin))
         <li class="nav-item {{ active_class(['/dashboard']) }}">
           <a href="{{ url('/dashboard') }}" class="nav-link">
             <i class="link-icon" data-feather="pie-chart"></i>
             <span class="link-title">Dashboard</span>
           </a>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
         <li class="nav-item mega-menu {{ active_class(['growth', 'contact', 'sales']) }}">
           <a href="#" class="nav-link">
             <i class="link-icon" data-feather="trending-up"></i>
@@ -128,6 +137,8 @@
                 </div>
             </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin))
         <li class="nav-item mega-menu {{ active_class(['ui-components/*', 'advanced-ui/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="file-text"></i>
@@ -182,6 +193,8 @@
                 </div>
             </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
         <li class="nav-item mega-menu {{ active_class(['forms/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="activity"></i>
@@ -230,6 +243,8 @@
                 </div>
             </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
         <li class="nav-item {{ active_class(['charts/*', 'tables/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="users"></i>
@@ -257,6 +272,8 @@
                 </div>
             </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
         <li class="nav-item {{ active_class(['icons/*']) }}">
           <a href="#" class="nav-link">
             <i class="link-icon" data-feather="anchor"></i>
@@ -270,6 +287,8 @@
             </ul>
           </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
         <li class="nav-item {{ active_class(['general/*', 'error/*', 'auth/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="book"></i>
@@ -283,10 +302,12 @@
                 </ul>
             </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin) || in_array('formulation_access', $dataLogin))
         <li class="nav-item {{ active_class(['general/*', 'error/*', 'auth/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="filter"></i>
-                    <span class="menu-title">RnD</span>
+                    <span class="menu-title">Formulation</span>
                 <i class="link-arrow"></i>
             </a>
             <div class="submenu">
@@ -296,26 +317,37 @@
                 </ul>
             </div>
         </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
         <li class="nav-item">
             <a href="{{ url('') }}" class="nav-link">
                 <i class="link-icon" data-feather="coffee"></i>
-                    <span class="menu-title">Creative</span>
+                <span class="menu-title">Creative</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="{{ url('') }}" class="nav-link">
-                <i class="link-icon" data-feather="settings"></i>
-                    <span class="menu-title">Apps Settings</span>
-                <i class="link-arrow"></i>
-            </a>
-            <div class="submenu">
-                <ul class="submenu-item">
-                    <li class="nav-item"><a href="{{ url('slack-account') }}" class="nav-link {{ active_class(['slack-account']) }}">Automation</a></li>
-                    <li class="nav-item"><a href="{{ url('users') }}" class="nav-link {{ active_class(['users']) }}">User Settings</a></li>
-                </ul>
-            </div>
-        </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ url('') }}" class="nav-link">
+                    <i class="link-icon" data-feather="settings"></i>
+                        <span class="menu-title">Apps Settings</span>
+                    <i class="link-arrow"></i>
+                </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item"><a href="{{ url('slack-account') }}" class="nav-link {{ active_class(['slack-account']) }}">Automation</a></li>
+                        <li class="nav-item"><a href="{{ url('users') }}" class="nav-link {{ active_class(['users']) }}">User Settings</a></li>
+                    </ul>
+                </div>
+            </li>
+        @endif
       </ul>
     </div>
   </nav>
 </div>
+
+<script>
+function submitForm() {
+  document.getElementById("logout_admin").submit();
+}
+</script>

@@ -28,7 +28,6 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            dd($credentials);
             return redirect()->intended('dashboard');    
         } else {
             // Jika login gagal, tambahkan notifikasi ke flash session

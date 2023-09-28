@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -22,15 +25,22 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'permissions' => 'required|array',
         ]);
 
-        $data['password'] = Hash::make($data['password']);
-        User::create($data);
+        $uuid = Str::uuid()->toString();
+        $user = new User();
+        $user->id = $uuid;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->permission = json_encode($request->permissions);
+        $user->save();
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
     public function edit(User $user)

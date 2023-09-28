@@ -19,15 +19,16 @@ class LoginController extends Controller
 
     public function proses(Request $request)
     {
+        
         $request->validate([
             'email' => 'required',
             'password' => 'required',
         ]);
 
         $credentials = $request->only('email', 'password');
-
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            dd($credentials);
             return redirect()->intended('dashboard');    
         } else {
             // Jika login gagal, tambahkan notifikasi ke flash session

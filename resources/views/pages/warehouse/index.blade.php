@@ -332,75 +332,75 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Oli Bahan</label>
-                            <input type="number" class="form-control" name="oli_bahan" required>
+                            <input type="text" class="form-control" name="oli_bahan" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Oli Service</label>
-                            <input type="number" class="form-control" name="oli_service" required>
+                            <input type="text" class="form-control" name="oli_service" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Oli Trafo</label>
-                            <input type="number" class="form-control" name="oli_trafo" required>
+                            <input type="text" class="form-control" name="oli_trafo" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Lemak</label>
-                            <input type="number" class="form-control" name="lemak" required>
+                            <input type="text" class="form-control" name="lemak" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Wandes</label>
-                            <input type="number" class="form-control" name="wandes" required>
+                            <input type="text" class="form-control" name="wandes" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">PFAD</label>
-                            <input type="number" class="form-control" name="pfad" required>
+                            <input type="text" class="form-control" name="pfad" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Kapur</label>
-                            <input type="number" class="form-control" name="kapur" required>
+                            <input type="text" class="form-control" name="kapur" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Latex</label>
-                            <input type="number" class="form-control" name="latex" required>
+                            <input type="text" class="form-control" name="latex" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Minarex</label>
-                            <input type="number" class="form-control" name="minarex" required>
+                            <input type="text" class="form-control" name="minarex" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Sepuhan Merah</label>
-                            <input type="number" class="form-control" name="s_merah" required>
+                            <input type="text" class="form-control" name="s_merah" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Sepuhan Hijau</label>
-                            <input type="number" class="form-control" name="s_hijau" required>
+                            <input type="text" class="form-control" name="s_hijau" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Sepuhan Kuning</label>
-                            <input type="number" class="form-control" name="s_kuning" required>
+                            <input type="text" class="form-control" name="s_kuning" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Sepuhan Biru</label>
-                            <input type="number" class="form-control" name="s_biru" required>
+                            <input type="text" class="form-control" name="s_biru" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Sepuhan KUHL</label>
-                            <input type="number" class="form-control" name="s_kuhl" required>
+                            <input type="text" class="form-control" name="s_kuhl" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Tackifier 2022</label>
-                            <input type="number" class="form-control" name="tackifier_22" required>
+                            <input type="text" class="form-control" name="tackifier_22" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Tackifier Champ</label>
-                            <input type="number" class="form-control" name="tackifier_champ" required>
+                            <input type="text" class="form-control" name="tackifier_champ" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Natrium Bicarbonat</label>
-                            <input type="number" class="form-control" name="natrium_bicarbonat" required>
+                            <input type="text" class="form-control" name="natrium_bicarbonat" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Soda Ash</label>
-                            <input type="number" class="form-control" name="soda_ash" required>
+                            <input type="text" class="form-control" name="soda_ash" required>
                         </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Simpan Data</button>

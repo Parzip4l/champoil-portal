@@ -12,8 +12,8 @@
 */
 
 
-Route::resource('/', DashboardController::class);
-Route::resource('dashboard', DashboardController::class);
+
+
 Route::resource('sales', SalesController::class);
 Route::resource('delivery-orders', DeliveryorderController::class);
 // Purchase
@@ -34,8 +34,9 @@ Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
 Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
 Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
 // Dashboard
-Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
-    
+Route::middleware(['auth', 'permission:dashboard_access,accounting_access,inventory_access'])->group(function () {
+    Route::resource('dashboard', DashboardController::class);
+    Route::resource('/', DashboardController::class);
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
@@ -109,6 +110,8 @@ Route::controller(LoginController::class)->group(function(){
     Route::get('login','index')->name('login');
     Route::post('login/proses','proses');
 });
+
+Route::get('/logout', 'LoginController@logout')->name('logout');
 
 
 Route::group(['prefix' => 'email'], function(){

@@ -15,8 +15,9 @@ class User extends Authenticatable
      *
      * @var array
      */
+    protected $table = 'users';
     protected $fillable = [
-        'name', 'email', 'password',
+        'id','name', 'email', 'password', 'permission',
     ];
 
     /**
@@ -44,7 +45,7 @@ class User extends Authenticatable
 
     public function hasPermission($permission)
     {
-        $permissions = json_decode($this->permissions, true); // Menguraikan data JSON menjadi array
+        $permissions = json_decode($this->permissions, true);
 
         if (is_array($permissions) && in_array($permission, $permissions)) {
             return true;

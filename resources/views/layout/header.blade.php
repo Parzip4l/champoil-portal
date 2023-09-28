@@ -311,6 +311,7 @@
             <div class="submenu">
                 <ul class="submenu-item">
                     <li class="nav-item"><a href="{{ url('slack-account') }}" class="nav-link {{ active_class(['slack-account']) }}">Automation</a></li>
+                    <li class="nav-item"><a href="{{ url('users') }}" class="nav-link {{ active_class(['users']) }}">User Settings</a></li>
                 </ul>
             </div>
         </li>

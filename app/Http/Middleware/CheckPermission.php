@@ -17,14 +17,21 @@ class CheckPermission
      */
     public function handle(Request $request, Closure $next, $permission)
     {
-        // Mengecek apakah pengguna telah login
         if (Auth::check()) {
             // Mengecek izin akses pengguna
-            if (Auth::user()->hasPermission($permission)) {
-                return $next($request);
-            } else {
-                abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
+            $userPermissions = json_decode(Auth::user()->permission, true);
+
+            if (!is_array($userPermissions)) {
+                abort(500, 'Invalid user permissions format.');
             }
+
+            foreach ($userPermissions as $data) {
+                if (in_array($data, $userPermissions)) {
+                    return $next($request);
+                }
+            }
+
+            abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
 
         return redirect('/login');

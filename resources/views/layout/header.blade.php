@@ -267,6 +267,7 @@
                             <li class="category-heading">Others</li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Document Controls</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">FPTK</a></li>
+                            <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Pencatatan Limbah B3</a></li>
                         </ul>
                     </div>
                 </div>
@@ -312,8 +313,8 @@
             </a>
             <div class="submenu">
                 <ul class="submenu-item">
-                    <li class="nav-item"><a href="{{ url('/#') }}" class="nav-link {{ active_class(['#']) }}">Quality Check</a></li>
-                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">Penetrasi Check</a></li>
+                    <li class="nav-item"><a href="{{ url('/#') }}" class="nav-link {{ active_class(['#']) }}">Qc</a></li>
+                    <li class="nav-item"><a href="{{ url('rnd-check') }}" class="nav-link {{ active_class(['rnd-check']) }}">RnD</a></li>
                 </ul>
             </div>
         </li>

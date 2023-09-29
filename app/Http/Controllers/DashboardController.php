@@ -162,9 +162,7 @@ class DashboardController extends Controller
             }
         }
         
-        return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini'
-        ));
+        return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData', 'salesData2', 'TotalSales', 'TotalSalesLatest', 'PersentaseSales', 'arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2', 'greeting', 'alreadyClockIn', 'alreadyClockOut', 'isSameDay', 'datakaryawan', 'logs','hariini'));
     }
 
     public function getSalesData()

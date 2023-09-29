@@ -28,7 +28,8 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');    
+            $token = $request->user()->createToken('mobile')->plainTextToken;
+            return redirect()->intended('dashboard')->with('token', $token); 
         } else {
             // Jika login gagal, tambahkan notifikasi ke flash session
             Session::flash('error', 'Email atau password salah.');

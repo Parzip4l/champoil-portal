@@ -102,7 +102,7 @@
                 <div class="card-body">
                     <div class="menu-absen-wrap d-flex justify-content-between">
                         <div class="col-md-4 col-sm-4">
-                            <a href="">
+                            <a href="{{route('mylogs')}}">
                                 <div class="icon text-center">
                                     <i class="me-2 icon-lg" data-feather="git-branch"></i>
                                 </div>

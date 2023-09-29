@@ -23,6 +23,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('purchase', PurchaseController::class);
     Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
+    Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
     // Absen
     Route::post('/absensi/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockin'])
     ->middleware('auth')

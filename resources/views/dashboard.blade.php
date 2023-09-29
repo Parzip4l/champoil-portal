@@ -6,10 +6,6 @@
 @endpush
 
 @section('content')
-@php 
-    $dataLogin = json_decode(Auth::user()->permission);
-  @endphp 
-
 <div class="absen-wrap mb-4">
     <div class="row">
         <div class="col-md-12 mb-3">
@@ -142,6 +138,10 @@
     </div>
 </div>
 <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+  @php 
+    $dataLogin = json_decode(Auth::user()->permission);
+  @endphp 
+  @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin) || in_array('sales_access', $dataLogin))
   <div class="d-flex align-items-center flex-wrap text-nowrap">
     <div class="input-group flatpickr wd-200 me-2 mb-2 mb-md-0" id="dashboardDate">
       <span class="input-group-text input-group-addon bg-transparent border-primary" data-toggle><i data-feather="calendar" class="text-primary"></i></span>
@@ -390,7 +390,8 @@
       </div>
     </div>
   </div>
-</div>
+</div> <!-- row -->
+@endif
 @endsection
 
 @push('plugin-scripts')

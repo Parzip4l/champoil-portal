@@ -167,7 +167,7 @@ class DashboardController extends Controller
         }
         
         return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawanData','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini'
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini'
         ));
     }
 

@@ -9,7 +9,7 @@
 @php 
     $dataLogin = json_decode(Auth::user()->permission);
   @endphp 
-  @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin) || in_array('sales_access', $dataLogin))
+
 <div class="absen-wrap mb-4">
     <div class="row">
         <div class="col-md-12 mb-3">
@@ -390,8 +390,7 @@
       </div>
     </div>
   </div>
-</div> <!-- row -->
-@endif
+</div>
 @endsection
 
 @push('plugin-scripts')

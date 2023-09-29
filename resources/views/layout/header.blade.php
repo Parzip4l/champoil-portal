@@ -194,7 +194,7 @@
             </div>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || is_array('ops_access', $dataLogin))
         <li class="nav-item mega-menu {{ active_class(['forms/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="activity"></i>

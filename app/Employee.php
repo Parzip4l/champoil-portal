@@ -10,4 +10,9 @@ class Employee extends Model
     use HasFactory;
     protected $table = 'karyawan';
     protected $fillable = ['id'];
+
+    public function karyawan()
+    {
+        return $this->hasOne(UserController::class);
+    }
 }

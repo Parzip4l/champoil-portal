@@ -114,6 +114,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
     Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
+    Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
 });
 
 

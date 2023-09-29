@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Employee;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -20,6 +21,30 @@ class UserController extends Controller
     public function create()
     {
         return view('pages.app-setting.user.create');
+    }
+
+    public function autocomplete(Request $request)
+    {
+        $term = $request->input('term');
+        $users = Employee::select('id','nik','nama')
+            ->where('nama', 'LIKE', '%' . $term . '%')
+            ->get();
+        
+        $response = array();
+        foreach($users as $user){
+            $response[] = array(
+                'id' => $user->id,
+                'nik' => $user->nik,
+                'value' => $user->nama
+            );
+        }
+        
+        return response()->json($response);
+    }
+
+    public function show($id)
+    {
+        
     }
 
     public function store(Request $request)

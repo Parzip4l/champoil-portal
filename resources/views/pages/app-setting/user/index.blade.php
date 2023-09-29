@@ -79,7 +79,8 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Nama Lengkap</label>
-                            <input type="text" class="form-control" name="name" placeholder="Nama Lengkap" required>
+                            <input type="text" class="form-control" name="name" id="nama" placeholder="Nama Lengkap" required>
+                            <input type="hidden" name="employee_code" id="employee_code">
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Email</label>
@@ -197,9 +198,38 @@
 @endsection
 
 @push('plugin-scripts')
-  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
-  <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
-  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script>
+  $('#nama').autocomplete({
+        minLength: 1,
+        source: function(request, response){
+            $.ajax({
+                url: "{{ route('users.autocomplete') }}",
+                dataType: "json",
+                data: {
+                    term: request.term
+                },
+                success: function(data){
+                    response($.map(data, function(item){
+                        return {
+                            nik: item.nik,
+                            value: item.value
+                        }
+                    }));
+                }
+            });
+        },
+        select: function(event, ui){
+            $('#nama').val(ui.item.value);
+            $('#employee_code').val(ui.item.nik);
+            return false;
+        }
+    });
+</script>
 @endpush
 
 @push('custom-scripts')
@@ -234,4 +264,5 @@
     }
   });
 </script>
+
 @endpush

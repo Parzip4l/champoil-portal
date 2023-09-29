@@ -5,10 +5,64 @@
 @endpush
 
 @section('content')
+<div class="absen-wrap mb-4">
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="button-absen">
+                    <h4 class="mb-3 text-center">{{$greeting}} {{Auth::user()->name}} {{$greeting === 'Selamat Pagi' ? 'Selamat Beraktifitas' : ''}}</h4>
+                        <a href="" class="btn btn-primary w-100 mb-2">CLOCK IN</a>
+                        <a href="" class="btn btn-danger w-100">CLOCK OUT</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="menu-absen-wrap d-flex justify-content-between">
+                        <div class="col-md-4 col-sm-4">
+                            <a href="">
+                                <div class="icon text-center">
+                                    <i class="me-2 icon-lg" data-feather="git-branch"></i>
+                                </div>
+                                <div class="menu-name text-center">
+                                    <p class="text-muted">Attendence Log</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <a href="">
+                                <div class="icon text-center">
+                                    <i class="me-2 icon-lg" data-feather="user-plus"></i>
+                                </div>
+                                <div class="menu-name text-center">
+                                    <p class="text-muted">Request Attendence</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <a href="">
+                                <div class="icon text-center">
+                                    <i class="me-2 icon-lg" data-feather="file-text"></i>
+                                </div>
+                                <div class="menu-name text-center">
+                                    <p class="text-muted">My Payslip</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
-  <div>
-    <h4 class="mb-3 mb-md-0">Welcome to Dashboard</h4>
-  </div>
+  @php 
+    $dataLogin = json_decode(Auth::user()->permission);
+  @endphp 
+  @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin) || in_array('sales_access', $dataLogin))
   <div class="d-flex align-items-center flex-wrap text-nowrap">
     <div class="input-group flatpickr wd-200 me-2 mb-2 mb-md-0" id="dashboardDate">
       <span class="input-group-text input-group-addon bg-transparent border-primary" data-toggle><i data-feather="calendar" class="text-primary"></i></span>
@@ -258,6 +312,7 @@
     </div>
   </div>
 </div> <!-- row -->
+@endif
 @endsection
 
 @push('plugin-scripts')

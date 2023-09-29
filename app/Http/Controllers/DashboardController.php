@@ -101,9 +101,22 @@ class DashboardController extends Controller
                             ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, sum(total) as total_sales')
                             ->groupBy('year', 'month')
                             ->get();
+
+        // Greeting
+
+        date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda
+            $hour = date('H'); // Ambil jam saat ini
+
+            if ($hour >= 5 && $hour < 12) {
+                $greeting = 'Selamat Pagi';
+            } else if ($hour >= 12 && $hour < 18) {
+                $greeting = 'Selamat Siang';
+            } else {
+                $greeting = 'Selamat Malam';
+            }
         
         return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2'
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting'
         ));
     }
 

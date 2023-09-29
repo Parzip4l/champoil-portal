@@ -81,7 +81,7 @@
   <nav class="bottom-navbar">
     <div class="container">
       <ul class="nav page-navigation">
-      @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin))
+      @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin) || in_array('sales_access', $dataLogin))
         <li class="nav-item {{ active_class(['/dashboard']) }}">
           <a href="{{ url('/dashboard') }}" class="nav-link">
             <i class="link-icon" data-feather="pie-chart"></i>
@@ -89,7 +89,7 @@
           </a>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('sales_access', $dataLogin))
         <li class="nav-item mega-menu {{ active_class(['growth', 'contact', 'sales']) }}">
           <a href="#" class="nav-link">
             <i class="link-icon" data-feather="trending-up"></i>
@@ -244,7 +244,7 @@
             </div>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('hc_access', $dataLogin))
         <li class="nav-item {{ active_class(['charts/*', 'tables/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="users"></i>
@@ -274,7 +274,7 @@
             </div>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('maintenance_access', $dataLogin))
         <li class="nav-item {{ active_class(['icons/*']) }}">
           <a href="#" class="nav-link">
             <i class="link-icon" data-feather="anchor"></i>
@@ -289,7 +289,7 @@
           </div>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('purchase_access', $dataLogin))
         <li class="nav-item {{ active_class(['general/*', 'error/*', 'auth/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="book"></i>
@@ -319,7 +319,7 @@
             </div>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('creative_access', $dataLogin))
         <li class="nav-item">
             <a href="{{ url('') }}" class="nav-link">
                 <i class="link-icon" data-feather="coffee"></i>

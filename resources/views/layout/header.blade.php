@@ -259,7 +259,7 @@
                             <li class="nav-item"><a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Payroll</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Payslip</a></li>
-                            <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Attendance Record</a></li>
+                            <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6">

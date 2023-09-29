@@ -29,6 +29,7 @@
                     <th>SO Number</th>
                     <th>Customer Name</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -52,6 +53,26 @@
                                 </select>
                                 <button type="submit" class="btn btn-primary w-100 mt-2">Update Status</button>
                             </form>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item d-flex align-items-center" href="{{route('manual-delivery.edit', $data->id)}}">
+                                        <i data-feather="edit-2" class="icon-sm me-2"></i>
+                                        <span class="">Edit</span>
+                                    </a>
+                                    <form action="{{ route('manual-delivery.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
+                                        @csrf @method('DELETE') 
+                                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                            <i data-feather="trash" class="icon-sm me-2"></i>
+                                            <span class="">Delete</span>
+                                        </a>
+                                    </form>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @endforeach

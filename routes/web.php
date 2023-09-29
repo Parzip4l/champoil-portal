@@ -21,6 +21,15 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('isi-survei', SurveyController::class);
     Route::resource('purchase', PurchaseController::class);
     Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
+    Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
+    // Absen
+    Route::post('/absensi/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockin'])
+    ->middleware('auth')
+    ->name('clockin');
+
+    Route::post('/absensi/clockout', [\App\Http\Controllers\Absen\AbsenController::class, 'clockout'])
+    ->middleware('auth')
+    ->name('clockout');
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
@@ -96,7 +105,6 @@ Route::middleware(['auth', 'permission:ops_access'])->group(function () {
     Route::resource('warehouse-stock-pck', App\Http\Controllers\Warehousestock\PckController::class);
     Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaController::class);
     Route::resource('manual-delivery', ManualDeliveryController::class);
-    Route::post('/update-status', 'ManualDeliveryController@updateStatus')->name('delivery.updateStatus');
     Route::resource('product-category', ProductCategoryController::class);
 });
 
@@ -115,7 +123,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
+    Route::put('/manual-delivery/{id}/update-kiriman', 'ManualDeliveryController@UpdateSeluruhData')->name('manual-delivery.UpdateData');
 });
+
+
 
 
 

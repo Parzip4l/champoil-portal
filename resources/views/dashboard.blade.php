@@ -2,6 +2,7 @@
 
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -12,8 +13,86 @@
                 <div class="card-body">
                     <div class="button-absen">
                     <h4 class="mb-3 text-center">{{$greeting}} {{Auth::user()->name}} {{$greeting === 'Selamat Pagi' ? 'Selamat Beraktifitas' : ''}}</h4>
-                        <a href="" class="btn btn-primary w-100 mb-2">CLOCK IN</a>
-                        <a href="" class="btn btn-danger w-100">CLOCK OUT</a>
+                        @foreach ($datakaryawan as $data)
+                            @if (Auth::check())
+                                @php
+                                    $user = Auth::user();
+                                    $today = \Carbon\Carbon::now()->format('Y-m-d');
+                                    $clockin = \App\Absen::where('nik', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->first();
+                                @endphp
+                                @if ($clockin)
+                                <h5 class="text-center mb-3">Let's Get To Home !</h5>
+                                @else
+                                <h5 class="text-center mb-3">Let's Get To Work !</h5>
+                                @endif
+                            @endif
+                        @endforeach
+                        @if (Auth::check())
+                            @php
+                                $user = Auth::user();
+                                $today = \Carbon\Carbon::now()->format('Y-m-d');
+                                $clockin = \App\Absen::where('nik', $user->employee_code)
+                                    ->whereDate('tanggal', $today)
+                                    ->first();
+                            @endphp
+                            @if ($clockin)
+                            <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
+                            @csrf
+                                <input type="hidden" name="latitude_out" id="latitude_out">
+                                <input type="hidden" name="longitude_out" id="longitude_out">
+                                <input type="hidden" name="status" value="H">
+                                <button type="submit" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out
+                                </button>
+                        </form>
+                        @else
+                        <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
+                            @csrf
+                                <input type="hidden" name="latitude" id="latitude">
+                                <input type="hidden" name="longitude" id="longitude">
+                                <input type="hidden" name="status" value="H">
+                                <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100" id="btn-absen" onClick="formAbsen()">
+                                Clock IN</a>
+                        </form>
+                        @endif
+                    @endif
+                    <div class="log-absen-today mt-2">
+                        <div class="card ">
+                            <div class="card-header text-center bg-warning">
+                                <h5>Attendance Log</h5>   
+                            </div>
+                            <div class="card-body">
+                                @foreach ($logs as $log)
+                                <div class="clock-in-wrap d-flex justify-content-between">
+                                    <div class="con">
+                                        <h5 class="text-bold mb-1">{{ $log->clock_in }}</h5>
+                                        <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                    </div>
+                                    <div class="ket align-self-center">
+                                        <h5 class="mb-1 text-end text-success">CLOCK IN</h5>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="clock-in-wrap d-flex justify-content-between">
+                                @if (isset($log->clock_out) && !empty($log->clock_out))
+                                <div class="con">
+                                        <h5 class="text-bold mb-1">{{ $log->clock_out}}</h5>
+                                        <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                    </div>
+                                    <div class="ket align-self-center">
+                                        <h5 class="mb-1 text-end text-danger">CLOCK OUT</h5>
+                                    </div>
+                                </div>
+                                @else
+                                <div class="w-100">
+                                    <p class="text-center">Anda Belum Absen Pulang</p>  
+                                </div>
+                                @endif
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -318,10 +397,29 @@
 @push('plugin-scripts')
   <script src="{{ asset('assets/plugins/flatpickr/flatpickr.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
   <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+  <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+  <script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ session('success') }}',
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session('error') }}',
+        });
+    @endif
+</script>
   <script>
     var salesData = {!! json_encode($salesData) !!};
     var salesDates = salesData.map(item => item.date);
@@ -712,4 +810,49 @@
     opacity: 1!important;
   }
 </style>
+
+<!-- Absen -->
+<script>
+    $(document).ready(function () {
+        // Mengambil data lokasi pengguna saat tombol absen ditekan
+        $('#btn-absen').on('click', function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    // Mengisi nilai hidden input dengan data lokasi pengguna
+                    $('#latitude').val(position.coords.latitude);
+                    $('#longitude').val(position.coords.longitude);
+
+                    // Mengirim form absen
+                    $('#form-absen').submit();
+                });
+            } else {
+                alert('Geolocation tidak didukung oleh browser Anda');
+            }
+        });
+    });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Mengambil data lokasi pengguna saat tombol absen ditekan
+            $('#btnout').on('click', function () {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        // Mengisi nilai hidden input dengan data lokasi pengguna
+                        $('#latitude_out').val(position.coords.latitude);
+                        $('#longitude_out').val(position.coords.longitude);
+
+                        // Mengirim form absen
+                        $('#form-absen2').submit();
+                    });
+                } else {
+                    alert('Geolocation tidak didukung oleh browser Anda');
+                }
+            });
+        });
+    </script>
+    <script>
+        function formAbsen() {
+        document.getElementById("btn-absen").submit();
+        }
+    </script>
 @endpush

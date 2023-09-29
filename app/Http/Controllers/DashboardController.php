@@ -7,6 +7,10 @@ use App\Purchase;
 use App\Sales;
 use App\Invoice;
 use Carbon\Carbon;
+use App\Absen;
+use App\Employee;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class DashboardController extends Controller
 {
@@ -114,9 +118,55 @@ class DashboardController extends Controller
             } else {
                 $greeting = 'Selamat Malam';
             }
+
+        // Absen Data
+        if (Auth::check()) {
+            // Get the authenticated user
+            $user = Auth::user();
+        
+            if ($user->employee_code) {
+                // Get all Karyawan data
+                $karyawan = Employee::all();
+        
+                // Get the last Absensi record for the user
+                $lastAbsensi = $user->Absen()->latest()->first();
+        
+                // Get the authenticated user's ID and today's date
+                $userId = Auth::id();
+                $EmployeeCode = Auth::user()->employee_code;
+                $hariini = now()->format('Y-m-d');
+        
+                // Get Karyawan data for the authenticated user
+                $datakaryawan = Employee::join('users', 'karyawan.nik', '=', 'users.employee_code')
+                    ->where('users.employee_code', $userId)
+                    ->select('karyawan.*')
+                    ->get();
+        
+                // Get log of Absensi for the authenticated user on the current date
+                $logs = Absen::where('nik', $EmployeeCode)
+                    ->whereDate('tanggal', $hariini)
+                    ->get();
+        
+                // Check if the user has already clocked in or out for the day
+                $alreadyClockIn = false;
+                $alreadyClockOut = false;
+                $isSameDay = false;
+        
+                if ($lastAbsensi) {
+                    if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
+                        $alreadyClockIn = true;
+                    } elseif ($lastAbsensi->clock_in && $lastAbsensi->clock_out) {
+                        $alreadyClockOut = true;
+                        $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
+                        $today = Carbon::today();
+                        $isSameDay = $lastClockOut->isSameDay($today);
+                    }
+                }
+            }
+        }
         
         return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting'
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini'
         ));
     }
 

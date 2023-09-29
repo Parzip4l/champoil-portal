@@ -14,6 +14,7 @@
 
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
+    Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::resource('dashboard', DashboardController::class);
     Route::resource('/', DashboardController::class);
     Route::get('/get-last-product-code', 'ProductController@getLastProductCode');

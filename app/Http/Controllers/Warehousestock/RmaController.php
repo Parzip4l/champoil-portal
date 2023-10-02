@@ -60,7 +60,7 @@ class RmaController extends Controller
             $purchase->soda_ash = $request->soda_ash;
             $purchase->save();
 
-            $slackChannel = Slack::where('channel', 'Testing Channel')->first();
+            $slackChannel = Slack::where('channel', 'Jadwal Pengiriman')->first();
             $slackWebhookUrl = $slackChannel->url;
 
             $today = now()->toDateString();

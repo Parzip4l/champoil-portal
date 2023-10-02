@@ -19713,7 +19713,6 @@ body {
   position: relative;
   width: 100%;
   z-index: 99;
-  justify-content: space-between;
   transition-duration: 0.2s;
   transition-property: background, box-shadow;
 }

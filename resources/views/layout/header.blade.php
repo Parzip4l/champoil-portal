@@ -244,7 +244,7 @@
             </div>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin) || in_array('hc_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('hr_access', $dataLogin))
         <li class="nav-item {{ active_class(['charts/*', 'tables/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="users"></i>

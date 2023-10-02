@@ -37,8 +37,6 @@ class RmaController extends Controller
      */
     public function store(Request $request)
     {
-
-        dd($request->lemak);
         try {
             // Simpan data pembelian
             $purchase = new RmaM(); // Generate UUID

@@ -76,7 +76,7 @@ class PenetrasiController extends Controller
                             ],
                             [
                                 'title' => 'Penetrasi Proses',
-                                'value' => $request->p_proses,
+                                'value' => $request->p_process,
                                 'short' => true,
                             ],
                             [

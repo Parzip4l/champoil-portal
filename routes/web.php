@@ -126,6 +126,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
     Route::put('/manual-delivery/{id}/update-kiriman', 'ManualDeliveryController@UpdateSeluruhData')->name('manual-delivery.UpdateData');
+
+    // Payrol Data
+    Route::resource('payrol-component', App\Http\Controllers\Payrol\PayrolComponent::class);
 });
 
 

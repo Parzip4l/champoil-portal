@@ -257,7 +257,7 @@
                         <ul class="submenu-item pe-0">
                             <li class="category-heading">Employee</li>
                             <li class="nav-item"><a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee</a></li>
-                            <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Payroll</a></li>
+                            <li class="nav-item"><a href="{{ url('payrol-component') }}" class="nav-link {{ active_class(['payrol-component']) }}">Payroll</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Payslip</a></li>
                             <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
                         </ul>

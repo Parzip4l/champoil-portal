@@ -344,15 +344,22 @@
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Lemak</label>
-                            <input type="text" class="form-control" name="lemak" required>
+                            <input type="text" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Wandes</label>
-                            <input type="text" class="form-control" name="wandes" required>
+                            <input type="text" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">PFAD</label>
-                            <input type="text" class="form-control" name="pfad" required>
+                            <input type="text" class="form-control" required>
+                        </div>
+                            <input type="hidden" class="form-control" name="lemak" id="lemak_drum" required>
+                        <div class="col-md-6 mb-2">
+                            <input type="hidden" class="form-control" name="wandes" id=wandes_drum required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="hidden" class="form-control" name="pfad" id="pfad_drum" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Kapur</label>
@@ -544,5 +551,37 @@
   });
 
 });
+</script>
+<script>
+    // Fungsi untuk mengkonversi kg ke drum
+    function konversiKgKeDrum(inputKg, outputDrum) {
+        const kgPerDrum = 180; // Satu drum setara dengan 180 Kg
+
+        // Mengambil nilai dalam kg dari input
+        const nilaiKg = parseFloat(inputKg.value);
+
+        // Melakukan konversi dan menampilkan hasil dalam input drum
+        const nilaiDrum = nilaiKg / kgPerDrum;
+        outputDrum.value = nilaiDrum.toFixed(2); // Menampilkan hanya 2 angka desimal
+    }
+
+    // Mendapatkan elemen-elemen input kg dan output drum
+    const inputLemakKg = document.querySelector('input[name="lemak"]');
+    const inputWandesKg = document.querySelector('input[name="wandes"]');
+    const inputPfadKg = document.querySelector('input[name="pfad"]');
+    const outputLemakDrum = document.getElementById('lemak_drum');
+    const outputWandesDrum = document.getElementById('wandes_drum');
+    const outputPfadDrum = document.getElementById('pfad_drum');
+
+    // Menambahkan event listener untuk setiap input kg
+    inputLemakKg.addEventListener('input', () => {
+        konversiKgKeDrum(inputLemakKg, outputLemakDrum);
+    });
+    inputWandesKg.addEventListener('input', () => {
+        konversiKgKeDrum(inputWandesKg, outputWandesDrum);
+    });
+    inputPfadKg.addEventListener('input', () => {
+        konversiKgKeDrum(inputPfadKg, outputPfadDrum);
+    });
 </script>
 @endpush

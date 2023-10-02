@@ -72,32 +72,32 @@ class RmaController extends Controller
                         'fields' => [
                             [
                                 'title' => 'Oli Bahan',
-                                'value' => $request->oli_bahan . ' Kg',
+                                'value' => $request->oli_bahan . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Oli Service',
-                                'value' => $request->oli_service  . ' Kg',
+                                'value' => $request->oli_service  . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Oli Trafo',
-                                'value' => $request->oli_trafo . ' Kg',
+                                'value' => $request->oli_trafo . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Lemak',
-                                'value' => $request->lemak . ' Kg',
+                                'value' => $request->lemak . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Wandes',
-                                'value' => $request->wandes . ' Kg',
+                                'value' => $request->wandes . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'PFAD',
-                                'value' => $request->pfad . ' Kg',
+                                'value' => $request->pfad . ' Drum',
                                 'short' => true,
                             ],
                             [

@@ -37,15 +37,17 @@ class RmaController extends Controller
      */
     public function store(Request $request)
     {
+
+        dd($request->lemak);
         try {
             // Simpan data pembelian
             $purchase = new RmaM(); // Generate UUID
             $purchase->oli_bahan = $request->oli_bahan;
             $purchase->oli_service = $request->oli_service;
             $purchase->oli_trafo = $request->oli_trafo;
-            $purchase->lemak = $request->lemak;
-            $purchase->wandes = $request->wandes;
-            $purchase->pfad = $request->pfad;
+            $purchase->lemak = $request->lemak1;
+            $purchase->wandes = $request->wandes1;
+            $purchase->pfad = $request->pfad1;
             $purchase->kapur = $request->kapur;
             $purchase->latex = $request->latex;
             $purchase->minarex = $request->minarex;
@@ -60,7 +62,7 @@ class RmaController extends Controller
             $purchase->soda_ash = $request->soda_ash;
             $purchase->save();
 
-            $slackChannel = Slack::where('channel', 'Warehouse')->first();
+            $slackChannel = Slack::where('channel', 'Testing Channel')->first();
             $slackWebhookUrl = $slackChannel->url;
 
             $today = now()->toDateString();
@@ -87,17 +89,17 @@ class RmaController extends Controller
                             ],
                             [
                                 'title' => 'Lemak',
-                                'value' => $request->lemak . ' Drum',
+                                'value' => $request->lemak1 . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Wandes',
-                                'value' => $request->wandes . ' Drum',
+                                'value' => $request->wandes1 . ' Drum',
                                 'short' => true,
                             ],
                             [
                                 'title' => 'PFAD',
-                                'value' => $request->pfad . ' Drum',
+                                'value' => $request->pfad1 . ' Drum',
                                 'short' => true,
                             ],
                             [

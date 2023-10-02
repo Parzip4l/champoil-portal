@@ -344,22 +344,22 @@
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Lemak</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" id="lemak" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Wandes</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" id="wandes" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">PFAD</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" id="pfad" required>
                         </div>
-                            <input type="hidden" class="form-control" name="lemak" id="lemak_drum" required>
+                            <input type="hidden" class="form-control" name="lemak1" id="lemak_drum" required>
                         <div class="col-md-6 mb-2">
-                            <input type="hidden" class="form-control" name="wandes" id=wandes_drum required>
+                            <input type="hidden" class="form-control" name="wandes1" id=wandes_drum required>
                         </div>
                         <div class="col-md-6 mb-2">
-                            <input type="hidden" class="form-control" name="pfad" id="pfad_drum" required>
+                            <input type="hidden" class="form-control" name="pfad1" id="pfad_drum" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Kapur</label>
@@ -566,9 +566,9 @@
     }
 
     // Mendapatkan elemen-elemen input kg dan output drum
-    const inputLemakKg = document.querySelector('input[name="lemak"]');
-    const inputWandesKg = document.querySelector('input[name="wandes"]');
-    const inputPfadKg = document.querySelector('input[name="pfad"]');
+    const inputLemakKg = document.getElementById('lemak');
+    const inputWandesKg = document.getElementById('wandes');
+    const inputPfadKg = document.getElementById('pfad');
     const outputLemakDrum = document.getElementById('lemak_drum');
     const outputWandesDrum = document.getElementById('wandes_drum');
     const outputPfadDrum = document.getElementById('pfad_drum');

@@ -8,7 +8,7 @@ use App\Employee;
 use App\Payrol;
 use App\PayrolCM;
 
-class PayrolController extends Controller
+class PayslipController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +17,18 @@ class PayrolController extends Controller
      */
     public function index()
     {
-        $payrol = PayrolCM::all();
-        return view('pages.hc.payrol.payrol', compact('payrol'));
+        $data = Payrol::all();
+        return view ('pages.hc.payrol.payslip', compact('data'));
+    }
+
+    public function payslipuser()
+    {
+        $employeeCode = auth()->user()->employee_code;
+
+        // Ambil semua payslip berdasarkan employee_code
+        $payslips = Payrol::where('employee_code', $employeeCode)->get();
+
+        return view('pages.hc.payrol.payslip-user', compact('payslips'));
     }
 
     /**
@@ -28,7 +38,7 @@ class PayrolController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
@@ -38,39 +48,9 @@ class PayrolController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    $employeeCodes = $request->input('employee_code');
-    $bulan = $request->input('month');
-    $tahun = $request->input('year');
-
-    // Loop melalui setiap employee code
-    foreach ($employeeCodes as $code) {
-        $payrollComponents = PayrolCM::where('employee_code', $code)->first();
-
-        if ($payrollComponents) {
-            // Simpan detail payroll component
-            $basic_salary = $payrollComponents->basic_salary;
-            $allowancesData = $payrollComponents->allowances;
-            $deductionsData = $payrollComponents->deductions;
-            $NetSalary = $payrollComponents->net_salary;
-
-            // Simpan data payroll
-            $payroll = new Payrol();
-            $payroll->employee_code = $code;
-            $payroll->month = $bulan;
-            $payroll->year = $tahun;
-            $payroll->basic_salary = $basic_salary;
-            $payroll->allowances = $allowancesData;
-            $payroll->deductions = $deductionsData;
-            $payroll->net_salary = $NetSalary;
-            $payroll->save();
-        }
+    {
+        //
     }
-
-    return redirect()->route('payroll.index')->with(['success' => 'Data Berhasil Disimpan!']);
-}
-
-
 
     /**
      * Display the specified resource.
@@ -80,7 +60,10 @@ class PayrolController extends Controller
      */
     public function show($id)
     {
-        //
+        $payslip = Payrol::findOrFail($id);
+
+        $dataPayslip = Payrol::where('id', $id)->get();
+        return view('pages.hc.payrol.payslip-file', compact('dataPayslip'));
     }
 
     /**

@@ -122,7 +122,7 @@
                             </a>
                         </div>
                         <div class="col-md-4 col-sm-4">
-                            <a href="">
+                            <a href="{{route('mySlip')}}">
                                 <div class="icon text-center">
                                     <i class="me-2 icon-lg" data-feather="file-text"></i>
                                 </div>

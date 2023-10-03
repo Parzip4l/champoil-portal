@@ -32,6 +32,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/absensi/clockout', [\App\Http\Controllers\Absen\AbsenController::class, 'clockout'])
     ->middleware('auth')
     ->name('clockout');
+
+    // Payslip
+    Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
@@ -129,6 +132,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
     // Payrol Data
     Route::resource('payrol-component', App\Http\Controllers\Payrol\PayrolComponent::class);
+    Route::resource('payroll', App\Http\Controllers\Payrol\PayrolController::class);
+    Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
 });
 
 

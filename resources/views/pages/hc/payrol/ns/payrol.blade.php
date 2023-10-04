@@ -24,16 +24,16 @@
     <div class="card">
       <div class="card-body">
         <div class="head-card d-flex justify-content-between mb-3">
-            <h6 class="card-title align-self-center mb-0">Payroll</h6>
+            <h6 class="card-title align-self-center mb-0">Payroll Frontline Officer</h6>
         </div>
         <hr>
-        <form action="{{route('payroll.store')}}" method="POST">
+        <form action="{{route('payrollns.store')}}" method="POST">
             @csrf
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <div class="form-group">
                         <label for="" class="form-label">Payroll Periode</label>
-                        <select name="month" id="" class="form-control" required>
+                        <select name="month" id="month" class="form-control" required>
                             <option value="Januari">Januari</option>
                             <option value="Februari">Februari</option>
                             <option value="Maret">Maret</option>
@@ -49,23 +49,40 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label for="" class="form-label">Week</label>
+                        <select name="week" id="week" class="form-control" required>
+                            <!-- Opsi week akan diisi otomatis menggunakan JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Year</label>
                         <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Select Employee</label>
-                        <select class="js-example-basic-multiple form-select" id="employeeSelect" name="employee_code[]" multiple="multiple" data-width="100%">
-                            @foreach ($payrol as $data)
-                            @php
-                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                            @endphp
-                                <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
-                            @endforeach
-                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="EmployeeTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Jam Lembur</th>
+                                    <th>Uang Makan</th>
+                                    <th>Uang Kerajinan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        
+                            </tbody>
+                        </table>
+                        <button type="button" id="addProduct" class="btn btn-primary mt-1 mb-3">Tambah Employee</button>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -154,5 +171,86 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+   $(document).ready(function() {
+    // Memuat daftar minggu saat halaman pertama kali dimuat
+    loadWeeks();
+
+    // Memuat daftar minggu saat bulan dipilih
+    $('#month').change(function() {
+        loadWeeks();
+    });
+
+    function loadWeeks() {
+        const selectedMonth = $('#month').val();
+
+        // Kirim permintaan AJAX untuk mendapatkan daftar minggu berdasarkan bulan yang dipilih
+        $.ajax({
+            url: '/get-weeks',
+            method: 'GET',
+            data: { month: selectedMonth },
+            success: function(response) {
+                const weeks = response.weeks;
+                const weekSelect = $('#week');
+                weekSelect.empty(); // Hapus opsi sebelumnya
+
+                // Tambahkan opsi week yang baru
+                for (const week of weeks) {
+                    const matches = week.match(/Week \d+ \((\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})\)/);
+                    if (matches && matches.length === 3) {
+                        const weekStart = matches[1];
+                        const weekEnd = matches[2];
+                        weekSelect.append(`<option value="${weekStart} - ${weekEnd}">${week}</option>`);
+                    } else {
+                        console.error('Invalid week format:', week);
+                    }
+                }
+            }
+        });
+    }
+});
+
+</script>
+<!-- Payroll -->
+<script>
+    function addProductRow() {
+        const newRow = `
+            <tr>
+                <td>
+                    <select class="form-control" id="employeeSelect" name="employee_code[]">
+                        @foreach ($payrol as $data)
+                        @php
+                            $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                        @endphp
+                            <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="lembur_jam[]" placeholder="1" class="form-control">
+                </td>
+                <td>
+                    <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
+                </td> 
+                <td class="purchase-uom-td">
+                    <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
+                </td>
+            </tr>
+        `;
+        document.querySelector('#EmployeeTable tbody').insertAdjacentHTML('beforeend', newRow);
+
+        updateProductCategory(document.querySelector('#EmployeeTable tbody').lastElementChild.querySelector('.form-select'));
+    }
+
+    function removeProductRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+    }
+
+    document.getElementById('addProduct').addEventListener('click', addProductRow);
 </script>
 @endpush

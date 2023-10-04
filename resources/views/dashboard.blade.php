@@ -811,48 +811,48 @@
   }
 </style>
 
-<!-- Absen -->
-<script>
-    $(document).ready(function () {
-        // Mengambil data lokasi pengguna saat tombol absen ditekan
-        $('#btn-absen').on('click', function () {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    // Mengisi nilai hidden input dengan data lokasi pengguna
-                    $('#latitude').val(position.coords.latitude);
-                    $('#longitude').val(position.coords.longitude);
+  <!-- Absen -->
+  <script>
+      $(document).ready(function () {
+          // Mengambil data lokasi pengguna saat tombol absen ditekan
+          $('#btn-absen').on('click', function () {
+              if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(function (position) {
+                      // Mengisi nilai hidden input dengan data lokasi pengguna
+                      $('#latitude').val(position.coords.latitude);
+                      $('#longitude').val(position.coords.longitude);
 
-                    // Mengirim form absen
-                    $('#form-absen').submit();
-                });
-            } else {
-                alert('Geolocation tidak didukung oleh browser Anda');
-            }
-        });
-    });
-    </script>
-    <script>
-        $(document).ready(function () {
-            // Mengambil data lokasi pengguna saat tombol absen ditekan
-            $('#btnout').on('click', function () {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function (position) {
-                        // Mengisi nilai hidden input dengan data lokasi pengguna
-                        $('#latitude_out').val(position.coords.latitude);
-                        $('#longitude_out').val(position.coords.longitude);
+                      // Mengirim form absen
+                      $('#form-absen').submit();
+                  });
+              } else {
+                  alert('Geolocation tidak didukung oleh browser Anda');
+              }
+          });
+      });
+      </script>
+      <script>
+          $(document).ready(function () {
+              // Mengambil data lokasi pengguna saat tombol absen ditekan
+              $('#btnout').on('click', function () {
+                  if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(function (position) {
+                          // Mengisi nilai hidden input dengan data lokasi pengguna
+                          $('#latitude_out').val(position.coords.latitude);
+                          $('#longitude_out').val(position.coords.longitude);
 
-                        // Mengirim form absen
-                        $('#form-absen2').submit();
-                    });
-                } else {
-                    alert('Geolocation tidak didukung oleh browser Anda');
-                }
-            });
-        });
-    </script>
-    <script>
-        function formAbsen() {
-        document.getElementById("btn-absen").submit();
-        }
-    </script>
+                          // Mengirim form absen
+                          $('#form-absen2').submit();
+                      });
+                  } else {
+                      alert('Geolocation tidak didukung oleh browser Anda');
+                  }
+              });
+          });
+      </script>
+      <script>
+          function formAbsen() {
+          document.getElementById("btn-absen").submit();
+          }
+      </script>
 @endpush

@@ -87,7 +87,6 @@
     </table>
     <button type="button" id="addProduct" class="btn btn-primary mt-1 mb-3">Tambah Produk</button>
 </div>
-
         <button type="submit" class="btn btn-primary">Create Purchase Order</button>
     </form>
             </div>

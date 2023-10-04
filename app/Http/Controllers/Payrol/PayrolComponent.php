@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Employee;
 use App\Payrol;
 use App\PayrolCM;
+use App\PayrolComponent_NS;
 
 class PayrolComponent extends Controller
 {
@@ -19,7 +20,8 @@ class PayrolComponent extends Controller
     {
         $employee = Employee::all();
         $payrol = PayrolCM::all();
-        return view('pages.hc.payrol.index', compact('employee','payrol'));
+        $parolns = PayrolComponent_NS::all();
+        return view('pages.hc.payrol.index', compact('employee','payrol','parolns'));
     }
 
     /**
@@ -29,8 +31,14 @@ class PayrolComponent extends Controller
      */
     public function create()
     {
-        $employee = Employee::all();
+        $employee = Employee::where('organisasi', 'Management Leader')->get();
         return view('pages.hc.payrol.create',compact('employee'));
+    }
+
+    public function createns()
+    {
+        $employee = Employee::where('organisasi', 'Frontline Officer')->get();
+        return view('pages.hc.payrol.ns.createcomponent',compact('employee'));
     }
 
     /**
@@ -55,6 +63,25 @@ class PayrolComponent extends Controller
         $payrolComponent->deductions = json_encode($request->deductions);
         $payrolComponent->thp = $request->thp;
         $payrolComponent->net_salary = $request->thp;
+        $payrolComponent->save();
+
+        return redirect()->route('payrol-component.index')->with(['success' => 'Data Berhasil Disimpan!']);
+    }
+
+    public function storens(Request $request)
+    {
+        $request->validate([
+            'employee_code' => 'required',
+            'daily_salary' => 'required|numeric',
+            'allowances' => 'required|array',
+            'deductions' => 'required|array',
+        ]);
+
+        $payrolComponent = new PayrolComponent_NS();
+        $payrolComponent->employee_code = $request->employee_code;
+        $payrolComponent->daily_salary = $request->daily_salary;
+        $payrolComponent->allowances = json_encode($request->allowances);
+        $payrolComponent->deductions = json_encode($request->deductions);
         $payrolComponent->save();
 
         return redirect()->route('payrol-component.index')->with(['success' => 'Data Berhasil Disimpan!']);

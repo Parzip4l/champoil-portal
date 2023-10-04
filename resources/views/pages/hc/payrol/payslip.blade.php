@@ -46,31 +46,75 @@
                 </div>
             </div>
         </div>
-        <div class="table-responsive">
-          <table id="dataTableExample" class="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Employe Name</th>
-                <th>Payroll Periode</th>
-              </tr>
-            </thead>
-            <tbody>
-                @php 
-                    $no = 1;
-                @endphp
-                @foreach ($data as $data)
-              <tr>
-                <td>{{ $no++ }}</td>
-                @php
-                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                @endphp
-                <td><a href="{{route('payslip.show', $data->id)}}">{{ $employee->nama; }}</a></td>
-                <td>{{ $data->year }} - {{ $data->month }}</td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
+        <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Frontline Officer</a>
+            </li>
+        </ul>
+        <div class="tab-content mt-3" id="lineTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Employe Name</th>
+                            <th>Payroll Periode</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                            @endphp
+                            @foreach ($data as $data)
+                        <tr>
+                            <td>{{ $no++ }}</td>
+                            @php
+                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                            @endphp
+                            <td><a href="{{route('payslip.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>{{ $data->year }} - {{ $data->month }}</td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Employe Name</th>
+                            <th>Payroll Periode</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                                
+                            @endphp
+                            @foreach ($datans as $data)
+                        <tr>
+                            <td>{{ $no++ }}</td>
+                            @php
+                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                                $dates = explode(' - ', $data->periode);
+                                $startDate = date('j M Y', strtotime($dates[0]));
+                                $endDate = date('j M Y', strtotime($dates[1]));
+                            @endphp
+                            <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>{{ $endDate }}</td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
       </div>
     </div>

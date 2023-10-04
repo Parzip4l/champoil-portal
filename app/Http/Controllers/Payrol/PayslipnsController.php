@@ -9,7 +9,7 @@ use App\Payrol;
 use App\PayrolCM;
 use App\Payrollns;
 
-class PayslipController extends Controller
+class PayslipnsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,25 +18,7 @@ class PayslipController extends Controller
      */
     public function index()
     {
-        $data = Payrol::all();
-        $datans = Payrollns::all();
-        return view ('pages.hc.payrol.payslip', compact('data','datans'));
-    }
-
-    public function payslipuser()
-    {
-        $employeeCode = auth()->user()->employee_code;
-
-        // Ambil semua payslip berdasarkan employee_code
-        $dataKaryawan = Employee::where('nik', $employeeCode)->first();
-        $karyawan = json_decode($dataKaryawan, true);
-        if($karyawan['organisasi'] === 'Management Leaders') {
-            $payslips = Payrol::where('employee_code', $employeeCode)->get();
-        }else{
-            $payslips = Payrollns::where('employee_code', $employeeCode)->get();
-        }
-
-        return view('pages.hc.payrol.payslip-user', compact('payslips'));
+        //
     }
 
     /**
@@ -67,14 +49,6 @@ class PayslipController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        $payslip = Payrol::findOrFail($id);
-
-        $dataPayslip = Payrol::where('id', $id)->get();
-        return view('pages.hc.payrol.payslip-file', compact('dataPayslip'));
-    }
-
-    public function showns($id)
     {
         $payslip = Payrollns::findOrFail($id);
 

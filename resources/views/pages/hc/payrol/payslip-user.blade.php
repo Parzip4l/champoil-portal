@@ -35,6 +35,7 @@
             <tbody>
                 @php 
                     $no = 1;
+                    
                 @endphp
                 @foreach ($payslips as $data)
               <tr>
@@ -42,8 +43,14 @@
                 @php
                     $employee = \App\Employee::where('nik', $data->employee_code)->first();
                 @endphp
+                @if($employee->organisasi === 'Management Leaders')
                 <td><a href="{{route('payslip.show', $data->id)}}">{{ $data->employee_code }}</a></td>
                 <td>{{ $data->month }} - {{ $data->year }}</td>
+                @endif
+                @if($employee->organisasi === 'Frontline Officer')
+                <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $data->employee_code }}</a></td>
+                <td>{{ $data->month }} - {{ $data->year }}</td>
+                @endif
               </tr>
               @endforeach
             </tbody>

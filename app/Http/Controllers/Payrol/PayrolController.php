@@ -10,7 +10,7 @@ use App\PayrolCM;
 use App\PayrolComponent_NS;
 use Carbon\Carbon;
 use App\Absen;
-
+use App\Payrollns;
 class PayrolController extends Controller
 {
     /**
@@ -122,79 +122,83 @@ class PayrolController extends Controller
 
     public function storens(Request $request)
     {
-        
+        // Mendapatkan input dari request
         $employeeCodes = $request->input('employee_code');
+        $lembur_jam = $request->input('lembur_jam');
+        $uang_makan = $request->input('uang_makan');
+        $uang_kerajinan = $request->input('uang_kerajinan');
         $bulan = $request->input('month');
         $tahun = $request->input('year');
         $week = $request->input('week');
-
+    
         // Extract Week
         list($startDate, $endDate) = explode(' - ', $week);
-
+    
+        // Inisialisasi array untuk menyimpan detail payroll
         $payrolldetails = [];
-        $payrollComponents = PayrolComponent_NS::whereIn('employee_code', $employeeCodes)->get();
-        $tambahanData = json_decode($payrollComponents, true);
-
-        for ($i = 0; $i < count($request->employee_code); $i++) {
-            $employeeId = $request->employee_code[$i];
-            $jamLembur = $request->lembur_jam[$i];
-            $uangMakan = $request->uang_makan[$i];
-            $uangKerajinan = $request->uang_kerajinan[$i];
-
-            $lemburAllowance = 0;
-            foreach ($payrollComponents as $component) {
-                if ($component['employee_code'] === $employeeId) {
-                    // Dapatkan nilai lembur dari allowances
-                    $allowancesData = json_decode($component['allowances'], true);
-                    if (isset($allowancesData['lembur'][0])) {
-                        $lemburAllowance = $allowancesData['lembur'][0];
-                    }
-                    break; // Keluar dari loop setelah nilai lembur ditemukan
-                }
-            }
-
-            // Mengalikan jam_lembur dengan nilai lembur dari allowances
-            $jamLemburdata = $jamLembur * $lemburAllowance;
-
-            $payrolldetails[] = [
-                'employee_code' => $employeeId,
-                'jam_lembur' => $jamLembur,
-                'uang_makan' => $uangMakan,
-                'uang_kerajinan' => $uangKerajinan
-            ];
-        }
+    
         // Loop melalui setiap employee code
-        foreach ($employeeCodes as $code) {
-            $payrollComponents = PayrolComponent_NS::where('employee_code', $code)->first();
+        foreach ($employeeCodes as $index => $employeeCode) {
+            // Mengalikan jam_lembur dengan nilai lembur dari allowances
+            $lemburAllowance = 0; // Inisialisasi nilai lembur allowance-
+    
+            // Simpan detail payroll
+            $payrolldetails[] = [
+                'employee_code' => $employeeCode,
+                'jam_lembur' => $lembur_jam[$index],
+                'uang_makan' => $uang_makan[$index],
+                'uang_kerajinan' => $uang_kerajinan[$index]
+            ];
+    
+            // Dapatkan data payroll components berdasarkan employee code
+            $payrollComponents = PayrolComponent_NS::where('employee_code', $employeeCode)->first();
+    
             if ($payrollComponents) {
-                // Simpan detail payroll component
+                $allowancesData = json_decode($payrollComponents->allowances, true);
+                $lemburAllowance = $allowancesData['lembur'][0];
+                $jamLemburdata = $lembur_jam[$index] * $lemburAllowance;
+                // Simpan data absensi
+                $totalAbsen = Absen::where('nik', $employeeCode)
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->count();
+    
+                // Hitung total daily salary
                 $daily_salary = $payrollComponents->daily_salary;
-                $allowancesData = $payrollComponents->allowances;
-                $deductionsData = $payrollComponents->deductions;
-                $lembur = $payrollComponents->lembur;
-
-                // Get Absen 
-                $totalAbsen = Absen::where('nik', $code)
-                                ->whereBetween('tanggal', [$startDate, $endDate])
-                                ->count();
-
-                $totalAbsenPerEmployee[$code] = $totalAbsen;
+                $totaldaily = $totalAbsen * $daily_salary;
+    
+                // Hitung total potongan
+                $dataDeductions = json_decode($payrollComponents->deductions, true);
+                $totalPotongan = $dataDeductions['hutang'][0] + $dataDeductions['mess'][0] + $dataDeductions['lain_lain'][0];
+    
+                // Hitung THP (Take Home Pay)
+                $thpdetails = $totaldaily + $jamLemburdata + $uang_makan[$index] + $uang_kerajinan[$index] - $totalPotongan;
+    
                 // Simpan data payroll
-                $payroll = new Payrol();
-                $payroll->employee_code = $code;
+                $payroll = new Payrollns();
+                $payroll->employee_code = $employeeCode;
                 $payroll->month = $bulan;
                 $payroll->year = $tahun;
-                $payroll->week = $week;
-                $payroll->basic_salary = $daily_salary * $totalAbsen;
-                $payroll->allowances = $allowancesData;
-                $payroll->deductions = $deductionsData;
-                $payroll->net_salary = $jamLemburdata;
+                $payroll->periode = $week;
+                $payroll->daily_salary = $daily_salary;
+                $payroll->total_absen = $totalAbsen;
+                $payroll->lembur_salary = $lemburAllowance;
+                $payroll->jam_lembur = $lembur_jam[$index];
+                $payroll->total_lembur = $jamLemburdata;
+                $payroll->uang_makan = $uang_makan[$index];
+                $payroll->uang_kerajinan = $uang_kerajinan[$index];
+                $payroll->potongan_hutang = $dataDeductions['hutang'][0];
+                $payroll->potongan_mess = $dataDeductions['mess'][0];
+                $payroll->potongan_lain = $dataDeductions['lain_lain'][0];
+                $payroll->thp = $thpdetails;
+                $payroll->total_daily = $totaldaily;
                 $payroll->save();
             }
         }
-
+    
         return redirect()->route('payroll.ns')->with(['success' => 'Data Berhasil Disimpan!']);
     }
+    
+
 
 
     /**

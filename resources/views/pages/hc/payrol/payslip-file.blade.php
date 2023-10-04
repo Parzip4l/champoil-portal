@@ -7,7 +7,7 @@
 
 @section('content')
 
-<div class="row">
+<div class="row desktop">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
@@ -98,10 +98,18 @@
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-md-6">
-                                                <span>BPJS Ketenagakerjaan</span>
+                                                <span>JHT Employee</span>
                                             </div>
                                             <div class="col-md-6 text-right">
                                                 <span class="text-right">Rp {{ number_format($datadeductions['bpsj_tk'][0], 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Jaminan Pensiun</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp {{ number_format($datadeductions['j_pensiun'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-2">
@@ -133,6 +141,10 @@
                                 <table class="table">
                                     <tbody>
                                         <tr>
+                                            <td class="text-bold-800">Basic Salary</td>
+                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($dataPayslip[0]['basic_salary'], 0, ',', '.') }}</td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-bold-800">Total Allowences</td>
                                             <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($dataEarnings['t_allowance'][0], 0, ',', '.') }}</td>
                                         </tr>
@@ -154,6 +166,157 @@
                     <a href="javascript:;" class="btn btn-primary float-end mt-4 ms-2"><i data-feather="download" class="me-3 icon-md"></i>Download</a>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile -->
+<div class="payslip-mobile mobile">
+    <div class="row">
+        <div class="col-md-12"> 
+            <div class="card mb-3">
+                <div class="card-header text-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Payroll Periode {{$dataPayslip[0]['month']}} {{$dataPayslip[0]['year']}}</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-danger">*CONFIDENTIAL</h5>
+                    <hr>
+                    <div class="details-employee">
+                        <div class="name">
+                            <h5>{{$employee->nama}}</h5>
+                        </div>
+                        <div class="jabatan">
+                            <p class="text-muted">
+                            {{$employee->jabatan}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Basic salary -->
+            <div class="card mb-3">
+                <div class="card-header text-center">
+                    <h4>Basic Salary</h4>
+                </div>
+                <div class="card-body">
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Basic Salary
+                        </span>
+                        <span>
+                            Rp. {{ number_format($dataPayslip[0]['basic_salary'], 0, ',', '.') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- Earnings -->
+            <div class="card mb-3">
+                <div class="card-header text-center">
+                    <h4>Earnings</h4>
+                </div>
+                <div class="card-body">
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Struktural
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_struktural'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Kinerja
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_kinerja'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Alat Kerja
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-header text-center">
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <h4>Total Earnings</h4>
+                        <h4 id="totalAmount">Rp. {{ number_format($dataEarnings['t_allowance'][0], 0, ',', '.') }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deductions -->
+            <div class="card mb-3">
+                <div class="card-header text-center">
+                    <h4>Deductions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            BPJS Kesehatan
+                        </span>
+                        <span>
+                            Rp {{ number_format($datadeductions['bpjs_ks'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            JHT Employee
+                        </span>
+                        <span>
+                            Rp {{ number_format($datadeductions['bpsj_tk'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Jaminan Pensiun
+                        </span>
+                        <span>
+                            Rp {{ number_format($datadeductions['j_pensiun'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Potongan Hutang
+                        </span>
+                        <span>
+                            Rp {{ number_format($datadeductions['p_hutang'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            PPH21
+                        </span>
+                        <span>
+                            Rp {{ number_format($datadeductions['pph21'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-header text-center">
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <h4>Total Deductions</h4>
+                        <h4>Rp. {{ number_format($datadeductions['t_deduction'][0], 0, ',', '.') }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THP -->
+            <div class="thp-wrap text-center mb-2">
+                <h5 class="text-danger mb-2">TAKE HOME PAY</h5>
+                <h2> Rp. {{ number_format($dataPayslip[0]['net_salary'], 0, ',', '.') }}</h2>
+            </div>
+            <div class="button-download-slip mb-2">
+                <a href="#" class="btn btn-primary w-100">Download Payslip </a>
+            </div>
+            <p class="text-muted text-center">*This is a computer generated payslip and no signature is required.</p>
         </div>
     </div>
 </div>
@@ -232,4 +395,25 @@
         });
     @endif
 </script>
+<style>
+    @media(min-width: 678px){
+        .mobile {
+            display : none;
+        }
+
+        .desktop {
+            display : block;
+        }
+    }
+
+    @media(max-width: 678px){
+        .mobile {
+            display : block;
+        }
+
+        .desktop {
+            display : none;
+        }
+    }
+</style>
 @endpush

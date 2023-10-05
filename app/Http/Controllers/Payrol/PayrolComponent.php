@@ -31,7 +31,7 @@ class PayrolComponent extends Controller
      */
     public function create()
     {
-        $employee = Employee::where('organisasi', 'Management Leader')->get();
+        $employee = Employee::where('organisasi', 'Management Leaders')->get();
         return view('pages.hc.payrol.create',compact('employee'));
     }
 

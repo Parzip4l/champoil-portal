@@ -122,6 +122,15 @@ Route::middleware(['auth', 'permission:ops_access'])->group(function () {
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
+    // Payslip
+    Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
+    // Component Ns
+    Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
+    Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');
+    Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
+    Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
+    Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
+    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
 });
 
 Route::middleware(['auth', 'permission:creative_access'])->group(function () {
@@ -141,6 +150,15 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('payrol-component', App\Http\Controllers\Payrol\PayrolComponent::class);
     Route::resource('payroll', App\Http\Controllers\Payrol\PayrolController::class);
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
+    // Payslip
+    Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
+    // Component Ns
+    Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
+    Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');
+    Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
+    Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
+    Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
+    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
 });
 
 

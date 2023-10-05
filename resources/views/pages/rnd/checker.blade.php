@@ -159,6 +159,7 @@
                             <label for="" class="form-label">Produk</label>
                             <select name="product" id="" class="form-control">
                                 <option value="Supreme">Supreme</option>
+                                <option value="Super">Super</option>
                                 <option value="Optima">Optima</option>
                                 <option value="Heavy Loader">Heavy Loader</option>
                                 <option value="Xtreme">Xtreme</option>

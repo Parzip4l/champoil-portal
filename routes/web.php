@@ -159,6 +159,12 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
+
+
+    // CG Component
+    Route::group(['prefix' => 'kas'], function(){
+        Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);
+    });
 });
 
 

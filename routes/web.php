@@ -11,7 +11,6 @@
 |
 */
 
-
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
@@ -164,6 +163,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);
+        Route::resource('project', App\Http\Controllers\CgControllers\ProjectControllers::class);
+        Route::resource('project-details', App\Http\Controllers\CgControllers\ProjectDetailsController::class);
     });
 });
 

@@ -276,7 +276,7 @@
                         <ul class="submenu-item pe-0">
                             <li class="category-heading">KAS MODUL</li>
                             <li class="nav-item"><a href="{{ route('jabatan.index') }}" class="nav-link {{ active_class(['kas/jabatan']) }}">Jabatan</a></li>
-                            <li class="nav-item"><a href="{{ route('jabatan.index') }}" class="nav-link {{ active_class(['kas/jabatan']) }}">Project</a></li>
+                            <li class="nav-item"><a href="{{ route('project.index') }}" class="nav-link {{ active_class(['kas/project']) }}">Project</a></li>
                         </ul>
                     </div>
                 </div>

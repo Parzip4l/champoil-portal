@@ -10,8 +10,8 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Jabatan</h5>
-                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#JabatanModal">Tambah Jabatan</a>
+                <h5 class="mb-0 align-self-center">Data Project</h5>
+                <a href="{{route('project.create')}}" class="btn btn-sm btn-primary">Tambah Project Baru</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -19,7 +19,10 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Jabatan</th>
+                                <th>Project</th>
+                                <th>Badan</th>
+                                <th>Start Contract</th>
+                                <th>End Contract</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -30,14 +33,21 @@
                             @foreach ($project as $data)
                             <tr>
                                 <td> {{$nomor++}} </td>
-                                <td> {{ $data->name }} </td>
+                                <td><a href="{{ route('project.show', $data->id) }}">{{ $data->name }}</a></td>
+                                <td> {{ $data->badan }} </td>
+                                <td> {{ $data->contract_start }} </td>
+                                <td> {{ $data->end_contract }} </td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id}}">
+                                            <a class="dropdown-item d-flex align-items-center" href="{{route('project-details.show', $data->id)}}">
+                                                <i data-feather="plus" class="icon-sm me-2"></i>
+                                                <span class="">Project Component</span>
+                                            </a>
+                                            <a class="dropdown-item d-flex align-items-center" href="{{route('project.show', $data->id)}}">
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
                                             </a>
@@ -60,34 +70,6 @@
         </div>
     </div>
 </div>
-
-<!-- Modal Data FNG -->
-<div class="modal fade" id="JabatanModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Jabatan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{route('jabatan.store')}}" method="POST">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Nama Jabatan</label>
-                            <input type="text" class="form-control" name="name" required>    
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- End -->
 @endsection
 
 @push('plugin-scripts')

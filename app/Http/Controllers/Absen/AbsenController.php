@@ -65,10 +65,14 @@ class AbsenController extends Controller
         //
     }
 
+
     public function clockin(Request $request)
     {   
         $user = Auth::user();
         $nik = Auth::user()->employee_code;
+
+        $kantorLatitude = -6.1369556;
+        $kantorLongtitude = 106.7601356;
 
         $time_in = Carbon::now()->format('H:i');
         $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
@@ -77,17 +81,39 @@ class AbsenController extends Controller
         $long = $request->input('longitude');
         $status = $request->input('status');
         
+        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
 
-        $absensi = new absen();
-        $absensi->user_id = $nik;
-        $absensi->nik = $nik;
-        $absensi->tanggal = now()->toDateString();
-        $absensi->clock_in = now()->toTimeString();
-        $absensi->latitude = $lat;
-        $absensi->longtitude = $long;
-        $absensi->status = $status;
-        $absensi->save();
-        return redirect()->back()->with('success', 'Clockin success!');
+        $allowedRadius = 5;
+
+        if ($distance <= $allowedRadius) {
+            $absensi = new absen();
+            $absensi->user_id = $nik;
+            $absensi->nik = $nik;
+            $absensi->tanggal = now()->toDateString();
+            $absensi->clock_in = now()->toTimeString();
+            $absensi->latitude = $lat;
+            $absensi->longtitude = $long;
+            $absensi->status = $status;
+            $absensi->save();
+            return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
+        } else {
+            return redirect()->back()->with('error', 'Anda Diluar Radius Absen!');
+        }
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // radius Bumi dalam kilometer
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c; // jarak dalam kilometer
+
+        return $distance;
     }
 
     public function clockout(Request $request)

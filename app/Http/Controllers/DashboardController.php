@@ -9,6 +9,7 @@ use App\Invoice;
 use Carbon\Carbon;
 use App\Absen;
 use App\Employee;
+use App\ModelCG\asign_test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -164,9 +165,12 @@ class DashboardController extends Controller
                 }
             }
         }
+
+        $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
+
         
         return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini'
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test'
         ));
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Employee;
+use App\ModelCG\Jabatan;
 
 class EmployeeController extends Controller
 {
@@ -25,8 +26,9 @@ class EmployeeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        return view('pages.hc.karyawan.create');
+    {   
+        $jabatan = Jabatan::all();
+        return view('pages.hc.karyawan.create', compact('jabatan'));
     }
 
     /**

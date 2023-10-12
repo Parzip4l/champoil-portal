@@ -3,6 +3,9 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.carousel.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.theme.default.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/animate-css/animate.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -18,6 +21,9 @@
                                 @php
                                     $user = Auth::user();
                                     $today = \Carbon\Carbon::now()->format('Y-m-d');
+                                    $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->exists();
                                     $clockin = \App\Absen::where('nik', $user->employee_code)
                                         ->whereDate('tanggal', $today)
                                         ->first();
@@ -33,103 +39,134 @@
                             @php
                                 $user = Auth::user();
                                 $today = \Carbon\Carbon::now()->format('Y-m-d');
+                                $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->exists();
                                 $clockin = \App\Absen::where('nik', $user->employee_code)
                                     ->whereDate('tanggal', $today)
                                     ->first();
                             @endphp
-                            @if ($clockin)
-                            <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
-                            @csrf
-                                <input type="hidden" name="latitude_out" id="latitude_out">
-                                <input type="hidden" name="longitude_out" id="longitude_out">
-                                <input type="hidden" name="status" value="H">
-                                <button type="submit" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out
-                                </button>
-                        </form>
-                        @else
-                        <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
-                            @csrf
-                                <input type="hidden" name="latitude" id="latitude">
-                                <input type="hidden" name="longitude" id="longitude">
-                                <input type="hidden" name="status" value="H">
-                                <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100" id="btn-absen" onClick="formAbsen()">
-                                Clock IN</a>
-                        </form>
+                            @if($hasScheduleForToday)
+                                @if ($clockin)
+                                <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
+                                @csrf
+                                    <input type="hidden" name="latitude_out" id="latitude_out">
+                                    <input type="hidden" name="longitude_out" id="longitude_out">
+                                    <input type="hidden" name="status" value="H">
+                                    <button type="submit" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out</button>
+                                </form>
+                                @else
+                                <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
+                                    @csrf
+                                        <input type="hidden" name="latitude" id="latitude">
+                                        <input type="hidden" name="longitude" id="longitude">
+                                        <input type="hidden" name="status" value="H">
+                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100" id="btn-absen" onClick="formAbsen()">
+                                        Clock IN</a>
+                                </form>
+                                @endif
+                            @else
+                            <h4 class="text-center text-danger">Day Off</h4>
                         @endif
                     @endif
-                    <div class="log-absen-today mt-2">
-                        <div class="card ">
-                            <div class="card-header text-center bg-warning">
-                                <h5>Attendance Log</h5>   
-                            </div>
-                            <div class="card-body">
-                                @foreach ($logs as $log)
-                                <div class="clock-in-wrap d-flex justify-content-between">
+                        <div class="log-absen-today mt-2">
+                            <div class="card ">
+                                <div class="card-header text-center bg-warning">
+                                    <h5>Attendance Log</h5>   
+                                </div>
+                                <div class="card-body">
+                                    @foreach ($logs as $log)
+                                    <div class="clock-in-wrap d-flex justify-content-between">
+                                        <div class="con">
+                                            <h5 class="text-bold mb-1">{{ $log->clock_in }}</h5>
+                                            <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                        </div>
+                                        <div class="ket align-self-center">
+                                            <h5 class="mb-1 text-end text-success">CLOCK IN</h5>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="clock-in-wrap d-flex justify-content-between">
+                                    @if (isset($log->clock_out) && !empty($log->clock_out))
                                     <div class="con">
-                                        <h5 class="text-bold mb-1">{{ $log->clock_in }}</h5>
-                                        <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                            <h5 class="text-bold mb-1">{{ $log->clock_out}}</h5>
+                                            <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                        </div>
+                                        <div class="ket align-self-center">
+                                            <h5 class="mb-1 text-end text-danger">CLOCK OUT</h5>
+                                        </div>
                                     </div>
-                                    <div class="ket align-self-center">
-                                        <h5 class="mb-1 text-end text-success">CLOCK IN</h5>
+                                    @else
+                                    <div class="w-100">
+                                        <p class="text-center">Anda Belum Absen Pulang</p>  
                                     </div>
+                                    @endif
+                                    @endforeach
                                 </div>
-                                <hr>
-                                <div class="clock-in-wrap d-flex justify-content-between">
-                                @if (isset($log->clock_out) && !empty($log->clock_out))
-                                <div class="con">
-                                        <h5 class="text-bold mb-1">{{ $log->clock_out}}</h5>
-                                        <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
-                                    </div>
-                                    <div class="ket align-self-center">
-                                        <h5 class="mb-1 text-end text-danger">CLOCK OUT</h5>
-                                    </div>
-                                </div>
-                                @else
-                                <div class="w-100">
-                                    <p class="text-center">Anda Belum Absen Pulang</p>  
-                                </div>
-                                @endif
-                                @endforeach
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="log-absen-today mt-2">
+            <div class="card ">
+                <div class="card-header text-center bg-warning">
+                    <h5>Undangan TEST</h5>   
+                </div>
+                <div class="card-body">
+                  
+                      @foreach($asign_test as $row_asign_test)
+                      <a href="{{ route('read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
+                      @endforeach
                 </div>
             </div>
         </div>
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="menu-absen-wrap d-flex justify-content-between">
-                        <div class="col-md-4 col-sm-4">
-                            <a href="{{route('mylogs')}}">
-                                <div class="icon text-center">
-                                    <i class="me-2 icon-lg" data-feather="git-branch"></i>
-                                </div>
-                                <div class="menu-name text-center">
-                                    <p class="text-muted">Attendence Log</p>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-4 col-sm-4">
-                            <a href="">
-                                <div class="icon text-center">
-                                    <i class="me-2 icon-lg" data-feather="user-plus"></i>
-                                </div>
-                                <div class="menu-name text-center">
-                                    <p class="text-muted">Request Attendence</p>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-4 col-sm-4">
-                            <a href="{{route('mySlip')}}">
-                                <div class="icon text-center">
-                                    <i class="me-2 icon-lg" data-feather="file-text"></i>
-                                </div>
-                                <div class="menu-name text-center">
-                                    <p class="text-muted">My Payslip</p>
-                                </div>
-                            </a>
+                    <div class="menu-absen-wrap desktop">
+                        <div class="owl-carousel owl-theme owl-basic">
+                            <div class="item">
+                                <a href="{{route('mylogs')}}">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="git-branch"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Attendence Log</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="{{route('attendence-request.create')}}">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="user-plus"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Request Attendence</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="{{route('mySlip')}}">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="file-text"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">My Payslip</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="{{route('attendence.backup')}}">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="clock"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Backup Attendence</p>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -398,11 +435,13 @@
   <script src="{{ asset('assets/plugins/flatpickr/flatpickr.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
   <script src="{{ asset('assets/js/dashboard.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+  <script src="{{ asset('assets/js/carousel.js') }}"></script>
   <script>
     @if(session('success'))
         Swal.fire({
@@ -855,4 +894,9 @@
           document.getElementById("btn-absen").submit();
           }
       </script>
+      <style>
+        .owl-theme .owl-nav.disabled+.owl-dots{
+            display : none;
+        }
+      </style>
 @endpush

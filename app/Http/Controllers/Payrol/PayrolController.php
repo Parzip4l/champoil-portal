@@ -31,45 +31,45 @@ class PayrolController extends Controller
     }
 
     public function getWeeks(Request $request)
-{
-    $monthNames = [
-        'Januari' => 1,
-        'Februari' => 2,
-        'Maret' => 3,
-        'April' => 4,
-        'Mei' => 5,
-        'Juni' => 6,
-        'Juli' => 7,
-        'Agustus' => 8,
-        'September' => 9,
-        'Oktober' => 10,
-        'November' => 11,
-        'Desember' => 12
-    ];
-    $selectedMonth = $monthNames[$request->input('month')];
+    {
+        $monthNames = [
+            'Januari' => 1,
+            'Februari' => 2,
+            'Maret' => 3,
+            'April' => 4,
+            'Mei' => 5,
+            'Juni' => 6,
+            'Juli' => 7,
+            'Agustus' => 8,
+            'September' => 9,
+            'Oktober' => 10,
+            'November' => 11,
+            'Desember' => 12
+        ];
+        $selectedMonth = $monthNames[$request->input('month')];
 
-    // Menggunakan Carbon untuk mendapatkan tanggal awal dan akhir dari bulan
-    $startDate = Carbon::createFromDate(null, $selectedMonth, 1)->startOfWeek(Carbon::MONDAY);
-    $endDate = Carbon::createFromDate(null, $selectedMonth, 1)->endOfMonth()->endOfWeek(Carbon::FRIDAY);
+        // Menggunakan Carbon untuk mendapatkan tanggal awal dan akhir dari bulan
+        $startDate = Carbon::createFromDate(null, $selectedMonth, 1)->startOfWeek(Carbon::MONDAY);
+        $endDate = Carbon::createFromDate(null, $selectedMonth, 1)->endOfMonth()->endOfWeek(Carbon::FRIDAY);
 
-    // Inisialisasi array untuk menyimpan daftar minggu
-    $weeks = [];
+        // Inisialisasi array untuk menyimpan daftar minggu
+        $weeks = [];
 
-    // Perulangan untuk mengisi array dengan daftar minggu
-    $currentDate = $startDate;
-    $weekNumber = 1;
+        // Perulangan untuk mengisi array dengan daftar minggu
+        $currentDate = $startDate;
+        $weekNumber = 1;
 
-    while ($currentDate->lte($endDate)) {
-        $weekStart = $currentDate->format('Y-m-d'); // Format tanggal start
-        $weekEnd = $currentDate->copy()->addDays(4)->format('Y-m-d'); // Format tanggal end
+        while ($currentDate->lte($endDate)) {
+            $weekStart = $currentDate->format('Y-m-d'); // Format tanggal start
+            $weekEnd = $currentDate->copy()->addDays(4)->format('Y-m-d'); // Format tanggal end
 
-        $weeks[] = "Week " . $weekNumber . " ($weekStart - $weekEnd)";
-        $currentDate->addWeek();
-        $weekNumber++;
+            $weeks[] = "Week " . $weekNumber . " ($weekStart - $weekEnd)";
+            $currentDate->addWeek();
+            $weekNumber++;
+        }
+
+        return response()->json(['weeks' => $weeks]);
     }
-
-    return response()->json(['weeks' => $weeks]);
-}
 
     /**
      * Show the form for creating a new resource.

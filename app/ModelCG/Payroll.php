@@ -9,4 +9,6 @@ class Payroll extends Model
 {
     use HasFactory;
     protected $connection = 'mysql_secondary';
+    protected $table = 'payrolls';
+    protected $fillable = ['id','employee_code'];
 }

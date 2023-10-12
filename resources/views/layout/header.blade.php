@@ -245,7 +245,7 @@
         </li>
         @endif
         @if(in_array('superadmin_access', $dataLogin) || in_array('hr_access', $dataLogin))
-        <li class="nav-item {{ active_class(['charts/*', 'tables/*']) }}">
+        <li class="nav-item mega-menu {{ active_class(['charts/*', 'tables/*']) }}">
             <a href="#" class="nav-link">
                 <i class="link-icon" data-feather="users"></i>
                 <span class="menu-title">Human Culture</span>
@@ -253,26 +253,34 @@
             </a>
             <div class="submenu">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <ul class="submenu-item pe-0">
                             <li class="category-heading">Employee</li>
                             <li class="nav-item"><a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee</a></li>
+                            <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
+                            <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
+                            <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['kas/shift']) }}">Shift</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <ul class="submenu-item pe-0">
+                            <li class="category-heading">Payroll</li>
+                            <li class="nav-item"><a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payslip</a></li>
                             <li class="nav-item"><a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payroll</a></li>
                             <li class="nav-item"><a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payroll Frontline Officer</a></li>
                             <li class="nav-item"><a href="{{ url('payrol-component') }}" class="nav-link {{ active_class(['payrol-component']) }}">Payroll Component</a></li>
-                            <li class="nav-item"><a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payslip</a></li>
-                            <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
                         </ul>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <ul class="submenu-item ps-0">
                             <li class="category-heading">Others</li>
+                            <li class="nav-item"><a href="{{ url('knowledge_base') }}" class="nav-link {{ active_class(['#']) }}">E-Learning</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Document Controls</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">FPTK</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Pencatatan Limbah B3</a></li>
                         </ul>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <ul class="submenu-item pe-0">
                             <li class="category-heading">KAS MODUL</li>
                             <li class="nav-item"><a href="{{ route('jabatan.index') }}" class="nav-link {{ active_class(['kas/jabatan']) }}">Jabatan</a></li>

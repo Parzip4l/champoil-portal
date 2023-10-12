@@ -5,11 +5,10 @@ namespace App\ModelCG;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Schedule extends Model
+class ScheduleBackup extends Model
 {
-    use HasFactory;
-    protected $table = 'schedules';
-    protected $fillable = ['schedule_code']; 
+    protected $table = 'schedule_backups';
+    protected $fillable = ['project']; 
 
     public function project()
     {

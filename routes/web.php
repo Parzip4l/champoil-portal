@@ -23,15 +23,33 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
     Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
-    // Absen
+    // Backup
+    Route::get('/backup-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'absenBackup'])->name('attendence.backup');
     Route::post('/absensi/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockin'])
     ->middleware('auth')
     ->name('clockin');
+
+    Route::post('/absensi/backup/clockout', [\App\Http\Controllers\Absen\AbsenController::class, 'clockoutbackup'])
+    ->middleware('auth')
+    ->name('clockout.backup');
+    
+    // Absen
+    Route::post('/absensi/backup/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockinbackup'])
+    ->middleware('auth')
+    ->name('clockin.backup');
 
     Route::post('/absensi/clockout', [\App\Http\Controllers\Absen\AbsenController::class, 'clockout'])
     ->middleware('auth')
     ->name('clockout');
 
+    // Request Absen
+    Route::group(['prefix' => 'attendence'], function(){
+        Route::resource('attendence-request', App\Http\Controllers\Absen\RequestControllers::class);
+        Route::post('/attendence-request/{id}', [App\Http\Controllers\Absen\RequestControllers::class, 'updateStatusSetuju'])->name('approve.request');
+        Route::post('/reject-request/{id}', [App\Http\Controllers\Absen\RequestControllers::class, 'updateStatusReject'])->name('reject.request');
+        Route::get('attendence-request/{id}/download', [App\Http\Controllers\Absen\RequestControllers::class, 'download'])->name('dokumen.download');
+    });
+    
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     // Component Ns
@@ -165,6 +183,35 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);
         Route::resource('project', App\Http\Controllers\CgControllers\ProjectControllers::class);
         Route::resource('project-details', App\Http\Controllers\CgControllers\ProjectDetailsController::class);
+        Route::resource('shift', App\Http\Controllers\CgControllers\ShiftControllers::class);
+        Route::resource('schedule', App\Http\Controllers\CgControllers\ScheduleControllers::class);
+        Route::resource('backup-schedule', App\Http\Controllers\CgControllers\ScheduleBackupControllers::class);
+
+        // Schedule Details
+        Route::get('/schedule/details/{project}/{periode}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetails'])->name('schedule.details');
+        Route::get('/schedule/details/{project}/{periode}/{employee}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetailsEmployee'])->name('schedule.employee');
+
+        // Day Off
+        Route::get('/getEmployeesWithDayOff', [App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getEmployeesWithDayOff'])->name('getEmployeesWithDayOff.backup');
+
+        // Payroll
+        Route::resource('payroll-kas', App\Http\Controllers\CgControllers\PayrolNS::class);
+
+        // Get Employee
+        Route::get('/get-employees', [App\Http\Controllers\Employee\EmployeeController::class, 'getEmployees']);
+
+        // Learning
+        Route::resource('knowledge_base',App\Http\Controllers\Knowledge\KnowledgeController::class);
+        Route::get('/knowledge_base', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'index'])->name('knowledge_base');
+        Route::post('/knowledge.store', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'store'])->name('knowledge.store');
+        Route::delete('/knowledge.destroy/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
+        Route::get('/add_soal/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'add_soal'])->name('add_soal');
+        Route::post('/knowledge.save_soal', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'save_soal'])->name('knowledge.save_soal');
+        //knowledge -asign user
+        Route::get('/asign_user/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'asign_user'])->name('asign_user');
+        Route::get('/read_test/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'read_test'])->name('read_test');
+        Route::get('/pdf.preview/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
+        Route::post('/knowledge.save_asign_users', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'save_asign_users'])->name('knowledge.save_asign_users');
     });
 });
 

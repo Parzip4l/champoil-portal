@@ -15,11 +15,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('pages.app-setting.user.index', compact('users'));
+        $employee = Employee::all();
+        return view('pages.app-setting.user.index', compact('users','employee'));
     }
 
     public function create()
     {
+        
         return view('pages.app-setting.user.create');
     }
 

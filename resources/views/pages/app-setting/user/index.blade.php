@@ -79,8 +79,12 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Nama Lengkap</label>
-                            <input type="text" class="form-control" name="name" id="nama" placeholder="Nama Lengkap" required>
-                            <input type="hidden" name="employee_code" id="employee_code">
+                            <select name="name" id="" class="js-example-basic-single form-select" data-width="100%">
+                                <option disabled>Select Employee</option>
+                                @foreach($employee as $karyawan)
+                                <option value="{{$karyawan->nik}}">{{$karyawan->nama}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Email</label>

@@ -52,7 +52,9 @@
             <div class="col-md-6">
                 <label class="form-label">Jabatan</label>
                 <select class="js-example-basic-single form-select" data-width="100%" name="jabatan">
-                    <option value="IT Staff">IT STAFF</option>
+                    @foreach($jabatan as $jabatan)
+                        <option value="{{$jabatan->name}}">{{$jabatan->name}}</option>
+                     @endforeach
                 </select>
             </div>
           </div>

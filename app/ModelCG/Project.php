@@ -11,4 +11,9 @@ class Project extends Model
     protected $connection = 'mysql_secondary';
     protected $table = 'projects';
     protected $fillable = ['id','name']; 
+
+    public function schedules()
+{
+    return $this->hasMany(Schedule::class, 'project_id');
+}
 }

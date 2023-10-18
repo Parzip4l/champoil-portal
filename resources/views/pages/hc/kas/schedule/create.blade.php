@@ -31,9 +31,9 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Project</label>
-                                    @foreach($project as $project)
+                                    @foreach($project as $projectd)
                                         <select name="project" id="" class="form-control">
-                                            <option value="{{$project->id}}">{{$project->name}}</option>
+                                            <option value="{{$projectd->id}}">{{$projectd->name}}</option>
                                         </select>
                                     @endforeach
                                 </div>

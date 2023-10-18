@@ -52,7 +52,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
-    
+
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
     Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');
@@ -62,12 +62,12 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
 
     // Classroom
-    Route::get('/kas/read_test/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'read_test'])->name('kas/read_test');
-    Route::get('/pdf.preview/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
-    Route::get('/kas/user.test/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'user_test'])->name('kas/user.test');
-    Route::post('/knowledge.save_test_user', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'submit_user'])->name('knowledge.save_test_user');
-    Route::get('/list-class', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'list_classroom'])->name('list-class');
-    Route::get('/start_class/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
+    Route::get('/kas/read_test/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'read_test'])->name('kas/read_test');
+    Route::get('/pdf.preview/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
+    Route::get('/kas/user.test/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'user_test'])->name('kas/user.test');
+    Route::post('/knowledge.save_test_user', [App\Http\Controllers\knowledge\KnowledgeController::class, 'submit_user'])->name('knowledge.save_test_user');
+    Route::get('/list-class', [App\Http\Controllers\knowledge\KnowledgeController::class, 'list_classroom'])->name('list-class');
+    Route::get('/start_class/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
@@ -210,16 +210,16 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/get-employees', [App\Http\Controllers\CgControllers\PayrolNS::class, 'getEmployees'])->name('employee.unit');
 
         // Learning
-        Route::resource('knowledge_base',App\Http\Controllers\Knowledge\KnowledgeController::class);
-        Route::post('/knowledge.store', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'store'])->name('knowledge.store');
-        Route::delete('/knowledge.destroy/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
-        Route::get('/add_soal/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'add_soal'])->name('add_soal');
-        Route::post('/knowledge.save_soal', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'save_soal'])->name('knowledge.save_soal');
+        Route::resource('knowledge_base',App\Http\Controllers\knowledge\KnowledgeController::class);
+        Route::post('/knowledge.store', [App\Http\Controllers\knowledge\KnowledgeController::class, 'store'])->name('knowledge.store');
+        Route::delete('/knowledge.destroy/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
+        Route::get('/add_soal/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'add_soal'])->name('add_soal');
+        Route::post('/knowledge.save_soal', [App\Http\Controllers\knowledge\KnowledgeController::class, 'save_soal'])->name('knowledge.save_soal');
         //knowledge -asign user
-        Route::get('/asign_user/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'asign_user'])->name('asign_user');
-        Route::get('/read_test/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'read_test'])->name('read_test');
-        Route::get('/pdf.preview/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
-        Route::post('/knowledge.save_asign_users', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'save_asign_users'])->name('knowledge.save_asign_users');
+        Route::get('/asign_user/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'asign_user'])->name('asign_user');
+        Route::get('/read_test/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'read_test'])->name('read_test');
+        Route::get('/pdf.preview/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
+        Route::post('/knowledge.save_asign_users', [App\Http\Controllers\knowledge\KnowledgeController::class, 'save_asign_users'])->name('knowledge.save_asign_users');
     });
 });
 

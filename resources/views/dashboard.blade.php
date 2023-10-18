@@ -109,13 +109,12 @@
                 </div>
             </div>
         </div>
-        <div class="log-absen-today mt-2">
+        <div class="log-absen-today mt-2 mb-2">
             <div class="card ">
                 <div class="card-header text-center bg-warning">
                     <h5>Undangan TEST</h5>   
                 </div>
                 <div class="card-body">
-                  
                       @foreach($asign_test as $row_asign_test)
                       <a href="{{ route('read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
                       @endforeach

@@ -36,7 +36,6 @@
                                 <div class="form-check">
                                     <input type="checkbox" name="employee_code[]" value="{{ $record->nik }}" class="form-check-input" id="exampleCheckbox1{{ $record->nik }}">
                                     <label class="form-check-label" for="exampleCheckbox1{{ $record->nik }}">{{ $record->nama }} </label>
-                                    
                                 </div>
                                 </td>
                                 

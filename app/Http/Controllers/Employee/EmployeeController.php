@@ -87,7 +87,8 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        //
+        $employee = Employee::find($id);
+        return view('pages.hc.karyawan.details', compact('employee'));
     }
 
     /**
@@ -98,7 +99,8 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        //
+        $employee = Employee::find($id);
+        return view('pages.hc.karyawan.edit', compact('employee'));
     }
 
     /**
@@ -110,7 +112,51 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'ktp' => 'required|numeric',
+            'nik' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
+            'agama' => 'required|string|max:255',
+            'jenis_kelamin' => 'required|string|in:Laki-Laki,Perempuan',
+            'email' => 'required|email',
+            'telepon' => 'required|string|max:15',
+            'status_kontrak' => 'required|string|in:Contract,Permanent',
+            'organisasi' => 'required|string|in:Professional Frontline,Management Leaders',
+            'joindate' => 'required|date',
+            'berakhirkontrak' => 'required|date',
+            'tempat_lahir' => 'required|string|max:255',
+            'tanggal_lahir' => 'required|date',
+            'alamat' => 'required|string',
+            'status_pernikahan' => 'required|string|in:Married,Single',
+        ]);
+
+        // Find the employee by ID
+        $employee = Employee::findOrFail($id);
+
+        // Update the employee data
+        $employee->nama = $request->input('nama');
+        $employee->ktp = $request->input('ktp');
+        $employee->nik = $request->input('nik');
+        $employee->jabatan = $request->input('jabatan');
+        $employee->agama = $request->input('agama');
+        $employee->jenis_kelamin = $request->input('jenis_kelamin');
+        $employee->email = $request->input('email');
+        $employee->telepon = $request->input('telepon');
+        $employee->status_kontrak = $request->input('status_kontrak');
+        $employee->organisasi = $request->input('organisasi');
+        $employee->joindate = $request->input('joindate');
+        $employee->berakhirkontrak = $request->input('berakhirkontrak');
+        $employee->tempat_lahir = $request->input('tempat_lahir');
+        $employee->tanggal_lahir = $request->input('tanggal_lahir');
+        $employee->alamat = $request->input('alamat');
+        $employee->status_pernikahan = $request->input('status_pernikahan');
+
+        // Save the updated employee
+        $employee->save();
+
+        // Redirect to a view or return a response as needed
+        return redirect()->route('employee.index')->with('success', 'Employee data updated successfully.');
     }
 
     /**

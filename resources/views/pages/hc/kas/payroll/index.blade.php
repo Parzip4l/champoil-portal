@@ -21,7 +21,6 @@
                                 <th>Employee</th>
                                 <th>Periode</th>
                                 <th>THP</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,10 +28,7 @@
                             <tr>
                                 <td> {{ $data->employee_code }} </td>
                                 <td> {{ $data->periode }} </td>
-                                <td> {{ $data->thp }} </td>
-                                <td>
-                                <a href="{{ route('schedule.details', ['project' => $scheduleByProject->project, 'periode' => $scheduleByProject->periode]) }}" class="btn btn-primary btn-sm">Details</a>
-                                </td>
+                                <td>{{ 'Rp ' . number_format($data->thp, 0, ',', '.') }}</td>
                             </tr>
                             @endforeach
                         </tbody>

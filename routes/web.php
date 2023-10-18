@@ -52,6 +52,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
+    
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
     Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');
@@ -59,6 +60,14 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
+
+    // Classroom
+    Route::get('/kas/read_test/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'read_test'])->name('kas/read_test');
+    Route::get('/pdf.preview/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
+    Route::get('/kas/user.test/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'user_test'])->name('kas/user.test');
+    Route::post('/knowledge.save_test_user', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'submit_user'])->name('knowledge.save_test_user');
+    Route::get('/list-class', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'list_classroom'])->name('list-class');
+    Route::get('/start_class/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
 });
 
 Route::middleware(['auth', 'permission:sales_access'])->group(function () {
@@ -198,11 +207,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('payroll-kas', App\Http\Controllers\CgControllers\PayrolNS::class);
 
         // Get Employee
-        Route::get('/get-employees', [App\Http\Controllers\Employee\EmployeeController::class, 'getEmployees']);
+        Route::get('/get-employees', [App\Http\Controllers\CgControllers\PayrolNS::class, 'getEmployees'])->name('employee.unit');
 
         // Learning
         Route::resource('knowledge_base',App\Http\Controllers\Knowledge\KnowledgeController::class);
-        Route::get('/knowledge_base', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'index'])->name('knowledge_base');
         Route::post('/knowledge.store', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'store'])->name('knowledge.store');
         Route::delete('/knowledge.destroy/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'destroy'])->name('knowledge.destroy');
         Route::get('/add_soal/{id}', [App\Http\Controllers\Knowledge\KnowledgeController::class, 'add_soal'])->name('add_soal');

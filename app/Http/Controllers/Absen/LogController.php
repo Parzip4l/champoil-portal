@@ -32,29 +32,34 @@ class LogController extends Controller
                         ->where('users.employee_code', $userId)
                         ->select('karyawan.*')
                         ->get();
+
+                    $employeCode = User::where('id',$userId)->first();
+
                     // Get Log Absensi
-                    $logs = Absen::where('user_id', $userId)
+                    $logs = Absen::where('user_id', $employeCode->employee_code)
                         ->whereDate('tanggal', $hariini)
                         ->get();
-
                     $startOfMonth = Carbon::now()->startOfMonth();
                     $endOfMonth = Carbon::now()->endOfMonth();
 
                     // Get logs for the month
-                    $logsmonths = Absen::where('user_id', $userId)
+                    $logsmonths = Absen::where('user_id', $employeCode->employee_code)
                     ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                     ->orderByDesc('tanggal')
                     ->get();
-
+                    
                     $bulan = $request->input('bulan');
 
                     if ($bulan) {
                         $logsfilter = DB::table('absens')
                             ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
                             ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
+                            ->where('user_id',$employeCode->employee_code)
                             ->get();
                     } else {
-                        $logsfilter = DB::table('absens')->get();
+                        $logsfilter = DB::table('absens')
+                        ->where('user_id',$employeCode->employee_code)
+                        ->get();
                     }
 
                     // Remove Absen Button

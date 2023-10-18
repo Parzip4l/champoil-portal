@@ -53,13 +53,15 @@
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Year</label>
                         <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
+                        <input type="hidden" name="periode" value="{{$start_date2}} - {{$end_date2}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Unit Bisnis</label>
-                        <select name="" id="UnitBisnis" class="form-control">
-                            <option value="Champoil">Champoil</option>
+                        <select name="unit_bisnis" id="UnitBisnis" class="form-control">
+                            <option disabled selected>Pilih Unit Bisnis</option>
+                            <option value="CHAMPOIL">Champoil</option>
                             <option value="Kas">Kas</option>
                         </select>
                     </div>
@@ -73,17 +75,30 @@
                             <thead>
                                 <tr>
                                     <th>Employee</th>
+                                    <th>Select All/Deselect All</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                        
+                                <tr>
+                                    <td>
+                                        <select class="form-control employeeSelect" id="employeeSelect" name="employee_code[]" multiple>
+                                            <!-- Add options for employees here -->
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm" id="selectAll">Select All</button>
+                                        <button type="button" class="btn btn-primary btn-sm" id="deselectAll">Deselect All</button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
-                        <button type="button" id="addProduct" class="btn btn-primary mt-1 mb-3">Tambah Employee</button>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <button type="submit" class="btn btn-primary">Run Payroll</button>
                 </div>
             </div>
@@ -106,139 +121,65 @@
     <script src="{{ asset('assets/js/select2.js') }}"></script>
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
-  <script>
-    function showDeleteDataDialog(id) {
-        Swal.fire({
-            title: 'Hapus Data',
-            text: 'Anda Yakin Akan Menghapus Data Ini?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Perform the delete action here (e.g., send a request to delete the data)
-                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('employee.destroy', ':id') }}".replace(':id', id);
-                fetch(deleteUrl, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+    <script>
+        $(document).ready(function() {
+            // Event listener for changes in the UnitBisnis select
+            $('#UnitBisnis').change(function() {
+                // Get the selected unit bisnis
+                const selectedUnitBisnis = $(this).val();
+
+                // Update the list of employees based on the selected unit bisnis
+                updateEmployeeOptions(selectedUnitBisnis);
+            });
+
+            // Function to update the list of employees based on unit bisnis
+            function updateEmployeeOptions(unitBisnis) {
+                const employeeSelect = $('.employeeSelect');
+
+                // Perform an AJAX request to fetch employees based on the unit bisnis
+                $.ajax({
+                    url: "{{ route('employee.unit') }}", // Adjust the URL accordingly
+                    method: 'GET',
+                    data: { unit_bisnis: unitBisnis },
+                    success: function(response) {
+
+                        // Clear previous options
+                        employeeSelect.empty();
+
+                        // Add options for employees
+                        if (Array.isArray(response.employees)) {
+                            $.each(response.employees, function(key, value) {
+                                employeeSelect.append('<option value="' + value.nik + '">' + value.nama + '</option>');
+                            });
+                        } else {
+                            console.error('Invalid response format: employees is not an array.');
+                        }
+
+                        // Initialize Select2 after updating options
+                        employeeSelect.select2();
                     },
-                }).then((response) => {
-                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Employee Successfully Deleted',
-                            icon: 'success',
-                        }).then(() => {
-                            window.location.reload(); // Refresh halaman setelah menutup alert
-                        });
-                    } else {
-                        // Handle error response if needed
-                        Swal.fire({
-                            title: 'Contact Failed to Delete',
-                            text: 'An error occurred while deleting data.',
-                            icon: 'error',
-                        });
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching employees:', error);
                     }
-                }).catch((error) => {
-                    // Handle fetch error if needed
-                    Swal.fire({
-                        title: 'Contact Failed to Delete',
-                        text: 'An error occurred while deleting data.',
-                        icon: 'error',
-                    });
                 });
             }
+
+            // Event listener to select all employees
+            $('#selectAll').click(function() {
+                $('.employeeSelect option').prop('selected', true);
+                $('.employeeSelect').trigger('change');
+            });
+
+            // Event listener to deselect all employees
+            $('#deselectAll').click(function() {
+                $('.employeeSelect option').prop('selected', false);
+                $('.employeeSelect').trigger('change');
+            });
         });
-    }
     </script>
-  <script>
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('success') }}',
-        });
-    @endif
-
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: '{{ session('error') }}',
-        });
-    @endif
-</script>
-<!-- Payroll -->
-<script>
-    function addProductRow() {
-        const newRow = `
-            <tr>
-                <td>
-                    <select class="form-control employeeSelect" id="employeeSelect" name="employee_code[]">
-                        @foreach ($employee as $data)
-                            <option value="{{$data->employee_code}}">{{$data->nama}}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
-                </td>
-            </tr>
-        `;
-        document.querySelector('#EmployeeTable tbody').insertAdjacentHTML('beforeend', newRow);
-
-        updateProductCategory(document.querySelector('#EmployeeTable tbody').lastElementChild.querySelector('.form-select'));
-    }
-
-    function removeProductRow(button) {
-        const row = button.closest('tr');
-        row.remove();
-    }
-
-    document.getElementById('addProduct').addEventListener('click', addProductRow);
-</script>
-<script>
-    $(document).ready(function() {
-    // Event listener for changes in the UnitBisnis select
-    $('#UnitBisnis').change(function() {
-        // Get the selected unit bisnis
-        const selectedUnitBisnis = $(this).val();
-
-        // Update the list of employees based on the selected unit bisnis
-        updateEmployeeOptions(selectedUnitBisnis);
-    });
-
-    // Function to update the list of employees based on unit bisnis
-    function updateEmployeeOptions(unitBisnis) {
-        // Get all selects with the employeeSelect class
-        const employeeSelects = $('.employeeSelect');
-
-        // Send an AJAX request to get the list of employees based on unit bisnis
-        $.ajax({
-            url: '/get-employees', // Adjust the URL accordingly
-            method: 'GET',
-            data: { unit_bisnis: unitBisnis },
-            success: function(response) {
-            console.log('Response from server:', response);
-
-            const employees = response.employees;
-
-            if (Array.isArray(employees)) {
-                // Update each select with the appropriate employee options
-                employeeSelects.each(function(index) {
-                    // Rest of the code remains the same
-                });
-            } else {
-                console.error('Invalid response format: employees is not an array.');
-            }
-        },
-            error: function(xhr, status, error) {
-                console.error('Error fetching employees:', error);
-            }
-        });
-    }
-});
-</script>
+    <style>
+        .select2-container {
+            width : 100%!important;
+        }
+    </style>
 @endpush

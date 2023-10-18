@@ -82,7 +82,7 @@
                             <select name="name" id="" class="js-example-basic-single form-select" data-width="100%">
                                 <option disabled>Select Employee</option>
                                 @foreach($employee as $karyawan)
-                                <option value="{{$karyawan->nik}}">{{$karyawan->nama}}</option>
+                                    <option value="{{$karyawan->nik}}" data-nik="{{$karyawan->nik}}">{{$karyawan->nama}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -268,5 +268,4 @@
     }
   });
 </script>
-
 @endpush

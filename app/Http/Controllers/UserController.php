@@ -51,6 +51,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all());
         $data = $request->validate([
             'name' => 'required',
             'email' => 'required',
@@ -61,6 +62,7 @@ class UserController extends Controller
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->employee_code = $request->name;
         $user->password = Hash::make($request->password);
         $user->permission = json_encode($request->permissions);
         $user->save();

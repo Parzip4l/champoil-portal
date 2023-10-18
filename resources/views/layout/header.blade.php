@@ -274,7 +274,7 @@
                     <div class="col-md-3">
                         <ul class="submenu-item ps-0">
                             <li class="category-heading">Others</li>
-                            <li class="nav-item"><a href="{{ url('knowledge_base') }}" class="nav-link {{ active_class(['#']) }}">E-Learning</a></li>
+                            <li class="nav-item"><a href="{{ route('knowledge_base.index') }}" class="nav-link {{ active_class(['#']) }}">E-Learning</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Document Controls</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">FPTK</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Pencatatan Limbah B3</a></li>

@@ -128,37 +128,6 @@
                     <div class="menu-absen-wrap desktop">
                         <div class="owl-carousel owl-theme owl-basic">
                             <div class="item">
-                                <a href="{{ route('list-class') }}">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="book"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">Class Room</p>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="item">
-                                <a href="javascript:void(0)">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="user-plus"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">Fitup</p>
-                                    </div>
-                                </a>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="menu-absen-wrap desktop">
-                        <div class="owl-carousel owl-theme owl-basic">
-                            <div class="item">
                                 <a href="{{route('mylogs')}}">
                                     <div class="icon text-center">
                                         <i class="me-2 icon-lg" data-feather="git-branch"></i>
@@ -195,6 +164,26 @@
                                     </div>
                                     <div class="menu-name text-center">
                                         <p class="text-muted">Backup Attendence</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="{{ route('list-class') }}">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="book"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Class Room</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="javascript:void(0)">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="user-plus"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Fitup</p>
                                     </div>
                                 </a>
                             </div>

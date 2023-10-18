@@ -109,7 +109,7 @@
                 </div>
             </div>
         </div>
-        <div class="log-absen-today mt-2">
+        <div class="log-absen-today mt-1 mb-3">
             <div class="card ">
                 <div class="card-header text-center bg-warning">
                     <h5>Undangan TEST</h5>   

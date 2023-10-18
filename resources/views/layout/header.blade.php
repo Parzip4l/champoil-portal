@@ -278,6 +278,7 @@
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Document Controls</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">FPTK</a></li>
                             <li class="nav-item"><a href="{{ url('#') }}" class="nav-link {{ active_class(['#']) }}">Pencatatan Limbah B3</a></li>
+                            <li class="nav-item"><a href="{{ url('kas/knowledge_base') }}" class="nav-link {{ active_class(['#']) }}">Class Room</a></li>
                         </ul>
                     </div>
                     <div class="col-md-3">

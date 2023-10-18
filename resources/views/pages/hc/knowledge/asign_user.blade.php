@@ -15,7 +15,32 @@
         <form id="form_category" action="{{route('knowledge.save_asign_users')}}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="id_test" value="{{ $id_test }}">
-        <button type="submit" id="submit" class="btn btn-primary ml-3" style="float:right">Submit</button>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="metode_training">Tipe Test:</label>
+                <select class="form-control" id="metode_training" name="metode_training">
+                    <option value="Online">Online</option>
+                    <option value="Offline">Offline</option>
+                </select>
+                <div id="offline">
+                    <label for="" class="form-label">Lokasi</label>
+                    <input type="text" class="form-control" name="lokasi">
+                    <label for="" class="form-label">Tanggal</label>
+                    <input type="date" class="form-control" name="tanggal">
+                    
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="offline2">
+                    <label for="" class="form-label">Jam</label>
+                    <input type="time" class="form-control" name="jam">
+                    <label for="" class="form-label">Catatan</label>
+                    <textarea class="form-control" name="catatan" height="300"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        
             <div class="table-responsive">
                     <table id="dataTableExample" class="table">
                         <thead>
@@ -36,6 +61,7 @@
                                 <div class="form-check">
                                     <input type="checkbox" name="employee_code[]" value="{{ $record->nik }}" class="form-check-input" id="exampleCheckbox1{{ $record->nik }}">
                                     <label class="form-check-label" for="exampleCheckbox1{{ $record->nik }}">{{ $record->nama }} </label>
+                                    
                                 </div>
                                 </td>
                                 
@@ -44,7 +70,7 @@
                         </tbody>
                     </table>
                 </div>
-            
+                <button type="submit" id="submit" class="btn btn-primary ml-3" style="float:left">Submit</button>
             
         </form>
       </div>
@@ -66,6 +92,7 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
+   
     function showDeleteDataDialog(id) {
         Swal.fire({
             title: 'Hapus Data',

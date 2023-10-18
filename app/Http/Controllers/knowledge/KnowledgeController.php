@@ -8,10 +8,12 @@ use App\ModelCG\Knowledge;
 use App\ModelCG\Knowledge_soal;
 use App\ModelCG\knowledge_jawaban;
 use App\ModelCG\asign_test;
+use App\ModelCG\jawaban_user;
 use App\Employee;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class KnowledgeController extends Controller
 {
@@ -23,6 +25,16 @@ class KnowledgeController extends Controller
     public function index()
     {
         $records = Knowledge::all();
+        if($records){
+            foreach($records as $row){
+                $cek_asign = asign_test::where('id_test',$row->id)
+                                        ->where('status',0)
+                                        ->where('metode_training',"Offline")
+                                        ->count();
+                $row->count_cek = $cek_asign;
+            }
+        }
+
         return view('pages.hc.knowledge.index', compact('records'));
     }
 
@@ -132,6 +144,7 @@ class KnowledgeController extends Controller
         $data['id_module']=$id;
         $data['file_module']=storage_path('app/'.$data['record']->file_name);
         
+        
         return view('pages.hc.knowledge.read_test',$data);
 
     }
@@ -191,10 +204,97 @@ class KnowledgeController extends Controller
         if($data){
             $no=0;
             foreach($data['employee_code'] as $row){
-                asign_test::insert(['employee_code'=>$data['employee_code'][$no],'id_test'=>$data['id_test'],"status"=>0]);
+                $notes_training=[
+                    "lokasi"=>$data['lokasi'],
+                    "tanggal"=>$data['tanggal'],
+                    "jam"=>$data['jam'],
+                    "catatan"=>$data['catatan']
+                ];
+
+                $data_insert =[
+                    'employee_code'=>$data['employee_code'][$no],
+                    'id_test'=>$data['id_test'],
+                    "status"=>0,
+                    "metode_training"=>$data['metode_training'],
+                    "notes_training"=>json_encode($notes_training)
+                ];
+
+
+                asign_test::insert($data_insert);
                 $no++;
             }
         }
         return redirect()->route('asign_user', ['id' => $data['id_test']])->with('success', 'Contact Successfully Deleted');
+    }
+
+    public function user_test($id){
+        $data['id_module']=$id;
+        $data['result']=[];
+        $test = Knowledge::find($id);
+        if($test){
+            $soal = Knowledge_soal::where('master_test',$test->id)->inRandomOrder()->get();
+            if($soal){
+                foreach($soal as $row){
+                    $jawaban = Knowledge_jawaban::where('id_soal',$row->id)->inRandomOrder()->get();
+                    $row->jawaban = $jawaban;
+                    $response[]=$row;
+                }
+                
+            }
+            $data['result']=$response;
+        }
+
+        $data['test']=$test;
+
+        return view('pages.hc.knowledge.user_test',$data);
+    }
+
+    public function submit_user(Request $request){
+        $data = $request->all();
+        
+        if($data){
+            $count = count($data);
+            $jml_test = $count-3;
+            $point=0;
+            for ($i = 0; $i <= $jml_test; $i++) {
+                $explode = explode("-",$data['test_'.$i]);
+                $id_soal = $explode[1];
+                $id_jawaban = $explode[0];
+                $cek_jawaban = knowledge_jawaban::where('id',$id_jawaban)->first();
+                
+                $insert=[
+                    "id_soal"=>$id_soal,
+                    "id_jawaban"=>$cek_jawaban->id,
+                    "nilai_point"=>isset($cek_jawaban->point)?$cek_jawaban->point:0
+                ];
+                $point +=isset($cek_jawaban->point)?$cek_jawaban->point:0;
+                
+                jawaban_user::insert($insert);
+            }
+            
+            asign_test::where('employee_code',Auth::user()->employee_code)
+                        ->where('id_test',$data['id_module'])
+                        ->update(["status"=>1,"total_point"=>$point]);
+            
+        }
+        return redirect()->route('dashboard.index')->with('success', 'Submit Successfully');
+    }
+    public function list_classroom(){
+        $data=[];
+        $data['test_finis']=DB::connection('mysql_secondary')
+                            ->table('asign_tests')
+                            ->join('knowledge','asign_tests.id_test', '=', 'knowledge.id')
+                            ->where('status',1)
+                            ->where('employee_code',Auth::user()->employee_code)
+                            ->select('knowledge.*','asign_tests.total_point','asign_tests.updated_at')
+                            ->get();
+        $data['asign_test'] = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
+
+        return view('pages.hc.knowledge.list_class',$data);
+    }
+
+    public function start_class($id){
+        asign_test::where('id_test',$id)->update(['start_class'=>1]);
+        return redirect()->route('knowledge_base')->with('success', 'Class Is Starting');
     }
 }

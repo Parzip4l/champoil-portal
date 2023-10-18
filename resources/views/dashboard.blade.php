@@ -109,7 +109,7 @@
                 </div>
             </div>
         </div>
-        <div class="log-absen-today mt-1 mb-3">
+        <div class="log-absen-today mt-2">
             <div class="card ">
                 <div class="card-header text-center bg-warning">
                     <h5>Undangan TEST</h5>   
@@ -119,6 +119,37 @@
                       @foreach($asign_test as $row_asign_test)
                       <a href="{{ route('read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
                       @endforeach
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="menu-absen-wrap desktop">
+                        <div class="owl-carousel owl-theme owl-basic">
+                            <div class="item">
+                                <a href="{{ route('list-class') }}">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="book"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Class Room</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="javascript:void(0)">
+                                    <div class="icon text-center">
+                                        <i class="me-2 icon-lg" data-feather="user-plus"></i>
+                                    </div>
+                                    <div class="menu-name text-center">
+                                        <p class="text-muted">Fitup</p>
+                                    </div>
+                                </a>
+                            </div>
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

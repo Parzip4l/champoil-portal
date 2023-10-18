@@ -51,6 +51,12 @@
                                                 <i data-feather="users" class="icon-sm me-2"></i>
                                                 <span class="">Asign User</span>
                                             </a>
+                                            @if($record->count_cek > 0)
+                                                <a class="dropdown-item d-flex align-items-center" href="{{ route('start_class', ['id' => $record->id]) }}">
+                                                    <i data-feather="book" class="icon-sm me-2"></i>
+                                                    <span class="">Start Class </span>
+                                                </a>
+                                            @endif
                                             <form action="{{ route('knowledge.destroy', $record->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
                                                 <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $record->id }}')">

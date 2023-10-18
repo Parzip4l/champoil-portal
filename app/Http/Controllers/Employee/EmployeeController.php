@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Employee;
+use App\Absen;
+use App\UserActivities;
 use App\ModelCG\Jabatan;
+use Carbon\Carbon;
+use App\Absen\RequestAbsen;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -88,7 +93,65 @@ class EmployeeController extends Controller
     public function show($id)
     {
         $employee = Employee::find($id);
-        return view('pages.hc.karyawan.details', compact('employee'));
+        $nikdata = $employee->nik;
+
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+        // Hitung jumlah hari kerja tanpa absensi (termasuk akhir pekan)
+        $totalWorkingDays = $startDate->diffInWeekdays($endDate) + 1;
+
+        // Fetch attendance data for the current month
+        $attendanceData = DB::table('absens')
+            ->where('nik', $nikdata)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->get();
+
+        // Hitung jumlah hari dengan absensi
+        $daysWithAttendance = count($attendanceData);
+
+        // Hitung jumlah hari tanpa absensi
+        $daysWithoutAttendance = $totalWorkingDays - $daysWithAttendance;
+
+        // No ClockOut
+        $daysWithClockInNoClockOut = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if (!empty($absendata->clock_in) && empty($absendata->clock_out)) {
+                $daysWithClockInNoClockOut++;
+            }
+        }
+
+        // Sakit
+        $sakit = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if ($absendata->status == 'Sakit') {
+                $sakit++;
+            }
+        }
+
+        $izin = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if ($absendata->status == 'Izin') {
+                $izin++;
+            }
+        }
+
+        // Request Absen
+        $requestAbsen = RequestAbsen::where('employee',$nikdata)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->get();
+        
+        //count Request
+        $CountRequest = RequestAbsen::where('employee',$nikdata)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->count(); 
+        
+
+        return view('pages.hc.karyawan.details', compact('employee', 'attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin'));
     }
 
     /**
@@ -170,5 +233,46 @@ class EmployeeController extends Controller
         $contact = Employee::find($id);
         $contact->delete();
         return redirect()->route('employee.index')->with('success', 'Employee Successfully Deleted');
+    }
+
+    // Update Absen
+    public function UpdateAbsen(Request $request, $date)
+    {
+        // Lakukan pemrosesan untuk mengedit data berdasarkan tanggal ($date)
+        // Misalnya, simpan perubahan pada database
+        $attendance = Absen::where('tanggal', $date)->first();
+        if ($attendance) {
+            $attendance->clock_in = $request->input('clock_in');
+            $attendance->clock_out = $request->input('clock_out');
+            $attendance->status = $request->input('status');
+            $attendance->save();
+
+            return redirect()->back()->with('success', 'Data Absensi berhasil diubah');
+        } else {
+            return redirect()->back()->with('error', 'Data tidak ditemukan untuk tanggal yang dipilih');
+        }
+    }
+
+    // Tambah Absen
+    public function CreateAbsen(Request $request)
+    {
+        // Lakukan pemrosesan untuk menambahkan data baru
+        // Misalnya, simpan data baru ke database
+        try{
+            $attendance = new Absen;
+            $attendance->user_id = $request->input('user');
+            $attendance->nik = $request->input('user');
+            $attendance->tanggal = $request->input('tanggal');
+            $attendance->clock_in = $request->input('clock_in');
+            $attendance->clock_out = $request->input('clock_out');
+            $attendance->latitude = $request->input('latitude');
+            $attendance->longtitude = $request->input('longtitude');
+            $attendance->status = $request->input('status');
+            $attendance->save();
+    
+            return redirect()->back()->with('success', 'Absensi berhasil ditambahkan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

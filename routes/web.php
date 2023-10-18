@@ -122,7 +122,7 @@ Route::middleware(['auth', 'permission:accounting_access'])->group(function () {
     Route::resource('tax', TaxController::class);
 });
 
-Route::middleware(['auth', 'permission:inventory_access'])->group(function () {
+Route::middleware(['auth', 'permission:inventory_access,formulation_access'])->group(function () {
     Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
     Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
     Route::resource('product-category', ProductCategoryController::class);
@@ -163,6 +163,7 @@ Route::middleware(['auth', 'permission:creative_access'])->group(function () {
     
 });
 
+// Superadmin Access
 Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
@@ -185,6 +186,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
+
+    // Update Absen
+    Route::post('/action/edit/{date}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');
+    Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsen'])->name('attendance.createData');
 
 
     // CG Component
@@ -222,8 +227,6 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::post('/knowledge.save_asign_users', [App\Http\Controllers\knowledge\KnowledgeController::class, 'save_asign_users'])->name('knowledge.save_asign_users');
     });
 });
-
-
 
 
 

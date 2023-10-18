@@ -35,32 +35,32 @@
         <form method="POST" action="{{ route('employee.update', $employee->id) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label for="name" class="form-label">Nama lengkap</label>
                 <input id="name" class="form-control" name="nama" type="text" placeholder="John Doe" value="{{$employee->nama}}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label for="Ktp" class="form-label">KTP</label>
                 <input id="ktp" class="form-control" name="ktp" type="number" placeholder="3xxxxxx" value="{{$employee->ktp}}">
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label for="kode_karyawan" class="form-label">Kode Karyawan</label>
                 <input id="kode_karyawan" class="form-control" name="nik" type="number" placeholder="xxx-xxx-xxx" value="{{$employee->nik}}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Jabatan</label>
                 <input type="text" name="jabatan" class="form-control" value="{{$employee->jabatan}}">
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label class="form-label">Agama</label>
                 <input type="text" name="agama" value="{{$employee->agama}}" class="form-control">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Jenis Kelamin</label>
                 <select class="js-example-basic-single form-select" data-width="100%" name="jenis_kelamin">
                     <option value="Laki-Laki" {{$employee->jenis_kelamin == 'Laki-Laki' ? 'selected' : ''}}>Laki-Laki</option>
@@ -68,25 +68,25 @@
                 </select>
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label for="kode_karyawan" class="form-label">Email</label>
                 <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id" value="{{$employee->email}}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
                 <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx" value="{{$employee->telepon}}">
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label class="form-label">Status Kontrak</label>
                 <select class="js-example-basic-single form-select" data-width="100%" name="status_kontrak">
                     <option value="Contract" {{$employee->status_kontrak == 'Contract' ? 'selected' : ''}}>Kontrak</option>
                     <option value="Permanent" {{$employee->status_kontrak == 'Permanent' ? 'selected' : ''}}>Tetap</option>
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Organisasi</label>
                 <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
                     <option value="Professional Frontline" {{$employee->organisasi == 'Professional Frontline' ? 'selected' : ''}}>Professional Frontline</option>
@@ -94,32 +94,32 @@
                 </select>
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label class="form-label">Tanggal Masuk</label>
                 <input type="date" class="form-control" name="joindate" value="{{$employee->joindate}}" >
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Tanggal Berakhir</label>
                 <input type="date" class="form-control" name="berakhirkontrak" value="{{$employee->berakhirkontrak}}">
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label class="form-label">Tempat Lahir</label>
                 <input type="text" class="form-control" name="tempat_lahir" placeholder="Jakarta" value="{{$employee->tempat_lahir}}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Tanggal Lahir</label>
                 <input type="date" class="form-control" name="tanggal_lahir" value="{{$employee->tanggal_lahir}}">
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3 mb-3">
             <label class="form-label">alamat</label>
             <textarea name="alamat" id="" cols="30" rows="10" class=form-control>{{$employee->alamat}}</textarea>
           </div>
-          <div class="row mb-3">
-            <div class="col">
+          <div class="row">
+            <div class="col mb-3">
                 <label class="form-label">Status Pernikahan</label>
                 <select class="js-example-basic-single form-select" data-width="100%" name="status_pernikahan">
                     <option value="Married" {{$employee->status_pernikahan == 'Married' ? 'selected' : ''}}>Married</option>
@@ -127,7 +127,7 @@
                 </select>
             </div>
           </div>
-          <button class="btn btn-primary" type="submit">Update Data</button>
+          <button class="btn btn-primary w-100" type="submit">Update Data</button>
         </form>
       </div>
     </div>

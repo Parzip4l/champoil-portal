@@ -18,6 +18,11 @@ return new class extends Migration
             $table->integer('employee_code');
             $table->integer('id_test');
             $table->integer('status');
+            $table->integer('total_point');
+            $table->string('metode_training');
+            $table->longText('notes_training');
+            $table->string('start_class');
+            $table->integer('module_read');
             $table->timestamps();
         });
     }

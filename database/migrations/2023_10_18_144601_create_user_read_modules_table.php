@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_read_modules', function (Blueprint $table) {
+        Schema::connection('mysql_secondary')->create('user_read_modules', function (Blueprint $table) {
             $table->id();
+            $table->string('employee_code');
+            $table->string('id_module');
             $table->timestamps();
         });
     }

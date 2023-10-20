@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('id_soal');
             $table->string('id_jawaban');
             $table->string('point');
+            
             $table->timestamps();
         });
     }

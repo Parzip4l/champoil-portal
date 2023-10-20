@@ -178,7 +178,110 @@ class PenetrasiController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'batch' => 'required|string|max:255',
+        ]);
+
+        // Find the Penetrasi by ID
+        $penetrasi = Penetrasi::findOrFail($id);
+
+        // Update the Penetrasi data
+        $penetrasi->batch = $request->batch;
+        $penetrasi->product = $request->product;
+        $penetrasi->p_process = $request->p_process;
+        $penetrasi->k_process = $request->k_process;
+        $penetrasi->k_fng = $request->k_fng;
+        $penetrasi->p_fng = $request->p_fng;
+        $penetrasi->checker = $request->checker;
+        $penetrasi->save();
+
+        $slackChannel = Slack::where('channel', 'Formulation')->first();
+            $slackWebhookUrl = $slackChannel->url;
+            $today = now()->toDateString();
+            $data = [
+                'text' => "Update Penetrasi Produksi Batch Number {$request->batch}",
+                'attachments' => [
+                    [
+                        'title' => 'Data Check Penetrasi',
+                        'fields' => [
+                            [
+                                'title' => 'Batch Number',
+                                'value' => $request->batch,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Product',
+                                'value' => $request->product,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Penetrasi Proses',
+                                'value' => $request->p_process,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Keterangan Proses',
+                                'value' => $request->k_process,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Penetrasi Finish Goods',
+                                'value' => $request->p_fng,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Keterangan Finish Goods',
+                                'value' => $request->k_fng,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Checker',
+                                'value' => $request->checker,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Lihat Detail Data Di Champoil Portal',
+                                'value' => '(https://portal.champoil.co.id/rnd-check)',
+                                'short' => true,
+                            ]
+                        ],
+                    ],
+                ],
+                
+            ];
+
+            $data_string = json_encode($data);
+
+            $ch = curl_init($slackWebhookUrl);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data_string),
+            ]);
+
+            $result = curl_exec($ch);
+
+            if ($result === false) {
+                // Penanganan kesalahan jika Curl gagal
+                $error = curl_error($ch);
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+            }
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($httpCode !== 200) {
+                // Penanganan kesalahan jika Slack merespons selain status 200 OK
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+            }
+
+            curl_close($ch);
+
+        // Redirect to a view or return a response as needed
+        return redirect()->route('rnd-check.index')->with('success', 'Penetration data updated successfully.');
     }
 
     /**
@@ -189,6 +292,8 @@ class PenetrasiController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $penetrasi = Penetrasi::find($id);
+        $penetrasi->delete();
+        return redirect()->route('rnd-check.index')->with('success', 'Data Successfully Deleted');
     }
 }

@@ -60,6 +60,10 @@
                                                         <i data-feather="eye" class="icon-sm me-2"></i>
                                                         <span class="">Details</span>
                                                     </a>
+                                                    <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#penetrasiModal{{ $data->id}}">
+                                                        <i data-feather="edit-2" class="icon-sm me-2"></i>
+                                                        <span class="">Edit</span>
+                                                    </a>
                                                     <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                         @csrf @method('DELETE') 
                                                         <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
@@ -113,13 +117,13 @@
                                                     <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id}}">
+                                                    <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#kuhlModal{{ $data->id}}">
                                                         <i data-feather="edit-2" class="icon-sm me-2"></i>
                                                         <span class="">Edit</span>
                                                     </a>
                                                     <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                         @csrf @method('DELETE') 
-                                                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialogKuhl('{{ $data->id }}')">
                                                             <i data-feather="trash" class="icon-sm me-2"></i>
                                                             <span class="">Delete</span>
                                                         </a>
@@ -246,6 +250,117 @@
     </div>
 </div>
 <!-- End -->
+
+<!-- Modal Edit Kuhl -->
+@foreach($kuhl as $editkuhl)
+<div class="modal fade" id="kuhlModal{{$editkuhl->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Buat Data FNG</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('rnd-check-kuhl.update', $editkuhl->id )}}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Batch Code</label>
+                            <input type="text" class="form-control" name="batch" value="{{$editkuhl->batch}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Ph</label>
+                            <input type="text" class="form-control" name="ph" value="{{$editkuhl->ph}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Keterangan</label>
+                            <input type="text" class="form-control" name="keterangan" value="{{$editkuhl->keterangan}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Checker</label>
+                            <select name="checker" class="form-control" id="">
+                                <option value="Alfiandri" {{$editkuhl->checker == 'Alfiandri' ? 'selected' : ''}}>Alfiandri</option>
+                                <option value="Leo" {{$editkuhl->checker == 'Leo' ? 'selected' : ''}}>Leo</option>
+                                <option value="Yovilianda" {{$editkuhl->checker == 'Yovilianda' ? 'selected' : ''}}>Yovilianda</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Update Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+
+@foreach($penetrasi as $dataPenetrasi)
+<!-- Modal Edit Penetrasi -->
+<div class="modal fade" id="penetrasiModal{{$dataPenetrasi->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Buat Data Penetrasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('rnd-check.update', $dataPenetrasi->id)}}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Batch Code</label>
+                            <input type="text" class="form-control" name="batch" value="{{$dataPenetrasi->batch}}" required>    
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Produk</label>
+                            <select name="product" id="" class="form-control">
+                                <option value="Supreme" {{$dataPenetrasi->product == 'Supreme' ? 'selected' : ''}}>Supreme</option>
+                                <option value="Super" {{$dataPenetrasi->product == 'Super' ? 'selected' : ''}}>Super</option>
+                                <option value="Optima" {{$dataPenetrasi->product == 'Optima' ? 'selected' : ''}}>Optima</option>
+                                <option value="Heavy Loader" {{$dataPenetrasi->product == 'Heavy Loader' ? 'selected' : ''}}>Heavy Loader</option>
+                                <option value="Xtreme" {{$dataPenetrasi->product == 'Xtreme' ? 'selected' : ''}}>Xtreme</option>
+                                <option value="Power" {{$dataPenetrasi->product == 'Power' ? 'selected' : ''}}>Power</option>
+                                <option value="Activ" {{$dataPenetrasi->product == 'Activ' ? 'selected' : ''}}>Activ</option>
+                                <option value="Multi Purpose" {{$dataPenetrasi->product == 'Multi Purpose' ? 'selected' : ''}}>Multi Purpose</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Penetrasi Proses</label>
+                            <input type="number" class="form-control" name="p_process" value="{{$dataPenetrasi->p_process}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Keterangan Penetrasi Proses</label>
+                            <input type="text" class="form-control" name="k_process" value="{{$dataPenetrasi->k_process}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Penetrasi Finish Goods</label>
+                            <input type="number" class="form-control" name="p_fng" value="{{$dataPenetrasi->p_fng}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Keterangan Finish Goods</label>
+                            <input type="text" class="form-control" name="k_fng" value="{{$dataPenetrasi->k_fng}}" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Checker</label>
+                            <select name="checker" class="form-control" id="">
+                                <option value="Alfiandri" {{$dataPenetrasi->checker == 'Alfiandri' ? 'selected' : ''}}>Alfiandri</option>
+                                <option value="Leo" {{$dataPenetrasi->checker == 'Leo' ? 'selected' : ''}}>Leo</option>
+                                <option value="Yovilianda" {{$dataPenetrasi->checker == 'Yovilianda' ? 'selected' : ''}}>Yovilianda</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Update Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 @endsection
 
 @push('plugin-scripts')
@@ -269,7 +384,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('contact.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('rnd-check.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {
@@ -279,7 +394,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Contact Successfully Deleted',
+                            title: 'Data Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert
@@ -287,7 +402,7 @@
                     } else {
                         // Handle error response if needed
                         Swal.fire({
-                            title: 'Contact Failed to Delete',
+                            title: 'Data Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });
@@ -295,7 +410,54 @@
                 }).catch((error) => {
                     // Handle fetch error if needed
                     Swal.fire({
-                        title: 'Contact Failed to Delete',
+                        title: 'Data Failed to Delete',
+                        text: 'An error occurred while deleting data.',
+                        icon: 'error',
+                    });
+                });
+            }
+        });
+    }
+</script>
+<script>
+    function showDeleteDataDialogKuhl(id) {
+        Swal.fire({
+            title: 'Hapus Data',
+            text: 'Anda Yakin Akan Menghapus Data Ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform the delete action here (e.g., send a request to delete the data)
+                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
+                const deleteUrl = "{{ route('rnd-check-kuhl.destroy', ':id') }}".replace(':id', id);
+                fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                }).then((response) => {
+                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Data Successfully Deleted',
+                            icon: 'success',
+                        }).then(() => {
+                            window.location.reload(); // Refresh halaman setelah menutup alert
+                        });
+                    } else {
+                        // Handle error response if needed
+                        Swal.fire({
+                            title: 'Data Failed to Delete',
+                            text: 'An error occurred while deleting data.',
+                            icon: 'error',
+                        });
+                    }
+                }).catch((error) => {
+                    // Handle fetch error if needed
+                    Swal.fire({
+                        title: 'Data Failed to Delete',
                         text: 'An error occurred while deleting data.',
                         icon: 'error',
                     });

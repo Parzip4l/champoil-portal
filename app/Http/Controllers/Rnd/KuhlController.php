@@ -154,7 +154,24 @@ class KuhlController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'batch' => 'required|string|max:255',
+        ]);
+
+        // Find the kuhl by ID
+        $kuhldata = Kuhl::findOrFail($id);
+
+        // Update the kuhl data
+        $kuhldata->batch = $request->input('batch');
+        $kuhldata->ph = $request->input('ph');
+        $kuhldata->keterangan = $request->input('keterangan');
+        $kuhldata->checker = $request->input('checker');
+
+        // Save the updated kuhl
+        $kuhldata->save();
+
+        // Redirect to a view or return a response as needed
+        return redirect()->route('rnd-check.index')->with('success', 'Kuhl Penetration data updated successfully.');
     }
 
     /**
@@ -165,6 +182,8 @@ class KuhlController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $kuhl = Kuhl::find($id);
+        $kuhl->delete();
+        return redirect()->route('rnd-check.index')->with('success', 'Data Successfully Deleted');
     }
 }

@@ -252,7 +252,7 @@ class KnowledgeController extends Controller
 
         $test = Knowledge::find($id);
         if($test){
-            $soal = Knowledge_soal::where('master_test',$test->id)->inRandomOrder()->get();
+            $soal = Knowledge_soal::where('master_test',$test->id)->inRandomOrder()->limit(30)->get();
             if($soal){
                 foreach($soal as $row){
                     $jawaban = Knowledge_jawaban::where('id_soal',$row->id)->inRandomOrder()->get();

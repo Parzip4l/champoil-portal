@@ -106,6 +106,7 @@ class EmployeeController extends Controller
         $attendanceData = DB::table('absens')
             ->where('nik', $nikdata)
             ->whereBetween('tanggal', [$startDate, $endDate])
+            ->orderBy('tanggal', 'asc')
             ->get();
 
         // Hitung jumlah hari dengan absensi

@@ -179,7 +179,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="table-responsive">
-                                    <table id="dataTableExample" class="table">
+                                    <table id="" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Tanggal</th>

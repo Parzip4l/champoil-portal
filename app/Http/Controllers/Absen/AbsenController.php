@@ -200,7 +200,7 @@ class AbsenController extends Controller
             $absensi = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $currentDate)
                 ->orderBy('clock_in', 'desc')
-                ->first();
+                ->paginate(10);
 
             if ($absensi) {
                 $absensi->clock_out = Carbon::now()->toTimeString();

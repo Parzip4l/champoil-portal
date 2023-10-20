@@ -91,6 +91,7 @@
                 <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
                     <option value="Professional Frontline" {{$employee->organisasi == 'Professional Frontline' ? 'selected' : ''}}>Professional Frontline</option>
                     <option value="Management Leaders" {{$employee->organisasi == 'Management Leaders' ? 'selected' : ''}}>Management Leaders</option>
+                    <option value="Frontline Officer" {{$employee->organisasi == 'Frontline Officer' ? 'selected' : ''}}>Frontline Officer</option>
                 </select>
             </div>
           </div>

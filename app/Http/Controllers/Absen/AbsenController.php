@@ -108,7 +108,7 @@ class AbsenController extends Controller
             $absensi->user_id = $nik;
             $absensi->nik = $nik;
             $absensi->tanggal = now()->toDateString();
-            $absensi->clock_in = now()->toTimeString();
+            $absensi->clock_in = now()->format('H:i');
             $absensi->latitude = $lat;
             $absensi->longtitude = $long;
             $absensi->status = $status;
@@ -191,23 +191,30 @@ class AbsenController extends Controller
 
     public function clockout(Request $request)
     {
-        $nik = Auth::user()->employee_code;
-        $lat2 = $request->input('latitude_out');
-        $long2 = $request->input('longitude_out');
-        $absensi = Absen::where('nik', $nik)
-            ->orderBy('clock_in', 'desc')
-            ->first();
-        
-        if ($absensi) {
-            $absensi->clock_out = Carbon::now()->toTimeString();
-            $absensi->latitude_out = $lat2;
-            $absensi->longtitude_out = $long2;
-            $absensi->save();
+        try {
+            $nik = Auth::user()->employee_code;
+            $lat2 = $request->input('latitude_out');
+            $long2 = $request->input('longitude_out');
+            $currentDate = now()->format('Y-m-d');
 
-            return redirect()->back()->with('success', 'Clockout success!, Selamat Beristirahat!');
+            $absensi = Absen::where('nik', $nik)
+                ->whereDate('tanggal', $currentDate)
+                ->orderBy('clock_in', 'desc')
+                ->first();
+
+            if ($absensi) {
+                $absensi->clock_out = Carbon::now()->toTimeString();
+                $absensi->latitude_out = $lat2;
+                $absensi->longtitude_out = $long2;
+                $absensi->save();
+
+                return redirect()->back()->with('success', 'Clockout success!, Selamat Beristirahat!');
+            }
+        } catch (\Exception $e) {
+            // Tampilkan pesan kesalahan atau log pengecualian
+            dd($e->getMessage());
         }
-
-        return redirect()->back()->with('error', 'No clockin record found.');
+        
     }
 
     public function clockoutbackup(Request $request)
@@ -215,7 +222,9 @@ class AbsenController extends Controller
         $nik = Auth::user()->employee_code;
         $lat2 = $request->input('latitude_out');
         $long2 = $request->input('longitude_out');
+        $currentDate = now()->format('Y-m-d');
         $absensi = Absen::where('nik', $nik)
+            ->whereDate('clock_in', $currentDate) // Filter berdasarkan tanggal saat ini
             ->orderBy('clock_in', 'desc')
             ->first();
         

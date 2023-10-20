@@ -9,6 +9,7 @@ use App\ModelCG\Knowledge_soal;
 use App\ModelCG\knowledge_jawaban;
 use App\ModelCG\asign_test;
 use App\ModelCG\jawaban_user;
+use App\ModelCG\user_read_module;
 use App\Employee;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -71,6 +72,7 @@ class KnowledgeController extends Controller
     
         $knowledge = new Knowledge();
         $knowledge->title = $request->title;
+        $knowledge->durasi = $request->durasi;
         $knowledge->file_name = $filePath; // Save the file path
         $knowledge->save();
 
@@ -143,9 +145,21 @@ class KnowledgeController extends Controller
         $data['record']=Knowledge::where('id',$id)->first();
         $data['id_module']=$id;
         $data['file_module']=storage_path('app/'.$data['record']->file_name);
+
+        user_read_module::insert(["created_at"=>date("Y-m-d H:i:s"),"employee_code"=>Auth::user()->employee_code,"id_module"=>$id]);
+        
+        $cek = asign_test::where('id_test',$id)
+                            ->where('employee_code',Auth::user()->employee_code)
+                            ->where('status',0)
+                            ->first();
+        if($cek->module_read == 1){
+            return redirect()->route('kas/user.test', ['id' => $id])->with('success', 'Your Module Redirect');
+
+        }else{
+            return view('pages.hc.knowledge.read_test',$data);
+        }
         
         
-        return view('pages.hc.knowledge.read_test',$data);
 
     }
 
@@ -230,6 +244,12 @@ class KnowledgeController extends Controller
     public function user_test($id){
         $data['id_module']=$id;
         $data['result']=[];
+        
+        asign_test::where('id_test',$id)
+                    ->where('employee_code',Auth::user()->employee_code)
+                    ->where('status',0)
+                    ->update(['module_read'=>1]);
+
         $test = Knowledge::find($id);
         if($test){
             $soal = Knowledge_soal::where('master_test',$test->id)->inRandomOrder()->get();
@@ -245,6 +265,8 @@ class KnowledgeController extends Controller
         }
 
         $data['test']=$test;
+
+        $data['durasi_test']=$test->durasi;
 
         return view('pages.hc.knowledge.user_test',$data);
     }

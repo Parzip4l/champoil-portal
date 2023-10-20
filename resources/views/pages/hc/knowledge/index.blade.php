@@ -93,6 +93,10 @@
                             <label for="" class="form-label">Judul</label>
                             <input type="text" class="form-control" name="title" required>    
                         </div>
+                        <div class="input-group mb-3">
+                            <input type="number" name="durasi" class="form-control" >
+                            <span class="input-group-text" id="basic-addon2">Jam</span>
+                        </div>
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Dokumen</label>
                             <input type="file" class="form-control" name="file_name" required>    

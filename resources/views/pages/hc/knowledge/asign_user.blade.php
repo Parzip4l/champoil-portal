@@ -18,7 +18,7 @@
         <div class="row">
             <div class="col-md-6">
                 <label for="metode_training">Tipe Test:</label>
-                <select class="form-control" id="metode_training" name="metode_training">
+                <select class="form-control" id="metode_training" onchange="myFunction()" name="metode_training">
                     <option value="Online">Online</option>
                     <option value="Offline">Offline</option>
                 </select>
@@ -92,7 +92,22 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
-   
+    $(document).ready(function() {
+        // Your code here
+        $("#offline").hide();
+        $("#offline2").hide();
+        myFunction = function() {
+            var selectedOption = document.getElementById("metode_training").value;
+            // Do something with the selected option
+            if(selectedOption == "Online"){
+                $("#offline").hide();
+                $("#offline2").hide();
+            }else{
+                $("#offline").show();
+                $("#offline2").show();
+            }
+        }
+    });
     function showDeleteDataDialog(id) {
         Swal.fire({
             title: 'Hapus Data',

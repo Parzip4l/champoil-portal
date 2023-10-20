@@ -38,10 +38,10 @@
         <div class="card-body">
               @foreach($asign_test as $row_asign_test)
                 @if($row_asign_test->metode_training == "Online")
-                  <a href="{{ route('kas/read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
+                  <a href="{{ route('read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
                 @else
                   @if($row_asign_test->start_class == 1)
-                      <a href="{{ route('kas/read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
+                      <a href="{{ route('read_test', ['id' => $row_asign_test->id_test]) }}" class="btn btn-sm btn-primary">Lihat Test</a>
                   @else
                       <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         Class Offline

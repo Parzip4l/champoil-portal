@@ -10,7 +10,7 @@
 $currentDateTime = date('Y-m-d H:i:s');
 
 // Add 2 hours to the current date and time
-$newDateTime = date('Y-m-d H:i:s', strtotime($currentDateTime) + 1 * 60);
+$newDateTime = date('Y-m-d H:i:s', strtotime($currentDateTime) + $durasi_test * 60);
 ?>
 <form action="{{route('knowledge.save_test_user')}}" method="POST" id="form_test" enctype="multipart/form-data">
     @csrf

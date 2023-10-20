@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql_secondary')->create('user_read_modules', function (Blueprint $table) {
-            $table->id();
-            
-            $table->timestamps();
+        Schema::connection('mysql_secondary')->table('knowledge', function (Blueprint $table) {
+            $table->integer('durasi');
         });
     }
 
@@ -27,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_read_modules');
+        Schema::connection('mysql_secondary')->table('knowledge', function (Blueprint $table) {
+            //
+        });
     }
 };

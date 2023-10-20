@@ -94,7 +94,7 @@
             <div class="col-md-6">
                 <label class="form-label">Organisasi</label>
                 <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
-                    <option value="Professional Frontline">Professional Frontline</option>
+                    <option value="Frontline Officer">Frontline Officer</option>
                     <option value="Management Leaders">Management Leaders</option>
                 </select>
             </div>

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql_secondary')->table('asign_test', function (Blueprint $table) {
+        Schema::connection('mysql_secondary')->table('asign_tests', function (Blueprint $table) {
             $table->integer('total_point');
             $table->string('metode_training');
             $table->longText('notes_training');

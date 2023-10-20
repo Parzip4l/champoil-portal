@@ -41,7 +41,7 @@
                                 <div class="profile-photo">
                                     <h5>Profile Image</h5>
                                     <div class="image-wrap mt-4">
-                                        <img src="" alt="">
+                                        <img src="{{ asset('images/' . $employee->gambar) }}" alt="{{$employee->nama}}">
                                     </div>
                                 </div>
                             </div>
@@ -391,6 +391,13 @@
         background: #c0c0c0;
         border-radius: 10px;
         height : 300px;
+    }
+
+    .image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
     }
 
     .item-details {

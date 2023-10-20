@@ -92,6 +92,7 @@
                         <tr>
                             <th>#</th>
                             <th>Employe Name</th>
+                            <th>THP</th>
                             <th>Payroll Periode</th>
                         </tr>
                         </thead>
@@ -110,6 +111,7 @@
                                 $endDate = date('j M Y', strtotime($dates[1]));
                             @endphp
                             <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
                             <td>{{ $endDate }}</td>
                         </tr>
                         @endforeach

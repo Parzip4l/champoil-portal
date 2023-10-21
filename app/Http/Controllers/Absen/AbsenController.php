@@ -200,7 +200,7 @@ class AbsenController extends Controller
             $absensi = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $currentDate)
                 ->orderBy('clock_in', 'desc')
-                ->paginate(10);
+                ->first();
 
             if ($absensi) {
                 $absensi->clock_out = Carbon::now()->toTimeString();
@@ -214,7 +214,6 @@ class AbsenController extends Controller
             // Tampilkan pesan kesalahan atau log pengecualian
             dd($e->getMessage());
         }
-        
     }
 
     public function clockoutbackup(Request $request)

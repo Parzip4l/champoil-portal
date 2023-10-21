@@ -228,7 +228,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     });
 });
 
-
+Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');;
 
 // Login
 Route::controller(LoginController::class)->group(function(){

@@ -167,6 +167,50 @@ class EmployeeController extends Controller
         return view('pages.hc.karyawan.edit', compact('employee'));
     }
 
+    public function getAttendanceData(Request $request) {
+        $selectedMonth = $request->input('month');
+        $selectedYear = $request->input('year');
+
+        // Hitung tanggal awal (start_date) dan tanggal akhir (end_date) berdasarkan bulan dan tahun yang dipilih
+        $start_date = Carbon::create($selectedYear, $selectedMonth, 21, 0, 0, 0);
+        $end_date = $start_date->copy()->addMonth()->day(20);
+
+        // Buat array yang akan berisi data untuk setiap tanggal dalam rentang
+        $tableData = [];
+
+        // Loop melalui setiap tanggal dalam rentang
+        $currentDate = $start_date->copy();
+        while ($currentDate->lte($end_date)) {
+            // Cari data absen untuk tanggal saat ini
+            $attendanceData = Absen::whereDate('tanggal', $currentDate)->first();
+
+            // Buat array data untuk tanggal ini
+            $rowData = [
+                'tanggal' => $currentDate->format('Y-m-d'),
+                'clock_in' => $attendanceData ? $attendanceData->clock_in : '-',
+                'clock_out' => $attendanceData ? $attendanceData->clock_out : '-',
+                'status' => $attendanceData ? $attendanceData->status : '-',
+            ];
+
+            // Tambahkan kolom tombol Edit jika diperlukan
+            $rowData['edit_button'] = true;
+
+            // Tambahkan kelas "text-danger" jika tanggal adalah hari Sabtu atau Minggu
+            if ($currentDate->isWeekend()) {
+                $rowData['is_weekend'] = true;
+            }
+
+            // Tambahkan data tanggal ini ke array utama
+            $tableData[] = $rowData;
+
+            // Pindah ke tanggal berikutnya
+            $currentDate->addDay();
+        }
+
+        // Kembalikan data dalam format JSON
+        return response()->json($tableData);
+    }
+
     /**
      * Update the specified resource in storage.
      *

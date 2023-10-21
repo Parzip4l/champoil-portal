@@ -176,10 +176,28 @@
                             </div>
                         </div>
                         <!-- Table Attendece -->
+                        <div class="form-group mb-3">
+                            <label for="" class="form-label">Filter Periode</label>
+                            <select id="monthSelect" class="form-control">
+                                <option Disabled selected> Pilih Periode </option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">Maret</option>
+                                <option value="4">April</option>
+                                <option value="5">Mei</option>
+                                <option value="6">Juni</option>
+                                <option value="7">July</option>
+                                <option value="8">Agustus</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Desember</option>
+                            </select>
+                        </div>
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="table-responsive">
-                                    <table id="" class="table">
+                                    <table id="attendanceTable" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Tanggal</th>
@@ -198,13 +216,17 @@
                                             $currentMonth = $currentDate->month;
                                             $currentYear = $currentDate->year;
 
+                                            $today = now();
+                                            $start_date = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+                                            $end_date = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
                                             // Set the start date to 21st of the previous month
                                             $startDate = Carbon::create($currentYear, $currentMonth, 21, 0, 0, 0)->subMonth();
 
                                             // Set the end date to 20th of the current month
                                             $endDate = Carbon::create($currentYear, $currentMonth, 20, 0, 0, 0);
 
-                                            $currentDate = $startDate->copy();
+                                            $currentDate = $start_date->copy();
 
                                             // Create an array to store attendance data for each date
                                             $attendanceDataByDate = [];
@@ -213,9 +235,9 @@
                                             }
                                             @endphp
 
-                                            @while ($currentDate->lte($endDate))
+                                            @while ($currentDate->lte($end_date))
                                             <tr>
-                                            <td>{{ $currentDate->translatedFormat('D, j M Y') }}</td>
+                                            <td class="{{ $currentDate->isWeekend() ? 'text-danger' : '' }}">{{ $currentDate->translatedFormat('D, j M Y') }}</td>
                                                 @if (isset($attendanceDataByDate[$currentDate->format('Y-m-d')]))
                                                     <td class="text-success">{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_in }}</td>
                                                     <td class="text-danger">{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_out }}</td>
@@ -343,31 +365,6 @@
 @push('custom-scripts')
 <script src="{{ asset('assets/js/data-table.js') }}"></script>
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
-<script>
-    $(document).ready(function() {
-    $('#editModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var date = button.data('date');
-        var clockIn = button.data('clock-in');
-        var clockOut = button.data('clock-out');
-        var modal = $(this);
-
-        // Mengisi nilai tanggal pada formulir
-        modal.find('#editDate').val(date);
-        modal.find('#clockIn').val(clockIn);
-        modal.find('#clockOut').val(clockOut);
-
-        // Set the action URL based on whether data exists for the date
-        var actionUrl = clockIn ? "{{ route('attendance.editData', ':date') }}" : "{{ route('attendance.createData') }}";
-        actionUrl = actionUrl.replace(':date', date);
-
-        // Mengganti aksi formulir
-        modal.find('form').attr('action', actionUrl);
-    });
-});
-
-</script>
-
 <style>
     .nav.nav-tabs.nav-tabs-vertical .nav-link{
         border : 0;
@@ -438,5 +435,94 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    document.getElementById('monthSelect').addEventListener('change', function() {
+    var selectedMonth = this.value; // Dapatkan bulan yang dipilih
+    var selectedYear = new Date().getFullYear(); // Dapatkan tahun saat ini
+
+    // Lakukan permintaan ke server untuk mendapatkan data berdasarkan bulan yang dipilih
+    var requestUrl = '{{ route('absen.getDataDetails') }}' + '?month=' + selectedMonth + '&year=' + selectedYear;
+
+    fetch(requestUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Panggil fungsi untuk memperbarui tabel dengan data yang diterima
+            updateTable(data);
+        })
+        .catch(error => {
+            console.error('Gagal memuat data: ' + error);
+        });
+});
+
+function updateTable(data) {
+    var table = document.getElementById('attendanceTable');
+    var tbody = table.querySelector('tbody');
+
+    // Hapus semua baris yang ada dalam tbody
+    tbody.innerHTML = '';
+
+    // Loop melalui data yang diterima dan tambahkan baris-baris baru ke tbody
+    data.forEach(item => {
+        var row = document.createElement('tr');
+        var columns = ['tanggal', 'clock_in', 'clock_out', 'status'];
+        
+        columns.forEach(column => {
+            var cell = document.createElement('td');
+            cell.textContent = item[column];
+            row.appendChild(cell);
+        });
+
+        if (item['edit_button']) {
+            var editCell = document.createElement('td');
+            var editButton = document.createElement('a');
+            editButton.href = '#';
+            editButton.className = 'btn btn-sm btn-warning';
+            editButton.setAttribute('data-bs-toggle', 'modal');
+            editButton.setAttribute('data-bs-target', '#editModal');
+            editButton.setAttribute('data-date', item['tanggal']);
+            editButton.setAttribute('data-clock-in', item['clock_in']);
+            editButton.setAttribute('data-clock-out', item['clock_out']);
+            editButton.textContent = 'Edit';
+            editCell.appendChild(editButton);
+            row.appendChild(editCell);
+        }
+
+        tbody.appendChild(row);
+    });
+}
+</script>
+<script>
+$(document).ready(function() {
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var date = button.data('date');
+        var clockIn = button.data('clock-in');
+        var clockOut = button.data('clock-out');
+        var modal = $(this);
+
+        // Mengisi nilai tanggal pada formulir
+        modal.find('#editDate').val(date);
+        modal.find('#clockIn').val(clockIn);
+        modal.find('#clockOut').val(clockOut);
+
+        // Set the action URL based on whether data exists for the date
+        var actionUrl = "";
+
+        if (clockIn) {
+            // Data sudah ada, atur URL edit
+            actionUrl = "{{ route('attendance.editData', ':date') }}";
+        } else {
+            // Data belum ada, atur URL create
+            actionUrl = "{{ route('attendance.createData') }}";
+        }
+
+        actionUrl = actionUrl.replace(':date', date);
+
+        // Mengganti aksi formulir
+        modal.find('form').attr('action', actionUrl);
+    });
+});
+
 </script>
 @endpush

@@ -228,7 +228,7 @@
                     </select>
                 </td>
                 <td>
-                    <input type="number" name="lembur_jam[]" placeholder="1" class="form-control">
+                    <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
                 </td>
                 <td>
                     <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  

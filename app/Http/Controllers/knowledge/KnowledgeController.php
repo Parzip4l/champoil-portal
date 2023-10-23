@@ -139,29 +139,30 @@ class KnowledgeController extends Controller
         return view('pages.hc.knowledge.asign_user',$data);
     }
 
-    public function read_test($id){
-        
-        $data['records']= Employee::where('organisasi','Frontline Officer')->get();
-        $data['record']=Knowledge::where('id',$id)->first();
-        $data['id_module']=$id;
-        $data['file_module']=storage_path('app/'.$data['record']->file_name);
-
-        user_read_module::insert(["created_at"=>date("Y-m-d H:i:s"),"employee_code"=>Auth::user()->employee_code,"id_module"=>$id]);
-        
-        $cek = asign_test::where('id_test',$id)
-                            ->where('employee_code',Auth::user()->employee_code)
-                            ->where('status',0)
-                            ->first();
-        if($cek->module_read == 1){
+    public function read_test($id) {
+        $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
+        $data['record'] = Knowledge::where('id', $id)->first();
+        $data['id_module'] = $id;
+        $data['file_module'] = storage_path('app/' . $data['record']->file_name);
+    
+        user_read_module::insert([
+            "created_at" => now(), // Use the `now()` function to get the current date and time.
+            "employee_code" => Auth::user()->employee_code,
+            "id_module" => $id
+        ]);
+    
+        $cek = asign_test::where('id_test', $id)
+            ->where('employee_code', Auth::user()->employee_code)
+            ->where('status', 0)
+            ->first();
+    
+        if ($cek && $cek->module_read == 1) { // Check if $cek exists before accessing its properties.
             return redirect()->route('kas/user.test', ['id' => $id])->with('success', 'Your Module Redirect');
-
-        }else{
-            return view('pages.hc.knowledge.read_test',$data);
+        } else {
+            return view('pages.hc.knowledge.read_test', $data);
         }
-        
-        
-
     }
+    
 
     public function pdfPreview($id){
         

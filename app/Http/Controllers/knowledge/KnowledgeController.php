@@ -229,6 +229,7 @@ class KnowledgeController extends Controller
                     'employee_code'=>$data['employee_code'][$no],
                     'id_test'=>$data['id_test'],
                     "status"=>0,
+                    "total_point"=>0,
                     "metode_training"=>$data['metode_training'],
                     "notes_training"=>json_encode($notes_training)
                 ];
@@ -283,6 +284,8 @@ class KnowledgeController extends Controller
                 $id_soal = $explode[1];
                 $id_jawaban = $explode[0];
                 $cek_jawaban = knowledge_jawaban::where('id',$id_jawaban)->first();
+
+                //rumus bobot
                 
                 $insert=[
                     "id_soal"=>$id_soal,

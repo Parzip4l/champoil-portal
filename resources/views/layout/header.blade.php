@@ -290,6 +290,7 @@
                             <li class="category-heading">KAS MODUL</li>
                             <li class="nav-item"><a href="{{ route('jabatan.index') }}" class="nav-link {{ active_class(['kas/jabatan']) }}">Jabatan</a></li>
                             <li class="nav-item"><a href="{{ route('project.index') }}" class="nav-link {{ active_class(['kas/project']) }}">Project</a></li>
+                            <li class="nav-item"><a href="{{ route('payroll-kas.index') }}" class="nav-link {{ active_class(['kas/payroll-kas']) }}">Payroll Anggota</a></li>
                         </ul>
                     </div>
                 </div>

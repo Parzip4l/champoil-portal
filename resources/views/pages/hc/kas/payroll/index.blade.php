@@ -26,7 +26,7 @@
                         <tbody>
                             @foreach ($dataPayroll as $data)
                             <tr>
-                                <td> {{ $data->employee_code }} </td>
+                                <td> <a href="{{route('payroll-kas.show', $data->id)}}">{{ $data->employee_code }} </a></td>
                                 <td> {{ $data->periode }} </td>
                                 <td>{{ 'Rp ' . number_format($data->thp, 0, ',', '.') }}</td>
                             </tr>

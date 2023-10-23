@@ -91,6 +91,7 @@ class PayrolNS extends Controller
             $totalHariBackup = 0;
             $totalGajiBackup = 0;
             $allowenceData= [];
+            $deductiondata = [];
 
             // Mengakumulasi jumlah hari dan total gaji dari setiap absensi
             foreach ($absen as $absensi) {
@@ -113,40 +114,81 @@ class PayrolNS extends Controller
                 $projectBackup = [$absensi->project_backup];
 
                 // Dapatkan data project details dan rate harian dari project
-                $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
-                    ->where('jabatan', $jabatan) 
-                    ->pluck('rate_harian', 'project_code');
+                $rate_harian = 0;
+                if (!empty($projectIds)) {
+                    $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
+                        ->where('jabatan', $jabatan)
+                        ->pluck('rate_harian', 'project_code');
 
-                $projectDetailsBackup = ProjectDetails::whereIn('project_code', $projectBackup)
-                    ->where('jabatan', $jabatan) 
-                    ->pluck('rate_harian', 'project_code');
-
-                // Hitung gaji untuk setiap proyek
-                foreach ($projectIds as $projectId) {
-                    if (isset($projectDetails[$projectId])) {
-                        // Jika absensi berada dalam periode, tambahkan gaji
-                        $rate_harian = $projectDetails[$projectId];
-                        $totalGaji += $inPeriode ? $projectDetails[$projectId] : 0;
+                    foreach ($projectIds as $projectId) {
+                        if (isset($projectDetails[$projectId])) {
+                            // Jika absensi berada dalam periode, tambahkan gaji
+                            $rate_harian = $projectDetails[$projectId];
+                            $totalGaji += $inPeriode ? $projectDetails[$projectId] : 0;
+                        }
                     }
                 }
                 
-                foreach ($projectBackup as $projectIdBackup) {
-                    if (isset($projectDetailsBackup[$projectIdBackup])) {
-                        // Jika absensi berada dalam periode, tambahkan gaji backup
-                        $totalGajiBackup += $inPeriode ? $projectDetailsBackup[$projectIdBackup] : 0;
+                // backup rate
+                $rate_harianbackup = 0;
+                if (!empty($projectBackup)) {
+                    $projectDetailsBackup = ProjectDetails::whereIn('project_code', $projectBackup)
+                        ->where('jabatan', $jabatan)
+                        ->pluck('rate_harian', 'project_code');
+
+                    foreach ($projectBackup as $projectIdBackup) {
+                        if (isset($projectDetailsBackup[$projectIdBackup])) {
+                            // Jika absensi berada dalam periode, tambahkan gaji backup
+                            $rate_harianbackup = $projectDetailsBackup[$projectIdBackup];
+                            $totalGajiBackup += $inPeriode ? $projectDetailsBackup[$projectIdBackup] : 0;
+                        }
                     }
                 }
-                $thp = $totalGaji + $totalGajiBackup;
+                // Allowence 
+                $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
+                    ->where('jabatan', $jabatan)
+                    ->select('p_bpjs_ks', 'p_tkerja', 'p_tlain')
+                    ->get();
 
+                $projectAllowancesTotal = 0;
+                    foreach ($ProjectAllowances as $projectDetailallowence) {
+                        $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
+                    }
+
+
+                // Deducitons
+                $ProjectDeduction = ProjectDetails::whereIn('project_code', $projectIds)
+                    ->where('jabatan', $jabatan)
+                    ->select('p_bpjstk', 'p_tseragam', 'p_operasional')
+                    ->get();
+                
+                $projectDedutionsTotal = 0;
+                foreach ($ProjectDeduction as $projectDetaildeductions) {
+                    $projectDedutionsTotal += array_sum($projectDetaildeductions->toArray());
+                }
+                
                 $allowenceData = [
                     'totalHari' => $totalHari,
-                    'totalHariBackup' => $totalHariBackup, // Menambahkan total hari backup
+                    'totalHariBackup' => $totalHariBackup,
                     'totalGaji' => $totalGaji,
                     'totalGajiBackup' => $totalGajiBackup,
-                    'rate_harian' => $rate_harian
+                    'rate_harian' => $rate_harian,
+                    'rate_harian_backup' => $rate_harianbackup,
+                    'allowence_total' => $projectAllowancesTotal,
+                    'projectAllowances' => $ProjectAllowances->toArray(),
+                    
                 ];
 
+                $deductiondata = [
+                    'projectDeductions' => $ProjectDeduction->toArray(),
+                    'deductions_total' => $projectDedutionsTotal,
+                ];
+
+                $thp = $totalGaji + $totalGajiBackup + $projectAllowancesTotal - $projectDedutionsTotal;
+
                 $allowenceData = json_encode($allowenceData);
+                $deductionData = json_encode($deductiondata);
+
             }
             // Simpan data ke tabel payroll
             $payroll = new Payroll();
@@ -154,6 +196,7 @@ class PayrolNS extends Controller
             $payroll->periode = $request->periode;
             $payroll->thp = $thp;
             $payroll->allowences = $allowenceData;
+            $payroll->deductions = $deductionData;
             $payroll->save();
         }
 
@@ -179,7 +222,15 @@ class PayrolNS extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $payroll = Payroll::findOrFail($id);
+    
+            // Jika data ditemukan, tampilkan halaman detail payroll
+            return view('pages.hc.kas.payroll.show', ['payroll' => $payroll]);
+        } catch (\Exception $e) {
+            // Jika data tidak ditemukan, tampilkan pesan kesalahan atau redirect ke halaman lain
+            return back()->with('error', 'Data payroll tidak ditemukan.');
+        }
     }
 
     /**

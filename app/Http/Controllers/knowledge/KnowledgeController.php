@@ -76,7 +76,7 @@ class KnowledgeController extends Controller
         $knowledge->file_name = $filePath; // Save the file path
         $knowledge->save();
 
-        return redirect()->route('knowledge_base')->with('success', 'Knowledge Successfully Added');
+        return redirect()->route('knowledge_base.index')->with('success', 'Knowledge Successfully Added');
     }
 
     /**

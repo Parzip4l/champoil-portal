@@ -65,7 +65,7 @@ class KnowledgeController extends Controller
         // Check if a file has been uploaded
         if ($request->hasFile('file_name')) {
             // Store the uploaded file and get its path
-            $filePath = $request->file('file_name')->store('public/knowledge_base'); // 'uploads' is the directory where files will be stored
+            $filePath = $request->file('file_name')->store('public/images'); // 'uploads' is the directory where files will be stored
         } else {
             $filePath = null;
         }
@@ -151,7 +151,6 @@ class KnowledgeController extends Controller
     
         $data['id_module'] = $id;
         $data['file_module'] = storage_path('app/' . $data['record']->file_name);
-    
         // Check if the file exists
         if (!file_exists($data['file_module'])) {
             return redirect()->route('some_error_route')->with('error', 'File not found');

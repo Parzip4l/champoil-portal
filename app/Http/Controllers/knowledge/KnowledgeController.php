@@ -65,7 +65,7 @@ class KnowledgeController extends Controller
         // Check if a file has been uploaded
         if ($request->hasFile('file_name')) {
             // Store the uploaded file and get its path
-            $filePath = $request->file('file_name')->store('pulic/knowledge_base'); // 'uploads' is the directory where files will be stored
+            $filePath = $request->file('file_name')->store('public/knowledge_base'); // 'uploads' is the directory where files will be stored
         } else {
             $filePath = null;
         }

@@ -122,7 +122,7 @@ class KnowledgeController extends Controller
         //
         $knowledge = Knowledge::find($id);
         $knowledge->delete();
-        return redirect()->route('knowledge_base')->with('success', 'Contact Successfully Deleted');
+        return redirect()->route('knowledge_base.index')->with('success', 'Contact Successfully Deleted');
     }
 
     public function add_soal($id){
@@ -233,7 +233,7 @@ class KnowledgeController extends Controller
                 $no++;
             }
         }
-        return redirect()->route('knowledge_base')->with('success', 'Contact Successfully Deleted');
+        return redirect()->route('knowledge_base.index')->with('success', 'Contact Successfully Deleted');
     }
     
     public function save_asign_users(Request $request){
@@ -344,6 +344,6 @@ class KnowledgeController extends Controller
 
     public function start_class($id){
         Asign_test::where('id_test',$id)->update(['start_class'=>1]);
-        return redirect()->route('knowledge_base')->with('success', 'Class Is Starting');
+        return redirect()->route('knowledge_base.index')->with('success', 'Class Is Starting');
     }
 }

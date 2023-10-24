@@ -167,10 +167,10 @@
                             <div class="item">
                                 <a href="javascript:void(0)">
                                     <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="user-plus"></i>
+                                        <i class="me-2 icon-lg" data-feather="book"></i>
                                     </div>
                                     <div class="menu-name text-center">
-                                        <p class="text-muted">Fitup</p>
+                                        <p class="text-muted">E-Workplan</p>
                                     </div>
                                 </a>
                             </div>

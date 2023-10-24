@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Knowledge;
 use App\ModelCG\Knowledge_soal;
-use App\ModelCG\knowledge_jawaban;
-use App\ModelCG\asign_test;
-use App\ModelCG\jawaban_user;
-use App\ModelCG\user_read_module;
+use App\ModelCG\Knowledge_jawaban;
+use App\ModelCG\Asign_test;
+use App\ModelCG\Jawaban_user;
+use App\ModelCG\User_read_module;
 use App\Employee;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,7 +28,7 @@ class KnowledgeController extends Controller
         $records = Knowledge::all();
         if($records){
             foreach($records as $row){
-                $cek_asign = asign_test::where('id_test',$row->id)
+                $cek_asign = Asign_test::where('id_test',$row->id)
                                         ->where('status',0)
                                         ->where('metode_training',"Offline")
                                         ->count();
@@ -156,13 +156,13 @@ class KnowledgeController extends Controller
             return redirect()->route('some_error_route')->with('error', 'File not found');
         }
     
-        user_read_module::insert([
+        User_read_module::insert([
             "created_at" => now(),
             "employee_code" => Auth::user()->employee_code,
             "id_module" => $id
         ]);
     
-        $cek = asign_test::where('id_test', $id)
+        $cek = Asign_test::where('id_test', $id)
             ->where('employee_code', Auth::user()->employee_code)
             ->where('status', 0)
             ->first();
@@ -225,7 +225,7 @@ class KnowledgeController extends Controller
                         "point"=>$data['point_'.$no][$no2]
                     ];
                     
-                    knowledge_jawaban::insert($insert);
+                    Knowledge_jawaban::insert($insert);
                     $no2++;
                 }
                 
@@ -258,7 +258,7 @@ class KnowledgeController extends Controller
                 ];
 
 
-                asign_test::insert($data_insert);
+                Asign_test::insert($data_insert);
                 $no++;
             }
         }
@@ -269,7 +269,7 @@ class KnowledgeController extends Controller
         $data['id_module']=$id;
         $data['result']=[];
         $response=[];
-        asign_test::where('id_test',$id)
+        Asign_test::where('id_test',$id)
                     ->where('employee_code',Auth::user()->employee_code)
                     ->where('status',0)
                     ->update(['module_read'=>1]);
@@ -307,7 +307,7 @@ class KnowledgeController extends Controller
                 $explode = explode("-",$data['test_'.$i]);
                 $id_soal = $explode[1];
                 $id_jawaban = $explode[0];
-                $cek_jawaban = knowledge_jawaban::where('id',$id_jawaban)->first();
+                $cek_jawaban = Knowledge_jawaban::where('id',$id_jawaban)->first();
 
                 //rumus bobot
                 
@@ -318,10 +318,10 @@ class KnowledgeController extends Controller
                 ];
                 $point +=isset($cek_jawaban->point)?$cek_jawaban->point:0;
                 
-                jawaban_user::insert($insert);
+                Jawaban_user::insert($insert);
             }
             
-            asign_test::where('employee_code',Auth::user()->employee_code)
+            Asign_test::where('employee_code',Auth::user()->employee_code)
                         ->where('id_test',$data['id_module'])
                         ->update(["status"=>1,"total_point"=>$point]);
             
@@ -337,13 +337,13 @@ class KnowledgeController extends Controller
                             ->where('employee_code',Auth::user()->employee_code)
                             ->select('knowledge.*','asign_tests.total_point','asign_tests.updated_at')
                             ->get();
-        $data['asign_test'] = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
+        $data['asign_test'] = Asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
         return view('pages.hc.knowledge.list_class',$data);
     }
 
     public function start_class($id){
-        asign_test::where('id_test',$id)->update(['start_class'=>1]);
+        Asign_test::where('id_test',$id)->update(['start_class'=>1]);
         return redirect()->route('knowledge_base')->with('success', 'Class Is Starting');
     }
 }

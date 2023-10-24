@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\ModelCG\Knowledge;
 use App\ModelCG\Knowledge_soal;
 use App\ModelCG\Knowledge_jawaban;
-use App\ModelCG\Asign_test;
+use App\ModelCG\asign_test;
 use App\ModelCG\Jawaban_user;
 use App\ModelCG\User_read_module;
 use App\Employee;
@@ -28,7 +28,7 @@ class KnowledgeController extends Controller
         $records = Knowledge::all();
         if($records){
             foreach($records as $row){
-                $cek_asign = Asign_test::where('id_test',$row->id)
+                $cek_asign = asign_test::where('id_test',$row->id)
                                         ->where('status',0)
                                         ->where('metode_training',"Offline")
                                         ->count();

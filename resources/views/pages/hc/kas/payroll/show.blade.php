@@ -109,6 +109,22 @@
                                         @foreach ($projectAllowances as $projectAllowance)
                                         <div class="row mb-2">
                                             <div class="col-md-6">
+                                                <span>Tunjangan Kerja</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($projectAllowance->p_tkerja, 0, ',', '.') }} </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Tunjangan Lain Lain</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($projectAllowance->p_bpjs_ks, 0, ',', '.') }} </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
                                                 <span>BPJS Kesehatan Mandiri</span>
                                             </div>
                                             <div class="col-md-6 text-right">

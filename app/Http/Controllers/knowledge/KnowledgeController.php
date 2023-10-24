@@ -61,19 +61,17 @@ class KnowledgeController extends Controller
             'title' => 'required',
             'file_name' => 'required|file', // Add file validation rule
         ]);
-    
-        // Check if a file has been uploaded
-        if ($request->hasFile('file_name')) {
-            // Store the uploaded file and get its path
-            $filePath = $request->file('file_name')->store('public/images'); // 'uploads' is the directory where files will be stored
-        } else {
-            $filePath = null;
-        }
-    
+
         $knowledge = new Knowledge();
         $knowledge->title = $request->title;
         $knowledge->durasi = $request->durasi;
-        $knowledge->file_name = $filePath; // Save the file path
+        if ($request->hasFile('file_name')) {
+            $image = $request->file('file_name');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/knowledge_test');
+            $image->move($destinationPath, $filename);
+            $knowledge->file_name = $filename;
+        }
         $knowledge->save();
 
         return redirect()->route('knowledge_base.index')->with('success', 'Knowledge Successfully Added');
@@ -143,16 +141,18 @@ class KnowledgeController extends Controller
         
         $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
         $data['record'] = Knowledge::where('id', $id)->first();
-    
+
+        $fileName = $data['record']->file_name;
+
         // Check if the record exists
         if (!$data['record']) {
             return redirect()->route('some_error_route')->with('error', 'Knowledge record not found');
         }
     
         $data['id_module'] = $id;
-        $data['file_module'] = storage_path('app/' . $data['record']->file_name);
+        $data['file_module'] = $fileName;
         // Check if the file exists
-        if (!file_exists($data['file_module'])) {
+        if (!($data['file_module'])) {
             return redirect()->route('some_error_route')->with('error', 'File not found');
         }
     

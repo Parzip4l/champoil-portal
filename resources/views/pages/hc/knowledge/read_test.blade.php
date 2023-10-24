@@ -6,11 +6,8 @@
 @endpush
 
 @section('content')
-<!-- {{ $file_module }} -->
-<!-- http://data.cityservice.co.id/aFyPRgtGlU3tLNb1kWvyqnZ6r3S3e3aMq14Uqd6G.pdf#toolbar=0 -->
 
-    <iframe src="{{ $file_module }}#toolbar=0" width="400" height="800"></iframe>
-    <!-- <a href="{{ route('kas/user.test', ['id' => $id_module]) }}"  class="btn btn-primary btn-sm">Lanjut Test</a> -->
+    <iframe src="{{ asset('knowledge_test/' . $file_module) }}#toolbar=0" width="400" height="800"></iframe>
     <a href="javascript:void(0)" id="goto_test"  class="btn btn-primary btn-sm">Lanjut Test</a>
 <!-- End -->
 @endsection

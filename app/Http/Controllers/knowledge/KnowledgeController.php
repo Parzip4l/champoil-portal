@@ -140,13 +140,25 @@ class KnowledgeController extends Controller
     }
 
     public function read_test($id) {
+        
         $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
         $data['record'] = Knowledge::where('id', $id)->first();
+    
+        // Check if the record exists
+        if (!$data['record']) {
+            return redirect()->route('some_error_route')->with('error', 'Knowledge record not found');
+        }
+    
         $data['id_module'] = $id;
         $data['file_module'] = storage_path('app/' . $data['record']->file_name);
     
+        // Check if the file exists
+        if (!file_exists($data['file_module'])) {
+            return redirect()->route('some_error_route')->with('error', 'File not found');
+        }
+    
         user_read_module::insert([
-            "created_at" => now(), // Use the `now()` function to get the current date and time.
+            "created_at" => now(),
             "employee_code" => Auth::user()->employee_code,
             "id_module" => $id
         ]);
@@ -156,10 +168,21 @@ class KnowledgeController extends Controller
             ->where('status', 0)
             ->first();
     
-        if ($cek && $cek->module_read == 1) { // Check if $cek exists before accessing its properties.
+        if ($cek && $cek->module_read == 1) {
             return redirect()->route('kas/user.test', ['id' => $id])->with('success', 'Your Module Redirect');
         } else {
             return view('pages.hc.knowledge.read_test', $data);
+        }
+    }
+    
+    public function serveFile($file)
+    {
+        $filePath = storage_path('app/' . $file);
+        
+        if (file_exists($filePath)) {
+            return response()->file($filePath);
+        } else {
+            return redirect()->route('some_error_route')->with('error', 'File not found');
         }
     }
     
@@ -246,7 +269,7 @@ class KnowledgeController extends Controller
     public function user_test($id){
         $data['id_module']=$id;
         $data['result']=[];
-        
+        $response=[];
         asign_test::where('id_test',$id)
                     ->where('employee_code',Auth::user()->employee_code)
                     ->where('status',0)
@@ -264,6 +287,7 @@ class KnowledgeController extends Controller
                 
             }
             $data['result']=$response;
+
         }
 
         $data['test']=$test;

@@ -98,18 +98,10 @@
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-md-6">
-                                                <span>JHT Employee</span>
+                                                <span>BPJS Ketenagakerjaan</span>
                                             </div>
                                             <div class="col-md-6 text-right">
                                                 <span class="text-right">Rp {{ number_format($datadeductions['bpsj_tk'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Jaminan Pensiun</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($datadeductions['j_pensiun'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-2">
@@ -269,18 +261,10 @@
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
-                            JHT Employee
+                            BPJS Ketenagakerjaan
                         </span>
                         <span>
                             Rp {{ number_format($datadeductions['bpsj_tk'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Jaminan Pensiun
-                        </span>
-                        <span>
-                            Rp {{ number_format($datadeductions['j_pensiun'][0], 0, ',', '.') }}
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">

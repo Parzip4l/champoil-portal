@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-Template Name: Champoil Portal - Admin Champoil Super Apps
+Template Name: TRUEST HRIS APPS
 Author: RinableCreative
 Website: https://www.rinablecreative.com
 Portfolio: https://behance.net/muhamadsobirin3
@@ -10,11 +10,11 @@ Portfolio: https://behance.net/muhamadsobirin3
   <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="description" content="Champoil Super Apps">
+  <meta name="description" content="TRUEST HRIS Apps">
 	<meta name="author" content="Rinable Creative">
 	<meta name="keywords" content="superapp, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, laravel, theme, front-end, ui kit, web">
 
-  <title>CHAMPOIL - Portal Super Apps</title>
+  <title>TRUEST - HRIS Apps</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

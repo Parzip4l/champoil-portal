@@ -3,7 +3,7 @@
     <div class="container">
       <div class="navbar-content">
         <a href="#" class="navbar-brand">
-          CHAMPOIL<span>PORTAL</span>
+          TRUE<span>ST</span>
         </a>
         <form class="search-form">
           <div class="input-group">

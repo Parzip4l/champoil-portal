@@ -9,7 +9,7 @@
         <div class="row">
           <div class="col-md-12 ps-md-0">
             <div class="auth-form-wrapper px-4 py-5">
-              <a href="#" class="noble-ui-logo d-block mb-2 text-center">CHAMPOIL<span>PORTAL</span></a>
+              <a href="#" class="noble-ui-logo d-block mb-2 text-center">TRUE<span>ST</span></a>
               <h5 class="text-muted fw-normal mb-4 text-center">Silahkan Masukan Email dan Password untuk masuk ke dalam portal.</h5>
               <form class="forms-sample" action="{{url('login/proses')}}" method="POST">
               @csrf

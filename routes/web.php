@@ -192,6 +192,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsen'])->name('attendance.createData');
 
 
+    // Payroll
+        // Component Master
+        Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
+        
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);

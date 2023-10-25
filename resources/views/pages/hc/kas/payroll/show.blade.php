@@ -159,6 +159,38 @@
                                                 <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Potongan Diksar</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Potongan Hutang</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Taxes Income</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Potangan Lain Lain</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
                                         @endforeach
                                     </td>
                                 </tr>

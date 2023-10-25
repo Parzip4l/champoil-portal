@@ -57,16 +57,16 @@
             <hr>
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Bpjs Kesehatan</label>
+                    <label for="kode_karyawan" class="form-label">BPJS Kesehatan</label>
                     <input type="number" id="bpjs_ks" class="form-control deduction" name="deductions[bpjs_ks][]" placeholder="Rp. " required>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">JHT Employee</label>
+                    <label for="kode_karyawan" class="form-label">BPJS Ketenagakerjaan</label>
                     <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[bpsj_tk][]" placeholder="Rp. " required>
                 </div>
                 <div class="col-md-6">
                     <label for="kode_karyawan" class="form-label">Jaminan Pensiun</label>
-                    <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[j_pensiun][]" placeholder="Rp. " required>
+                    <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[j_pensiun][]" placeholder="Rp. " required disabled>
                 </div>
                 <div class="col-md-6">
                     <label for="kode_karyawan" class="form-label">PPH 21</label>
@@ -140,9 +140,10 @@
             // Menghitung THP
             const totalAllowance = parseFloat($('#t_allowance').val()) || 0;
             const totalDeduction = parseFloat($('#t_deduction').val()) || 0;
-            const BasiSalary = parseFloat($('#basic_salary').val());
-            const thp = BasiSalary + totalAllowance - totalDeduction;
+            const BasicSalary = parseFloat($('#basic_salary').val());
+            const thp = Math.round(BasicSalary + totalAllowance - totalDeduction);
             $('#thp').val(thp);
+            console.log(thp);
         });
     });
 </script>

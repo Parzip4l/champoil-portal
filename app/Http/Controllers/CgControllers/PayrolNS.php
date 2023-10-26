@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Payroll;
 use App\Employee;
+use App\Loan\LoanModel;
+Use App\GardaPratama\Gp;
 use App\Absen;
 use Carbon\Carbon;
 use App\ModelCG\Project;
@@ -92,6 +94,58 @@ class PayrolNS extends Controller
             $totalGajiBackup = 0;
             $allowenceData= [];
             $deductiondata = [];
+            $totalPotonganHutang = 0;
+            $TotalGP = 0;
+
+            //Potongan Hutang
+            $potonganHutang = LoanModel::where('employee_id', $nik)
+            ->where('is_paid', 0)
+            ->pluck('installment_amount');
+
+            $SisaHutangData = LoanModel::where('employee_id', $nik)
+                ->where('is_paid', 0)
+                ->pluck('remaining_amount');
+            
+            $totalPotonganHutang = $potonganHutang->sum();
+            $SisaHutangData1 = $SisaHutangData->sum();
+            
+            $sisahutangTotal = $SisaHutangData1 - $totalPotonganHutang;
+
+            if ($sisahutangTotal === 0) {
+                // Update data di database
+                LoanModel::where('employee_id', $nik)
+                    ->where('is_paid', 0)
+                    ->update(['is_paid' => 1, 'remaining_amount' => 0]);
+            }else{
+                LoanModel::where('employee_id', $nik)
+                    ->where('is_paid', 0)
+                    ->update(['is_paid' => 0, 'remaining_amount' => $sisahutangTotal]);
+            }
+
+            // Garda Pratama
+            $potonganGP = Gp::where('employee_id', $nik)
+            ->where('is_paid', 0)
+            ->pluck('installment_amount');
+
+            $sisaGp = Gp::where('employee_id', $nik)
+                ->where('is_paid', 0)
+                ->pluck('remaining_amount');
+            
+            $TotalGP = $potonganGP->sum();
+            $SisaGP = $sisaGp->sum();
+            
+            $SistaTotalGP = $SisaGP - $TotalGP;
+
+            if ($SistaTotalGP === 0) {
+                // Update data di database
+                Gp::where('employee_id', $nik)
+                    ->where('is_paid', 0)
+                    ->update(['is_paid' => 1, 'remaining_amount' => 0]);
+            }else{
+                Gp::where('employee_id', $nik)
+                    ->where('is_paid', 0)
+                    ->update(['is_paid' => 0, 'remaining_amount' => $SistaTotalGP]);
+            }
 
             // Mengakumulasi jumlah hari dan total gaji dari setiap absensi
             foreach ($absen as $absensi) {
@@ -155,13 +209,12 @@ class PayrolNS extends Controller
                         $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
                     }
 
-
                 // Deducitons
                 $ProjectDeduction = ProjectDetails::whereIn('project_code', $projectIds)
                     ->where('jabatan', $jabatan)
                     ->select('p_bpjstk', 'p_tseragam', 'p_operasional')
                     ->get();
-                
+
                 $projectDedutionsTotal = 0;
                 foreach ($ProjectDeduction as $projectDetaildeductions) {
                     $projectDedutionsTotal += array_sum($projectDetaildeductions->toArray());
@@ -181,15 +234,18 @@ class PayrolNS extends Controller
 
                 $deductiondata = [
                     'projectDeductions' => $ProjectDeduction->toArray(),
-                    'deductions_total' => $projectDedutionsTotal,
+                    'deductions_total' => $projectDedutionsTotal + $totalPotonganHutang,
+                    'potongan_hutang' => $totalPotonganHutang,
+                    'potongan_gp' => $TotalGP,
                 ];
+                $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 
-                $thp = $totalGaji + $totalGajiBackup + $projectAllowancesTotal - $projectDedutionsTotal;
+                $thp = $totalGaji + $totalGajiBackup + $projectAllowancesTotal - $dataDeduction;
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);
-
             }
+
             // Simpan data ke tabel payroll
             $payroll = new Payroll();
             $payroll->employee_code = $nik;

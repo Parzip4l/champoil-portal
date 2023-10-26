@@ -25,7 +25,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="payslip-details">
-                                    <div class="row mb-2">
+                                    <div class="row mb-3">
                                         <div class="col-md-3">
                                             Employee Name
                                         </div>
@@ -33,7 +33,7 @@
                                            : {{$employee->nama}}
                                         </div>
                                     </div>
-                                    <div class="row mb-2">
+                                    <div class="row mb-3">
                                         <div class="col-md-3">
                                             Job position
                                         </div>
@@ -45,6 +45,7 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="col-lg-6 pe-0">
                         <h5 class="fw-bold text-uppercase text-end mt-4 mb-2"> 
                             {{ \Carbon\Carbon::createFromFormat('d-m-Y', explode(' - ', $payroll->periode)[0])->locale('id')->isoFormat('D MMMM') }} 
@@ -66,13 +67,14 @@
                             @php
                                 $allowencesData = json_decode($payroll->allowences);
                                 $deductionData = json_decode($payroll->deductions);
+                                $HutangData = $deductionData->potongan_hutang;
                                 $projectAllowances = $allowencesData->projectAllowances;
                                 $projectDeductions = $deductionData->projectDeductions;
                             @endphp
                             <tbody>
                                 <tr>
                                     <td>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Daily Salary</span>
                                             </div>
@@ -92,7 +94,7 @@
                                                 <span class="text-right mb-4">Rp. {{ number_format($allowencesData->totalGaji, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Backup</span>
                                             </div>
@@ -107,7 +109,7 @@
                                             </div>
                                         </div>
                                         @foreach ($projectAllowances as $projectAllowance)
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Tunjangan Kerja</span>
                                             </div>
@@ -115,7 +117,7 @@
                                                 <span class="text-right">Rp. {{ number_format($projectAllowance->p_tkerja, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Tunjangan Lain Lain</span>
                                             </div>
@@ -123,7 +125,7 @@
                                                 <span class="text-right">Rp. {{ number_format($projectAllowance->p_bpjs_ks, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>BPJS Kesehatan Mandiri</span>
                                             </div>
@@ -135,7 +137,7 @@
                                     </td>
                                     <td>
                                         @foreach($projectDeductions as $deduction)
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potongan BPJS Ketenagakerjaan</span>
                                             </div>
@@ -143,7 +145,7 @@
                                                 <span class="text-right">Rp. {{ number_format($deduction->p_bpjstk, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potongan Seragam</span>
                                             </div>
@@ -151,7 +153,7 @@
                                                 <span class="text-right">Rp. {{ number_format($deduction->p_tseragam, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potongan Operasional</span>
                                             </div>
@@ -159,36 +161,36 @@
                                                 <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potongan Diksar</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_gp, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potongan Hutang</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_hutang, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Taxes Income</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. 0</span>
                                             </div>
                                         </div>
-                                        <div class="row mb-2">
+                                        <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potangan Lain Lain</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. 0</span>
                                             </div>
                                         </div>
                                         @endforeach

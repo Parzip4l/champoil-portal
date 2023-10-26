@@ -264,7 +264,7 @@
                             <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
                             <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
                             <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['kas/shift']) }}">Shift</a></li>
-                            <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['kas/shift']) }}">Loan</a></li>
+                            <li class="nav-item"><a href="{{ route('employee-loan.index') }}" class="nav-link {{ active_class(['employee-loan']) }}">Employee Loan</a></li>
                         </ul>
                     </div>
                     <div class="col-md-3">

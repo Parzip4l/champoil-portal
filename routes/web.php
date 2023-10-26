@@ -13,6 +13,13 @@
 
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
+
+    // Employee Loan
+    Route::resource('employee-loan', App\Http\Controllers\Loan\LoanController::class);
+    
+    // Garda Pratama
+    Route::resource('garda-pratama', App\Http\Controllers\GardaPratama\GpController::class);
+
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::resource('dashboard', DashboardController::class);
     Route::resource('/', DashboardController::class);

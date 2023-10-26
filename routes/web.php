@@ -26,6 +26,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
+    Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
     
     Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
     Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
@@ -182,7 +183,6 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Payrol Data
     Route::resource('payrol-component', App\Http\Controllers\Payrol\PayrolComponent::class);
     Route::resource('payroll', App\Http\Controllers\Payrol\PayrolController::class);
-    Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
     
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');

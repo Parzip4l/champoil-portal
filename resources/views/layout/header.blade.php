@@ -30,12 +30,12 @@
                     $employeeDetails = \App\Employee::where('nik', Auth::user()->employee_code)->first();
                     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
                 @endphp
-                <img class="wd-30 ht-30 rounded-circle" src="{{ asset('images/' . $employeeDetails->gambar) }}" alt="$employee->nama">
+                <img class="wd-30 ht-30 rounded-circle" src="{{ asset('images/' . $employeeDetails->gambar) }}" alt="{{$employee->nama}}">
                 </a>
                 <div class="dropdown-menu p-0" aria-labelledby="profileDropdown">
                 <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
                     <div class="mb-3">
-                    <img class="wd-80 ht-80 rounded-circle" src="{{ asset('images/' . $employeeDetails->gambar) }}" alt="$employee->nama">
+                    <img class="wd-80 ht-80 rounded-circle" src="{{ asset('images/' . $employeeDetails->gambar) }}" alt="{{$employee->nama}}">
                     </div>
                     <div class="text-center">
                     <p class="tx-16 fw-bolder">{{ $employee->nama }}</p>

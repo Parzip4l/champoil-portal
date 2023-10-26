@@ -23,6 +23,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::resource('dashboard', DashboardController::class);
     Route::resource('/', DashboardController::class);
+
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     
@@ -155,8 +156,6 @@ Route::middleware(['auth', 'permission:ops_access'])->group(function () {
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
-    // Payslip
-    Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
     Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');

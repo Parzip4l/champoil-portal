@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Knowledge;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Knowledge;
-use App\ModelCG\Knowledge_soal;
+use App\ModelCG\Knowledge_soal; 
 use App\ModelCG\Knowledge_jawaban;
 use App\ModelCG\asign_test;
 use App\ModelCG\Jawaban_user;

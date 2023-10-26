@@ -15,7 +15,10 @@
             <div class="card">
                 <div class="card-body">
                     <div class="button-absen">
-                    <h4 class="mb-3 text-center">{{$greeting}} {{Auth::user()->name}} {{$greeting === 'Selamat Pagi' ? 'Selamat Beraktifitas' : ''}}</h4>
+                      @php 
+                        $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+                      @endphp
+                    <h4 class="mb-3 text-center">{{$greeting}} {{ $employee->nama }} {{$greeting === 'Selamat Pagi' ? 'Selamat Beraktifitas' : ''}}</h4>
                         @foreach ($datakaryawan as $data)
                             @if (Auth::check())
                                 @php

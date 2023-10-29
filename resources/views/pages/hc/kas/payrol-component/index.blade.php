@@ -20,6 +20,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Component</th>
+                                <th>Tax</th>
                                 <th>Type</th>
                                 <th>Action</th>
                             </tr>
@@ -32,6 +33,12 @@
                             <tr>
                                 <td> {{ $nomor++}} </td>
                                 <td> {{ $data->name }} </td>
+                                <td>    @if ($data->is_taxable == 1)
+                                            Taxable
+                                        @else
+                                            Non Taxable
+                                        @endif 
+                                </td>
                                 <td class="@if ($data->type === 'Allowences') text-success @else text-danger @endif"> {{ $data->type }} </td>
                                 <td>
                                     <div class="dropdown">
@@ -39,6 +46,10 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a href="#" class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#ComponentModal{{$data->id}}">
+                                                <i data-feather="edit-2" class="icon-sm me-2"></i>
+                                                <span class="">Edit</span>
+                                            </a>
                                             <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
                                                 <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
@@ -59,7 +70,7 @@
     </div>
 </div>
 
-<!-- Modal Data FNG -->
+<!-- Modal Data Component -->
 <div class="modal fade" id="ComponentModal" tabindex="-1" aria-labelledby="ModalTambahComponent" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -74,6 +85,14 @@
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Component Name</label>
                             <input type="text" class="form-control" name="name" placeholder="Component Name" required>    
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Tax</label>
+                            <select name="is_taxable" id="" class="form-control" required>
+                                <option disabled selected>Select Type</option>
+                                <option value="1">Tax</option>
+                                <option value="0">No Tax</option>
+                            </select>  
                         </div>
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Component Type</label>
@@ -92,8 +111,51 @@
         </div>
     </div>
 </div>
-
 <!-- End -->
+
+<!-- Modal Edit -->
+@foreach($data2 as $dataedit)
+<div class="modal fade" id="ComponentModal{{$dataedit->id}}" tabindex="-1" aria-labelledby="ModalTambahComponent" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalTambahComponent">Update Component</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('component-data.update', $dataedit->id)}}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Component Name</label>
+                            <input type="text" class="form-control" name="name" placeholder="Component Name" required value="{{$dataedit->name}}">    
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Tax</label>
+                            <select name="is_taxable" id="" class="form-control" required>
+                                <option value="1" {{$dataedit->is_taxable == '1' ? 'selected' : ''}}>Tax</option>
+                                <option value="0" {{$dataedit->is_taxable == '0' ? 'selected' : ''}}>No Tax</option>
+                            </select>  
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Component Type</label>
+                            <select name="type" id="" class="form-control" required>
+                                <option value="Allowences" {{$dataedit->type == 'Allowences' ? 'selected' : ''}}>Allowences</option>
+                                <option value="Deductions" {{$dataedit->type == 'Deductions' ? 'selected' : ''}}>Deductions</option>
+                            </select>  
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Update Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+
 @endsection
 
 @push('plugin-scripts')

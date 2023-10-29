@@ -67,6 +67,7 @@ class EmployeeController extends Controller
             $data->tanggal_lahir = $request->tanggal_lahir;
             $data->tempat_lahir = $request->tempat_lahir;
             $data->jenis_kelamin = $request->jenis_kelamin;
+            $data->tanggungan = $request->tanggungan;
 
             if ($request->hasFile('gambar')) {
                 $image = $request->file('gambar');
@@ -259,6 +260,7 @@ class EmployeeController extends Controller
         $employee->tanggal_lahir = $request->input('tanggal_lahir');
         $employee->alamat = $request->input('alamat');
         $employee->status_pernikahan = $request->input('status_pernikahan');
+        $employee->tanggungan = $request->input('tanggungan');
 
         // Save the updated employee
         $employee->save();

@@ -127,6 +127,21 @@
                     <option value="Single" {{$employee->status_pernikahan == 'Single' ? 'selected' : ''}}>Single</option>
                 </select>
             </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Jumlah Tanggungan</label>
+                <select class="js-example-basic-single form-select" data-width="100%" name="tanggungan">
+                    <option value="0" {{$employee->tanggungan == '0' ? 'selected' : ''}}>0</option>
+                    <option value="1" {{$employee->tanggungan == '1' ? 'selected' : ''}}>1</option>
+                    <option value="2" {{$employee->tanggungan == '2' ? 'selected' : ''}}>2</option>
+                    <option value="3" {{$employee->tanggungan == '3' ? 'selected' : ''}}>3</option>
+                    <option value="4" {{$employee->tanggungan == '4' ? 'selected' : ''}}>4</option>
+                    <option value="5" {{$employee->tanggungan == '5' ? 'selected' : ''}}>5</option>
+                    <option value="6" {{$employee->tanggungan == '6' ? 'selected' : ''}}>6</option>
+                    <option value="7" {{$employee->tanggungan == '7' ? 'selected' : ''}}>7</option>
+                    <option value="8" {{$employee->tanggungan == '8' ? 'selected' : ''}}>8</option>
+                    <option value="9" {{$employee->tanggungan == '9' ? 'selected' : ''}}>9</option>
+                </select>
+            </div>
           </div>
           <button class="btn btn-primary w-100" type="submit">Update Data</button>
         </form>

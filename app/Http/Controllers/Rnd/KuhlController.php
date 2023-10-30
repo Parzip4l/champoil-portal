@@ -46,7 +46,7 @@ class KuhlController extends Controller
             $purchase->checker = $request->checker;
             $purchase->save();
 
-            $slackChannel = Slack::where('channel', 'Formulation')->first();
+            $slackChannel = Slack::where('channel', 'QC')->first();
             $slackWebhookUrl = $slackChannel->url;
             $today = now()->toDateString();
             $data = [

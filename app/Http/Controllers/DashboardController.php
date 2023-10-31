@@ -95,6 +95,7 @@ class DashboardController extends Controller
             $PersentaseSales = null;
             $arrowIcon2 = 'minus';
             $textClass2 = 'text-muted';
+            $changeMessage2 = 'Tidak Ada Perubahan';
         }
 
         $salesData2 = Invoice::whereMonth('created_at', now()->month)

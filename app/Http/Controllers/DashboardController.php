@@ -74,6 +74,7 @@ class DashboardController extends Controller
         ->whereYear('created_at', $lastYear)
         ->sum('total');
 
+
         if ($TotalSalesLatest != 0) {
             $PersentaseSales = (($TotalSales - $TotalSalesLatest) / $TotalSalesLatest) * 100;
         
@@ -95,6 +96,7 @@ class DashboardController extends Controller
             $PersentaseSales = null;
             $arrowIcon2 = 'minus';
             $textClass2 = 'text-muted';
+            $changeMessage2="";
         }
 
         $salesData2 = Invoice::whereMonth('created_at', now()->month)

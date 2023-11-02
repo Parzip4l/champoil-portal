@@ -1,9 +1,15 @@
-<canvas id="canvas"></canvas>
 
-<script src="{{ asset('node_modules/qrcode/lib/core/qrcode.js') }}"></script>
-<script>
-  QRCode.toCanvas(document.getElementById('canvas'), 'sample text', function (error) {
-    if (error) console.error(error)
-    console.log('success!');
-  })
-</script>
+    <script src="{{ asset('assets/js/qrcode.js') }}"></script>
+    <!-- SJIS Support (optional) -->
+    <script src="{{ asset('assets/js/qrcode_SJIS.js') }}"></script>
+
+    <div id="qrcode"></div>
+
+    <script>
+        var typeNumber = 4;
+        var errorCorrectionLevel = 'L';
+        var qr = qrcode(typeNumber, errorCorrectionLevel);
+        qr.addData('{{ $unix_code }}');
+        qr.make();
+        document.getElementById('qrcode').innerHTML = qr.createImgTag(6);
+    </script>

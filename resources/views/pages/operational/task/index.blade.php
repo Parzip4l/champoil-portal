@@ -65,7 +65,7 @@
                                                 <span class="">Add List Task</span>
                                             </a>
 
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('qrcode') }}" >
+                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('qrcode', ['id' => $record->unix_code]) }}" >
                                                 <i data-feather="grid" class="icon-sm me-2"></i>
                                                 <span class="">Show QR</span>
                                             </a>

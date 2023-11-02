@@ -158,7 +158,7 @@ Route::middleware(['auth', 'permission:ops_access'])->group(function () {
     Route::resource('task', App\Http\Controllers\Taskmanagement\TaskController::class);
     Route::resource('list-task', App\Http\Controllers\Taskmanagement\ListController::class);
     Route::get('/add_task/{id}', [App\Http\Controllers\Taskmanagement\ListController::class, 'list_task'])->name('add_task');
-    Route::get('/qrcode', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
+    Route::get('/qrcode/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
 });
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {

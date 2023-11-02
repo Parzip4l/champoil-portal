@@ -245,6 +245,12 @@
                             <li class="nav-item"><a href="{{ url('manual-delivery') }}" class="nav-link {{ active_class(['manual-delivery']) }}">Delivery Orders</a></li>
                         </ul>
                     </div>
+                    <div class="col-group col-md-4">
+                        <p class="category-heading">Other</p>
+                        <ul class="submenu-item">
+                            <li class="nav-item"><a href="{{ url('task') }}" class="nav-link {{ active_class(['manual-delivery']) }}">Task Management</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </li>

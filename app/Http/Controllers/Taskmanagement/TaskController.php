@@ -130,10 +130,10 @@ class TaskController extends Controller
         return $unix_code;
     }
 
-    public function qr_code(){
+    public function qr_code($id){
         
-        
-        return view('pages.operational.task.qrcode');
+        $data['unix_code']=$id;
+        return view('pages.operational.task.qrcode',$data);
        
     }
 

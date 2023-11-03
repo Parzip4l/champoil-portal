@@ -76,7 +76,13 @@
                             @php
                                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                             @endphp
-                            <td><a href="{{route('payslip.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>
+                                @if ($employee->nama)
+                                    <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
+                                @else
+                                    Karyawan tidak ditemukan
+                                @endif
+                            </td>
                             <td>{{$data->thp}}</td>
                             <td>{{ $data->year }} - {{ $data->month }}</td>
                         </tr>
@@ -114,7 +120,7 @@
                                 @if ($employee->nama)
                                     <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
                                 @else
-                                    Karyawan tidak ada
+                                    Karyawan tidak ditemukan
                                 @endif
                             </td>
                             <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>

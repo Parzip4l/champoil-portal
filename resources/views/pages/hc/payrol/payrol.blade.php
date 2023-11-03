@@ -62,7 +62,7 @@
                             @foreach ($payrol as $data)
                             @php
                                 $employee = \App\Employee::where('nik', $data->employee_code)
-                                                ->where('unit_bisnis', 'CHAMPOIL') 
+                                                ->where('unit_bisnis', 'CHAMPOIL')
                                                 ->first();
                             @endphp
                             @if ($employee)

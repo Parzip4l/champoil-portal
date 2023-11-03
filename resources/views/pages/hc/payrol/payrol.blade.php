@@ -65,7 +65,11 @@
                                                 ->where('unit_bisnis', 'CHAMPOIL') 
                                                 ->first();
                             @endphp
+                            @if ($employee)
                                 <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
+                            @else
+                                <option value="{{$data->employee_code}}">Karyawan Tidak Ditemukan</option>
+                            @endif
                             @endforeach
                         </select>
                     </div>

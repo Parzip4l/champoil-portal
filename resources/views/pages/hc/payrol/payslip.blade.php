@@ -110,7 +110,13 @@
                                 $startDate = date('j M Y', strtotime($dates[0]));
                                 $endDate = date('j M Y', strtotime($dates[1]));
                             @endphp
-                            <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>
+                                @if ($employee->nama)
+                                    <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
+                                @else
+                                    Karyawan tidak ada
+                                @endif
+                            </td>
                             <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
                             <td>{{ $endDate }}</td>
                         </tr>

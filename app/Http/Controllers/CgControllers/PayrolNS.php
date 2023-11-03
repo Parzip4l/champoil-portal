@@ -96,6 +96,9 @@ class PayrolNS extends Controller
             $deductiondata = [];
             $totalPotonganHutang = 0;
             $TotalGP = 0;
+            $thp = 0;
+            $allowenceData = null;
+            $deductionData = null;
 
             //Potongan Hutang
             $potonganHutang = LoanModel::where('employee_id', $nik)

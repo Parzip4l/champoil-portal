@@ -221,7 +221,9 @@
                     <select class="form-control" id="employeeSelect" name="employee_code[]">
                         @foreach ($payrol as $data)
                         @php
-                            $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                            $employee = \App\Employee::where('nik', $data->employee_code)
+                                    ->where('unit_bisnis', 'CHAMPOIL') 
+                                    ->first();
                         @endphp
                             <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
                         @endforeach

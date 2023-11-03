@@ -61,7 +61,9 @@
                         <select class="js-example-basic-multiple form-select" id="employeeSelect" name="employee_code[]" multiple="multiple" data-width="100%">
                             @foreach ($payrol as $data)
                             @php
-                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                                $employee = \App\Employee::where('nik', $data->employee_code)
+                                                ->where('unit_bisnis', 'CHAMPOIL') 
+                                                ->first();
                             @endphp
                                 <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
                             @endforeach

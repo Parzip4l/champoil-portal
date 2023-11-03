@@ -77,7 +77,7 @@
                                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                             @endphp
                             <td>
-                                @if ($employee->nama)
+                                @if ($employee)
                                     <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
                                 @else
                                     Karyawan tidak ditemukan
@@ -117,7 +117,7 @@
                                 $endDate = date('j M Y', strtotime($dates[1]));
                             @endphp
                             <td>
-                                @if ($employee->nama)
+                                @if ($employee)
                                     <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
                                 @else
                                     Karyawan tidak ditemukan

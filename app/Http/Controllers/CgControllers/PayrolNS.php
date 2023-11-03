@@ -215,9 +215,31 @@ class PayrolNS extends Controller
                     ->select('p_bpjstk', 'p_tseragam', 'p_operasional')
                     ->get();
 
+                $dataPengurangBPJS = ProjectDetails::whereIn('project_code', $projectIds)
+                    ->where('jabatan', $jabatan)
+                    ->pluck('p_bpjstk')
+                    ->first();
+
                 $projectDedutionsTotal = 0;
                 foreach ($ProjectDeduction as $projectDetaildeductions) {
                     $projectDedutionsTotal += array_sum($projectDetaildeductions->toArray());
+                }
+
+                // Perhitungan PPH21
+                $PenghasilanBruto = $totalGaji + $projectAllowancesTotal + $totalGajiBackup;
+                $penghasilanNeto = $PenghasilanBruto - $dataPengurangBPJS;
+                $totalNeto = $penghasilanNeto*12;
+                $dataPTKP = $totalNeto -  54000000;
+                // Penghasilan Kena Pajak Setahun / Disetahunkan
+                $persentasePTKP = 0.05;
+                $dataSetahun = $dataPTKP * $persentasePTKP;
+
+                $totalPPH = $dataSetahun / 12;
+
+                if($totalPPH <= 0) {
+                    $totalPPH = 0;
+                }else{
+                    $totalPPH = $totalPPH;
                 }
                 
                 $allowenceData = [
@@ -237,10 +259,12 @@ class PayrolNS extends Controller
                     'deductions_total' => $projectDedutionsTotal + $totalPotonganHutang,
                     'potongan_hutang' => $totalPotonganHutang,
                     'potongan_gp' => $TotalGP,
+                    'PPH21' => $totalPPH,
                 ];
                 $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 
-                $thp = $totalGaji + $totalGajiBackup + $projectAllowancesTotal - $dataDeduction;
+                // THP
+                $thp = $totalGaji + $totalGajiBackup + $projectAllowancesTotal - $dataDeduction - $totalPPH;
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);

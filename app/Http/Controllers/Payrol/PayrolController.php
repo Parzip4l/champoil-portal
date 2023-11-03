@@ -49,7 +49,7 @@ class PayrolController extends Controller
         $selectedMonth = $monthNames[$request->input('month')];
 
         // Menggunakan Carbon untuk mendapatkan tanggal awal dan akhir dari bulan
-        $startDate = Carbon::createFromDate(null, $selectedMonth, 1)->startOfWeek(Carbon::MONDAY);
+        $startDate = Carbon::createFromDate(null, $selectedMonth, 1)->startOfWeek(Carbon::SATURDAY);
         $endDate = Carbon::createFromDate(null, $selectedMonth, 1)->endOfMonth()->endOfWeek(Carbon::FRIDAY);
 
         // Inisialisasi array untuk menyimpan daftar minggu
@@ -61,7 +61,7 @@ class PayrolController extends Controller
 
         while ($currentDate->lte($endDate)) {
             $weekStart = $currentDate->format('Y-m-d'); // Format tanggal start
-            $weekEnd = $currentDate->copy()->addDays(4)->format('Y-m-d'); // Format tanggal end
+            $weekEnd = $currentDate->copy()->addDays(6)->format('Y-m-d'); // Format tanggal end
 
             $weeks[] = "Week " . $weekNumber . " ($weekStart - $weekEnd)";
             $currentDate->addWeek();

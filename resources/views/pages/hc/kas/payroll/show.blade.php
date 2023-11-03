@@ -122,7 +122,7 @@
                                                 <span>Tunjangan Lain Lain</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($projectAllowance->p_bpjs_ks, 0, ',', '.') }} </span>
+                                                <span class="text-right">Rp. {{ number_format($projectAllowance->p_tlain, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -182,7 +182,7 @@
                                                 <span>Taxes Income</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. 0</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->PPH21, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -348,6 +348,14 @@
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Tunjangan Jabatan
+                        </span>
+                        <span>
+                            Rp. 0
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Lain-Lain
                         </span>
                         <span>
                             Rp. 0

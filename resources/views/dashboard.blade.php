@@ -9,16 +9,56 @@
 @endpush
 
 @section('content')
+@php 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+@endphp
 <div class="absen-wrap mb-4">
     <div class="row">
         <div class="col-md-12 mb-3">
-            <div class="card">
+            <!-- Employee Login Details -->
+            <div class="card custom-card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="content-wrap-employee-card d-flex justify-content-between mb-5">
+                            <div class="content-left align-self-center">
+                                <div class="employee-name mb-1">
+                                    <h5 class="text-white text-uppercase">{{ $employee->nama }}</h5>
+                                </div>
+                                <div class="employee-title-job">
+                                    <p>{{ $employee->jabatan }}</p>
+                                </div>
+                            </div>
+                            <div class="content-right">
+                                <div class="gambar">
+                                    <img src="{{ asset('images/' . $employee->gambar) }}" alt="" class="w-100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-wrap-employee-card d-flex justify-content-between">
+                            <div class="content-left align-self-center">
+                                <div class="employee-title-job">
+                                    <p>Employee ID</p>
+                                </div>
+                                <div class="employee-name mb-1">
+                                    <h5 class="text-white text-uppercase">{{ $employee->nik }}</h5>
+                                </div>
+                            </div>
+                            <div class="content-right">
+                                <div class="employee-title-job text-right">
+                                    <p>Division</p>
+                                </div>
+                                <div class="employee-name mb-1">
+                                    <h5 class="text-white text-uppercase">{{ $employee->organisasi }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End  -->
+            <div class="card custom-card2">
                 <div class="card-body">
                     <div class="button-absen">
-                      @php 
-                        $employee = \App\Employee::where('nik', Auth::user()->name)->first();
-                      @endphp
-                    <h4 class="mb-3 text-center">{{$greeting}} {{ $employee->nama }} {{$greeting === 'Selamat Pagi' ? 'Selamat Beraktifitas' : ''}}</h4>
                         @foreach ($datakaryawan as $data)
                             @if (Auth::check())
                                 @php
@@ -73,8 +113,8 @@
                         @endif
                     @endif
                         <div class="log-absen-today mt-2">
-                            <div class="card ">
-                                <div class="card-header text-center bg-warning">
+                            <div class="card custom-card2">
+                                <div class="card-header text-center bg-warning" style="border-radius:15px 15px 0 0">
                                     <h5>Attendance Log</h5>   
                                 </div>
                                 <div class="card-body">
@@ -113,7 +153,7 @@
             </div>
         </div>
         <div class="col-md-12 mt-3">
-            <div class="card">
+            <div class="card custom-card2">
                 <div class="card-body">
                     <div class="menu-absen-wrap desktop">
                         <div class="owl-carousel owl-theme owl-basic">
@@ -262,6 +302,29 @@ $(document).ready(function () {
 <style>
     .owl-theme .owl-nav.disabled+.owl-dots{
         display : none;
+    }
+    .card.custom-card {
+        background: #8c7ae6;
+        border-radius:15px;
+    }
+
+    .card.custom-card2 {
+        border-radius:15px;
+    }
+
+    .employee-title-job p {
+        color : #eee;
+    }
+
+    .gambar {
+        height:55px;
+        width:55px;
+        float: right;
+    }
+
+    .gambar img {
+        object-fit:cover;
+        border-radius : 10px;
     }
 </style>
 @endpush

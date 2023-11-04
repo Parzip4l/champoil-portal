@@ -191,7 +191,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('contact.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "#".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

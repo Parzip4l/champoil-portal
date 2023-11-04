@@ -12,9 +12,9 @@
 @php 
     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
 @endphp
-<div class="absen-wrap mb-4">
+<div class="absen-wrap mb-2">
     <div class="row">
-        <div class="col-md-12 mb-3">
+        <div class="col-md-12 mb-2">
             <!-- Employee Login Details -->
             <div class="card custom-card mb-3">
                 <div class="card-body">
@@ -104,8 +104,8 @@
                                         <input type="hidden" name="latitude" id="latitude">
                                         <input type="hidden" name="longitude" id="longitude">
                                         <input type="hidden" name="status" value="H">
-                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100" id="btn-absen" onClick="formAbsen()">
-                                        Clock IN</a>
+                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 bg-custom-biru" id="btn-absen" onClick="formAbsen()" style="border-radius:10px">
+                                        CLOCK IN</a>
                                 </form>
                                 @endif
                             @else
@@ -114,8 +114,8 @@
                     @endif
                         <div class="log-absen-today mt-2">
                             <div class="card custom-card2">
-                                <div class="card-header text-center bg-warning" style="border-radius:15px 15px 0 0">
-                                    <h5>Attendance Log</h5>   
+                                <div class="card-header text-center bg-custom-biru" style="border-radius:12px 12px 0 0">
+                                    <h5 class="text-white">Attendance Log</h5>   
                                 </div>
                                 <div class="card-body">
                                     @foreach ($logs as $log)
@@ -152,72 +152,74 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12 mt-3">
-            <div class="card custom-card2">
-                <div class="card-body">
-                    <div class="menu-absen-wrap desktop">
-                        <div class="owl-carousel owl-theme owl-basic">
-                            <div class="item">
-                                <a href="{{route('mylogs')}}">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="git-branch"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">Attendence Log</p>
-                                    </div>
-                                </a>
+    </div>
+</div>
+
+<!-- Menu -->
+<div class="row">
+    <div class="col-md-12 mt-2">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="menu-wrap">
+                    <div class="menu-item mb-3">
+                        <a href="{{route('mylogs')}}" class="d-flex text-white">
+                            <div class="icon">
+                                <i class="me-2 icon-lg" data-feather="clock"></i>
                             </div>
-                            <div class="item">
-                                <a href="{{route('attendence-request.create')}}">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="user-plus"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">Request Attendence</p>
-                                    </div>
-                                </a>
+                            <div class="menu-title align-self-center">
+                                <h5>Attendece Log</h5>
                             </div>
-                            <div class="item">
-                                <a href="{{ route('mySlip')}} ">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="file-text"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">My Payslip</p>
-                                    </div>
-                                </a>
+                        </a>
+                    </div>
+                    <div class="menu-item mb-3">
+                        <a href="{{route('attendence-request.create')}}" class="d-flex text-white">
+                            <div class="icon">
+                                <i class="me-2 icon-lg" data-feather="user-plus"></i>
                             </div>
-                            <div class="item">
-                                <a href="{{route('attendence.backup')}}">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="clock"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">Backup Attendence</p>
-                                    </div>
-                                </a>
+                            <div class="menu-title align-self-center">
+                                <h5>Request Attendence</h5>
                             </div>
-                            <div class="item">
-                                <a href="{{ route('list-class') }}">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="book"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">Class Room</p>
-                                    </div>
-                                </a>
+                        </a>
+                    </div>
+                    <div class="menu-item mb-3">
+                        <a href="{{ route('mySlip')}}" class="d-flex text-white">
+                            <div class="icon">
+                                <i class="me-2 icon-lg" data-feather="file-text"></i>
                             </div>
-                            <div class="item">
-                                <a href="javascript:void(0)">
-                                    <div class="icon text-center">
-                                        <i class="me-2 icon-lg" data-feather="book"></i>
-                                    </div>
-                                    <div class="menu-name text-center">
-                                        <p class="text-muted">E-Workplan</p>
-                                    </div>
-                                </a>
+                            <div class="menu-title align-self-center">
+                                <h5>My Payslip</h5>
                             </div>
-                        </div>
+                        </a>
+                    </div>
+                    <div class="menu-item mb-3">
+                        <a href="{{route('attendence.backup')}}" class="d-flex text-white">
+                            <div class="icon">
+                                <i class="me-2 icon-lg" data-feather="clock"></i>
+                            </div>
+                            <div class="menu-title align-self-center">
+                                <h5>Backup Attendence</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="menu-item mb-3">
+                        <a href="{{ route('list-class') }}" class="d-flex text-white">
+                            <div class="icon">
+                                <i class="me-2 icon-lg" data-feather="book"></i>
+                            </div>
+                            <div class="menu-title align-self-center">
+                                <h5>Class Room</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="menu-item mb-3">
+                        <a href="" class="d-flex text-white">
+                            <div class="icon">
+                                <i class="me-2 icon-lg" data-feather="book-open"></i>
+                            </div>
+                            <div class="menu-title align-self-center">
+                                <h5>E-Workplan</h5>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -304,7 +306,7 @@ $(document).ready(function () {
         display : none;
     }
     .card.custom-card {
-        background: #8c7ae6;
+        background: #7286D3;
         border-radius:15px;
     }
 
@@ -325,6 +327,20 @@ $(document).ready(function () {
     .gambar img {
         object-fit:cover;
         border-radius : 10px;
+    }
+
+    .menu-item {
+        background: #7286D3;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .menu-title h5 {
+        font-weight : 400;
+    }
+
+    .bg-custom-biru {
+        background: #7286D3!important;
     }
 </style>
 @endpush

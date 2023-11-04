@@ -27,14 +27,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
-    
-    Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
-    Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
-    Route::resource('isi-survei', SurveyController::class);
-    Route::resource('purchase', PurchaseController::class);
-    Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
     Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
+
     // Backup
     Route::get('/backup-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'absenBackup'])->name('attendence.backup');
     Route::post('/absensi/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockin'])
@@ -70,8 +65,6 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/update-component-ns/{id}', [App\Http\Controllers\Payrol\PayrolComponent::class, 'editns'])->name('editcomponentns.edit');
     Route::put('/payroll-components-ns/{id}', [App\Http\Controllers\Payrol\PayrolComponent::class, 'updateNS'])->name('updatecomponentNS.update');
 
-
-
     Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
@@ -86,88 +79,6 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/start_class/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
 });
 
-Route::middleware(['auth', 'permission:sales_access'])->group(function () {
-    Route::resource('sales', SalesController::class);
-    Route::resource('delivery-orders', DeliveryorderController::class);
-    // Growth
-    Route::resource('growth', GrowthController::class);
-    // Contact
-    Route::resource('contact', ContactController::class);
-});
-
-Route::middleware(['auth', 'permission:purchase_access'])->group(function () {
-    Route::resource('purchase', PurchaseController::class);
-    Route::get('purchase/receive/{id}', 'PurchaseController@receiveProductShow')->name('purchase.receive');
-    Route::post('/send-purchase-to-slack/{purchase}', 'PurchaseController@sendToSlack')->name('purchase.sendToSlack');
-    Route::post('/purchase/{id}/partial_receive', 'PurchaseController@partialReceive')->name('purchase.partial_receive');
-});
-
-Route::middleware(['auth', 'permission:accounting_access'])->group(function () {
-    Route::resource('payment-regist', PaymentRegistController::class);
-    Route::resource('journal', JournalController::class); 
-    Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
-    Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
-    Route::resource('uom-categories', UomCategoryController::class);
-    Route::resource('uom', UomController::class);
-    Route::resource('warehouse-location', WarehouselokController::class);
-    Route::resource('inventory-product', ProductController::class);
-    Route::resource('analytics-plans', App\Http\Controllers\Analytics\AnalyticsPlansController::class);
-    Route::resource('contact', ContactController::class);
-
-    // Analytics Account
-    Route::resource('analytics-account', App\Http\Controllers\Analytics\AnalyticsAccountController::class);
-
-    // Invoice
-    Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
-
-    // Top
-    Route::resource('terms-of-payment', App\Http\Controllers\Payment_terms\PaymentController::class);
-    // Journal Item
-    Route::resource('journal-item', App\Http\Controllers\Journal\JournalItemsController::class);
-    Route::resource('journal-entry', App\Http\Controllers\Journal\JournalEntryController::class);
-    Route::resource('profit-loss', App\Http\Controllers\AccountingReports\ProfitlossController::class);
-
-    // Accounting 
-    Route::resource('coa', CoaController::class);
-    Route::resource('account-type', AccountTypeController::class);
-
-    // Vendor Bills
-    Route::resource('vendor-bills', VendorbillController::class);
-    Route::resource('product-category', ProductCategoryController::class);
-
-    Route::resource('tax', TaxController::class);
-});
-
-Route::middleware(['auth', 'permission:inventory_access,formulation_access'])->group(function () {
-    Route::get('/inventory-product/by-category/{category_id}', 'ProductController@getProductsByCategory')->name('product.byCategory');
-    Route::get('/inventory-product/by-warehouse/{warehouse_id}', 'ProductController@getProductsByWarehouse')->name('product.byWarehouse');
-    Route::resource('product-category', ProductCategoryController::class);
-    Route::resource('inventory-product', ProductController::class);
-});
-
-Route::middleware(['auth', 'permission:formulation_access'])->group(function () {
-    Route::resource('rnd-check', App\Http\Controllers\Rnd\PenetrasiController::class);
-    Route::resource('rnd-check-kuhl', App\Http\Controllers\Rnd\KuhlController::class);
-});
-
-Route::middleware(['auth', 'permission:ops_access'])->group(function () {
-    Route::resource('uom-categories', UomCategoryController::class);
-    Route::resource('uom', UomController::class);
-    Route::resource('warehouse-location', WarehouselokController::class);
-    Route::resource('inventory-product', ProductController::class);
-    Route::resource('warehouse-stock', App\Http\Controllers\Warehousestock\FngController::class);
-    Route::resource('warehouse-stock-pck', App\Http\Controllers\Warehousestock\PckController::class);
-    Route::resource('warehouse-stock-rma', App\Http\Controllers\Warehousestock\RmaController::class);
-    Route::resource('manual-delivery', ManualDeliveryController::class);
-    Route::resource('product-category', ProductCategoryController::class);
-    
-    //task management
-    Route::resource('task', App\Http\Controllers\Taskmanagement\TaskController::class);
-    Route::resource('list-task', App\Http\Controllers\Taskmanagement\ListController::class);
-    Route::get('/add_task/{id}', [App\Http\Controllers\Taskmanagement\ListController::class, 'list_task'])->name('add_task');
-    Route::get('/qrcode', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
-});
-
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     // Component Ns
@@ -177,10 +88,6 @@ Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
-});
-
-Route::middleware(['auth', 'permission:creative_access'])->group(function () {
-    
 });
 
 // Superadmin Access
@@ -211,8 +118,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
 
     // Payroll
-        // Component Master
-        Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
+    // Component Master
+    Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
         
     // CG Component
     Route::group(['prefix' => 'kas'], function(){

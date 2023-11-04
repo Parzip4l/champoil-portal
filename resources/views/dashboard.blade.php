@@ -315,6 +315,31 @@
     @endif
 </script>
 
+<script>
+$(function() {
+    'use strict';
+
+    if ($('.owl-basic').length) {
+        $('.owl-basic').owlCarousel({
+            loop: true,
+            margin: 25,
+            nav: false,
+            responsive: {
+                0: {
+                    items: 3.5
+                },
+                600: {
+                    items: 3
+                },
+                1000: {
+                    items: 6.5
+                }
+            }
+        });
+    }
+});
+</script>
+
   <!-- Absen -->
 <script>
 $(document).ready(function () {

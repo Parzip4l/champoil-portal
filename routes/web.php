@@ -27,6 +27,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
+    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
     Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
 

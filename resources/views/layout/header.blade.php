@@ -170,6 +170,38 @@
   </nav>
 </div>
 
+<!-- Mobile Menu -->
+<div class="row">
+    <div class="container">
+        <div class="menu-mobile-wrap d-flex justify-content-between">
+            <a href="{{url('dashboard')}}" class="text-white nav-link {{ active_class(['dashboard']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="home"></i>
+                    <p>Home</p>
+                </div>
+            </a>
+            <a href="{{route('attendence-request.create')}}" class="text-white nav-link {{ active_class(['request']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="plus-circle"></i>
+                    <p>Request</p>
+                </div>
+            </a>
+            <a href="{{ route('mySlip')}}" class="text-white nav-link {{ active_class(['myslip', 'payslip']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="file-text"></i>
+                    <p>My Slip</p>
+                </div>
+            </a>
+            <a href="#" class="text-white nav-link {{ active_class(['profile']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="user"></i>
+                    <p>Profile</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
 <script>
 function submitForm() {
   document.getElementById("logout_admin").submit();

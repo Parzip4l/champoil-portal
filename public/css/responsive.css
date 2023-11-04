@@ -1,0 +1,37 @@
+@media(max-width:675px){
+    .mobile {
+        display: block;
+    }
+    .desktop {
+        display: none;
+    }
+    footer.footer.border-top {
+        display: none;
+    }
+
+    .horizontal-menu .navbar .navbar-content .navbar-nav, button.navbar-toggler.navbar-toggler-right.d-lg-none.align-self-center {
+        display : none;
+    }
+
+    .horizontal-menu {
+        display : none;
+    }
+
+    .page-wrapper {
+        margin-top : 0;
+    }
+}
+
+@media (min-width: 676px){
+    .desktop {
+        display: block;
+    }
+
+    .mobile {
+        display: none;
+    }
+
+    .menu-mobile-wrap {
+        display : none!important;
+    }
+}

@@ -158,7 +158,7 @@
 <!-- Menu -->
 <div class="row mb-3">
     <h5 class="mb-3">My Menu</h5>
-    <div class="menu-absen-wrap desktop">
+    <div class="menu-absen-wrap">
         <div class="owl-carousel owl-theme owl-basic">
             <div class="item">
                 <a href="{{route('mylogs')}}">
@@ -252,38 +252,6 @@
     </div>
 </div>
 <!-- End Task -->
-
-<!-- Mobile Menu -->
-<div class="row">
-    <div class="container">
-        <div class="menu-mobile-wrap d-flex justify-content-between">
-            <a href="" class="text-white nav-link {{ active_class(['dashboard']) }}">
-                <div class="menu-item-nav text-center">
-                    <i class="icon-lg" data-feather="home"></i>
-                    <p>Home</p>
-                </div>
-            </a>
-            <a href="{{route('attendence-request.create')}}" class="text-white nav-link {{ active_class(['request']) }}">
-                <div class="menu-item-nav text-center">
-                    <i class="icon-lg" data-feather="plus-circle"></i>
-                    <p>Request</p>
-                </div>
-            </a>
-            <a href="{{ route('mySlip')}}" class="text-white nav-link {{ active_class(['myslip']) }}">
-                <div class="menu-item-nav text-center">
-                    <i class="icon-lg" data-feather="file-text"></i>
-                    <p>My Slip</p>
-                </div>
-            </a>
-            <a href="#" class="text-white nav-link {{ active_class(['profile']) }}">
-                <div class="menu-item-nav text-center">
-                    <i class="icon-lg" data-feather="user"></i>
-                    <p>Profile</p>
-                </div>
-            </a>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('plugin-scripts')
@@ -359,127 +327,4 @@ $(document).ready(function () {
     document.getElementById("btn-absen").submit();
     }
 </script>
-<style>
-    .owl-theme .owl-nav.disabled+.owl-dots{
-        display : none;
-    }
-    .card.custom-card {
-        background: #424874;
-        border-radius:15px;
-    }
-
-    .card.custom-card2 {
-        border-radius:15px;
-    }
-
-    .employee-title-job p {
-        color : #eee;
-    }
-
-    .gambar {
-        height:55px;
-        width:55px;
-        float: right;
-    }
-
-    .gambar img {
-        object-fit:cover;
-        border-radius : 10px;
-    }
-
-    .menu-item {
-        background: #7286D3;
-        padding: 15px;
-        border-radius: 12px;
-    }
-
-    .menu-title h5 {
-        font-weight : 400;
-    }
-
-    .bg-custom-biru {
-        background: #424874!important;
-    }
-
-    .menu-mobile-wrap {
-        background: #A6B1E1;
-        border-radius: 15px;
-        padding: 15px 20px;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: 0 10px;
-        z-index: 1020;
-    }
-
-    .menu-item-nav p {
-        font-size : 13px;
-        font-weight : 500;
-        margin-top : 3px;
-        letter-spacing : 0.3px;
-        text-transform: uppercase;
-    }
-
-    .menu-item-nav svg.icon-lg {
-        height : 23px;
-        width : 23px;
-    }
-
-    a.text-white.nav-link.active {
-        color : #424874!important;
-    }
-
-    .icon.text-center {
-        background: #A6B1E1;
-        border-radius: 100%;
-        height: 50px;
-        width: 50px;
-        display: flex;
-        margin: auto;
-    }
-
-    .icon.text-center svg.icon-lg {
-        height: 20px;
-        width: 20px;
-        align-self: center;
-        text-align: center;
-        margin: auto;
-    }
-
-    .menu-name.text-center {
-        margin-top: 10px;
-        line-height: 15px;
-        font-size: 12px;
-    }
-
-    .color-custom {
-        color : #545C95;
-    }
-
-    @media (min-width : 676px) {
-        .menu-mobile-wrap {
-            display : none!important;
-        }
-    }
-
-    @media (max-width:675px)
-    {
-        footer.footer.border-top {
-            display: none;
-        }
-
-        .horizontal-menu .navbar .navbar-content .navbar-nav, button.navbar-toggler.navbar-toggler-right.d-lg-none.align-self-center {
-            display : none;
-        }
-
-        .horizontal-menu {
-            display : none;
-        }
-
-        .page-wrapper {
-            margin-top : 0;
-        }
-    }
-</style>
 @endpush

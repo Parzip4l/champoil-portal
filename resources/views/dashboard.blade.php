@@ -163,7 +163,7 @@
             <div class="item">
                 <a href="{{route('mylogs')}}">
                     <div class="icon text-center">
-                        <i class="icon-lg color-custom" data-feather="git-branch"></i>
+                        <i class="icon-lg text-white" data-feather="git-branch"></i>
                     </div>
                     <div class="menu-name text-center">
                         <p class="text-muted">Attendence Log</p>
@@ -173,7 +173,7 @@
             <div class="item">
                 <a href="{{route('attendence-request.create')}}">
                     <div class="icon text-center">
-                        <i class="icon-lg color-custom" data-feather="user-plus"></i>
+                        <i class="icon-lg text-white" data-feather="user-plus"></i>
                     </div>
                     <div class="menu-name text-center">
                         <p class="text-muted">Request</p>
@@ -183,7 +183,7 @@
             <div class="item">
                 <a href="{{ route('mySlip')}} ">
                     <div class="icon text-center">
-                        <i class="icon-lg color-custom" data-feather="file-text"></i>
+                        <i class="icon-lg text-white" data-feather="file-text"></i>
                     </div>
                     <div class="menu-name text-center">
                         <p class="text-muted">My Payslip</p>
@@ -193,7 +193,7 @@
             <div class="item">
                 <a href="{{route('attendence.backup')}}">
                     <div class="icon text-center">
-                        <i class="icon-lg color-custom" data-feather="clock"></i>
+                        <i class="icon-lg text-white" data-feather="clock"></i>
                     </div>
                     <div class="menu-name text-center">
                         <p class="text-muted">Backup</p>
@@ -203,7 +203,7 @@
             <div class="item">
                 <a href="{{ route('list-class') }}">
                     <div class="icon text-center">
-                        <i class="icon-lg color-custom" data-feather="book"></i>
+                        <i class="icon-lg text-white" data-feather="book"></i>
                     </div>
                     <div class="menu-name text-center">
                         <p class="text-muted">Class Room</p>
@@ -213,7 +213,7 @@
             <div class="item">
                 <a href="javascript:void(0)">
                     <div class="icon text-center">
-                        <i class="icon-lg color-custom" data-feather="book"></i>
+                        <i class="icon-lg text-white" data-feather="book"></i>
                     </div>
                     <div class="menu-name text-center">
                         <p class="text-muted">E-Workplan</p>

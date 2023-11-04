@@ -156,73 +156,131 @@
 </div>
 
 <!-- Menu -->
-<div class="row">
-    <div class="col-md-12 mt-2">
+<div class="row mb-3">
+    <h5 class="mb-3">My Menu</h5>
+    <div class="menu-absen-wrap desktop">
+        <div class="owl-carousel owl-theme owl-basic">
+            <div class="item">
+                <a href="{{route('mylogs')}}">
+                    <div class="icon text-center">
+                        <i class="icon-lg color-custom" data-feather="git-branch"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Attendence Log</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
+                <a href="{{route('attendence-request.create')}}">
+                    <div class="icon text-center">
+                        <i class="icon-lg color-custom" data-feather="user-plus"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Request</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
+                <a href="{{ route('mySlip')}} ">
+                    <div class="icon text-center">
+                        <i class="icon-lg color-custom" data-feather="file-text"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">My Payslip</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
+                <a href="{{route('attendence.backup')}}">
+                    <div class="icon text-center">
+                        <i class="icon-lg color-custom" data-feather="clock"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Backup</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
+                <a href="{{ route('list-class') }}">
+                    <div class="icon text-center">
+                        <i class="icon-lg color-custom" data-feather="book"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Class Room</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
+                <a href="javascript:void(0)">
+                    <div class="icon text-center">
+                        <i class="icon-lg color-custom" data-feather="book"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">E-Workplan</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Menu -->
+
+<!-- Announcement -->
+<div class="row mb-3">
+    <h5 class="mb-2">Announcement</h5>
+    <div class="col-md-12">
         <div class="card custom-card2">
             <div class="card-body">
-                <div class="menu-wrap">
-                    <div class="menu-item mb-3">
-                        <a href="{{route('mylogs')}}" class="d-flex text-white">
-                            <div class="icon">
-                                <i class="me-2 icon-lg" data-feather="clock"></i>
-                            </div>
-                            <div class="menu-title align-self-center">
-                                <h5>Attendece Log</h5>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="menu-item mb-3">
-                        <a href="{{route('attendence-request.create')}}" class="d-flex text-white">
-                            <div class="icon">
-                                <i class="me-2 icon-lg" data-feather="user-plus"></i>
-                            </div>
-                            <div class="menu-title align-self-center">
-                                <h5>Request Attendence</h5>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="menu-item mb-3">
-                        <a href="{{ route('mySlip')}}" class="d-flex text-white">
-                            <div class="icon">
-                                <i class="me-2 icon-lg" data-feather="file-text"></i>
-                            </div>
-                            <div class="menu-title align-self-center">
-                                <h5>My Payslip</h5>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="menu-item mb-3">
-                        <a href="{{route('attendence.backup')}}" class="d-flex text-white">
-                            <div class="icon">
-                                <i class="me-2 icon-lg" data-feather="clock"></i>
-                            </div>
-                            <div class="menu-title align-self-center">
-                                <h5>Backup Attendence</h5>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="menu-item mb-3">
-                        <a href="{{ route('list-class') }}" class="d-flex text-white">
-                            <div class="icon">
-                                <i class="me-2 icon-lg" data-feather="book"></i>
-                            </div>
-                            <div class="menu-title align-self-center">
-                                <h5>Class Room</h5>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="menu-item mb-3">
-                        <a href="" class="d-flex text-white">
-                            <div class="icon">
-                                <i class="me-2 icon-lg" data-feather="book-open"></i>
-                            </div>
-                            <div class="menu-title align-self-center">
-                                <h5>E-Workplan</h5>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <h5 class="text-center mb-2">No announcement</h5>
+                <p class="text-center text-muted">Your Announcement Will Show Here</p>
             </div>
+        </div>
+    </div>
+</div>
+<!-- End Announcement -->
+
+<!-- Task -->
+<div class="row mb-3">
+    <h5 class="mb-2">Task</h5>
+    <div class="col-md-12">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <h5 class="text-center mb-2">No Task</h5>
+                <p class="text-center text-muted">Your Task Will Show Here</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Task -->
+
+<!-- Mobile Menu -->
+<div class="row">
+    <div class="container">
+        <div class="menu-mobile-wrap d-flex justify-content-between">
+            <a href="" class="text-white nav-link {{ active_class(['dashboard']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="home"></i>
+                    <p>Home</p>
+                </div>
+            </a>
+            <a href="{{route('attendence-request.create')}}" class="text-white nav-link {{ active_class(['request']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="plus-circle"></i>
+                    <p>Request</p>
+                </div>
+            </a>
+            <a href="{{ route('mySlip')}}" class="text-white nav-link {{ active_class(['myslip']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="file-text"></i>
+                    <p>My Slip</p>
+                </div>
+            </a>
+            <a href="#" class="text-white nav-link {{ active_class(['profile']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="user"></i>
+                    <p>Profile</p>
+                </div>
+            </a>
         </div>
     </div>
 </div>
@@ -306,7 +364,7 @@ $(document).ready(function () {
         display : none;
     }
     .card.custom-card {
-        background: #7286D3;
+        background: #424874;
         border-radius:15px;
     }
 
@@ -340,7 +398,88 @@ $(document).ready(function () {
     }
 
     .bg-custom-biru {
-        background: #7286D3!important;
+        background: #424874!important;
+    }
+
+    .menu-mobile-wrap {
+        background: #A6B1E1;
+        border-radius: 15px;
+        padding: 15px 20px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0 10px;
+        z-index: 1020;
+    }
+
+    .menu-item-nav p {
+        font-size : 13px;
+        font-weight : 500;
+        margin-top : 3px;
+        letter-spacing : 0.3px;
+        text-transform: uppercase;
+    }
+
+    .menu-item-nav svg.icon-lg {
+        height : 23px;
+        width : 23px;
+    }
+
+    a.text-white.nav-link.active {
+        color : #424874!important;
+    }
+
+    .icon.text-center {
+        background: #A6B1E1;
+        border-radius: 100%;
+        height: 50px;
+        width: 50px;
+        display: flex;
+        margin: auto;
+    }
+
+    .icon.text-center svg.icon-lg {
+        height: 20px;
+        width: 20px;
+        align-self: center;
+        text-align: center;
+        margin: auto;
+    }
+
+    .menu-name.text-center {
+        margin-top: 10px;
+        line-height: 15px;
+        font-size: 12px;
+    }
+
+    .color-custom {
+        color : #545C95;
+    }
+
+    @media (min-width : 676px) {
+        .menu-mobile-wrap {
+            display : none!important;
+        }
+    }
+
+    @media (max-width:675px)
+    {
+        footer.footer.border-top {
+            display: none;
+        }
+
+        .horizontal-menu .navbar .navbar-content .navbar-nav, button.navbar-toggler.navbar-toggler-right.d-lg-none.align-self-center {
+            display : none;
+        }
+
+        .horizontal-menu {
+            display : none;
+        }
+
+        .page-wrapper {
+            margin-top : 0;
+        }
     }
 </style>
 @endpush

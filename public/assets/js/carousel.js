@@ -35,7 +35,7 @@ $(function() {
       autoplayHoverPause:true,
       responsive:{
         0:{
-            items:2
+            items:3.5
         },
         600:{
             items:3
@@ -79,7 +79,7 @@ $(function() {
         margin:10,
         responsive:{
             0:{
-                items:2
+                items:3.5
             },
             600:{
                 items:3

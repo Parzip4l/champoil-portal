@@ -308,7 +308,7 @@ $(function() {
 });
 </script>
 
-  <!-- Absen -->
+<!-- Absen -->
 <script>
 $(document).ready(function () {
     // Mengambil data lokasi pengguna saat tombol absen ditekan
@@ -321,6 +321,11 @@ $(document).ready(function () {
 
                 // Mengirim form absen
                 $('#form-absen').submit();
+            }, function(error) {
+                if (error.code === error.PERMISSION_DENIED) {
+                    // Pengguna menolak izin lokasi
+                    alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+                }
             });
         } else {
             alert('Geolocation tidak didukung oleh browser Anda');
@@ -340,6 +345,11 @@ $(document).ready(function () {
 
                     // Mengirim form absen
                     $('#form-absen2').submit();
+                }, function(error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        // Pengguna menolak izin lokasi
+                        alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+                    }
                 });
             } else {
                 alert('Geolocation tidak didukung oleh browser Anda');

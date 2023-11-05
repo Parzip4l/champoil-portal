@@ -77,7 +77,7 @@ class UserController extends Controller
     public function changePassword(Request $request, $id)
     {
         try {
-            $user = User::findOrFail($id);
+            $user = User::where('employee_code', $id)->firstOrFail();
             $user->update([
                 'password' => bcrypt($request->input('password')),
             ]);

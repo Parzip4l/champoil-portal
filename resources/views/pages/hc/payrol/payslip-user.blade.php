@@ -8,6 +8,16 @@
 
 @section('content')
 <!-- topbar -->
+<div class="row mb-4 mobile">
+    <div class="topbar-wrap d-flex justify-content-between">
+        <div class="arrow-back">
+            <a href="{{url('dashboard')}}" class="d-flex color-custom">
+                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
+                <h5 class="align-self-center">My Slip</h5>
+            </a>
+        </div>
+    </div>
+</div>
 @php 
     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
 @endphp

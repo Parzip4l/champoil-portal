@@ -77,6 +77,10 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/knowledge.save_test_user', [App\Http\Controllers\knowledge\KnowledgeController::class, 'submit_user'])->name('knowledge.save_test_user');
     Route::get('/list-class', [App\Http\Controllers\knowledge\KnowledgeController::class, 'list_classroom'])->name('list-class');
     Route::get('/start_class/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
+
+    // User Profile
+    Route::get('/MyProfile/{nik}', [App\Http\Controllers\employee\EmployeeController::class, 'MyProfile'])->name('MyProfile');
+    Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
 });
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
@@ -94,7 +98,6 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
-    Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
     Route::put('/manual-delivery/{id}/update-kiriman', 'ManualDeliveryController@UpdateSeluruhData')->name('manual-delivery.UpdateData');

@@ -79,7 +79,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/start_class/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
 
     // User Profile
-    Route::get('/MyProfile/{nik}', [App\Http\Controllers\employee\EmployeeController::class, 'MyProfile'])->name('MyProfile');
+    Route::get('/MyProfile/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'MyProfile'])->name('MyProfile');
     Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
 });
 

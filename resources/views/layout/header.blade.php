@@ -44,7 +44,7 @@
                 </div>
                 <ul class="list-unstyled p-1">
                     <li class="dropdown-item py-2">
-                    <a href="#" class="text-body ms-0">
+                    <a href="{{ route('MyProfile', ['nik' => Auth::user()->name])}}" class="text-body ms-0">
                         <i class="me-2 icon-md" data-feather="user"></i>
                         <span>Profile</span>
                     </a>
@@ -174,25 +174,25 @@
 <div class="row">
     <div class="container">
         <div class="menu-mobile-wrap d-flex justify-content-between">
-            <a href="{{url('dashboard')}}" class="text-white nav-link {{ active_class(['dashboard']) }}">
+            <a href="{{url('dashboard')}}" class="text-muted nav-link {{ active_class(['dashboard']) }}">
                 <div class="menu-item-nav text-center">
                     <i class="icon-lg" data-feather="home"></i>
                     <p>Home</p>
                 </div>
             </a>
-            <a href="{{route('attendence-request.create')}}" class="text-white nav-link {{ active_class(['request']) }}">
+            <a href="{{route('attendence-request.create')}}" class="text-muted nav-link {{ active_class(['attendence*']) }}">
                 <div class="menu-item-nav text-center">
                     <i class="icon-lg" data-feather="plus-circle"></i>
                     <p>Request</p>
                 </div>
             </a>
-            <a href="{{ route('mySlip')}}" class="text-white nav-link {{ active_class(['myslip', 'payslip']) }}">
+            <a href="{{ route('mySlip')}}" class="text-muted nav-link {{ active_class(['payslip*','myslip']) }}">
                 <div class="menu-item-nav text-center">
                     <i class="icon-lg" data-feather="file-text"></i>
                     <p>My Slip</p>
                 </div>
             </a>
-            <a href="#" class="text-white nav-link {{ active_class(['profile']) }}">
+            <a href="{{ route('MyProfile', ['nik' => Auth::user()->name])}}" class="text-muted nav-link {{ active_class(['MyProfile*']) }}">
                 <div class="menu-item-nav text-center">
                     <i class="icon-lg" data-feather="user"></i>
                     <p>Profile</p>

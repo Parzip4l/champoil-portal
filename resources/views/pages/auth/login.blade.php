@@ -49,7 +49,6 @@
 @endsection
 
 @push('custom-scripts')
-
 <script>
   const authCheck = document.getElementById('authCheck');
   const passwordInput = document.getElementById('passwordInput');

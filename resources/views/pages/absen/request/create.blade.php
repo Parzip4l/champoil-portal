@@ -7,6 +7,18 @@
 @endpush
 
 @section('content')
+<!-- TopBar -->
+<div class="row mb-4 mobile">
+    <div class="topbar-wrap d-flex justify-content-between">
+        <div class="arrow-back">
+            <a href="{{url('dashboard')}}" class="d-flex color-custom">
+                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
+                <h5 class="align-self-center">Attendence Request</h5>
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="absen-wrap mb-4">
     <div class="row">
         <div class="col-md-12 mb-3">

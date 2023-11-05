@@ -322,4 +322,70 @@ class EmployeeController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function MyProfile($nik)
+    {
+        $employee = Employee::where('nik',$nik)->first();
+        $nikdata = $employee->nik;
+
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+        // Hitung jumlah hari kerja tanpa absensi (termasuk akhir pekan)
+        $totalWorkingDays = $startDate->diffInWeekdays($endDate) + 1;
+
+        // Fetch attendance data for the current month
+        $attendanceData = DB::table('absens')
+            ->where('nik', $nikdata)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
+        // Hitung jumlah hari dengan absensi
+        $daysWithAttendance = count($attendanceData);
+
+        // Hitung jumlah hari tanpa absensi
+        $daysWithoutAttendance = $totalWorkingDays - $daysWithAttendance;
+
+        // No ClockOut
+        $daysWithClockInNoClockOut = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if (!empty($absendata->clock_in) && empty($absendata->clock_out)) {
+                $daysWithClockInNoClockOut++;
+            }
+        }
+
+        // Sakit
+        $sakit = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if ($absendata->status == 'Sakit') {
+                $sakit++;
+            }
+        }
+
+        $izin = 0;
+        $leaveTotal = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if ($absendata->status == 'Izin') {
+                $izin++;
+            }
+        }
+
+        // Request Absen
+        $requestAbsen = RequestAbsen::where('employee',$nikdata)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->get();
+        
+        //count Request
+        $CountRequest = RequestAbsen::where('employee',$nikdata)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->count(); 
+        
+        $leaveTotal = $sakit + $izin;
+        return view('pages.user-pages.profile', compact('employee','attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin','leaveTotal'));
+    }
 }

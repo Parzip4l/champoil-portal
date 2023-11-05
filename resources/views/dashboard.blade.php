@@ -104,7 +104,7 @@
                                         <input type="hidden" name="latitude" id="latitude">
                                         <input type="hidden" name="longitude" id="longitude">
                                         <input type="hidden" name="status" value="H">
-                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 bg-custom-biru" id="btn-absen" onClick="formAbsen()" style="border-radius:10px">
+                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 bg-custom-biru" id="btn-absen" onClick="formAbsen()" style="border-radius:10px; border-color: #424874;">
                                         CLOCK IN</a>
                                 </form>
                                 @endif
@@ -240,7 +240,7 @@
 <!-- End Announcement -->
 
 <!-- Task -->
-<div class="row mb-3">
+<div class="row mb-6">
     <h5 class="mb-2">Task</h5>
     <div class="col-md-12">
         <div class="card custom-card2">

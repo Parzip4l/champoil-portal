@@ -261,7 +261,7 @@
                             <img src="{{ asset('images/' . $dataAbsen->gambar) }}" alt="" class="w-100">
                         </div>
                         <div class="nama-karyawan align-self-center">
-                            <a href="#" class="color-custom" data-bs-toggle="modal" data-bs-target=".Request{{$dataAbsen->id}}">
+                            <a href="#" class="color-custom" data-bs-toggle="modal" data-bs-target=".Request{{$dataAbsen->unik_code}}">
                                 <h6>{{$dataAbsen->nama}}</h6>
                             </a>
                             <span class="text-muted">{{$dataAbsen->status}}</span>
@@ -274,7 +274,7 @@
     </div>
 </div>
 @foreach($dataRequest as $dataAbsen)
-<div class="modal fade bd-example-modal-lg Request{{$dataAbsen->id}}" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="#PersonalInfo">
+<div class="modal fade bd-example-modal-lg Request{{$dataAbsen->unik_code}}" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="#PersonalInfo">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-center">
@@ -298,24 +298,24 @@
                     <p>Date</p>
                     <h5>{{ $dataAbsen->tanggal }}</h5>
                 </div>
-                <a href="{{route('dokumen.download', $dataAbsen->id)}}" class="btn btn-primary mb-2 w-100 bg-custom-biru" style="border : none;">Download Attachment</a>
+                <a href="{{route('dokumen.download', ['id' => $dataAbsen->unik_code])}}" class="btn btn-primary mb-2 w-100 bg-custom-biru" style="border : none;">Download Attachment</a>
                 @if ($dataAbsen->aprrove_status !=="Approved")
-                <a class="btn btn-sm btn-success w-100 mb-2" href="{{ route('approve.request', $dataAbsen->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $dataAbsen->id }}').submit();">
+                <a class="btn btn-sm btn-success w-100 mb-2" href="{{ route('approve.request', $dataAbsen->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $dataAbsen->unik_code }}').submit();">
                     <span class="">Approve</span>
                 </a>
                 @endif
 
                 @if ($dataAbsen->aprrove_status !=="Reject")
-                <a class="btn btn-sm btn-danger w-100" href="{{ route('reject.request', $dataAbsen->id)}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $dataAbsen->id }}').submit();">
+                <a class="btn btn-sm btn-danger w-100" href="{{ route('reject.request', ['id' => $dataAbsen->unik_code])}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $dataAbsen->unik_code }}').submit();">
                     <span class="">Reject</span>
                 </a>
                 @endif
                 <!-- Form Approved -->
-                <form id="setujui-usulan-form-{{ $dataAbsen->id }}" action="{{ route('approve.request', $dataAbsen->id) }}" method="POST" style="display: none;">
+                <form id="setujui-usulan-form-{{ $dataAbsen->unik_code }}" action="{{ route('approve.request', ['id' => $dataAbsen->unik_code]) }}" method="POST" style="display: none;">
                     @csrf
                 </form>
                 <!-- Form Reject -->
-                <form id="reject-usulan-form-{{ $dataAbsen->id }}" action="{{ route('reject.request', $dataAbsen->id) }}" method="POST" style="display: none;">
+                <form id="reject-usulan-form-{{ $dataAbsen->unik_code }}" action="{{ route('reject.request', ['id' => $dataAbsen->unik_code]) }}" method="POST" style="display: none;">
                     @csrf
                 </form>
             </div>

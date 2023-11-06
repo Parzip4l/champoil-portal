@@ -33,7 +33,7 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
 
-        $requestabsen = RequestAbsen::findOrFail($id);
+        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
         if ($requestabsen->aprrove_status !== 'Approved') {
             $requestabsen->aprrove_status = 'Approved';
             $requestabsen->aprroved_by = $EmployeeCode;
@@ -59,7 +59,7 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
 
-        $requestabsen = RequestAbsen::findOrFail($id);
+        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
         if ($requestabsen->aprrove_status !== 'Reject') {
             $requestabsen->aprrove_status = 'Reject';
             $requestabsen->aprroved_by = $EmployeeCode;
@@ -71,7 +71,7 @@ class RequestControllers extends Controller
 
     public function download($id)
     {
-        $requestabsen = RequestAbsen::findOrFail($id);
+        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
 
         $file_path = storage_path('app/' .$requestabsen->dokumen);
 
@@ -87,7 +87,6 @@ class RequestControllers extends Controller
     {
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
-
         $historyData = RequestAbsen::where('employee', $EmployeeCode)->get();
 
         return view('pages.absen.request.create', compact('EmployeeCode','historyData'));
@@ -104,7 +103,9 @@ class RequestControllers extends Controller
         $request->validate([
             'tanggal' => 'required'
         ]);
+        $randomNumber = mt_rand(100000, 999999);
         $pengajuan = new RequestAbsen();
+        $pengajuan->unik_code = $randomNumber;
         $pengajuan->tanggal = $request->input('tanggal');
         $pengajuan->employee = $request->input('employee');
         $pengajuan->status = $request->input('status');
@@ -115,7 +116,7 @@ class RequestControllers extends Controller
 
             // Check if the uploaded file is a PDF
             if ($file->getClientOriginalExtension() !== 'pdf') {
-                throw ValidationException::withMessages(['dokumen' => 'Hanya file PDF yang diizinkan.']);
+                return redirect()->back()->with('error', 'Hanya file PDF yang diizinkan.');
             }
 
             $path = $file->store('public/files');

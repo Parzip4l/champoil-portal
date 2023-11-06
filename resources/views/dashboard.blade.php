@@ -488,7 +488,14 @@
         </div>
     </div>
 </div>
+
 <!-- End Feedback -->
+<div class="row">
+    <div class="download-apk">
+        
+    </div>
+</div>
+
 @endsection
 
 @push('plugin-scripts')

@@ -103,6 +103,16 @@
     <div class="col-md-12">
         <div class="menu-profile-wrap">
             <div class="menu-item-profile">
+                <a href="https://drive.google.com/uc?export=download&id=1rOAvxBV8syw5Ps5KLizuiRNUWPBvKi_f" class="d-flex justify-content-between menu-profile mb-3" id="clear-cache-link">
+                    <div class="d-flex">
+                        <div class="icon-profile-menu p-3 me-3" style="background: #D2E0FB;">
+                            <i class="icon-lg text-white" data-feather="download-cloud"></i>
+                        </div>
+                        <h5 class="align-self-center color-custom">Download Apps</h5>
+                    </div>
+                    <div class="icon-right align-self-center">
+                    </div>
+                </a>
                 <a href="#" class="d-flex justify-content-between menu-profile mb-3" data-bs-toggle="modal" data-bs-target=".PersonalInfo">
                     <div class="d-flex">
                         <div class="icon-profile-menu bg-custom-biru p-3 me-3">

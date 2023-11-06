@@ -25,7 +25,6 @@ class RequestControllers extends Controller
     public function index()
     {
         $dataRequest = RequestAbsen::all();
-
         return view('pages.absen.request.index', compact('dataRequest'));
     }
 
@@ -52,7 +51,7 @@ class RequestControllers extends Controller
             $absen->save();
         }
 
-        return redirect()->route('attendence-request.index')->with('success', 'Data Pengajuan Berhasil Diupdate.');
+        return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
     }
 
     public function updateStatusReject($id)
@@ -67,7 +66,7 @@ class RequestControllers extends Controller
             $requestabsen->save();
         }
 
-        return redirect()->route('attendence-request.index')->with('success', 'Data Pengajuan Berhasil Diupdate.');
+        return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
     }
 
     public function download($id)

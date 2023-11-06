@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Absen;
 use App\Employee;
 use App\Feedback;
+use App\Absen\RequestAbsen;
 use App\ModelCG\asign_test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,17 @@ class DashboardController extends Controller
 {
     public function index()
     {   
+        // Request Approval
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $dataRequest = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
+            ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+            ->where('aprrove_status', 'Pending')
+            ->select('requests_attendence.*', 'karyawan.*')
+            ->get();
+
+
         // Get Years & Month Now
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
@@ -172,7 +184,7 @@ class DashboardController extends Controller
 
         
         return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test'
+            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest'
         ));
     }
 

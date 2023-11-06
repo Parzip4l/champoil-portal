@@ -11,6 +11,8 @@ use App\ModelCG\Jabatan;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
@@ -21,7 +23,9 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $karyawan = Employee::all();
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
         return view('pages.hc.karyawan.index', compact('karyawan'));
     }
 

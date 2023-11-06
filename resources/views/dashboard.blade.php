@@ -12,6 +12,7 @@
 @php 
     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
     $feedback = \App\Feedback::where('name', Auth::user()->name)->first();
+    $dataLogin = json_decode(Auth::user()->permission);
 @endphp
 <div class="absen-wrap mb-2">
     <div class="row">
@@ -245,6 +246,85 @@
     </div>
 </div>
 <!-- End Announcement -->
+
+@if(in_array('hr_access', $dataLogin))
+<!-- Request -->
+<div class="row mb-3">
+    <h5 class="mb-2">Need My Approval</h5>
+    <div class="col-md-12">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="item-request">
+                    @foreach($dataRequest as $dataAbsen)
+                    <div class="wrapper-pengajuan d-flex mb-4">
+                        <div class="foto-profile me-2">
+                            <img src="{{ asset('images/' . $dataAbsen->gambar) }}" alt="" class="w-100">
+                        </div>
+                        <div class="nama-karyawan align-self-center">
+                            <a href="#" class="color-custom" data-bs-toggle="modal" data-bs-target=".Request{{$dataAbsen->id}}">
+                                <h6>{{$dataAbsen->nama}}</h6>
+                            </a>
+                            <span class="text-muted">{{$dataAbsen->status}}</span>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@foreach($dataRequest as $dataAbsen)
+<div class="modal fade bd-example-modal-lg Request{{$dataAbsen->id}}" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="#PersonalInfo">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="text-center">Attendence Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-custom mb-2">
+                    <p>Full Name</p>
+                    <h5>{{ $dataAbsen->nama }}</h5>
+                </div>
+                <div class="input-custom mb-2">
+                    <p>Type</p>
+                    <h5>{{ $dataAbsen->status }}</h5>
+                </div>
+                <div class="input-custom mb-2">
+                    <p>Reason</p>
+                    <h5>{{ $dataAbsen->alasan }}</h5>
+                </div>
+                <div class="input-custom mb-4">
+                    <p>Date</p>
+                    <h5>{{ $dataAbsen->tanggal }}</h5>
+                </div>
+                <a href="{{route('dokumen.download', $dataAbsen->id)}}" class="btn btn-primary mb-2 w-100 bg-custom-biru" style="border : none;">Download Attachment</a>
+                @if ($dataAbsen->aprrove_status !=="Approved")
+                <a class="btn btn-sm btn-success w-100 mb-2" href="{{ route('approve.request', $dataAbsen->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $dataAbsen->id }}').submit();">
+                    <span class="">Approve</span>
+                </a>
+                @endif
+
+                @if ($dataAbsen->aprrove_status !=="Reject")
+                <a class="btn btn-sm btn-danger w-100" href="{{ route('reject.request', $dataAbsen->id)}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $dataAbsen->id }}').submit();">
+                    <span class="">Reject</span>
+                </a>
+                @endif
+                <!-- Form Approved -->
+                <form id="setujui-usulan-form-{{ $dataAbsen->id }}" action="{{ route('approve.request', $dataAbsen->id) }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+                <!-- Form Reject -->
+                <form id="reject-usulan-form-{{ $dataAbsen->id }}" action="{{ route('reject.request', $dataAbsen->id) }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+@endif
+<!-- End -->
 
 <!-- Task -->
 <div class="row mb-6">

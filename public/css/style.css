@@ -430,6 +430,16 @@ input.rating {
     border-color: #424874!important;
 }
 
+.wrapper-pengajuan .foto-profile {
+    height: 50px;
+    width: 54px;
+}
+
+.wrapper-pengajuan .foto-profile img {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 @keyframes shake {
     30% {
         transform: perspective(240px) rotateX(var(--step-1-rx, 0deg)) rotateY(var(--step-1-ry, 0deg)) rotateZ(var(--step-1-rz, 0deg)) translateZ(10px);

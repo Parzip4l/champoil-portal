@@ -440,6 +440,10 @@ input.rating {
     object-fit: cover;
 }
 
+.wrapper-pengajuan.d-flex.mb-4:last-child{
+    margin-bottom: 0!important;
+}
+
 @keyframes shake {
     30% {
         transform: perspective(240px) rotateX(var(--step-1-rx, 0deg)) rotateY(var(--step-1-ry, 0deg)) rotateZ(var(--step-1-rz, 0deg)) translateZ(10px);

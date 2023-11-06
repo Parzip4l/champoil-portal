@@ -52,7 +52,7 @@
                         $employee = \App\Employee::where('nik', $previousName)->first();
                     @endphp
                     <tr>
-                        <td>{{ $employee->nama }}</td>
+                        <td>{{ $k->name }}</td>
                         @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
                             <td>
                                 @php

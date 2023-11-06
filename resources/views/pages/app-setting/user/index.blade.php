@@ -175,7 +175,7 @@
     <div class="modal-content p-4">
         <h4 class="pb-2">Ganti Password Pemilik Akun Dengan Username {{$d->name}}</h4>
         <hr>
-        <form class="forms-sample" action="{{ route('pass.update', $d->nik) }}" method="POST">
+        <form class="forms-sample" action="{{ route('pass.update', $d->id) }}" method="POST">
         @csrf
         @method('PUT')
             <div class="row">

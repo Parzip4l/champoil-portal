@@ -11,6 +11,7 @@
 @section('content')
 @php 
     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+    $feedback = \App\Feedback::where('name', Auth::user()->name)->first();
 @endphp
 <div class="absen-wrap mb-2">
     <div class="row">
@@ -258,6 +259,156 @@
     </div>
 </div>
 <!-- End Task -->
+
+<!-- Feedback Form -->
+<div class="feedback-button-wrap">
+    <a href="#" data-bs-toggle="modal" data-bs-target=".Feedback">
+        <div class="icon-feedback d-flex">
+            <i class="icon-lg text-white" data-feather="heart"></i>
+            <p class="text-white">Feedback</p>
+        </div>
+    </a>
+</div>
+
+<div class="modal fade bd-example-modal-lg Feedback" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="#PersonalInfo">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="text-center">Feedback & Suggestions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                @if(!$feedback)
+                <form action="{{route('feedback.store')}}" method="POST">
+                    @csrf
+                    <input type="hidden" name="name" value="{{ $employee->nik }}">
+                    <input type="hidden" name="email" value="{{ $employee->email }}">
+                    <div class="rating">
+                    <h6 class="mb-3">How was your experience using TRUEST ?</h6>
+                    <ul class="feedback mb-3">
+                        <li class="angry">
+                            <div>
+                                <label for="rating1">
+                                    <svg class="eye left">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="eye right">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="mouth">
+                                        <use xlink:href="#mouth"></use>
+                                    </svg>
+                                </label>
+                            </div>
+                            <input type="radio" name="rating" value="1" class="rating" id="rating1">
+                        </li>
+                        <li class="sad">
+                            <div>
+                                <label for="rating2">
+                                    <svg class="eye left">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="eye right">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="mouth">
+                                        <use xlink:href="#mouth"></use>
+                                    </svg>
+                                </label>
+                            </div>
+                            <input type="radio" name="rating" value="2" class="rating" id="rating2">
+                        </li>
+                        <li class="ok">
+                            <div>
+                                <label for="rating3"> 
+                                    <svg class="eye left">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                </label> 
+                            </div>
+                            <input type="radio" name="rating" value="3" class="rating" id="rating3">
+                        </li>
+                        <li class="good active">
+                            <div>
+                                <label for="rating4">
+                                    <svg class="eye left">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="eye right">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="mouth">
+                                        <use xlink:href="#mouth"></use>
+                                    </svg>
+                                </label>
+                            </div>
+                            <input type="radio" name="rating" value="4" class="rating" id="rating4">
+                        </li>
+                        <li class="happy">
+                            <div>
+                                <label for="rating5">
+                                    <svg class="eye left">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="eye right">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                </label>
+                            </div>
+                            <input type="radio" name="rating" value="5" class="rating" id="rating5">
+                        </li>
+                    </ul>
+                            
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 4" id="eye">
+                            <path d="M1,1 C1.83333333,2.16666667 2.66666667,2.75 3.5,2.75 C4.33333333,2.75 5.16666667,2.16666667 6,1"></path>
+                        </symbol>
+                        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 7" id="mouth">
+                            <path d="M1,5.5 C3.66666667,2.5 6.33333333,1 9,1 C11.6666667,1 14.3333333,2.5 17,5.5"></path>
+                        </symbol>
+                    </svg>
+
+                    <h6 class="mb-2">Every feedback helps us a lot. What can we improve on ?</h6>
+                    <input type="text" class="form-control mb-3" name="feedback" placeholder="Share your feedback.." required>
+
+                    <button type="submit" class="btn btn-primary w-100">Share Feedback</button>
+                </form>
+                @else
+                <div class="feedback-berhasil">
+                    <ul class="feedback mb-3">
+                        <li class="good active">
+                            <div>
+                                <label for="rating4">
+                                    <svg class="eye left">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="eye right">
+                                        <use xlink:href="#eye"></use>
+                                    </svg>
+                                    <svg class="mouth">
+                                        <use xlink:href="#mouth"></use>
+                                    </svg>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                    <h5 class="text-center mb-1">Thanks For Feedback</h5>
+                    <p class="text-muted text-center">Every feedback helps us a lot.</p>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                    <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 4" id="eye">
+                        <path d="M1,1 C1.83333333,2.16666667 2.66666667,2.75 3.5,2.75 C4.33333333,2.75 5.16666667,2.16666667 6,1"></path>
+                    </symbol>
+                    <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 7" id="mouth">
+                        <path d="M1,5.5 C3.66666667,2.5 6.33333333,1 9,1 C11.6666667,1 14.3333333,2.5 17,5.5"></path>
+                    </symbol>
+                </svg>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Feedback -->
 @endsection
 
 @push('plugin-scripts')
@@ -367,5 +518,27 @@ $(document).ready(function () {
     function formAbsen() {
     document.getElementById("btn-absen").submit();
     }
+</script>
+<script>
+    const feedbackItems = document.querySelectorAll('.feedback li');
+
+    feedbackItems.forEach(item => {
+        const radio = item.querySelector('input[type="radio"]');
+        const svg = item.querySelector('svg');
+
+        item.addEventListener('click', () => {
+
+            feedbackItems.forEach(otherItem => {
+                otherItem.classList.remove('active');
+            });
+
+            if (radio.checked) {
+                item.classList.add('active');
+                svg.classList.add('checked');
+            } else {
+                svg.classList.remove('checked');
+            }
+        });
+    });
 </script>
 @endpush

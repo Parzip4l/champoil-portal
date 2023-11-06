@@ -9,6 +9,7 @@ use App\Invoice;
 use Carbon\Carbon;
 use App\Absen;
 use App\Employee;
+use App\Feedback;
 use App\ModelCG\asign_test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -178,5 +179,22 @@ class DashboardController extends Controller
     public function getSalesData()
     {
         
+    }
+
+    public function StoreFeedback(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required'
+        ]);
+        
+        $coa = new Feedback();
+        $coa->name = $request->input('name');
+        $coa->email = $request->input('email');
+        $coa->rating = $request->input('rating');
+        $coa->feedback = $request->input('feedback');
+        $coa->save();
+
+        return redirect()->back()->with('success', 'Thankyou For Feedback');
     }
 }

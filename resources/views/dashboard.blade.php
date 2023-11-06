@@ -109,7 +109,7 @@
                                 </form>
                                 @endif
                             @else
-                            <h4 class="text-center text-danger">Enjoy Off The Rest Of The Day !</h4>
+                            <h6 class="text-center text-danger">Enjoy Off The Rest Of The Day !</h6>
                         @endif
                     @endif
                         <div class="log-absen-today mt-2">

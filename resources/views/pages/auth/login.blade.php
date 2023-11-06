@@ -10,7 +10,7 @@
           <div class="col-md-12 ps-md-0">
             <div class="auth-form-wrapper px-4 py-5">
               <a href="#" class="noble-ui-logo d-block mb-2 text-center">TRUE<span>ST</span></a>
-              <h5 class="text-muted fw-normal mb-4 text-center">Silahkan Masukan Email dan Password untuk masuk ke dalam portal.</h5>
+              <h5 class="text-muted fw-normal mb-4 text-center">Welcome back to TRUEST HRIS.</h5>
               <form class="forms-sample" action="{{url('login/proses')}}" method="POST">
               @csrf
               @if(Session::has('error'))
@@ -33,7 +33,7 @@
                   </label>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0 w-100 btn-icon-text">
+                  <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0 w-100 btn-icon-text bg-custom-biru"  style="border-radius:10px; border-color: #424874;">
                     <i class="btn-icon-prepend" data-feather="log-in"></i>
                     Login
                   </button>

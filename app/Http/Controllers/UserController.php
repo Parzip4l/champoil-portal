@@ -78,6 +78,17 @@ class UserController extends Controller
     {
         try {
             $user = User::where('employee_code', $id)->firstOrFail();
+    
+            // Validasi bahwa password sebelumnya cocok
+            if (!\Hash::check($request->input('current_password'), $user->password)) {
+                return redirect()->back()->with('error', 'Password sebelumnya tidak cocok.');
+            }
+    
+            // Validasi bahwa password baru cocok dengan konfirmasi
+            if ($request->input('password') !== $request->input('password_confirmation')) {
+                return redirect()->back()->with('error', 'Password baru dan konfirmasi password tidak cocok.');
+            }
+    
             $user->update([
                 'password' => bcrypt($request->input('password')),
             ]);

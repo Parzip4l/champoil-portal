@@ -218,8 +218,18 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-3">
-                                <label for="exampleInputUsername1" class="form-label">Password Baru</label>
-                                <input type="password" class="form-control" id="passwordInput" autocomplete="off" name="password" placeholder="Password" required>
+                                <label for="current_password" class="form-label">Password Sebelumnya</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Password Sebelumnya" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password Baru</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password Baru" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password Baru" required>
+                                <div class="text-danger" id="password-confirmation-error" style="display: none;"></div>
+                                <div class="text-success" id="password-confirmation-success" style="display: none;"></div>
                             </div>
                             <div class="form-check mb-3">
                                 <input type="checkbox" class="form-check-input" id="authCheck">
@@ -229,7 +239,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Change Password</button>    
+                    <button type="submit" class="btn btn-primary w-100 bg-custom-biru" style="border-radius:10px; border-color: #424874;">Change Password</button>    
                 </form>
             </div>
         </div>
@@ -341,15 +351,55 @@
     @endif
 </script>
 <script>
-    const authCheck = document.getElementById('authCheck');
-    const passwordInput = document.getElementById('passwordInput');
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmationInput = document.getElementById('password_confirmation');
+    const passwordError = document.getElementById('password-error');
+    const passwordConfirmationError = document.getElementById('password-confirmation-error');
+    const passwordSuccess = document.getElementById('password-success');
+    const passwordConfirmationSuccess = document.getElementById('password-confirmation-success');
 
-    authCheck.addEventListener('change', function() {
-        if (authCheck.checked) {
-        passwordInput.type = 'text';
+    passwordInput.addEventListener('input', () => {
+        if (passwordInput.value !== passwordConfirmationInput.value) {
+            passwordError.style.display = 'block';
+            passwordError.textContent = 'Password tidak cocok.';
         } else {
-        passwordInput.type = 'password';
+            passwordError.style.display = 'none';
+            passwordError.textContent = '';
         }
+    });
+
+    passwordConfirmationInput.addEventListener('input', () => {
+        if (passwordInput.value !== passwordConfirmationInput.value) {
+            passwordConfirmationError.style.display = 'block';
+            passwordConfirmationError.textContent = 'Password tidak cocok.';
+            passwordConfirmationSuccess.style.display = 'none';
+            passwordConfirmationSuccess.textContent = 'Password Cocok.';
+        } else {
+            passwordConfirmationError.style.display = 'none';
+            passwordConfirmationError.textContent = '';
+            passwordConfirmationSuccess.style.display = 'block';
+            passwordConfirmationSuccess.textContent = 'Password Cocok.';
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const authCheck = document.getElementById("authCheck");
+        const passwordInput = document.getElementById("password");
+        const CurrentPass = document.getElementById("current_password");
+        const passwordConfirmationInput = document.getElementById("password_confirmation");
+
+        authCheck.addEventListener("change", function() {
+            if (authCheck.checked) {
+                passwordInput.type = "text";
+                passwordConfirmationInput.type = "text";
+                CurrentPass.type = "text";
+            } else {
+                passwordInput.type = "password";
+                passwordConfirmationInput.type = "password";
+                CurrentPass.type = "password";
+            }
+        });
     });
 </script>
 @endpush

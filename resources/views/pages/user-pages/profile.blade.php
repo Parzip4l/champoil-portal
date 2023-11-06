@@ -147,7 +147,7 @@
                         <i class="icon-lg color-custom align-self-center" data-feather="chevron-right"></i>
                     </div>
                 </a>
-                <a href="#" class="d-flex justify-content-between menu-profile mb-6" data-bs-toggle="modal" data-bs-target=".ChangePassword">
+                <a href="#" class="d-flex justify-content-between menu-profile mb-3" data-bs-toggle="modal" data-bs-target=".ChangePassword">
                     <div class="d-flex">
                         <div class="icon-profile-menu p-3 me-3" style="background: #FF7171;">
                             <i class="icon-lg text-white" data-feather="lock"></i>
@@ -156,6 +156,16 @@
                     </div>
                     <div class="icon-right align-self-center">
                         <i class="icon-lg color-custom align-self-center" data-feather="chevron-right"></i>
+                    </div>
+                </a>
+                <a href="#" class="d-flex justify-content-between menu-profile mb-6" id="clear-cache-link">
+                    <div class="d-flex">
+                        <div class="icon-profile-menu p-3 me-3" style="background: #EF9595;">
+                            <i class="icon-lg text-white" data-feather="trash"></i>
+                        </div>
+                        <h5 class="align-self-center color-custom">Clear Cache</h5>
+                    </div>
+                    <div class="icon-right align-self-center">
                     </div>
                 </a>
             </div>
@@ -402,4 +412,39 @@
         });
     });
 </script>
+<!-- Clear Cache -->
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ session('success') }}',
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session('error') }}',
+        });
+    @endif
+
+    document.getElementById('clear-cache-link').addEventListener('click', function(event) {
+        event.preventDefault();
+        fetch('/clear-cache')
+            .then(response => response.text())
+            .then(data => {
+                Swal.fire({
+                    icon: 'success', // Ganti menjadi 'success' atau 'error' berdasarkan hasil permintaan
+                    title: 'Clear Cache',
+                    text: data, // Menampilkan pesan hasil dalam SweetAlert
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+
 @endpush

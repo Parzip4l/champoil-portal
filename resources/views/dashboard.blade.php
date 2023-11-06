@@ -109,7 +109,7 @@
                                 </form>
                                 @endif
                             @else
-                            <h4 class="text-center text-danger">Day Off</h4>
+                            <h4 class="text-center text-danger">Enjoy Off The Rest Of The Day !</h4>
                         @endif
                     @endif
                         <div class="log-absen-today mt-2">
@@ -118,33 +118,39 @@
                                     <h5 class="text-white">Attendance Log</h5>   
                                 </div>
                                 <div class="card-body">
-                                    @foreach ($logs as $log)
-                                    <div class="clock-in-wrap d-flex justify-content-between">
-                                        <div class="con">
-                                            <h5 class="text-bold mb-1">{{ $log->clock_in }}</h5>
-                                            <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                    @if (count($logs) > 0)
+                                        @foreach ($logs as $log)
+                                        <div class="clock-in-wrap d-flex justify-content-between">
+                                            <div class="con">
+                                                <h5 class="text-bold mb-1">{{ $log->clock_in }}</h5>
+                                                <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                            </div>
+                                            <div class="ket align-self-center">
+                                                <h5 class="mb-1 text-end text-success">CLOCK IN</h5>
+                                            </div>
                                         </div>
-                                        <div class="ket align-self-center">
-                                            <h5 class="mb-1 text-end text-success">CLOCK IN</h5>
+                                        <hr>
+                                        @if (isset($log->clock_out) && !empty($log->clock_out))
+                                        <div class="clock-in-wrap d-flex justify-content-between">
+                                            <div class="con">
+                                                <h5 class="text-bold mb-1">{{ $log->clock_out }}</h5>
+                                                <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                            </div>
+                                            <div class="ket align-self-center">
+                                                <h5 class="mb-1 text-end text-danger">CLOCK OUT</h5>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <hr>
-                                    <div class="clock-in-wrap d-flex justify-content-between">
-                                    @if (isset($log->clock_out) && !empty($log->clock_out))
-                                    <div class="con">
-                                            <h5 class="text-bold mb-1">{{ $log->clock_out}}</h5>
-                                            <h6 class="text-muted">{{ date('d M', strtotime($log->tanggal)) }}</h6>
+                                        @else
+                                        <div class="w-100">
+                                            <p class="text-center">Anda Belum Absen Pulang</p>  
                                         </div>
-                                        <div class="ket align-self-center">
-                                            <h5 class="mb-1 text-end text-danger">CLOCK OUT</h5>
-                                        </div>
-                                    </div>
+                                        @endif
+                                        @endforeach
                                     @else
-                                    <div class="w-100">
-                                        <p class="text-center">Anda Belum Absen Pulang</p>  
-                                    </div>
+                                        <div class="w-100">
+                                            <p class="text-center">Anda Belum Absen Masuk</p>
+                                        </div>
                                     @endif
-                                    @endforeach
                                 </div>
                             </div>
                         </div>

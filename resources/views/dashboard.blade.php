@@ -371,7 +371,7 @@
                     <h6 class="mb-2">Every feedback helps us a lot. What can we improve on ?</h6>
                     <input type="text" class="form-control mb-3" name="feedback" placeholder="Share your feedback.." required>
 
-                    <button type="submit" class="btn btn-primary w-100">Share Feedback</button>
+                    <button type="submit" class="btn btn-primary w-100 bg-custom-biru" style="border-radius:10px; border-color: #424874;">Share Feedback</button>
                 </form>
                 @else
                 <div class="feedback-berhasil">

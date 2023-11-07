@@ -39,16 +39,32 @@ class RequestControllers extends Controller
             $requestabsen->aprroved_by = $EmployeeCode;
             $requestabsen->save();
 
-            // Simpan Kedalam Table Absen
-            $absen = new Absen();
-            $absen->user_id = $EmployeeCode;
-            $absen->nik = $EmployeeCode;
-            $absen->tanggal = $requestabsen->tanggal;
-            $absen->clock_in = '-';
-            $absen->latitude = '-';
-            $absen->longtitude = '-';
-            $absen->status = $requestabsen->status;
-            $absen->save();
+            // Cek status jika lupa absen
+            if ($requestabsen->status = 'F') {
+                // Simpan Kedalam Table Absen
+                $absen = new Absen();
+                $absen->user_id = $EmployeeCode;
+                $absen->nik = $EmployeeCode;
+                $absen->tanggal = $requestabsen->tanggal;
+                $absen->clock_in = $requestabsen->clock_in;
+                $absen->clock_out = $requestabsen->clock_out;
+                $absen->latitude = '-';
+                $absen->longtitude = '-';
+                $absen->status = $requestabsen->status;
+                $absen->save();
+            } else {
+                // Simpan Kedalam Table Absen
+                $absen = new Absen();
+                $absen->user_id = $EmployeeCode;
+                $absen->nik = $EmployeeCode;
+                $absen->tanggal = $requestabsen->tanggal;
+                $absen->clock_in = '-';
+                $absen->latitude = '-';
+                $absen->longtitude = '-';
+                $absen->status = $requestabsen->status;
+                $absen->save();
+            }
+            
         }
 
         return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
@@ -108,6 +124,8 @@ class RequestControllers extends Controller
         $pengajuan->unik_code = $randomNumber;
         $pengajuan->tanggal = $request->input('tanggal');
         $pengajuan->employee = $request->input('employee');
+        $pengajuan->clock_in = $request->input('clock_in');
+        $pengajuan->clock_out = $request->input('clock_out');
         $pengajuan->status = $request->input('status');
         $pengajuan->alasan = $request->input('alasan');
         $pengajuan->aprrove_status = $request->input('aprrove_status');

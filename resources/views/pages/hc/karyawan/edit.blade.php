@@ -29,10 +29,10 @@
 @endif
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <h4 class="card-title">Form Tambah Data Karyawan</h4>
-        <form method="POST" action="{{ route('employee.update', $employee->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('employee.update', ['employee' => $employee->nik]) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
           <div class="row">
@@ -143,7 +143,34 @@
                 </select>
             </div>
           </div>
-          <button class="btn btn-primary w-100" type="submit">Update Data</button>
+            <div class="card-header mb-3">
+                <h5>Payroll Info</h5>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">BPJS Kesehatan</label>
+                    <input type="number" class="form-control" name="bpjs_kes" placeholder="0902xxx" required value="{{$employee->payrolinfo ? $employee->payrolinfo->bpjs_kes : '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">BPJS Ketenagakerjaan</label>
+                    <input type="number" class="form-control" name="bpjs_tk" placeholder="0902xxx" required value="{{$employee->payrolinfo ? $employee->payrolinfo->bpjs_tk : '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">NPWP</label>
+                    <input type="number" class="form-control" name="npwp" placeholder="0902xxx" required value="{{$employee->payrolinfo ? $employee->payrolinfo->npwp : '' }}">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Bank Name</label>
+                    <input type="text" class="form-control" name="bank_name" placeholder="BCA" required value="{{$employee->payrolinfo ? $employee->payrolinfo->bank_name : '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Bank Number</label>
+                    <input type="number" class="form-control" name="bank_number" required value="{{$employee->payrolinfo ? $employee->payrolinfo->bank_number : '' }}" placeholder="89120xxx">
+                </div>
+            </div>
+          <button class="btn btn-primary w-100 button-biru" type="submit">Update Data</button>
         </form>
       </div>
     </div>

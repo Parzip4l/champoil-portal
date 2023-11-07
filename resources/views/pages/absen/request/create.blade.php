@@ -39,6 +39,7 @@
                                         <option value="Cuti">Cuti</option>
                                         <option value="Visit Customer">Visit Customer</option>
                                         <option value="A">WFE</option>
+                                        <option value="F">Lupa Absen</option>
                                     </select>
                                     <input type="hidden" name="employee" value="{{$EmployeeCode}}">
                                 </div>
@@ -47,6 +48,20 @@
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Tanggal</label>
                                     <input type="date" name="tanggal" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Clock In</label>
+                                    <input type="time" name="clock_in" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Clock Out</label>
+                                    <input type="time" name="clock_out" class="form-control">
                                 </div>
                             </div>
                         </div>

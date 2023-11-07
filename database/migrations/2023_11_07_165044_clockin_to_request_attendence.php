@@ -14,7 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('requests_attendence', function (Blueprint $table) {
-            $table->string('unik_code')->unique();
+            $table->time('clock_in')->nullable();
+            $table->time('clock_out')->nullable();
         });
     }
 
@@ -25,7 +26,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('requests_attendence', function (Blueprint $table) {
+        Schema::table('request_attendence', function (Blueprint $table) {
             //
         });
     }

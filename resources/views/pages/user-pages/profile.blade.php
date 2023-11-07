@@ -319,8 +319,31 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
-                <h5 class="text-center mb-1">Your info will show here</h5>
-                <p class="text-center text-muted">Please Contact Your HR To Update Info</p>
+                @if($employee->payrolinfo)
+                <div class="input-custom mb-2">
+                    <p>BPJS Kesehatan</p>
+                    <h5>{{ $employee->payrolinfo->bpjs_kes }}</h5>
+                </div>
+                <div class="input-custom mb-2">
+                    <p>BPJS Ketenagakerjaan</p>
+                    <h5>{{ $employee->payrolinfo->bpjs_tk }}</h5>
+                </div>
+                <div class="input-custom mb-2">
+                    <p>NPWP</p>
+                    <h5>{{ $employee->payrolinfo->npwp }}</h5>
+                </div>
+                <div class="input-custom mb-2">
+                    <p>Bank Name</p>
+                    <h5>{{ $employee->payrolinfo->bank_name }}</h5>
+                </div>
+                <div class="input-custom mb-2">
+                    <p>Bank Number</p>
+                    <h5>{{ $employee->payrolinfo->bank_number }}</h5>
+                </div>
+                @else
+                    <h5 class="text-center mb-1">Your info will show here</h5>
+                    <p class="text-center text-muted">Please Contact Your HR To Update Info</p>
+                @endif
             </div>
         </div>
     </div>

@@ -39,27 +39,40 @@ class LogController extends Controller
                     $logs = Absen::where('user_id', $employeCode->employee_code)
                         ->whereDate('tanggal', $hariini)
                         ->get();
-                    $startOfMonth = Carbon::now()->startOfMonth();
-                    $endOfMonth = Carbon::now()->endOfMonth();
+                    $today = now();
+                    $startOfMonth = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+                    $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+                    $bulan = $request->input('bulan');
 
                     // Get logs for the month
-                    $logsmonths = Absen::where('user_id', $employeCode->employee_code)
-                    ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
-                    ->orderByDesc('tanggal')
-                    ->get();
-                    
-                    $bulan = $request->input('bulan');
+                    if($bulan) {
+                        $logsmonths = Absen::where('user_id', $employeCode->employee_code)
+                            ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
+                            ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
+                            ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                            ->orderBy('tanggal')
+                            ->get();
+                    } else {
+                        $logsmonths = Absen::where('user_id', $employeCode->employee_code)
+                            ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                            ->orderBy('tanggal')
+                            ->get();
+                    }
 
                     if ($bulan) {
                         $logsfilter = DB::table('absens')
                             ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
                             ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
+                            ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                             ->where('user_id',$employeCode->employee_code)
+                            ->orderBy('tanggal')
                             ->get();
                     } else {
                         $logsfilter = DB::table('absens')
-                        ->where('user_id',$employeCode->employee_code)
-                        ->get();
+                            ->where('user_id', $employeCode->employee_code)
+                            ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                            ->orderBy('tanggal')
+                            ->get();
                     }
 
                     // Remove Absen Button
@@ -89,8 +102,8 @@ class LogController extends Controller
                         $greeting = 'Selamat Malam';
                     }
 
-                    $totalDaysInMonth = Carbon::now()->daysInMonth;
-
+                    $totalDaysInMonth = $startOfMonth->diffInDays($endOfMonth);
+                    
                     // Calculate the number of weekend days in the current month
                     $weekendDays = 0;
                     $currentDate = Carbon::now()->startOfMonth();
@@ -102,17 +115,18 @@ class LogController extends Controller
                         }
                         $currentDate->addDay();
                     }
-
+                    
                     // Calculate the total weekdays in the current month (excluding weekends)
                     $weekdaysInMonth = $totalDaysInMonth - $weekendDays;
-
+                    
                     // Calculate the number of logs in the current month
                     $logsCount = $logsmonths->count();
-
+                    
                     // Calculate the number of weekdays with no logs
                     $daysWithNoLogs = $weekdaysInMonth - $logsCount;
 
-                    return view('pages.absen.log',compact('karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','greeting','logsmonths','logsfilter','daysWithNoLogs'));
+                    $bulanSelected = $bulan ? date('F', strtotime($bulan)) : date('F');
+                    return view('pages.absen.log',compact('karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','greeting','logsmonths','logsfilter','daysWithNoLogs','bulanSelected'));
                 }else{
                     return redirect('pages.auth.login')->intended('login');
                 }

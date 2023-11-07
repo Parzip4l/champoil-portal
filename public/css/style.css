@@ -49,6 +49,12 @@
     background: #424874!important;
 }
 
+.button-biru {
+    background: #424874!important;
+    border-radius: 10px!important;
+    border-color: #424874!important;
+}
+
 .menu-mobile-wrap {
     background: #fff;
     border-radius: 15px;

@@ -106,8 +106,8 @@
                                         <input type="hidden" name="latitude" id="latitude">
                                         <input type="hidden" name="longitude" id="longitude">
                                         <input type="hidden" name="status" value="H">
-                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 bg-custom-biru" id="btn-absen" onClick="formAbsen()" style="border-radius:10px; border-color: #424874;">
-                                        CLOCK IN</a>
+                                        <button type="submit" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 bg-custom-biru" style="border-radius:10px; border-color: #424874;" id="btn-absen">
+                                        CLOCK IN</button>
                                 </form>
                                 @endif
                             @else

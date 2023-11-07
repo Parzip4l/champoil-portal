@@ -113,12 +113,16 @@ class RequestControllers extends Controller
         $pengajuan->aprrove_status = $request->input('aprrove_status');
         if ($request->hasFile('dokumen')) {
             $file = $request->file('dokumen');
-
-            // Check if the uploaded file is a PDF
-            if ($file->getClientOriginalExtension() !== 'pdf') {
-                return redirect()->back()->with('error', 'Hanya file PDF yang diizinkan.');
+            
+            // Mendapatkan ekstensi file
+            $extension = $file->getClientOriginalExtension();
+        
+            // Mengecek apakah file adalah PDF atau JPG
+            if ($extension !== 'pdf' && $extension !== 'jpg') {
+                return redirect()->back()->with('error', 'Hanya file PDF dan JPG yang diizinkan.');
             }
-
+        
+            // Jika file adalah PDF atau JPG maka simpan
             $path = $file->store('public/files');
             $pengajuan->dokumen = $path;
         }

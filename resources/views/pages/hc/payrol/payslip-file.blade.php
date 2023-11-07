@@ -6,10 +6,21 @@
 @endpush
 
 @section('content')
-
+<!-- Top Bar -->
+<div class="row mb-5 mobile">
+    <div class="topbar-wrap d-flex justify-content-between">
+        <div class="arrow-back">
+            <a href="{{url('myslip')}}" class="d-flex color-custom">
+                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
+                <h5 class="align-self-center">My Payslip</h5>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- End -->
 <div class="row desktop">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-body">
                 <div class="container-fluid d-flex justify-content-between">
                     <div class="col-lg-6 ps-0">
@@ -163,10 +174,10 @@
 </div>
 
 <!-- Mobile -->
-<div class="payslip-mobile mobile">
+<div class="payslip-mobile mobile mb-6">
     <div class="row">
         <div class="col-md-12"> 
-            <div class="card mb-3">
+            <div class="card mb-3 custom-card2">
                 <div class="card-header text-center">
                     <div class="row">
                         <div class="col-md-6">
@@ -191,7 +202,7 @@
             </div>
 
             <!-- Basic salary -->
-            <div class="card mb-3">
+            <div class="card mb-3 custom-card2">
                 <div class="card-header text-center">
                     <h4>Basic Salary</h4>
                 </div>
@@ -207,7 +218,7 @@
                 </div>
             </div>
             <!-- Earnings -->
-            <div class="card mb-3">
+            <div class="card mb-3 custom-card2">
                 <div class="card-header text-center">
                     <h4>Earnings</h4>
                 </div>
@@ -246,7 +257,7 @@
             </div>
 
             <!-- Deductions -->
-            <div class="card mb-3">
+            <div class="card mb-3 custom-card2">
                 <div class="card-header text-center">
                     <h4>Deductions</h4>
                 </div>
@@ -298,7 +309,7 @@
                 <h2> Rp. {{ number_format($dataPayslip[0]['net_salary'], 0, ',', '.') }}</h2>
             </div>
             <div class="button-download-slip mb-2">
-                <a href="#" class="btn btn-primary w-100">Download Payslip </a>
+                <a href="#" class="btn btn-primary button-biru w-100">Download Payslip </a>
             </div>
             <p class="text-muted text-center">*This is a computer generated payslip and no signature is required.</p>
         </div>

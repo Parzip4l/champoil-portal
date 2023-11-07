@@ -76,7 +76,7 @@
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">File Pendukung</label>
                                     <span class="text-danger">(Only Pdf & JPG)</span>
-                                    <input type="file" name="dokumen" class="form-control" required>
+                                    <input type="file" name="dokumen" class="form-control">
                                     <input type="hidden" name="aprrove_status" value="Pending">
                                 </div>
                             </div>

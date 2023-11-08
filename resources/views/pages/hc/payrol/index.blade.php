@@ -21,7 +21,7 @@
 @endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <div class="head-card d-flex justify-content-between mb-3">
             <h6 class="card-title align-self-center mb-0">Payrol Component</h6>
@@ -107,7 +107,13 @@
                             @php
                                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                             @endphp
-                            <td><a href="{{route('payrol-component.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>
+                                @if ($employee)
+                                    <a href="{{ route('payrol-component.show', $data->id) }}">{{ $employee->nama }}</a>
+                                @else
+                                    <p>Karyawan Tidak Ditemukan</p>
+                                @endif
+                            </td>
                             <td>Rp {{ number_format($data->daily_salary, 0, ',', '.') }}</td>
                             <td>
                                 <div class="dropdown">

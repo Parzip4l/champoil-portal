@@ -11,6 +11,7 @@ use App\PayrolComponent_NS;
 use Carbon\Carbon;
 use App\Absen;
 use App\Payrollns;
+use Illuminate\Support\Facades\Auth;
 class PayrolController extends Controller
 {
     /**
@@ -20,7 +21,19 @@ class PayrolController extends Controller
      */
     public function index()
     {
-        $payrol = PayrolCM::all();
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        if ($employee) {
+            $unit_bisnis = $employee->unit_bisnis;
+        
+            // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
+            $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
+                ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->get();
+        } else {
+            $payrol = [];
+        }
         return view('pages.hc.payrol.payrol', compact('payrol'));
     }
 

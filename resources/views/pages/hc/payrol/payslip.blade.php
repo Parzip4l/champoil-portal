@@ -21,7 +21,7 @@
 @endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <div class="card-header mb-3">
             <div class="row">

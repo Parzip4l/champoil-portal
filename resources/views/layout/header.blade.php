@@ -76,6 +76,7 @@
   </nav>
   @php 
     $dataLogin = json_decode(Auth::user()->permission);
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
   @endphp 
   <nav class="bottom-navbar">
     <div class="container">
@@ -123,8 +124,15 @@
                     <ul class="submenu-item">
                         <li class="nav-item"><a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payslip</a></li>
                         <li class="nav-item"><a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payroll</a></li>
-                        <li class="nav-item"><a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payroll Frontline Officer</a></li>
-                        <li class="nav-item"><a href="{{ route('payroll-kas.index') }}" class="nav-link {{ active_class(['kas/payroll-kas']) }}">Payroll Anggota</a></li>
+
+                        @if($employee && $employee->unit_bisnis == 'CHAMPOIL')
+                            <li class="nav-item"><a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payroll Frontline Officer</a></li>
+                        @endif
+
+                        @if($employee && $employee->unit_bisnis == 'Kas')
+                            <li class="nav-item"><a href="{{ route('payroll-kas.index') }}" class="nav-link {{ active_class(['kas/payroll-kas']) }}">Payroll Anggota</a></li>
+                        @endif
+
                         <li class="nav-item"><a href="{{ url('payrol-component') }}" class="nav-link {{ active_class(['payrol-component']) }}">Assign Component</a></li>
                         <li class="nav-item"><a href="{{ url('component-data') }}" class="nav-link {{ active_class(['component-data']) }}">Component Master</a></li>
                     </ul>

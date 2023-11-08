@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Cache;
 
 class LoginController extends Controller
 {
@@ -29,7 +30,9 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $token = $request->user()->createToken('mobile')->plainTextToken;
-            return redirect()->intended('dashboard')->with('token', $token); 
+            // Simpan token dalam cache server selama satu jam
+            Cache::put('nik' . $request->user()->name, $token, 250000);
+            return redirect()->intended('dashboard')->with('token', $token);
         } else {
             // Jika login gagal, tambahkan notifikasi ke flash session
             Session::flash('error', 'Email atau password salah.');

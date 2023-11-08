@@ -8,6 +8,7 @@ use App\Employee;
 use App\Payrol;
 use App\PayrolCM;
 use App\PayrolComponent_NS;
+use Illuminate\Support\Facades\Auth;
 
 class PayrolComponent extends Controller
 {
@@ -18,9 +19,28 @@ class PayrolComponent extends Controller
      */
     public function index()
     {
-        $employee = Employee::all();
-        $payrol = PayrolCM::all();
-        $parolns = PayrolComponent_NS::all();
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
+
+        if ($DataCode) {
+            $unit_bisnis = $DataCode->unit_bisnis;
+            
+            $employee = Employee::where('unit_bisnis',$unit_bisnis)->get();
+            // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
+            $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
+                ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->get();
+
+            $parolns = PayrolComponent_NS::join('karyawan', 'payrol_component_ns.employee_code', '=', 'karyawan.nik')
+            ->where('karyawan.unit_bisnis', $unit_bisnis)
+            ->get();
+
+        } else {
+            $payrol = [];
+            $parolns = [];
+            $employee = [];
+        }
+        
         return view('pages.hc.payrol.index', compact('employee','payrol','parolns'));
     }
 

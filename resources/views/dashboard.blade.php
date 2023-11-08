@@ -106,8 +106,9 @@
                                         <input type="hidden" name="latitude" id="latitude">
                                         <input type="hidden" name="longitude" id="longitude">
                                         <input type="hidden" name="status" value="H">
-                                        <a href="#" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 button-biru" id="btn-absen" onClick="formAbsen()">
-                                        Clock IN</a>
+                                        <button type="button" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 button-biru" id="btn-absen" onClick="requestLocation()">
+                                            Clock IN
+                                        </button>
                                 </form>
                                 @endif
                             @else
@@ -554,28 +555,25 @@ $(function() {
 
 <!-- Absen -->
 <script>
-$(document).ready(function () {
-    // Mengambil data lokasi pengguna saat tombol absen ditekan
-    $('#btn-absen').on('click', function () {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                // Mengisi nilai hidden input dengan data lokasi pengguna
-                $('#latitude').val(position.coords.latitude);
-                $('#longitude').val(position.coords.longitude);
+function requestLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            // Mengisi nilai hidden input dengan data lokasi pengguna
+            $('#latitude').val(position.coords.latitude);
+            $('#longitude').val(position.coords.longitude);
 
-                // Mengirim form absen
-                $('#form-absen').submit();
-            }, function(error) {
-                if (error.code === error.PERMISSION_DENIED) {
-                    // Pengguna menolak izin lokasi
-                    alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
-                }
-            });
-        } else {
-            alert('Geolocation tidak didukung oleh browser Anda');
-        }
-    });
-});
+            // Mengirim form absen
+            $('#form-absen').submit();
+        }, function(error) {
+            if (error.code === error.PERMISSION_DENIED) {
+                // Pengguna menolak izin lokasi
+                alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+            }
+        });
+    } else {
+        alert('Geolocation tidak didukung oleh browser Anda');
+    }
+}
 </script>
 <script>
     $(document).ready(function () {

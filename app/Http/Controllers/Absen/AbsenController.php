@@ -89,8 +89,26 @@ class AbsenController extends Controller
         $user = Auth::user();
         $nik = Auth::user()->employee_code;
 
-        $kantorLatitude = -6.1369556;
-        $kantorLongtitude = 106.7601356;
+        $today = Carbon::now()->format('Y-m-d');
+
+        $schedulebackup = Schedule::where('employee', $nik)
+            ->whereDate('tanggal', $today)
+            ->get();
+
+        foreach($schedulebackup as $databackup)
+        {
+            $project_id = $databackup->project;
+            $tanggal_backup = $databackup->tanggal;
+            $shift = $databackup->shift;
+            $periode = $databackup->periode;
+        }
+        
+        $dataProject = Project::where('id', $project_id)->first();
+        $latitudeProject = $dataProject->latitude;
+        $longtitudeProject = $dataProject->longtitude;
+
+        $kantorLatitude = $latitudeProject;
+        $kantorLongtitude = $longtitudeProject;
 
         $time_in = Carbon::now()->format('H:i');
         $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');

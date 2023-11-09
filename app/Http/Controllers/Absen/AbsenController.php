@@ -121,20 +121,16 @@ class AbsenController extends Controller
 
         $allowedRadius = 5;
 
-        if ($distance <= $allowedRadius) {
-            $absensi = new absen();
-            $absensi->user_id = $nik;
-            $absensi->nik = $nik;
-            $absensi->tanggal = now()->toDateString();
-            $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $lat;
-            $absensi->longtitude = $long;
-            $absensi->status = $status;
-            $absensi->save();
-            return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
-        } else {
-            return redirect()->back()->with('error', 'Anda Diluar Radius Absen!');
-        }
+        $absensi = new absen();
+        $absensi->user_id = $nik;
+        $absensi->nik = $nik;
+        $absensi->tanggal = now()->toDateString();
+        $absensi->clock_in = now()->format('H:i');
+        $absensi->latitude = $lat;
+        $absensi->longtitude = $long;
+        $absensi->status = $status;
+        $absensi->save();
+        return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
     }
 
     public function clockinbackup(Request $request)

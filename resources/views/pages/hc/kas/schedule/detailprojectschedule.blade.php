@@ -30,7 +30,12 @@
                                     $projectname = \App\ModelCG\Project::find($schedule->project)->name;
                                     $employee = \App\Employee::where('nik', $schedule->employee)->first();
                                 @endphp
-                                <td> {{ $employee->nama }} </td>
+                                <td> @if($employee->nama)
+                                        {{ $employee->nama }}
+                                    @else
+                                        Tidak ada
+                                    @endif
+                                </td>
                                 <td> {{ $projectname }} </td>
                                 <td> {{ $schedule->periode }} </td>
                                 <td>

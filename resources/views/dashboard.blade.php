@@ -560,6 +560,23 @@ $(function() {
         $('#btn-absen').on('click', function () {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
+
+                    function successCallback(position) {
+                        console.log('Latitude:', position.coords.latitude);
+                        console.log('Longitude:', position.coords.longitude);
+                    }
+
+                    function errorCallback(error) {
+                        console.error('Error getting location:', error.message);
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // Jika tombol di klik, maka akan meminta lokasi
+                        document.getElementById('get-location-btn').addEventListener('click', function () {
+                            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+                        });
+                    });
+                    
                     // Mengisi nilai hidden input dengan data lokasi pengguna
                     $('#latitude').val(position.coords.latitude);
                     $('#longitude').val(position.coords.longitude);

@@ -565,7 +565,7 @@ $(function() {
                     $('#longitude').val(position.coords.longitude);
 
                     // Mengirim form absen
-                    $('#form-absen2').submit();
+                    $('#form-absen').submit();
                 }, function(error) {
                     if (error.code === error.PERMISSION_DENIED) {
                         // Pengguna menolak izin lokasi
@@ -585,11 +585,11 @@ $(function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     // Mengisi nilai hidden input dengan data lokasi pengguna
-                    $('#latitude').val(position.coords.latitude);
-                    $('#longitude').val(position.coords.longitude);
+                    $('#latitude_out').val(position.coords.latitude);
+                    $('#longitude_out').val(position.coords.longitude);
 
                     // Mengirim form absen
-                    $('#form-absen').submit();
+                    $('#form-absen2').submit();
                 }, function(error) {
                     if (error.code === error.PERMISSION_DENIED) {
                         // Pengguna menolak izin lokasi

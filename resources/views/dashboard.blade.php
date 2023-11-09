@@ -600,11 +600,6 @@ function requestLocation() {
     });
 </script>
 <script>
-    function formAbsen() {
-    document.getElementById("btn-absen").submit();
-    }
-</script>
-<script>
     const feedbackItems = document.querySelectorAll('.feedback li');
 
     feedbackItems.forEach(item => {

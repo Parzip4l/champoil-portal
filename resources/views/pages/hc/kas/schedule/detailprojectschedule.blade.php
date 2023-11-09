@@ -30,7 +30,8 @@
                                     $projectname = \App\ModelCG\Project::find($schedule->project)->name;
                                     $employee = \App\Employee::where('nik', $schedule->employee)->first();
                                 @endphp
-                                <td> @if($employee->nama)
+                                <td> 
+                                    @if($employee && $employee->nama)
                                         {{ $employee->nama }}
                                     @else
                                         Tidak ada

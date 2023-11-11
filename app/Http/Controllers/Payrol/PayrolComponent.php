@@ -28,10 +28,12 @@ class PayrolComponent extends Controller
             $employee = Employee::where('unit_bisnis',$unit_bisnis)->get();
             // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
             $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
+                ->select('payrol_components.id', 'payrol_components.*')
                 ->where('karyawan.unit_bisnis', $unit_bisnis)
                 ->get();
 
             $parolns = PayrolComponent_NS::join('karyawan', 'payrol_component_ns.employee_code', '=', 'karyawan.nik')
+            ->select('payrol_component_ns.id', 'payrol_component_ns.*')
             ->where('karyawan.unit_bisnis', $unit_bisnis)
             ->get();
 

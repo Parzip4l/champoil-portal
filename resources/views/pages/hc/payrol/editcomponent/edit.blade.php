@@ -12,7 +12,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         @if(session('error'))
             <div class="alert alert-danger">
@@ -71,10 +71,6 @@
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">BPJS Ketenagakerjaan</label>
                     <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[bpsj_tk][]" placeholder="Rp. " required value="{{$deductions->bpsj_tk[0]}}">
-                </div>
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">Jaminan Pensiun</label>
-                    <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[j_pensiun][]" placeholder="Rp. " required value="{{$deductions->j_pensiun[0]}}" disabled>
                 </div>
                 <div class="col-md-6">
                     <label for="kode_karyawan" class="form-label">PPH 21</label>

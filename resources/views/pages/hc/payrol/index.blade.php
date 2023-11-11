@@ -109,7 +109,7 @@
                             @endphp
                             <td>
                                 @if ($employee)
-                                    <a href="{{ route('payrol-component.show', $data->id) }}">{{ $employee->nama }}</a>
+                                    <a href="{{ route('editcomponentns.edit', $data->id) }}">{{ $employee->nama }}</a>
                                 @else
                                     <p>Karyawan Tidak Ditemukan</p>
                                 @endif

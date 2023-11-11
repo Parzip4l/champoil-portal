@@ -12,7 +12,7 @@
 @section('content')
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <h4 class="card-title">Payrol Component Frontline Officer</h4>
         <form method="POST" action="{{ route('updatecomponentNS.update', $payrolComponent->id) }}" enctype="multipart/form-data">
@@ -68,7 +68,7 @@
                     <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[lain_lain][]" placeholder="Rp. " required value="{{$deductions->lain_lain[0]}}">
                 </div>
             </div>
-          <button class="btn btn-primary" type="submit">Submit</button>
+          <button class="btn btn-primary button-biru w-100" type="submit">Submit</button>
         </form>
       </div>
     </div>

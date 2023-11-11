@@ -78,12 +78,12 @@
                             @endphp
                             <td>
                                 @if ($employee)
-                                    <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
+                                    <a href="{{ route('payslip.show', $data->id) }}">{{ $employee->nama }}</a>
                                 @else
                                     Karyawan tidak ditemukan
                                 @endif
                             </td>
-                            <td>{{$data->thp}}</td>
+                            <td>Rp {{ number_format($data->net_salary, 0, ',', '.') }}</td>
                             <td>{{ $data->year }} - {{ $data->month }}</td>
                         </tr>
                         @endforeach
@@ -93,7 +93,7 @@
             </div>
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
                 <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
+                    <table id="dataPayslipNS" class="table">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -108,25 +108,25 @@
                                 
                             @endphp
                             @foreach ($datans as $data)
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            @php
-                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                                $dates = explode(' - ', $data->periode);
-                                $startDate = date('j M Y', strtotime($dates[0]));
-                                $endDate = date('j M Y', strtotime($dates[1]));
-                            @endphp
-                            <td>
-                                @if ($employee)
-                                    <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
-                                @else
-                                    Karyawan tidak ditemukan
-                                @endif
-                            </td>
-                            <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
-                            <td>{{ $endDate }}</td>
-                        </tr>
-                        @endforeach
+                            <tr>
+                                <td>{{ $no++ }}</td>
+                                @php
+                                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                                    $dates = explode(' - ', $data->periode);
+                                    $startDate = date('j M Y', strtotime($dates[0]));
+                                    $endDate = date('j M Y', strtotime($dates[1]));
+                                @endphp
+                                <td>
+                                    @if ($employee)
+                                        <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
+                                    @else
+                                        Karyawan tidak ditemukan
+                                    @endif
+                                </td>
+                                <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
+                                <td>{{ $endDate }}</td>
+                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -216,14 +216,45 @@
 </script>
 <script>
     $(function() {
-  'use strict'
+    'use strict'
 
-  if ($(".js-example-basic-single").length) {
-    $(".js-example-basic-single").select2();
-  }
-  if ($(".js-example-basic-multiple").length) {
-    $(".js-example-basic-multiple").select2();
-  }
-});
+        if ($(".js-example-basic-single").length) {
+            $(".js-example-basic-single").select2();
+        }
+
+        if ($(".js-example-basic-multiple").length) {
+            $(".js-example-basic-multiple").select2();
+        }
+
+    });
+</script>
+<script>
+    $(function() {
+    'use strict';
+
+    $(function() {
+        $('#dataPayslipNS').DataTable({
+        "aLengthMenu": [
+            [10, 30, 50, -1],
+            [10, 30, 50, "All"]
+        ],
+        "iDisplayLength": 10,
+        "language": {
+            search: ""
+        }
+        });
+        $('#dataTableExample').each(function() {
+        var datatable = $(this);
+        // SEARCH - Add the placeholder for Search and Turn this into in-line form control
+        var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
+        search_input.attr('placeholder', 'Search');
+        search_input.removeClass('form-control-sm');
+        // LENGTH - Inline-Form control
+        var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
+        length_sel.removeClass('form-control-sm');
+        });
+    });
+
+    });
 </script>
 @endpush

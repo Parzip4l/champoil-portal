@@ -27,12 +27,13 @@
                             @foreach ($schedulesByProject as $scheduleByProject)
                             <tr>
                                 @php
-                                    $projectname = \App\ModelCG\Project::find($scheduleByProject->project)->name;
+                                    $project = \App\ModelCG\Project::find($scheduleByProject->project);
+                                    $projectname = isset($project->name) ? $project->name : 'Project not found';
                                 @endphp
                                 <td> {{ $projectname }} </td>
                                 <td> {{ $scheduleByProject->periode }} </td>
                                 <td>
-                                <a href="{{ route('schedule.details', ['project' => $scheduleByProject->project, 'periode' => $scheduleByProject->periode]) }}" class="btn btn-primary btn-sm">Details</a>
+                                    <a href="{{ route('schedule.details', ['project' => $scheduleByProject->project, 'periode' => $scheduleByProject->periode]) }}" class="btn btn-primary btn-sm">Details</a>
                                 </td>
                             </tr>
                             @endforeach

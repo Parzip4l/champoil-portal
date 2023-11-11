@@ -75,7 +75,7 @@
                     <div class="row">
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Nama Jabatan</label>
-                            <input type="text" class="form-control" name="name" required>    
+                            <input type="text" class="form-control" name="name" required>
                         </div>
                         <div class="col-md-12 mt-2">
                             <button class="btn btn-primary w-100" type="submit">Simpan Data</button>

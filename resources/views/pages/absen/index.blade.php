@@ -25,54 +25,59 @@
 @endif
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <div class="head-card d-flex justify-content-between mb-3">
-                        <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
-                    </div>
-                    <hr>
-                    <div class="table-responsive">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="head-card d-flex justify-content-between mb-3">
+                    <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
+                </div>
+                <hr>
+                <div class="table-responsive">
                     <table id="dataTableExample1" class="table table-striped nowrap" width="100%">
-                    <thead>
-                <tr>
-                    <th>Nama</th>  
-                    @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
-                    <th>{{ $date->format('d M Y') }}</th>
-                    @endforeach
-                </tr>
-            </thead>
-            @php
-                $previousName = null;
-            @endphp
-
-            @foreach($data1 as $k)
-                @if($previousName != $k->name)
-                    @php
-                        $previousName = $k->name;
-                        $employee = \App\Employee::where('nik', $previousName)->first();
-                    @endphp
-                    <tr>
-                        <td>{{ $k->name }}</td>
-                        @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
-                            <td>
+                        <thead>
+                            <tr>
+                                <th>Nama</th>  
+                                @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
+                                <th>{{ $date->format('d M Y') }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        @php
+                            $previousName = null;
+                        @endphp
+                        @foreach($data1 as $k)
+                            @if($previousName != $k->name)
                                 @php
-                                    $absensi = $data1->where('name', $k->name)->where('tanggal', $date->format('Y-m-d'))->first();
+                                    $previousName = $k->name;
+                                    $employee = \App\Employee::where('nik', $previousName)->first();
                                 @endphp
-                                @if($absensi)
-                                    <span class="text-success">{{ $absensi->clock_in }}</span> - <span class="text-danger">{{ $absensi->clock_out }}</span>
-                                @else
-                                    -
-                                @endif
-                            </td>
+                                <tr>
+                                    <td>
+                                        @if($employee)
+                                        {{ $employee->nama }}
+                                        @else
+                                        <p>Employee Not Found</p>
+                                        @endif
+                                    </td>
+                                    @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
+                                        <td>
+                                            @php
+                                                $absensi = $data1->where('name', $k->name)->where('tanggal', $date->format('Y-m-d'))->first();
+                                            @endphp
+                                            @if($absensi)
+                                                <span class="text-success">{{ $absensi->clock_in }}</span> - <span class="text-danger">{{ $absensi->clock_out }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endif
                         @endforeach
-                    </tr>
-                @endif
-            @endforeach
-          </table>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 @endsection
 

@@ -23,39 +23,24 @@ class AbsenController extends Controller
      */
     public function index()
     {
-        $today = Carbon::today();
-        $employee = Employee::all();
-        $absens = DB::table('absens')
-            ->whereDate('tanggal', $today)
-            ->get();
-        $namauser = Auth::user()->employee_code;
-        foreach ($absens as $absen) {
-            $karyawan = Employee::find($absen->nik);
-            if ($karyawan) {
-                $absen->nama_karyawan = $karyawan->nama;
-            } else {
-                $absen->nama_karyawan = "Karyawan tidak ditemukan";
-            }
-        }
-        $today = Carbon::today()->toDateString();
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->endOfMonth();
 
-        $data12 = Absen::leftJoin('karyawan', 'karyawan.nik', '=', 'absens.nik')
-            ->whereDate('absens.tanggal', $today)
-            ->orWhereNull('absens.tanggal')
-            ->select('karyawan.nama', 'karyawan.nik','absens.clock_in', 'absens.clock_out','absens.tanggal','absens.nik')
-            ->get();
+        $data1 = DB::table('users')
+                    ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
+                    ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
+                        $join->on('absens.nik', '=', 'users.employee_code')
+                            ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+                    })
+                    ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                    ->select('users.*', 'absens.*')
+                    ->orderBy('users.name')
+                    ->get();
 
-            $tanggal = now()->format('Y-m-d');
-            $data1 = DB::table('users')->leftJoin('absens', function($join) use($startDate,$endDate) {
-                         $join->on('absens.nik', '=', 'users.employee_code')
-                              ->whereBetween('absens.tanggal', [$startDate,$endDate]);
-                     })->select('users.*', 'absens.*')
-                       ->orderBy('users.name')
-                       ->get();
-
-        return view('pages.absen.index',compact('absens','employee','data1','endDate','startDate'));
+        return view('pages.absen.index',compact('data1','endDate','startDate'));
     }
 
     /**
@@ -230,7 +215,7 @@ class AbsenController extends Controller
                 ->first();
 
             if ($absensi) {
-                $absensi->clock_out = Carbon::now()->toTimeString();
+                $absensi->clock_out = now()->format('H:i');
                 $absensi->latitude_out = $lat2;
                 $absensi->longtitude_out = $long2;
                 $absensi->save();

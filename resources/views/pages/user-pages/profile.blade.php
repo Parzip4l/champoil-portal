@@ -243,13 +243,15 @@
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password Baru</label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Password Baru" required>
+                                <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password Baru" required>
+                                <div class="text-danger" id="passwordError" style="display: none;"></div>
+                                <div class="text-success" id="passwordSuccess" style="display: none;"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
-                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password Baru" required>
-                                <div class="text-danger" id="password-confirmation-error" style="display: none;"></div>
-                                <div class="text-success" id="password-confirmation-success" style="display: none;"></div>
+                                <input type="password" class="form-control" id="passwordConfirmationInput" name="password_confirmation" placeholder="Konfirmasi Password Baru" required>
+                                <div class="text-danger" id="passwordConfirmationError" style="display: none;"></div>
+                                <div class="text-success" id="passwordConfirmationSuccess" style="display: none;"></div>
                             </div>
                             <div class="form-check mb-3">
                                 <input type="checkbox" class="form-check-input" id="authCheck">
@@ -376,6 +378,7 @@
 @push('custom-scripts')
 <script src="{{ asset('assets/js/data-table.js') }}"></script>
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+<script src="{{ asset('assets/js/password.js') }}"></script>
 <script>
     @if(session('success'))
         Swal.fire({
@@ -394,43 +397,11 @@
     @endif
 </script>
 <script>
-    const passwordInput = document.getElementById('password');
-    const passwordConfirmationInput = document.getElementById('password_confirmation');
-    const passwordError = document.getElementById('password-error');
-    const passwordConfirmationError = document.getElementById('password-confirmation-error');
-    const passwordSuccess = document.getElementById('password-success');
-    const passwordConfirmationSuccess = document.getElementById('password-confirmation-success');
-
-    passwordInput.addEventListener('input', () => {
-        if (passwordInput.value !== passwordConfirmationInput.value) {
-            passwordError.style.display = 'block';
-            passwordError.textContent = 'Password tidak cocok.';
-        } else {
-            passwordError.style.display = 'none';
-            passwordError.textContent = '';
-        }
-    });
-
-    passwordConfirmationInput.addEventListener('input', () => {
-        if (passwordInput.value !== passwordConfirmationInput.value) {
-            passwordConfirmationError.style.display = 'block';
-            passwordConfirmationError.textContent = 'Password tidak cocok.';
-            passwordConfirmationSuccess.style.display = 'none';
-            passwordConfirmationSuccess.textContent = 'Password Cocok.';
-        } else {
-            passwordConfirmationError.style.display = 'none';
-            passwordConfirmationError.textContent = '';
-            passwordConfirmationSuccess.style.display = 'block';
-            passwordConfirmationSuccess.textContent = 'Password Cocok.';
-        }
-    });
-</script>
-<script>
     document.addEventListener("DOMContentLoaded", function() {
         const authCheck = document.getElementById("authCheck");
-        const passwordInput = document.getElementById("password");
+        const passwordInput = document.getElementById("passwordInput");
         const CurrentPass = document.getElementById("current_password");
-        const passwordConfirmationInput = document.getElementById("password_confirmation");
+        const passwordConfirmationInput = document.getElementById("passwordConfirmationInput");
 
         authCheck.addEventListener("change", function() {
             if (authCheck.checked) {

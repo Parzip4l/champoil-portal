@@ -81,6 +81,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // User Profile
     Route::get('/MyProfile/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'MyProfile'])->name('MyProfile');
     Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
+    Route::put('/users/{id}/reset-password', 'UserController@ResetPassword')->name('pass.reset');
 
     // Feedback
     Route::post('/users/feedback', 'DashboardController@StoreFeedback')->name('feedback.store');

@@ -63,6 +63,11 @@
                             <label class="form-label">Agama</label>
                             <select class="js-example-basic-single form-select" data-width="100%" name="agama">
                                 <option value="Islam">Islam</option>
+                                <option value="Kristen">Kristen</option>
+                                <option value="Katholik">Katholik</option>
+                                <option value="Budha">Budha</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Others">Others</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -120,7 +125,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">alamat</label>
+                        <label class="form-label">Full Address</label>
                         <textarea name="alamat" id="" cols="30" rows="10" class=form-control></textarea>
                     </div>
                     <div class="row mb-3">
@@ -185,6 +190,50 @@
                             <input type="number" class="form-control" name="bank_number" required placeholder="89120xxx">
                         </div>
                     </div>
+                    <div class="card-header mb-3">
+                        <h5>User Login Info</h5>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label for="passwordInput" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Password" required>
+                        <div class="text-danger" id="passwordError" style="display: none;"></div>
+                        <div class="text-success" id="passwordSuccess" style="display: none;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-control" id="passwordConfirmationInput" name="password_confirmation" placeholder="Konfirmasi Password" required>
+                        <div class="text-danger" id="passwordConfirmationError" style="display: none;"></div>
+                        <div class="text-success" id="passwordConfirmationSuccess" style="display: none;"></div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="authCheck">
+                        <label class="form-check-label" for="authCheck">
+                            Show Password
+                        </label>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label class="form-label">Permission</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access">
+                                    <label class="form-check-label">User</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access">
+                                    <label class="form-check-label">HR</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">
+                                    <label class="form-check-label">Super Admin</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <button class="btn btn-primary button-biru w-100" type="submit">Submit</button>
                 </form>
             </div>
@@ -218,5 +267,21 @@
   <script src="{{ asset('assets/js/dropify.js') }}"></script>
   <script src="{{ asset('assets/js/pickr.js') }}"></script>
   <script src="{{ asset('assets/js/flatpickr.js') }}"></script>
-  
+  <script src="{{ asset('assets/js/password.js') }}"></script>
+  <script>
+
+    const authCheck = document.getElementById('authCheck');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordConfirmationInput = document.getElementById('passwordConfirmationInput');
+
+    authCheck.addEventListener('change', function() {
+        if (authCheck.checked) {
+            passwordInput.type = 'text';
+            passwordConfirmationInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+            passwordConfirmationInput.type = 'password';
+        }
+    });
+    </script>
 @endpush

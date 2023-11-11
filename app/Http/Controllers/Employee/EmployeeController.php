@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Employee;
 use App\Absen;
+use App\User;
 use App\Payrolinfo\Payrolinfo;
 use App\UserActivities;
 use App\ModelCG\Jabatan;
@@ -84,6 +85,7 @@ class EmployeeController extends Controller
                 $data->gambar = $filename;
             }
             $data->save();
+            // Payrol Info
             $payrolinfo = new Payrolinfo();
             $payrolinfo->employee_code = $request->nik;
             $payrolinfo->bpjs_kes = $request->bpjs_kes;
@@ -93,6 +95,16 @@ class EmployeeController extends Controller
             $payrolinfo->bank_number = $request->bank_number;
             $payrolinfo->ptkp = $request->tanggungan;
             $payrolinfo->save();
+
+            // User Info
+            $userinfo = new User();
+            $userinfo->name = $request->nik;
+            $userinfo->email = $request->email;
+            $userinfo->password = Hash::make($request->password);
+            $userinfo->permission = json_encode($request->permissions);
+            $userinfo->employee_code = $request->nik;
+            $userinfo->save();
+
             DB::commit();
             return redirect()->route('employee.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }catch (ValidationException $exception) {

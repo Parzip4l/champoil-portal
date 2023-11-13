@@ -113,7 +113,7 @@
                             <select name="project_id" id="project_id" class="form-control">
                                 <option value="">PILIH PROJECT</option>
                                 @foreach($project as $row)
-                                <option value="{{ $row->id }}">{{ $row->project }}</option>
+                                <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
                         </div>

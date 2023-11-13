@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\PayslipEmail;
 use Illuminate\Support\Facades\Mail;
+use PDF;
 
 class DashboardController extends Controller
 {
@@ -119,8 +120,23 @@ class DashboardController extends Controller
         $data = Payrol::findOrFail($id);
         $dataPayslip = Payrol::where('id', $id)->get();
 
+        $pdf = PDF::loadView('pages.hc.payrol.payslip-file', compact('dataPayslip'));
+
+        // Simpan PDF ke file sementara
+        $pdfPath = storage_path('app/public/payslip.pdf');
+        $pdf->save($pdfPath);
+
+        // Kirim email dengan lampiran PDF
+        $data = [
+            'subject' => 'Slip Gaji',
+            'body' => 'Terlampir adalah slip gaji Anda',
+            'attachmentName' => 'slip_gaji.pdf',
+        ];
+
         // Send email
-        Mail::to('sobirin@champoil.co.id')->send(new PayslipEmail($dataPayslip));
+        Mail::to('sobirin@champoil.co.id')->send(new PayslipEmail($dataPayslip,$pdfPath));
+        // Hapus file PDF sementara
+        unlink($pdfPath);
 
         return redirect()->back()->with('success', 'Email sent successfully!');
     }

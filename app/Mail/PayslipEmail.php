@@ -14,14 +14,16 @@ class PayslipEmail extends Mailable
     use Queueable, SerializesModels;
 
     public $dataPayslip;
+    public $pdfPath;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($dataPayslip)
+    public function __construct($dataPayslip,$pdfPath)
     {
         $this->dataPayslip = $dataPayslip;
+        $this->pdfPath = $pdfPath;
     }
 
     /**
@@ -57,5 +59,6 @@ class PayslipEmail extends Mailable
     {
         return $this->view('pages.hc.payrol.payslip-file') // View Payslip
             ->subject('Payslip');
+            attach($this->pdfPath, ['as' => 'slip_gaji.pdf', 'mime' => 'application/pdf']);
     }
 }

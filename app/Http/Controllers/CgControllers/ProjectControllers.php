@@ -62,75 +62,7 @@ class ProjectControllers extends Controller
             $longtitude = $request->input('longtitude');
             $contract_start = $request->input('contract_start');
             $end_contract = $request->input('end_contract');
-            $jabatans = $request->input('jabatan');
-            $kebutuhan = $request->input('kebutuhan');
-            $p_gajipokok = $request->input('p_gajipokok');
-            $p_bpjstk = $request->input('p_bpjstk');
-            $p_bpjs_ks = $request->input('p_bpjs_ks');
-            $p_thr = $request->input('p_thr');
-            $p_tkerja = $request->input('p_tkerja');
-            $p_tseragam = $request->input('p_tseragam');
-            $p_tlain = $request->input('p_tlain');
-            $p_training = $request->input('p_training');
-            $p_operasional = $request->input('p_operasional');
-            $p_membership = $request->input('p_membership');
-            $r_deduction = $request->input('r_deduction');
-            $p_deduction = $request->input('p_deduction');
-            $tp_gapok = $request->input('tp_gapok');
-            $tp_bpjstk = $request->input('tp_bpjstk');
-            $tp_bpjsks = $request->input('tp_bpjsks');
-            $tp_thr = $request->input('tp_thr');
-            $tp_tunjangankerja = $request->input('tp_tunjangankerja');
-            $tp_tunjanganseragam = $request->input('tp_tunjanganseragam');
-            $tp_tunjanganlainnya = $request->input('tp_tunjanganlainnya');
-            $tp_training = $request->input('tp_training');
-            $tp_operasional = $request->input('tp_operasional');
-            $tp_ppn = $request->input('tp_ppn');
-            $tp_pph = $request->input('tp_pph');
-            $tp_cashin = $request->input('tp_cashin');
-            $kebutuhan = $request->input('kebutuhan');
-            $tp_total = $request->input('tp_total');
-            $tp_membership = $request->input('tp_membership');
-            $tp_bulanan = $request->input('tp_bulanan');
-            $rate_harian = $request->input('rate_harian');
-
-            $ProjectDetails = [];
-            
-            foreach($jabatans as $index => $jabatan)
-            {
-                $ProjectDetails[] = [
-                    'jabatan' => $jabatan,
-                    'kebutuhan' => $kebutuhan[$index],
-                    'p_gajipokok' => $p_gajipokok[$index],
-                    'p_bpjstk' => $p_bpjstk[$index],
-                    'p_bpjs_ks' => $p_bpjs_ks[$index],
-                    'p_thr' => $p_thr[$index],
-                    'p_tkerja' => $p_tkerja[$index],
-                    'p_tseragam' => $p_tseragam[$index],
-                    'p_tlain' => $p_tlain[$index],
-                    'p_training' => $p_training[$index],
-                    'p_operasional' => $p_operasional[$index],
-                    'p_membership' => $p_membership[$index],
-                    'r_deduction' => $r_deduction[$index],
-                    'p_deduction' => $p_deduction[$index],
-                    'tp_gapok' => $tp_gapok[$index],
-                    'tp_bpjstk' => $tp_bpjstk[$index],
-                    'tp_bpjsks' => $tp_bpjsks[$index],
-                    'tp_thr' => $tp_thr[$index],
-                    'tp_tunjangankerja' => $tp_tunjangankerja[$index],
-                    'tp_tunjanganseragam' => $tp_tunjanganseragam[$index],
-                    'tp_tunjanganlainnya' => $tp_tunjanganlainnya[$index],
-                    'tp_training' => $tp_training[$index],
-                    'tp_operasional' => $tp_operasional[$index],
-                    'tp_ppn' => $tp_ppn[$index],
-                    'tp_pph' => $tp_pph[$index],
-                    'tp_cashin' => $tp_cashin[$index],
-                    'tp_total' => $tp_total[$index],
-                    'tp_membership' => $tp_membership[$index],
-                    'tp_bulanan' => $tp_bulanan[$index],
-                    'rate_harian' => $rate_harian[$index]
-                ];
-            }
+        
             $randomCode = $this->generateRandomCode();
 
             $project = new Project();

@@ -120,7 +120,7 @@ class DashboardController extends Controller
         $data = Payrol::findOrFail($id);
         $dataPayslip = Payrol::where('id', $id)->get();
 
-        $pdf = PDF::loadView('pages.hc.payrol.payslip-file', compact('dataPayslip'));
+        $pdf = PDF::loadView('pages.hc.payrol.payslip-file',compact('dataPayslip'))->setOptions(['defaultFont' => 'sans-serif']);
 
         // Simpan PDF ke file sementara
         $pdfPath = storage_path('app/public/payslip.pdf');

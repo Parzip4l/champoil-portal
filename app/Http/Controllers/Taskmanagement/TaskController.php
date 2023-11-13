@@ -17,7 +17,7 @@ class TaskController extends Controller
     public function index()
     {
         $data['records']=Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
-                            ->select('master_tasks.*', 'projects.project as project_name')
+                            ->select('master_tasks.*', 'projects.name as project_name')
                             ->get();
         $data['project']=Project::all();
         return view('pages.operational.task.index',$data);

@@ -148,6 +148,12 @@
                     <span class="menu-title">LMS</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('patroli') }}" class="nav-link">
+                    <i class="link-icon" data-feather="book"></i>
+                    <span class="menu-title">Task Management</span>
+                </a>
+            </li>
         @endif
         @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">

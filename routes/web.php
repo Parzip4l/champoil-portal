@@ -88,6 +88,14 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('list-task', App\Http\Controllers\Taskmanagement\ListController::class);
     Route::get('/add_task/{id}', [App\Http\Controllers\Taskmanagement\ListController::class, 'list_task'])->name('add_task');
     Route::get('/qrcode/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
+    
+    //patroli
+    Route::get('/patroli', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'index'])->name('patroli');
+    Route::get('/scan_qr', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'scan_qr'])->name('scan_qr');
+    Route::get('/checklist/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'checklist_task'])->name('checklist');
+    Route::post('/checklist/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'post_code'])->name('checklist.post');
+    Route::post('/save_patroli', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'store'])->name('save_patroli');
+    
     // Feedback
     Route::post('/users/feedback', 'DashboardController@StoreFeedback')->name('feedback.store');
 });

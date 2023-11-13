@@ -50,20 +50,15 @@ class PayslipEmail extends Mailable
      *
      * @return array
      */
-    public function attachments()
-    {
-        return [
-            $this->pdfPath => [
-                'as' => 'slip_gaji.pdf',
-                'mime' => 'application/pdf',
-            ],
-        ];
-    }
+    
 
     public function build()
     {
         return $this->view('pages.hc.payrol.payslip-file') // View Payslip
             ->subject('Payslip')
-            ->attach($this->pdfPath, ['as' => 'slip_gaji.pdf', 'mime' => 'application/pdf']);
+            ->attach($this->pdfPath, [
+                'as' => 'slip_gaji.pdf',
+                'mime' => 'application/pdf',
+            ]);
     }
 }

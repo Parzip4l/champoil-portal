@@ -78,9 +78,7 @@
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                        
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                         <button type="button" id="addProduct" class="btn btn-primary mt-1 mb-3">Tambah Employee</button>
                     </div>
@@ -215,33 +213,38 @@
 <!-- Payroll -->
 <script>
     function addProductRow() {
-        const newRow = `
-            <tr>
-                <td>
-                    <select class="form-control" id="employeeSelect" name="employee_code[]">
-                        @foreach ($payrol as $data)
-                        @php
-                            $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                        @endphp
-                            <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
-                </td>
-                <td>
-                    <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
-                </td> 
-                <td class="purchase-uom-td">
-                    <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
-                </td>
-            </tr>
-        `;
-        document.querySelector('#EmployeeTable tbody').insertAdjacentHTML('beforeend', newRow);
+        const employeeTableBody = document.querySelector('#EmployeeTable tbody');
+
+        @foreach ($payrol as $data)
+        @php
+            $employee = \App\Employee::where('nik', $data->employee_code)
+                    ->where('unit_bisnis', 'CHAMPOIL') 
+                    ->first();
+        @endphp
+            const newRow{{ $data->employee_code }} = `
+                <tr>
+                    <td>
+                        <select class="form-control" name="employee_code[]">
+                            <option value="{{ $data->employee_code }}">{{ $employee->nama }}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
+                    </td>
+                    <td>
+                        <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
+                    </td> 
+                    <td class="purchase-uom-td">
+                        <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
+                    </td>
+                </tr>
+            `;
+
+            employeeTableBody.insertAdjacentHTML('beforeend', newRow{{ $data->employee_code }});
+        @endforeach
 
         updateProductCategory(document.querySelector('#EmployeeTable tbody').lastElementChild.querySelector('.form-select'));
     }
@@ -251,6 +254,18 @@
         row.remove();
     }
 
+    function selectAll() {
+        const allRows = document.querySelectorAll('#EmployeeTable tbody tr');
+        allRows.forEach(row => {
+            const inputFields = row.querySelectorAll('input');
+            inputFields.forEach(input => {
+                input.value = 0;
+            });
+        });
+    }
+
     document.getElementById('addProduct').addEventListener('click', addProductRow);
+    document.getElementById('addProduct').addEventListener('click', selectAll);
 </script>
+
 @endpush

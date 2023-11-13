@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Employee;
 use App\Payrol;
+use App\ModelCG\Payroll;
 use App\PayrolCM;
 use App\Payrollns;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PayslipController extends Controller
 {
@@ -18,9 +21,39 @@ class PayslipController extends Controller
      */
     public function index()
     {
-        $data = Payrol::all();
-        $datans = Payrollns::all();
-        return view ('pages.hc.payrol.payslip', compact('data','datans'));
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        if ($employee) {
+            $unit_bisnis = $employee->unit_bisnis;
+
+            // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
+            $data = Payrol::join('karyawan', 'payrols.employee_code', '=', 'karyawan.nik')
+                ->select('payrols.id', 'payrols.*') // Tambahkan id pada select clause
+                ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->get();
+
+            // Cek Data CG
+            if ($unit_bisnis == 'Kas') {
+                $dbSecondary = DB::connection('mysql_secondary');
+
+                $datans = $dbSecondary->table('payrolls')
+                    ->join('chag4694_champ_portal.karyawan', 'payrolls.employee_code', '=', 'karyawan.nik')
+                    ->select('payrolls.id', 'payrolls.*') // Tambahkan id pada select clause
+                    ->where('karyawan.unit_bisnis', $unit_bisnis)
+                    ->get();
+            } else {
+                $datans = Payrollns::join('karyawan', 'payrollns.employee_code', '=', 'karyawan.nik')
+                    ->select('payrollns.id', 'payrollns.*') // Tambahkan id pada select clause
+                    ->where('karyawan.unit_bisnis', $unit_bisnis)
+                    ->get();
+            }
+        } else {
+            $data = [];
+            $datans = [];
+        }
+
+        return view('pages.hc.payrol.payslip', compact('data', 'datans'));
     }
 
     public function payslipuser()

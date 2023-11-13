@@ -11,6 +11,7 @@ use App\PayrolComponent_NS;
 use Carbon\Carbon;
 use App\Absen;
 use App\Payrollns;
+use Illuminate\Support\Facades\Auth;
 class PayrolController extends Controller
 {
     /**
@@ -20,7 +21,19 @@ class PayrolController extends Controller
      */
     public function index()
     {
-        $payrol = PayrolCM::all();
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        if ($employee) {
+            $unit_bisnis = $employee->unit_bisnis;
+        
+            // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
+            $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
+                ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->get();
+        } else {
+            $payrol = [];
+        }
         return view('pages.hc.payrol.payrol', compact('payrol'));
     }
 
@@ -49,7 +62,7 @@ class PayrolController extends Controller
         $selectedMonth = $monthNames[$request->input('month')];
 
         // Menggunakan Carbon untuk mendapatkan tanggal awal dan akhir dari bulan
-        $startDate = Carbon::createFromDate(null, $selectedMonth, 1)->startOfWeek(Carbon::MONDAY);
+        $startDate = Carbon::createFromDate(null, $selectedMonth, 1)->startOfWeek(Carbon::SATURDAY);
         $endDate = Carbon::createFromDate(null, $selectedMonth, 1)->endOfMonth()->endOfWeek(Carbon::FRIDAY);
 
         // Inisialisasi array untuk menyimpan daftar minggu
@@ -61,7 +74,7 @@ class PayrolController extends Controller
 
         while ($currentDate->lte($endDate)) {
             $weekStart = $currentDate->format('Y-m-d'); // Format tanggal start
-            $weekEnd = $currentDate->copy()->addDays(4)->format('Y-m-d'); // Format tanggal end
+            $weekEnd = $currentDate->copy()->addDays(6)->format('Y-m-d'); // Format tanggal end
 
             $weeks[] = "Week " . $weekNumber . " ($weekStart - $weekEnd)";
             $currentDate->addWeek();

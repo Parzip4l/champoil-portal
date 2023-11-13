@@ -25,7 +25,6 @@ class RequestControllers extends Controller
     public function index()
     {
         $dataRequest = RequestAbsen::all();
-
         return view('pages.absen.request.index', compact('dataRequest'));
     }
 
@@ -34,25 +33,41 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
 
-        $requestabsen = RequestAbsen::findOrFail($id);
+        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
         if ($requestabsen->aprrove_status !== 'Approved') {
             $requestabsen->aprrove_status = 'Approved';
             $requestabsen->aprroved_by = $EmployeeCode;
             $requestabsen->save();
 
-            // Simpan Kedalam Table Absen
-            $absen = new Absen();
-            $absen->user_id = $EmployeeCode;
-            $absen->nik = $EmployeeCode;
-            $absen->tanggal = $requestabsen->tanggal;
-            $absen->clock_in = '-';
-            $absen->latitude = '-';
-            $absen->longtitude = '-';
-            $absen->status = $requestabsen->status;
-            $absen->save();
+            // Cek status jika lupa absen
+            if ($requestabsen->status = 'F') {
+                // Simpan Kedalam Table Absen
+                $absen = new Absen();
+                $absen->user_id = $EmployeeCode;
+                $absen->nik = $EmployeeCode;
+                $absen->tanggal = $requestabsen->tanggal;
+                $absen->clock_in = $requestabsen->clock_in;
+                $absen->clock_out = $requestabsen->clock_out;
+                $absen->latitude = '-';
+                $absen->longtitude = '-';
+                $absen->status = $requestabsen->status;
+                $absen->save();
+            } else {
+                // Simpan Kedalam Table Absen
+                $absen = new Absen();
+                $absen->user_id = $EmployeeCode;
+                $absen->nik = $EmployeeCode;
+                $absen->tanggal = $requestabsen->tanggal;
+                $absen->clock_in = '-';
+                $absen->latitude = '-';
+                $absen->longtitude = '-';
+                $absen->status = $requestabsen->status;
+                $absen->save();
+            }
+            
         }
 
-        return redirect()->route('attendence-request.index')->with('success', 'Data Pengajuan Berhasil Diupdate.');
+        return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
     }
 
     public function updateStatusReject($id)
@@ -60,19 +75,19 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
 
-        $requestabsen = RequestAbsen::findOrFail($id);
+        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
         if ($requestabsen->aprrove_status !== 'Reject') {
             $requestabsen->aprrove_status = 'Reject';
             $requestabsen->aprroved_by = $EmployeeCode;
             $requestabsen->save();
         }
 
-        return redirect()->route('attendence-request.index')->with('success', 'Data Pengajuan Berhasil Diupdate.');
+        return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
     }
 
     public function download($id)
     {
-        $requestabsen = RequestAbsen::findOrFail($id);
+        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
 
         $file_path = storage_path('app/' .$requestabsen->dokumen);
 
@@ -88,7 +103,6 @@ class RequestControllers extends Controller
     {
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
-
         $historyData = RequestAbsen::where('employee', $EmployeeCode)->get();
 
         return view('pages.absen.request.create', compact('EmployeeCode','historyData'));
@@ -105,20 +119,28 @@ class RequestControllers extends Controller
         $request->validate([
             'tanggal' => 'required'
         ]);
+        $randomNumber = mt_rand(100000, 999999);
         $pengajuan = new RequestAbsen();
+        $pengajuan->unik_code = $randomNumber;
         $pengajuan->tanggal = $request->input('tanggal');
         $pengajuan->employee = $request->input('employee');
+        $pengajuan->clock_in = $request->input('clock_in');
+        $pengajuan->clock_out = $request->input('clock_out');
         $pengajuan->status = $request->input('status');
         $pengajuan->alasan = $request->input('alasan');
         $pengajuan->aprrove_status = $request->input('aprrove_status');
         if ($request->hasFile('dokumen')) {
             $file = $request->file('dokumen');
-
-            // Check if the uploaded file is a PDF
-            if ($file->getClientOriginalExtension() !== 'pdf') {
-                throw ValidationException::withMessages(['dokumen' => 'Hanya file PDF yang diizinkan.']);
+            
+            // Mendapatkan ekstensi file
+            $extension = $file->getClientOriginalExtension();
+        
+            // Mengecek apakah file adalah PDF atau JPG
+            if ($extension !== 'pdf' && $extension !== 'jpg') {
+                return redirect()->back()->with('error', 'Hanya file PDF dan JPG yang diizinkan.');
             }
-
+        
+            // Jika file adalah PDF atau JPG maka simpan
             $path = $file->store('public/files');
             $pengajuan->dokumen = $path;
         }

@@ -7,10 +7,22 @@
 @endpush
 
 @section('content')
+<!-- TopBar -->
+<div class="row mb-4 mobile">
+    <div class="topbar-wrap d-flex justify-content-between">
+        <div class="arrow-back">
+            <a href="{{url('dashboard')}}" class="d-flex color-custom">
+                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
+                <h5 class="align-self-center">Attendence Request</h5>
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="absen-wrap mb-4">
     <div class="row">
         <div class="col-md-12 mb-3">
-            <div class="card">
+            <div class="card custom-card2">
                 <div class="card-header">
                     <h5>Request Attendence</h5>
                 </div>
@@ -26,6 +38,8 @@
                                         <option value="Sakit">Sakit</option>
                                         <option value="Cuti">Cuti</option>
                                         <option value="Visit Customer">Visit Customer</option>
+                                        <option value="A">WFE</option>
+                                        <option value="F">Lupa Absen</option>
                                     </select>
                                     <input type="hidden" name="employee" value="{{$EmployeeCode}}">
                                 </div>
@@ -40,6 +54,20 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
+                                    <label for="" class="form-label">Clock In</label>
+                                    <input type="time" name="clock_in" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Clock Out</label>
+                                    <input type="time" name="clock_out" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
                                     <label for="" class="form-label">Alasan</label>
                                     <input type="text" name="alasan" class="form-control" required>
                                 </div>
@@ -47,18 +75,19 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">File Pendukung</label>
-                                    <input type="file" name="dokumen" class="form-control" required>
+                                    <span class="text-danger">(Only Pdf & JPG)</span>
+                                    <input type="file" name="dokumen" class="form-control">
                                     <input type="hidden" name="aprrove_status" value="Pending">
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary w-100 mt-2">Ajukan Permohonan</button>
+                        <button class="btn btn-primary w-100 mt-2 button-biru">Ajukan Permohonan</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="card">
+        <div class="col-md-12 mb-6">
+            <div class="card custom-card2">
                 <div class="card-header">
                     <h5>History</h5>
                 </div>

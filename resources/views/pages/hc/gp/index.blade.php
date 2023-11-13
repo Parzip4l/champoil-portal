@@ -9,7 +9,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Data Garda Pratama</h5>
                 <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#JabatanModal">Tambah Data Garda Pratama</a>
@@ -65,7 +65,7 @@
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
                                             </a>
-                                            <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete">
+                                            <form action="#" method="POST" id="delete_contact" class="contactdelete">
                                                 @csrf @method('DELETE')
                                                 <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
                                                     <i data-feather="trash" class="icon-sm me-2"></i>
@@ -149,7 +149,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('contact.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "#".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

@@ -16,7 +16,8 @@ class ComponentController extends Controller
     public function index()
     {
         $data = Component::all();
-        return view('pages.hc.kas.payrol-component.index',compact('data'));
+        $data2 = Component::all();
+        return view('pages.hc.kas.payrol-component.index',compact('data','data2'));
     }
 
     /**
@@ -41,11 +42,13 @@ class ComponentController extends Controller
             $request->validate([
                 'name' => 'required',
                 'type' => 'required',
+                'is_taxable' => 'required',
             ]);
 
             $ComponentData = new Component();
             $ComponentData->name = $request->name;
             $ComponentData->type = $request->type;
+            $ComponentData->is_taxable = $request->is_taxable;
             $ComponentData->save();
 
             return redirect()->route('component-data.index')->with('success', 'Component Successfully Added');
@@ -85,7 +88,32 @@ class ComponentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'name' => 'required',
+                'is_taxable' => 'required',
+                'type' => 'required',
+            ]);
+
+            // Find the PayrollComponent by ID
+            $payrollComponent = Component::find($id);
+
+            if (!$payrollComponent) {
+                return redirect()->back()->with('error', 'PayrollComponent not found.');
+            }
+
+            // Update the PayrollComponent with the validated data
+            $payrollComponent->name = $validatedData['name'];
+            $payrollComponent->type = $validatedData['type'];
+            $payrollComponent->is_taxable = $validatedData['is_taxable'];
+            
+            $payrollComponent->save();
+
+            return redirect()->route('component-data.index')->with('success', 'Payroll Component updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Employee;
 use App\Payrol;
 use App\PayrolCM;
 use App\PayrolComponent_NS;
+use Illuminate\Support\Facades\Auth;
 
 class PayrolComponent extends Controller
 {
@@ -18,9 +19,30 @@ class PayrolComponent extends Controller
      */
     public function index()
     {
-        $employee = Employee::all();
-        $payrol = PayrolCM::all();
-        $parolns = PayrolComponent_NS::all();
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
+
+        if ($DataCode) {
+            $unit_bisnis = $DataCode->unit_bisnis;
+            
+            $employee = Employee::where('unit_bisnis',$unit_bisnis)->get();
+            // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
+            $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
+                ->select('payrol_components.id', 'payrol_components.*')
+                ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->get();
+
+            $parolns = PayrolComponent_NS::join('karyawan', 'payrol_component_ns.employee_code', '=', 'karyawan.nik')
+            ->select('payrol_component_ns.id', 'payrol_component_ns.*')
+            ->where('karyawan.unit_bisnis', $unit_bisnis)
+            ->get();
+
+        } else {
+            $payrol = [];
+            $parolns = [];
+            $employee = [];
+        }
+        
         return view('pages.hc.payrol.index', compact('employee','payrol','parolns'));
     }
 
@@ -113,7 +135,25 @@ class PayrolComponent extends Controller
      */
     public function edit($id)
     {
-        //
+        $payrolComponent = PayrolCM::find($id);
+
+        if (!$payrolComponent) {
+            return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');
+        }
+
+        return view('pages.hc.payrol.editcomponent.edit', compact('payrolComponent'));
+    }
+
+
+    public function editns($id)
+    {
+        $payrolComponent = PayrolComponent_NS::find($id);
+
+        if (!$payrolComponent) {
+            return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');
+        }
+
+        return view('pages.hc.payrol.editcomponent.editns', compact('payrolComponent'));
     }
 
     /**
@@ -125,7 +165,89 @@ class PayrolComponent extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'basic_salary' => 'required|numeric',
+                'allowances.t_struktural.0' => 'required|numeric',
+                'allowances.t_kinerja.0' => 'required|numeric',
+                'allowances.t_alatkerja.0' => 'required|numeric',
+                'allowances.t_allowance.0' => 'required|numeric',
+                'deductions.bpjs_ks.0' => 'required|numeric',
+                'deductions.bpsj_tk.0' => 'required|numeric',
+                'deductions.pph21.0' => 'required|numeric',
+                'deductions.p_hutang.0' => 'required|numeric',
+                'deductions.t_deduction.0' => 'required|numeric',
+                'thp' => 'required|numeric', 
+            ]);
+
+            // Find the PayrollComponent by ID
+            $payrollComponent = PayrolCM::find($id);
+
+            if (!$payrollComponent) {
+                return redirect()->back()->with('error', 'PayrollComponent not found.');
+            }
+
+            // Update the PayrollComponent with the validated data
+            $payrollComponent->basic_salary = $validatedData['basic_salary'];
+            $payrollComponent->allowances = json_encode([
+                't_struktural' => [$validatedData['allowances']['t_struktural'][0]],
+                't_kinerja' => [$validatedData['allowances']['t_kinerja'][0]],
+                't_alatkerja' => [$validatedData['allowances']['t_alatkerja'][0]],
+                't_allowance' => [$validatedData['allowances']['t_allowance'][0]],
+            ]);
+            $payrollComponent->deductions = json_encode([
+                'bpjs_ks' => [$validatedData['deductions']['bpjs_ks'][0]],
+                'bpsj_tk' => [$validatedData['deductions']['bpsj_tk'][0]],
+                'pph21' => [$validatedData['deductions']['pph21'][0]],
+                'p_hutang' => [$validatedData['deductions']['p_hutang'][0]],
+                't_deduction' => [$validatedData['deductions']['t_deduction'][0]],
+            ]);
+            $payrollComponent->net_salary = $validatedData['thp'];
+            
+            $payrollComponent->save();
+
+            return redirect()->route('payrol-component.index')->with('success', 'PayrollComponent updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function updateNS(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'daily_salary' => 'required|numeric',
+            'allowances.lembur.0' => 'required|numeric',
+            'allowances.uang_makan.0' => 'required|numeric',
+            'allowances.kerajinan.0' => 'required|numeric',
+            'deductions.mess.0' => 'required|numeric',
+            'deductions.hutang.0' => 'required|numeric',
+            'deductions.lain_lain.0' => 'required|numeric',
+        ]);
+
+        // Find the PayrollComponent by ID
+        $payrollComponent = PayrolComponent_NS::find($id);
+
+        if (!$payrollComponent) {
+            return redirect()->back()->with('error', 'PayrollComponent not found.');
+        }
+
+        // Update the PayrollComponent with the validated data
+        $payrollComponent->daily_salary = $validatedData['daily_salary'];
+        $payrollComponent->allowances = json_encode([
+            'lembur' => [$validatedData['allowances']['lembur'][0]],
+            'uang_makan' => [$validatedData['allowances']['uang_makan'][0]],
+            'kerajinan' => [$validatedData['allowances']['kerajinan'][0]],
+        ]);
+        $payrollComponent->deductions = json_encode([
+            'mess' => [$validatedData['deductions']['mess'][0]],
+            'hutang' => [$validatedData['deductions']['hutang'][0]],
+            'lain_lain' => [$validatedData['deductions']['lain_lain'][0]],
+        ]);
+        
+        $payrollComponent->save();
+
+        return redirect()->route('payrol-component.index')->with('success', 'PayrollComponent updated successfully.');
     }
 
     /**

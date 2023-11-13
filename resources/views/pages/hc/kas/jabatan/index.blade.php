@@ -41,7 +41,7 @@
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
                                             </a>
-                                            <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
+                                            <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
                                                 <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
                                                     <i data-feather="trash" class="icon-sm me-2"></i>
@@ -75,7 +75,7 @@
                     <div class="row">
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Nama Jabatan</label>
-                            <input type="text" class="form-control" name="name" required>    
+                            <input type="text" class="form-control" name="name" required>
                         </div>
                         <div class="col-md-12 mt-2">
                             <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
@@ -111,7 +111,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('contact.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "#".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

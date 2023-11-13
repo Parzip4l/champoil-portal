@@ -21,7 +21,7 @@
 @endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <div class="head-card d-flex justify-content-between mb-3">
             <h6 class="card-title align-self-center mb-0">Payrol Component</h6>
@@ -68,8 +68,8 @@
                                 <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.edit', $data->id) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                                    <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('payrol-component.edit', $data->id) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                                    <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                         @csrf @method('DELETE') 
                                         <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
                                             <i data-feather="trash" class="icon-sm me-2"></i>
@@ -107,16 +107,22 @@
                             @php
                                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                             @endphp
-                            <td><a href="{{route('payrol-component.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td>
+                                @if ($employee)
+                                    <a href="{{ route('editcomponentns.edit', $data->id) }}">{{ $employee->nama }}</a>
+                                @else
+                                    <p>Karyawan Tidak Ditemukan</p>
+                                @endif
+                            </td>
                             <td>Rp {{ number_format($data->daily_salary, 0, ',', '.') }}</td>
                             <td>
                                 <div class="dropdown">
                                 <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.edit', $data->id) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                                    <form action="{{ route('contact.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('editcomponentns.edit', $data->id) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                                    <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                         @csrf @method('DELETE') 
                                         <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
                                             <i data-feather="trash" class="icon-sm me-2"></i>

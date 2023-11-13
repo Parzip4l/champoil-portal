@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class CheckPermission
 {
@@ -20,7 +21,16 @@ class CheckPermission
         if (Auth::check()) {
             // Mengecek izin akses pengguna
             $userPermissions = json_decode(Auth::user()->permission, true);
-        
+
+            $user = Auth::user();
+            if ($user) {
+                $token = Cache::get('nik' . $user->name);
+                if ($token) {
+                    // Token ditemukan, pengguna masih dianggap masuk
+                    return $next($request);
+                }
+            }
+
             if (!is_array($userPermissions)) {
                 abort(500, 'Invalid user permissions format.');
             }

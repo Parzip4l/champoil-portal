@@ -8,7 +8,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Project Details {{$project->name}}</h5>
             </div>

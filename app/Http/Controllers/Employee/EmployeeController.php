@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Employee;
 use App\Absen;
+use App\User;
+use App\Payrolinfo\Payrolinfo;
 use App\UserActivities;
 use App\ModelCG\Jabatan;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
@@ -21,7 +25,9 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $karyawan = Employee::all();
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
         return view('pages.hc.karyawan.index', compact('karyawan'));
     }
 
@@ -49,7 +55,8 @@ class EmployeeController extends Controller
                 'nama' => 'required',
                 'gambar' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
-        
+            
+            DB::beginTransaction();
             $data = new Employee();
             $data->ktp = $request->ktp;
             $data->nik = $request->nik;
@@ -67,6 +74,8 @@ class EmployeeController extends Controller
             $data->tanggal_lahir = $request->tanggal_lahir;
             $data->tempat_lahir = $request->tempat_lahir;
             $data->jenis_kelamin = $request->jenis_kelamin;
+            $data->tanggungan = $request->tanggungan;
+            $data->unit_bisnis = $request->unit_bisnis;
 
             if ($request->hasFile('gambar')) {
                 $image = $request->file('gambar');
@@ -76,9 +85,30 @@ class EmployeeController extends Controller
                 $data->gambar = $filename;
             }
             $data->save();
+            // Payrol Info
+            $payrolinfo = new Payrolinfo();
+            $payrolinfo->employee_code = $request->nik;
+            $payrolinfo->bpjs_kes = $request->bpjs_kes;
+            $payrolinfo->bpjs_tk = $request->bpjs_tk;
+            $payrolinfo->npwp = $request->npwp;
+            $payrolinfo->bank_name = $request->bank_name;
+            $payrolinfo->bank_number = $request->bank_number;
+            $payrolinfo->ptkp = $request->tanggungan;
+            $payrolinfo->save();
 
+            // User Info
+            $userinfo = new User();
+            $userinfo->name = $request->nik;
+            $userinfo->email = $request->email;
+            $userinfo->password = Hash::make($request->password);
+            $userinfo->permission = json_encode($request->permissions);
+            $userinfo->employee_code = $request->nik;
+            $userinfo->save();
+
+            DB::commit();
             return redirect()->route('employee.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }catch (ValidationException $exception) {
+            DB::rollBack();
             $errorMessage = $exception->validator->errors()->first(); // ambil pesan error pertama dari validator
             redirect()->route('employee.index')->with('error', 'Gagal menyimpan data. ' . $errorMessage); // tambahkan alert error
         }
@@ -163,8 +193,9 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::where('nik', $id)->with('payrolinfo')->first();
         return view('pages.hc.karyawan.edit', compact('employee'));
+        
     }
 
     public function getAttendanceData(Request $request) {
@@ -220,51 +251,81 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'ktp' => 'required|numeric',
-            'nik' => 'required|string|max:255',
-            'jabatan' => 'required|string|max:255',
-            'agama' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|string|in:Laki-Laki,Perempuan',
-            'email' => 'required|email',
-            'telepon' => 'required|string|max:15',
-            'status_kontrak' => 'required|string|in:Contract,Permanent',
-            'organisasi' => 'required|string|in:Professional Frontline,Management Leaders',
-            'joindate' => 'required|date',
-            'berakhirkontrak' => 'required|date',
-            'tempat_lahir' => 'required|string|max:255',
-            'tanggal_lahir' => 'required|date',
-            'alamat' => 'required|string',
-            'status_pernikahan' => 'required|string|in:Married,Single',
-        ]);
+        try {
+            $request->validate([
+                'nama' => 'required|string|max:255',
+                'ktp' => 'required|numeric',
+            ]);
+            DB::beginTransaction();
+            // Find the employee by ID
+            $employee = Employee::where('nik', $id)->first();
+            
+            // Kembalikan jika tidak ditemukan
+            if (!$employee) {
+                return redirect()->back()->with('error', 'Employee not found.');
+            }
+            // Update the employee data
+            $employee->nama = $request->input('nama');
+            $employee->ktp = $request->input('ktp');
+            $employee->nik = $request->input('nik');
+            $employee->jabatan = $request->input('jabatan');
+            $employee->agama = $request->input('agama');
+            $employee->jenis_kelamin = $request->input('jenis_kelamin');
+            $employee->email = $request->input('email');
+            $employee->telepon = $request->input('telepon');
+            $employee->status_kontrak = $request->input('status_kontrak');
+            $employee->organisasi = $request->input('organisasi');
+            $employee->joindate = $request->input('joindate');
+            $employee->berakhirkontrak = $request->input('berakhirkontrak');
+            $employee->tempat_lahir = $request->input('tempat_lahir');
+            $employee->tanggal_lahir = $request->input('tanggal_lahir');
+            $employee->alamat = $request->input('alamat');
+            $employee->status_pernikahan = $request->input('status_pernikahan');
+            $employee->tanggungan = $request->input('tanggungan');
+            
+            // Save the updated employee
+            $employee->save();
+            
+            // Cek Payrol Info
+            $payrollInfo = Payrolinfo::where('employee_code', $id)->first();
 
-        // Find the employee by ID
-        $employee = Employee::findOrFail($id);
+            // Payroll Info 
+            if ($payrollInfo) {
+                $payrollInfo->employee_code = $request->input('nik');
+                $payrollInfo->bpjs_kes = $request->input('bpjs_kes');
+                $payrollInfo->bpjs_tk = $request->input('bpjs_tk');
+                $payrollInfo->npwp = $request->input('npwp');
+                $payrollInfo->bank_name = $request->input('bank_name');
+                $payrollInfo->bank_number = $request->input('bank_number');
+                $payrollInfo->ptkp = $request->input('tanggungan');
+                $payrollInfo->save();
+            } else {
+                // Jika tidak ditemukan maka buat baru
+                $payrolinfo = new Payrolinfo();
+                $payrolinfo->employee_code = $request->nik;
+                $payrolinfo->bpjs_kes = $request->bpjs_kes;
+                $payrolinfo->bpjs_tk = $request->bpjs_tk;
+                $payrolinfo->npwp = $request->npwp;
+                $payrolinfo->bank_name = $request->bank_name;
+                $payrolinfo->bank_number = $request->bank_number;
+                $payrolinfo->ptkp = $request->tanggungan;
+                $payrolinfo->save();
+            }
 
-        // Update the employee data
-        $employee->nama = $request->input('nama');
-        $employee->ktp = $request->input('ktp');
-        $employee->nik = $request->input('nik');
-        $employee->jabatan = $request->input('jabatan');
-        $employee->agama = $request->input('agama');
-        $employee->jenis_kelamin = $request->input('jenis_kelamin');
-        $employee->email = $request->input('email');
-        $employee->telepon = $request->input('telepon');
-        $employee->status_kontrak = $request->input('status_kontrak');
-        $employee->organisasi = $request->input('organisasi');
-        $employee->joindate = $request->input('joindate');
-        $employee->berakhirkontrak = $request->input('berakhirkontrak');
-        $employee->tempat_lahir = $request->input('tempat_lahir');
-        $employee->tanggal_lahir = $request->input('tanggal_lahir');
-        $employee->alamat = $request->input('alamat');
-        $employee->status_pernikahan = $request->input('status_pernikahan');
+            DB::commit();
+            // Redirect to a view or return a response as needed
+            return redirect()->route('employee.index')->with('success', 'Employee data updated successfully.');
+        }catch (ValidationException $exception) {
+            DB::rollBack();
+            $errorMessage = $exception->validator->errors()->first(); // ambil pesan error pertama dari validator
+            if (!$employee->save()) {
+                return redirect()->back()->with('error', 'Gagal menyimpan data karyawan.' . $errorMessage);
+            }
 
-        // Save the updated employee
-        $employee->save();
-
-        // Redirect to a view or return a response as needed
-        return redirect()->route('employee.index')->with('success', 'Employee data updated successfully.');
+            if (!$payrollInfo->save()) {
+                return redirect()->back()->with('error', 'Gagal menyimpan data Payroll Info.' . $errorMessage);
+            }
+        }
     }
 
     /**
@@ -319,5 +380,71 @@ class EmployeeController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function MyProfile($nik)
+    {
+        $employee = Employee::where('nik', $nik)->with('payrolinfo')->first();
+        $nikdata = $employee->nik;
+
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+        // Hitung jumlah hari kerja tanpa absensi (termasuk akhir pekan)
+        $totalWorkingDays = $startDate->diffInWeekdays($endDate) + 1;
+
+        // Fetch attendance data for the current month
+        $attendanceData = DB::table('absens')
+            ->where('nik', $nikdata)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
+        // Hitung jumlah hari dengan absensi
+        $daysWithAttendance = count($attendanceData);
+
+        // Hitung jumlah hari tanpa absensi
+        $daysWithoutAttendance = $totalWorkingDays - $daysWithAttendance;
+
+        // No ClockOut
+        $daysWithClockInNoClockOut = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if (!empty($absendata->clock_in) && empty($absendata->clock_out)) {
+                $daysWithClockInNoClockOut++;
+            }
+        }
+
+        // Sakit
+        $sakit = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if ($absendata->status == 'Sakit') {
+                $sakit++;
+            }
+        }
+
+        $izin = 0;
+        $leaveTotal = 0;
+
+        foreach ($attendanceData as $absendata) {
+            if ($absendata->status == 'Izin') {
+                $izin++;
+            }
+        }
+
+        // Request Absen
+        $requestAbsen = RequestAbsen::where('employee',$nikdata)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->get();
+        
+        //count Request
+        $CountRequest = RequestAbsen::where('employee',$nikdata)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->count(); 
+        
+        $leaveTotal = $sakit + $izin;
+        return view('pages.user-pages.profile', compact('employee','attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin','leaveTotal'));
     }
 }

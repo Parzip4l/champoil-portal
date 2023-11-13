@@ -7,58 +7,140 @@
 @endpush
 
 @section('content')
-
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
+<!-- topbar -->
+<div class="row mb-4 mobile">
+    <div class="topbar-wrap d-flex justify-content-between">
+        <div class="arrow-back">
+            <a href="{{url('dashboard')}}" class="d-flex color-custom">
+                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
+                <h5 class="align-self-center">My Slip</h5>
+            </a>
+        </div>
     </div>
-@endif  
-
-@if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
+</div>
+@php 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+@endphp
+<div class="card custom-card mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="content-wrap-employee-card d-flex justify-content-between mb-5">
+                <div class="content-left align-self-center">
+                    <div class="employee-name mb-1">
+                        <h5 class="text-white text-uppercase">{{ $employee->nama }}</h5>
+                    </div>
+                    <div class="employee-title-job">
+                        <p>{{ $employee->jabatan }}</p>
+                    </div>
+                </div>
+                <div class="content-right">
+                    <div class="gambar">
+                        <img src="{{ asset('images/' . $employee->gambar) }}" alt="" class="w-100">
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrap-employee-card d-flex justify-content-between">
+                <div class="content-left align-self-center">
+                    <div class="employee-title-job">
+                        <p>Employee ID</p>
+                    </div>
+                    <div class="employee-name mb-1">
+                        <h5 class="text-white text-uppercase">{{ $employee->nik }}</h5>
+                    </div>
+                </div>
+                <div class="content-right">
+                    <div class="employee-title-job text-right">
+                        <p>Division</p>
+                    </div>
+                    <div class="employee-name mb-1">
+                        <h5 class="text-white text-uppercase">{{ $employee->organisasi }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-@endif
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <div class="table-responsive">
-          <table id="dataTableExample" class="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Payslip Code</th>
-                <th>Payroll Periode</th>
-              </tr>
-            </thead>
-            <tbody>
-                @php 
-                    $no = 1;
-                    
-                @endphp
-                @foreach ($payslips as $data)
-              <tr>
-                <td>{{ $no++ }}</td>
+</div>
+<div class="row desktop">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Payslip Code</th>
+                                <th>Payroll Periode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                                
+                            @endphp
+                            @foreach ($payslips as $data)
+                            <tr>
+                                <td>{{ $no++ }}</td>
+                                @php
+                                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                                @endphp
+                                @if($employee->organisasi === 'Management Leaders')
+                                <td><a href="{{route('payslip.show', $data->id)}}">{{ $data->employee_code }}</a></td>
+                                <td>{{ $data->month }} - {{ $data->year }}</td>
+                                @endif
+                                @if($employee->organisasi === 'Frontline Officer')
+                                <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $data->employee_code }}</a></td>
+                                <td>{{ $data->month }} - {{ $data->year }}</td>
+                                @endif
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Show -->
+<div class="row mobile">
+    <div class="col-md-12">
+        <div class="card custom-card2">
+            <div class="card-body">
+            @foreach ($payslips as $data)
                 @php
                     $employee = \App\Employee::where('nik', $data->employee_code)->first();
                 @endphp
                 @if($employee->organisasi === 'Management Leaders')
-                <td><a href="{{route('payslip.show', $data->id)}}">{{ $data->employee_code }}</a></td>
-                <td>{{ $data->month }} - {{ $data->year }}</td>
+                <a href="{{route('payslip.show', $data->id)}}" class="mb-3">
+                    <div class="payslip-wrap d-flex">
+                        <div class="icon-wrap-slip me-3">
+                            <i class="icon-lg text-white" data-feather="file-text"></i>
+                        </div>
+                        <div class="payslip-info align-self-center">
+                            <h5 class="color-custom mb-1">Periode {{ $data->month }} {{ $data->year }}</h5>
+                            <p class="text-muted">{{ $data->employee_code }}</p>
+                        </div>
+                    </div>
+                </a>
                 @endif
                 @if($employee->organisasi === 'Frontline Officer')
-                <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $data->employee_code }}</a></td>
-                <td>{{ $data->month }} - {{ $data->year }}</td>
+                <a href="{{route('payslip-ns.show', $data->id)}}">
+                    <div class="payslip-wrap d-flex">
+                        <div class="icon-wrap-slip me-2">
+                            <i class="icon-lg text-white" data-feather="file-text"></i>
+                        </div>
+                        <div class="payslip-info align-self-center">
+                            <h5 class="color-custom mb-1">Periode {{ $data->month }} {{ $data->year }}</h5>
+                            <p class="text-muted">{{ $data->employee_code }}</p>
+                        </div>
+                    </div>
+                </a>
                 @endif
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
+            @endforeach
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 @endsection
 
@@ -74,80 +156,33 @@
     <script src="{{ asset('assets/js/select2.js') }}"></script>
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
-  <script>
-    function showDeleteDataDialog(id) {
-        Swal.fire({
-            title: 'Hapus Data',
-            text: 'Anda Yakin Akan Menghapus Data Ini?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Perform the delete action here (e.g., send a request to delete the data)
-                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('employee.destroy', ':id') }}".replace(':id', id);
-                fetch(deleteUrl, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                }).then((response) => {
-                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Employee Successfully Deleted',
-                            icon: 'success',
-                        }).then(() => {
-                            window.location.reload(); // Refresh halaman setelah menutup alert
-                        });
-                    } else {
-                        // Handle error response if needed
-                        Swal.fire({
-                            title: 'Contact Failed to Delete',
-                            text: 'An error occurred while deleting data.',
-                            icon: 'error',
-                        });
-                    }
-                }).catch((error) => {
-                    // Handle fetch error if needed
-                    Swal.fire({
-                        title: 'Contact Failed to Delete',
-                        text: 'An error occurred while deleting data.',
-                        icon: 'error',
-                    });
-                });
-            }
-        });
-    }
+    <script>
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '{{ session('error') }}',
+            });
+        @endif
     </script>
-  <script>
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('success') }}',
-        });
-    @endif
+    <script>
+        $(function() {
+    'use strict'
 
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: '{{ session('error') }}',
-        });
-    @endif
-</script>
-<script>
-    $(function() {
-  'use strict'
-
-  if ($(".js-example-basic-single").length) {
-    $(".js-example-basic-single").select2();
-  }
-  if ($(".js-example-basic-multiple").length) {
-    $(".js-example-basic-multiple").select2();
-  }
-});
-</script>
+    if ($(".js-example-basic-single").length) {
+        $(".js-example-basic-single").select2();
+    }
+    if ($(".js-example-basic-multiple").length) {
+        $(".js-example-basic-multiple").select2();
+    }
+    });
+    </script>
 @endpush

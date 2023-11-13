@@ -9,22 +9,25 @@ use App\Invoice;
 use Carbon\Carbon;
 use App\Absen;
 use App\Employee;
+use App\Feedback;
+use App\Payrol;
+use App\Absen\RequestAbsen;
 use App\ModelCG\asign_test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\PayslipEmail;
+use Illuminate\Support\Facades\Mail;
+use PDF;
 
 class DashboardController extends Controller
 {
     public function index()
     {   
-        // Get Years & Month Now
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
-        
-        // Get last Years & Month 
-        $lastMonth = Carbon::now()->subMonth()->month;
-        $lastYear = Carbon::now()->subMonth()->year;
+        // Request Approval
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
 
+<<<<<<< HEAD
         // Get Total Purchase Now
         $totalPembelianBulanIni = Purchase::whereMonth('created_at', $currentMonth)
                                  ->whereYear('created_at', $currentYear)
@@ -110,6 +113,13 @@ class DashboardController extends Controller
                             ->get();
 
         // Greeting
+=======
+        $dataRequest = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
+            ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+            ->where('aprrove_status', 'Pending')
+            ->select('requests_attendence.*', 'karyawan.*')
+            ->get();
+>>>>>>> ea975c674fc0170e26e661dd1f286d107cdc17b7
 
         date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda
             $hour = date('H'); // Ambil jam saat ini
@@ -170,14 +180,61 @@ class DashboardController extends Controller
 
         $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
-        
-        return view('dashboard', compact('totalPembelianBulanIni', 'totalPembelianBulanLalu', 'percentageChange', 'changeMessage', 'arrowIcon', 'textClass','salesData',
-            'salesData2', 'TotalSales', 'TotalSalesLatest','PersentaseSales','arrowIcon2', 'textClass2', 'YearlySales', 'changeMessage2','greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test'
+
+        return view('dashboard', compact('greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest'
         ));
     }
 
-    public function getSalesData()
+    public function StoreFeedback(Request $request)
     {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required'
+        ]);
         
+        $coa = new Feedback();
+        $coa->name = $request->input('name');
+        $coa->email = $request->input('email');
+        $coa->rating = $request->input('rating');
+        $coa->feedback = $request->input('feedback');
+        $coa->save();
+
+        return redirect()->back()->with('success', 'Thankyou For Feedback');
+    }
+
+    public function sendEmail($id)
+    {
+        // Retrieve data based on the ID
+        $data = Payrol::findOrFail($id);
+        $dataPayslip = Payrol::where('id', $id)->get();
+
+        $pdf = PDF::loadView('pages.hc.payrol.pdfslip',compact('dataPayslip'))->setOptions(['defaultFont' => 'sans-serif']);
+
+        // Simpan PDF ke file sementara
+        $pdfPath = storage_path('app/public/payslip.pdf');
+        $pdf->save($pdfPath);
+
+        // Kirim email dengan lampiran PDF
+        $data = [
+            'subject' => 'Slip Gaji',
+            'body' => 'Terlampir adalah slip gaji Anda',
+            'attachmentName' => 'slip_gaji.pdf',
+        ];
+
+        // Send email
+        Mail::to('sobirin@champoil.co.id')->send(new PayslipEmail($dataPayslip,$pdfPath));
+        // Hapus file PDF sementara
+        unlink($pdfPath);
+
+        return redirect()->back()->with('success', 'Email sent successfully!');
+    }
+
+    public function kirimEmail()
+    {
+        $userEmail = 'sobirin@champoil.co.id';
+
+        Mail::to($userEmail)->send(new PayslipEmail());
+
+        return redirect()->back()->with('success', 'Email Has Been Send');
     }
 }

@@ -27,14 +27,10 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
-    
-    Route::get('/get-last-product-code', 'ProductController@getLastProductCode');
-    Route::get('/get-purchase-data', 'DashboardController@getSalesData')->name('get-purchase-data');
-    Route::resource('isi-survei', SurveyController::class);
-    Route::resource('purchase', PurchaseController::class);
-    Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
+    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
     Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
+
     // Backup
     Route::get('/backup-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'absenBackup'])->name('attendence.backup');
     Route::post('/absensi/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockin'])
@@ -65,10 +61,14 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
     Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');
+    
+    // Update Component NS
+    Route::get('/update-component-ns/{id}', [App\Http\Controllers\Payrol\PayrolComponent::class, 'editns'])->name('editcomponentns.edit');
+    Route::put('/payroll-components-ns/{id}', [App\Http\Controllers\Payrol\PayrolComponent::class, 'updateNS'])->name('updatecomponentNS.update');
+
     Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
-    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
 
     // Classroom
     Route::get('/read_test/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'read_test'])->name('read_test');
@@ -77,17 +77,13 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/knowledge.save_test_user', [App\Http\Controllers\knowledge\KnowledgeController::class, 'submit_user'])->name('knowledge.save_test_user');
     Route::get('/list-class', [App\Http\Controllers\knowledge\KnowledgeController::class, 'list_classroom'])->name('list-class');
     Route::get('/start_class/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'start_class'])->name('start_class');
-});
 
-Route::middleware(['auth', 'permission:sales_access'])->group(function () {
-    Route::resource('sales', SalesController::class);
-    Route::resource('delivery-orders', DeliveryorderController::class);
-    // Growth
-    Route::resource('growth', GrowthController::class);
-    // Contact
-    Route::resource('contact', ContactController::class);
-});
+    // User Profile
+    Route::get('/MyProfile/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'MyProfile'])->name('MyProfile');
+    Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
+    Route::put('/users/{id}/reset-password', 'UserController@ResetPassword')->name('pass.reset');
 
+<<<<<<< HEAD
 Route::middleware(['auth', 'permission:purchase_access'])->group(function () {
     Route::resource('purchase', PurchaseController::class);
     Route::get('purchase/receive/{id}', 'PurchaseController@receiveProductShow')->name('purchase.receive');
@@ -159,6 +155,10 @@ Route::middleware(['auth', 'permission:ops_access'])->group(function () {
     Route::resource('list-task', App\Http\Controllers\Taskmanagement\ListController::class);
     Route::get('/add_task/{id}', [App\Http\Controllers\Taskmanagement\ListController::class, 'list_task'])->name('add_task');
     Route::get('/qrcode/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
+=======
+    // Feedback
+    Route::post('/users/feedback', 'DashboardController@StoreFeedback')->name('feedback.store');
+>>>>>>> ea975c674fc0170e26e661dd1f286d107cdc17b7
 });
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
@@ -169,11 +169,6 @@ Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
-    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
-});
-
-Route::middleware(['auth', 'permission:creative_access'])->group(function () {
-    
 });
 
 // Superadmin Access
@@ -181,7 +176,6 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
-    Route::put('/users/{id}/update-password', 'UserController@changePassword')->name('pass.update');
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
     Route::put('/manual-delivery/{id}/update-kiriman', 'ManualDeliveryController@UpdateSeluruhData')->name('manual-delivery.UpdateData');
@@ -196,7 +190,6 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
-    Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
 
     // Update Absen
     Route::post('/action/edit/{date}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');
@@ -204,8 +197,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
 
     // Payroll
-        // Component Master
-        Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
+    // Component Master
+    Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
         
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
@@ -243,7 +236,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     });
 });
 
-Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');;
+Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');
+
+// Tes Email
+Route::get('/kirim-email', [App\Http\Controllers\DashboardController::class, 'kirimEmail']);
+Route::get('/send-email/{id}', [App\Http\Controllers\DashboardController::class, 'sendEmail'])->name('send-email');
 
 // Login
 Route::controller(LoginController::class)->group(function(){

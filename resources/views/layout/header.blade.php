@@ -44,22 +44,10 @@
                 </div>
                 <ul class="list-unstyled p-1">
                     <li class="dropdown-item py-2">
-                    <a href="{{ url('/general/profile') }}" class="text-body ms-0">
-                        <i class="me-2 icon-md" data-feather="user"></i>
-                        <span>Profile</span>
-                    </a>
-                    </li>
-                    <li class="dropdown-item py-2">
-                    <a href="javascript:;" class="text-body ms-0">
-                        <i class="me-2 icon-md" data-feather="edit"></i>
-                        <span>Edit Profile</span>
-                    </a>
-                    </li>
-                    <li class="dropdown-item py-2">
-                    <a href="javascript:;" class="text-body ms-0">
-                        <i class="me-2 icon-md" data-feather="repeat"></i>
-                        <span>Switch User</span>
-                    </a>
+                        <a href="{{ route('MyProfile', ['nik' => Auth::user()->name])}}" class="text-body ms-0">
+                            <i class="me-2 icon-md" data-feather="user"></i>
+                            <span>Profile</span>
+                        </a>
                     </li>
                     <li class="dropdown-item py-2">
                         <form action="{{ route('logout') }}" method="POST" id="logout_admin">
@@ -82,11 +70,12 @@
   </nav>
   @php 
     $dataLogin = json_decode(Auth::user()->permission);
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
   @endphp 
   <nav class="bottom-navbar">
     <div class="container">
       <ul class="nav page-navigation">
-      @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin) || in_array('sales_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('accounting_access', $dataLogin) || in_array('sales_access', $dataLogin))
         <li class="nav-item {{ active_class(['/dashboard']) }}">
           <a href="{{ url('/dashboard') }}" class="nav-link">
             <i class="link-icon" data-feather="pie-chart"></i>
@@ -94,6 +83,7 @@
           </a>
         </li>
         @endif
+<<<<<<< HEAD
         @if(in_array('superadmin_access', $dataLogin) || in_array('sales_access', $dataLogin))
         <li class="nav-item mega-menu {{ active_class(['growth', 'contact', 'sales']) }}">
           <a href="#" class="nav-link">
@@ -359,18 +349,88 @@
                 <span class="menu-title">Creative</span>
             </a>
         </li>
+=======
+        @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ url('employee') }}" class="nav-link">
+                    <i class="link-icon" data-feather="user"></i>
+                    <span class="menu-title">Employee</span>
+                </a>
+            </li>
+>>>>>>> ea975c674fc0170e26e661dd1f286d107cdc17b7
         @endif
         @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
-                <a href="{{ url('') }}" class="nav-link">
+                <a href="{{ url('#') }}" class="nav-link">
+                    <i class="link-icon" data-feather="clock"></i>
+                        <span class="menu-title">Time Management</span>
+                    <i class="link-arrow"></i>
+                </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
+                        <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
+                        <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['kas/shift']) }}">Shift</a></li>
+                    </ul>
+                </div>
+            </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ url('#') }}" class="nav-link">
+                    <i class="link-icon" data-feather="dollar-sign"></i>
+                        <span class="menu-title">Payroll</span>
+                    <i class="link-arrow"></i>
+                </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item"><a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payslip</a></li>
+                        <li class="nav-item"><a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payroll</a></li>
+
+                        @if($employee && $employee->unit_bisnis == 'CHAMPOIL')
+                            <li class="nav-item"><a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payroll Frontline Officer</a></li>
+                        @endif
+
+                        @if($employee && $employee->unit_bisnis == 'Kas')
+                            <li class="nav-item"><a href="{{ route('payroll-kas.index') }}" class="nav-link {{ active_class(['kas/payroll-kas']) }}">Payroll Anggota</a></li>
+                        @endif
+
+                        <li class="nav-item"><a href="{{ url('payrol-component') }}" class="nav-link {{ active_class(['payrol-component']) }}">Assign Component</a></li>
+                        <li class="nav-item"><a href="{{ url('component-data') }}" class="nav-link {{ active_class(['component-data']) }}">Component Master</a></li>
+                    </ul>
+                </div>
+            </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ route('employee-loan.index') }}" class="nav-link {{ active_class(['employee-loan']) }}">
+                    <i class="link-icon" data-feather="credit-card"></i>
+                    <span class="menu-title">Employee Loan</span>
+                </a>
+            </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ route('knowledge_base.index') }}" class="nav-link">
+                    <i class="link-icon" data-feather="book-open"></i>
+                    <span class="menu-title">LMS</span>
+                </a>
+            </li>
+        @endif
+        @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ url('#') }}" class="nav-link">
                     <i class="link-icon" data-feather="settings"></i>
-                        <span class="menu-title">Apps Settings</span>
+                        <span class="menu-title">Apps Setting</span>
                     <i class="link-arrow"></i>
                 </a>
                 <div class="submenu">
                     <ul class="submenu-item">
                         <li class="nav-item"><a href="{{ url('slack-account') }}" class="nav-link {{ active_class(['slack-account']) }}">Automation</a></li>
                         <li class="nav-item"><a href="{{ url('users') }}" class="nav-link {{ active_class(['users']) }}">User Settings</a></li>
+                        <li class="nav-item"><a href="{{ route('jabatan.index') }}" class="nav-link {{ active_class(['kas/jabatan']) }}">Jabatan</a></li>
+                        <li class="nav-item"><a href="{{ route('project.index') }}" class="nav-link {{ active_class(['kas/project']) }}">Project</a></li>
+                        <li class="nav-item"><a href="{{ url('garda-pratama') }}" class="nav-link {{ active_class(['garda-pratama']) }}">Garda Pratama</a></li>
                     </ul>
                 </div>
             </li>
@@ -378,6 +438,38 @@
       </ul>
     </div>
   </nav>
+</div>
+
+<!-- Mobile Menu -->
+<div class="row">
+    <div class="container">
+        <div class="menu-mobile-wrap d-flex justify-content-between">
+            <a href="{{url('dashboard')}}" class="text-muted nav-link {{ active_class(['dashboard']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="home"></i>
+                    <p>Home</p>
+                </div>
+            </a>
+            <a href="{{route('attendence-request.create')}}" class="text-muted nav-link {{ active_class(['attendence*']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="plus-circle"></i>
+                    <p>Request</p>
+                </div>
+            </a>
+            <a href="{{ route('mySlip')}}" class="text-muted nav-link {{ active_class(['payslip*','myslip']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="file-text"></i>
+                    <p>My Slip</p>
+                </div>
+            </a>
+            <a href="{{ route('MyProfile', ['nik' => Auth::user()->name])}}" class="text-muted nav-link {{ active_class(['MyProfile*']) }}">
+                <div class="menu-item-nav text-center">
+                    <i class="icon-lg" data-feather="user"></i>
+                    <p>Profile</p>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 
 <script>

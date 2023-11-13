@@ -7,18 +7,18 @@ $(function() {
   if($('.owl-basic').length) {
     $('.owl-basic').owlCarousel({
       loop:true,
-      margin:10,
+      margin:25,
       rtl: checkRTL(),
       nav:false,
       responsive:{
           0:{
-              items:2
+              items:3.5
           },
           600:{
               items:3
           },
           1000:{
-              items:4
+              items:6.5
           }
       }
     });
@@ -35,7 +35,7 @@ $(function() {
       autoplayHoverPause:true,
       responsive:{
         0:{
-            items:2
+            items:3.5
         },
         600:{
             items:3
@@ -79,7 +79,7 @@ $(function() {
         margin:10,
         responsive:{
             0:{
-                items:2
+                items:3.5
             },
             600:{
                 items:3

@@ -9,19 +9,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         $users = User::all();
-        $employee = Employee::all();
+        $employee = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
         return view('pages.app-setting.user.index', compact('users','employee'));
     }
 
     public function create()
-    {
-        
+    {   
         return view('pages.app-setting.user.create');
     }
 
@@ -77,7 +79,33 @@ class UserController extends Controller
     public function changePassword(Request $request, $id)
     {
         try {
-            $user = User::findOrFail($id);
+            $user = User::where('employee_code', $id)->firstOrFail();
+    
+            // Validasi bahwa password sebelumnya cocok
+            if (!\Hash::check($request->input('current_password'), $user->password)) {
+                return redirect()->back()->with('error', 'Password sebelumnya tidak cocok.');
+            }
+    
+            // Validasi bahwa password baru cocok dengan konfirmasi
+            if ($request->input('password') !== $request->input('password_confirmation')) {
+                return redirect()->back()->with('error', 'Password baru dan konfirmasi password tidak cocok.');
+            }
+    
+            $user->update([
+                'password' => bcrypt($request->input('password')),
+            ]);
+    
+            return redirect()->back()->with('success', 'Password Berhasil Diupdate.');
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors());
+        }
+    }
+
+    public function ResetPassword(Request $request, $id)
+    {
+        try {
+            $user = User::where('employee_code', $id)->firstOrFail();
+    
             $user->update([
                 'password' => bcrypt($request->input('password')),
             ]);

@@ -3,6 +3,7 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -100,31 +101,7 @@
                                 <div class="col-md-4">
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access">
-                                        <label class="form-check-label">Dashboard Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="accounting_access">
-                                        <label class="form-check-label">Accounting Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="inventory_access">
-                                        <label class="form-check-label">Inventory Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="ops_access">
-                                        <label class="form-check-label">Ops Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="sales_access">
-                                        <label class="form-check-label">Sales Access</label>
+                                        <label class="form-check-label">User Accerss</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -135,26 +112,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="formulation_access">
-                                        <label class="form-check-label">Formulation Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="creative_access">
-                                        <label class="form-check-label">Creative Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="maintenance_access">
-                                        <label class="form-check-label">Maintenance Access</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="purchase_access">
-                                        <label class="form-check-label">Purchase Access</label>
+                                        <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">
+                                        <label class="form-check-label">Super Admin</label>
                                     </div>
                                 </div>
                             </div>
@@ -175,7 +134,7 @@
     <div class="modal-content p-4">
         <h4 class="pb-2">Ganti Password Pemilik Akun Dengan Username {{$d->name}}</h4>
         <hr>
-        <form class="forms-sample" action="{{ route('pass.update', $d->id) }}" method="POST">
+        <form class="forms-sample" action="{{ route('pass.reset', ['id' => $d->employee_code]) }}" method="POST">
         @csrf
         @method('PUT')
             <div class="row">
@@ -207,38 +166,13 @@
     <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-    <script>
-  $('#nama').autocomplete({
-        minLength: 1,
-        source: function(request, response){
-            $.ajax({
-                url: "{{ route('users.autocomplete') }}",
-                dataType: "json",
-                data: {
-                    term: request.term
-                },
-                success: function(data){
-                    response($.map(data, function(item){
-                        return {
-                            nik: item.nik,
-                            value: item.value
-                        }
-                    }));
-                }
-            });
-        },
-        select: function(event, ui){
-            $('#nama').val(ui.item.value);
-            $('#employee_code').val(ui.item.nik);
-            return false;
-        }
-    });
-</script>
+    <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+  <script src="{{ asset('assets/js/select2.js') }}"></script>
   <script>
     @if(session('success'))
         Swal.fire({
@@ -268,4 +202,16 @@
     }
   });
 </script>
+<script>
+    $(document).ready(function () {
+        $('#usersModal').on('shown.bs.modal', function () {
+            $('.js-example-basic-single').select2();
+        });
+    });
+</script>
+<style>
+    .select2-container--default .select2-dropdown {
+        z-index: 10000; /* Adjust the z-index as needed */
+    }
+</style>
 @endpush

@@ -28,119 +28,217 @@
     </div>
 @endif
 <div class="row">
-  <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Form Tambah Data Karyawan</h4>
-        <form method="POST" action="{{ route('employee.store') }}" enctype="multipart/form-data">
-            @csrf
-          <div class="row mb-3">
-            <div class="col">
-                <label for="name" class="form-label">Nama lengkap</label>
-                <input id="name" class="form-control" name="nama" type="text" placeholder="John Doe">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <h4 class="card-title">Form Tambah Data Karyawan</h4>
+                <form method="POST" action="{{ route('employee.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="name" class="form-label">Nama lengkap</label>
+                            <input id="name" class="form-control" name="nama" type="text" placeholder="John Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Ktp" class="form-label">KTP</label>
+                            <input id="ktp" class="form-control" name="ktp" type="number" placeholder="3xxxxxx">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="kode_karyawan" class="form-label">Kode Karyawan</label>
+                            <input id="kode_karyawan" class="form-control" name="nik" type="number" placeholder="xxx-xxx-xxx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Jabatan</label>
+                            <select class="js-example-basic-single form-select" data-width="100%" name="jabatan">
+                                @foreach($jabatan as $jabatan)
+                                    <option value="{{$jabatan->name}}">{{$jabatan->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Agama</label>
+                            <select class="js-example-basic-single form-select" data-width="100%" name="agama">
+                                <option value="Islam">Islam</option>
+                                <option value="Kristen">Kristen</option>
+                                <option value="Katholik">Katholik</option>
+                                <option value="Budha">Budha</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select class="js-example-basic-single form-select" data-width="100%" name="jenis_kelamin">
+                                <option value="Laki-Laki">Laki-Laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="kode_karyawan" class="form-label">Email</label>
+                            <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
+                            <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Status Kontrak</label>
+                            <select class="js-example-basic-single form-select" data-width="100%" name="status_kontrak">
+                                <option value="Contract">Kontrak</option>
+                                <option value="Permanent">Tetap</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Organisasi</label>
+                            <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
+                                <option value="Frontline Officer">Frontline Officer</option>
+                                <option value="Management Leaders">Management Leaders</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Tanggal Masuk</label>
+                            <input type="date" class="form-control" name="joindate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal Berakhir</label>
+                            <input type="date" class="form-control" name="berakhirkontrak">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Tempat Lahir</label>
+                            <input type="text" class="form-control" name="tempat_lahir" placeholder="Jakarta">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal Lahir</label>
+                            <input type="date" class="form-control" name="tanggal_lahir">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full Address</label>
+                        <textarea name="alamat" id="" cols="30" rows="10" class=form-control></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Status Pernikahan</label>
+                            <select class="js-example-basic-single form-select" data-width="100%" name="status_pernikahan">
+                                <option value="Married">Married</option>
+                                <option value="Single">Single</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jumlah Tanggungan</label>
+                            <select name="tanggungan" class="form-control" id="">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Photo</label>
+                            <input type="file" class="form-control" name="gambar">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unit Bisnis</label>
+                            <select name="unit_bisnis" name="unit_bisnis" id="" required class="form-control">
+                                <option value="CHAMPOIL">CHAMPOIL</option>
+                                <option value="Kas">CITY GUARD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-header mb-3">
+                        <h5>Payroll Info</h5>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">BPJS Kesehatan</label>
+                            <input type="number" class="form-control" name="bpjs_kes" placeholder="0902xxx" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">BPJS Ketenagakerjaan</label>
+                            <input type="number" class="form-control" name="bpjs_tk" placeholder="0902xxx" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">NPWP</label>
+                            <input type="number" class="form-control" name="npwp" placeholder="0902xxx" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" class="form-control" name="bank_name" placeholder="BCA" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bank Number</label>
+                            <input type="number" class="form-control" name="bank_number" required placeholder="89120xxx">
+                        </div>
+                    </div>
+                    <div class="card-header mb-3">
+                        <h5>User Login Info</h5>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label for="passwordInput" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Password" required>
+                        <div class="text-danger" id="passwordError" style="display: none;"></div>
+                        <div class="text-success" id="passwordSuccess" style="display: none;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-control" id="passwordConfirmationInput" name="password_confirmation" placeholder="Konfirmasi Password" required>
+                        <div class="text-danger" id="passwordConfirmationError" style="display: none;"></div>
+                        <div class="text-success" id="passwordConfirmationSuccess" style="display: none;"></div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="authCheck">
+                        <label class="form-check-label" for="authCheck">
+                            Show Password
+                        </label>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label class="form-label">Permission</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access">
+                                    <label class="form-check-label">User</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access">
+                                    <label class="form-check-label">HR</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">
+                                    <label class="form-check-label">Super Admin</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary button-biru w-100" type="submit">Submit</button>
+                </form>
             </div>
-            <div class="col-md-6">
-                <label for="Ktp" class="form-label">KTP</label>
-                <input id="ktp" class="form-control" name="ktp" type="number" placeholder="3xxxxxx">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label for="kode_karyawan" class="form-label">Kode Karyawan</label>
-                <input id="kode_karyawan" class="form-control" name="nik" type="number" placeholder="xxx-xxx-xxx">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Jabatan</label>
-                <select class="js-example-basic-single form-select" data-width="100%" name="jabatan">
-                    @foreach($jabatan as $jabatan)
-                        <option value="{{$jabatan->name}}">{{$jabatan->name}}</option>
-                     @endforeach
-                </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label class="form-label">Agama</label>
-                <select class="js-example-basic-single form-select" data-width="100%" name="agama">
-                    <option value="Islam">Islam</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Jenis Kelamin</label>
-                <select class="js-example-basic-single form-select" data-width="100%" name="jenis_kelamin">
-                    <option value="Laki-Laki">Laki-Laki</option>
-                    <option value="Perempuan">Perempuan</option>
-                </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label for="kode_karyawan" class="form-label">Email</label>
-                <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id">
-            </div>
-            <div class="col-md-6">
-                <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
-                <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label class="form-label">Status Kontrak</label>
-                <select class="js-example-basic-single form-select" data-width="100%" name="status_kontrak">
-                    <option value="Contract">Kontrak</option>
-                    <option value="Permanent">Tetap</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Organisasi</label>
-                <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
-                    <option value="Frontline Officer">Frontline Officer</option>
-                    <option value="Management Leaders">Management Leaders</option>
-                </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label class="form-label">Tanggal Masuk</label>
-                <input type="date" class="form-control" name="joindate">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Tanggal Berakhir</label>
-                <input type="date" class="form-control" name="berakhirkontrak">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label class="form-label">Tempat Lahir</label>
-                <input type="text" class="form-control" name="tempat_lahir" placeholder="Jakarta">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Tanggal Lahir</label>
-                <input type="date" class="form-control" name="tanggal_lahir">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">alamat</label>
-            <textarea name="alamat" id="" cols="30" rows="10" class=form-control></textarea>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-                <label class="form-label">Status Pernikahan</label>
-                <select class="js-example-basic-single form-select" data-width="100%" name="status_pernikahan">
-                    <option value="Married">Married</option>
-                    <option value="Single">Single</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Photo</label>
-                <input type="file" class="form-control" name="gambar">
-            </div>
-          </div>
-          <button class="btn btn-primary" type="submit">Submit</button>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
 </div>
 @endsection
 
@@ -169,5 +267,21 @@
   <script src="{{ asset('assets/js/dropify.js') }}"></script>
   <script src="{{ asset('assets/js/pickr.js') }}"></script>
   <script src="{{ asset('assets/js/flatpickr.js') }}"></script>
-  
+  <script src="{{ asset('assets/js/password.js') }}"></script>
+  <script>
+
+    const authCheck = document.getElementById('authCheck');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordConfirmationInput = document.getElementById('passwordConfirmationInput');
+
+    authCheck.addEventListener('change', function() {
+        if (authCheck.checked) {
+            passwordInput.type = 'text';
+            passwordConfirmationInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+            passwordConfirmationInput.type = 'password';
+        }
+    });
+    </script>
 @endpush

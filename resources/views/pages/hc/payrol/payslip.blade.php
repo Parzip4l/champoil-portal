@@ -21,7 +21,7 @@
 @endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <div class="card-header mb-3">
             <div class="row">
@@ -64,6 +64,7 @@
                             <th>Employe Name</th>
                             <th>Thp</th>
                             <th>Payroll Periode</th>
+                            <th>Send Payslip</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -76,9 +77,22 @@
                             @php
                                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                             @endphp
-                            <td><a href="{{route('payslip.show', $data->id)}}">{{ $employee->nama; }}</a></td>
-                            <td>{{$data->thp}}</td>
+                            <td>
+                                @if ($employee)
+                                    <a href="{{ route('payslip.show', $data->id) }}">{{ $employee->nama }}</a>
+                                @else
+                                    Karyawan tidak ditemukan
+                                @endif
+                            </td>
+                            <td>Rp {{ number_format($data->net_salary, 0, ',', '.') }}</td>
                             <td>{{ $data->year }} - {{ $data->month }}</td>
+                            <td>
+                                @if ($employee)
+                                    <a href="{{ route('send-email', $data->id) }}" class="btn btn-primary btn-sm" onclick="return showSweetAlert()">Send Email</a>
+                                @else
+                                    Karyawan tidak ditemukan
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                         </tbody>
@@ -87,7 +101,7 @@
             </div>
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
                 <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
+                    <table id="dataPayslipNS" class="table">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -102,19 +116,25 @@
                                 
                             @endphp
                             @foreach ($datans as $data)
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            @php
-                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                                $dates = explode(' - ', $data->periode);
-                                $startDate = date('j M Y', strtotime($dates[0]));
-                                $endDate = date('j M Y', strtotime($dates[1]));
-                            @endphp
-                            <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $employee->nama; }}</a></td>
-                            <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
-                            <td>{{ $endDate }}</td>
-                        </tr>
-                        @endforeach
+                            <tr>
+                                <td>{{ $no++ }}</td>
+                                @php
+                                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                                    $dates = explode(' - ', $data->periode);
+                                    $startDate = date('j M Y', strtotime($dates[0]));
+                                    $endDate = date('j M Y', strtotime($dates[1]));
+                                @endphp
+                                <td>
+                                    @if ($employee)
+                                        <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
+                                    @else
+                                        Karyawan tidak ditemukan
+                                    @endif
+                                </td>
+                                <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
+                                <td>{{ $endDate }}</td>
+                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -204,14 +224,67 @@
 </script>
 <script>
     $(function() {
-  'use strict'
+    'use strict'
 
-  if ($(".js-example-basic-single").length) {
-    $(".js-example-basic-single").select2();
-  }
-  if ($(".js-example-basic-multiple").length) {
-    $(".js-example-basic-multiple").select2();
-  }
-});
+        if ($(".js-example-basic-single").length) {
+            $(".js-example-basic-single").select2();
+        }
+
+        if ($(".js-example-basic-multiple").length) {
+            $(".js-example-basic-multiple").select2();
+        }
+
+    });
+</script>
+<script>
+    $(function() {
+    'use strict';
+
+    $(function() {
+        $('#dataPayslipNS').DataTable({
+        "aLengthMenu": [
+            [10, 30, 50, -1],
+            [10, 30, 50, "All"]
+        ],
+        "iDisplayLength": 10,
+        "language": {
+            search: ""
+        }
+        });
+        $('#dataTableExample').each(function() {
+        var datatable = $(this);
+        // SEARCH - Add the placeholder for Search and Turn this into in-line form control
+        var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
+        search_input.attr('placeholder', 'Search');
+        search_input.removeClass('form-control-sm');
+        // LENGTH - Inline-Form control
+        var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
+        length_sel.removeClass('form-control-sm');
+        });
+    });
+
+    });
+</script>
+<script>
+    // Function to show SweetAlert confirmation
+    function showSweetAlert() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to send an email?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, send it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If user clicks "Yes," continue with the default link behavior
+                return true;
+            } else {
+                // If user clicks "No" or closes the dialog, prevent the default link behavior
+                return false;
+            }
+        });
+    }
 </script>
 @endpush

@@ -10,10 +10,13 @@ use Carbon\Carbon;
 use App\Absen;
 use App\Employee;
 use App\Feedback;
+use App\Payrol;
 use App\Absen\RequestAbsen;
 use App\ModelCG\asign_test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\PayslipEmail;
+use Illuminate\Support\Facades\Mail;
 
 class DashboardController extends Controller
 {
@@ -88,7 +91,7 @@ class DashboardController extends Controller
 
         $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
-        
+
         return view('dashboard', compact('greeting','karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest'
         ));
     }
@@ -108,5 +111,26 @@ class DashboardController extends Controller
         $coa->save();
 
         return redirect()->back()->with('success', 'Thankyou For Feedback');
+    }
+
+    public function sendEmail($id)
+    {
+        // Retrieve data based on the ID
+        $data = Payrol::findOrFail($id);
+        $dataPayslip = Payrol::where('id', $id)->get();
+
+        // Send email
+        Mail::to('sobirin@champoil.co.id')->send(new PayslipEmail($dataPayslip));
+
+        return redirect()->back()->with('success', 'Email sent successfully!');
+    }
+
+    public function kirimEmail()
+    {
+        $userEmail = 'sobirin@champoil.co.id';
+
+        Mail::to($userEmail)->send(new PayslipEmail());
+
+        return redirect()->back()->with('success', 'Email Has Been Send');
     }
 }

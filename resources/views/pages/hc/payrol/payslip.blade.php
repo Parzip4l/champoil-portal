@@ -64,6 +64,7 @@
                             <th>Employe Name</th>
                             <th>Thp</th>
                             <th>Payroll Periode</th>
+                            <th>Send Payslip</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -85,6 +86,13 @@
                             </td>
                             <td>Rp {{ number_format($data->net_salary, 0, ',', '.') }}</td>
                             <td>{{ $data->year }} - {{ $data->month }}</td>
+                            <td>
+                                @if ($employee)
+                                    <a href="{{ route('send-email', $data->id) }}" class="btn btn-primary btn-sm" onclick="return showSweetAlert()">Send Email</a>
+                                @else
+                                    Karyawan tidak ditemukan
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                         </tbody>
@@ -256,5 +264,27 @@
     });
 
     });
+</script>
+<script>
+    // Function to show SweetAlert confirmation
+    function showSweetAlert() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to send an email?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, send it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If user clicks "Yes," continue with the default link behavior
+                return true;
+            } else {
+                // If user clicks "No" or closes the dialog, prevent the default link behavior
+                return false;
+            }
+        });
+    }
 </script>
 @endpush

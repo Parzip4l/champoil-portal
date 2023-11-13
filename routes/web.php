@@ -162,7 +162,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     });
 });
 
-Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');;
+Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');
+
+// Tes Email
+Route::get('/kirim-email', [App\Http\Controllers\DashboardController::class, 'kirimEmail']);
+Route::get('/send-email/{id}', [App\Http\Controllers\DashboardController::class, 'sendEmail'])->name('send-email');
 
 // Login
 Route::controller(LoginController::class)->group(function(){

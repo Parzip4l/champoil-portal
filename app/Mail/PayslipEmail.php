@@ -54,7 +54,7 @@ class PayslipEmail extends Mailable
 
     public function build()
     {
-        return $this->view('pages.hc.payrol.payslip-file') // View Payslip
+        return $this->view('pages.hc.payrol.pdfslip') // View Payslip
             ->subject('Payslip')
             ->attach($this->pdfPath, [
                 'as' => 'slip_gaji.pdf',

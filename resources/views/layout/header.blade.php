@@ -149,7 +149,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('patroli') }}" class="nav-link">
+                <a href="{{ url('task') }}" class="nav-link">
                     <i class="link-icon" data-feather="book"></i>
                     <span class="menu-title">Task Management</span>
                 </a>

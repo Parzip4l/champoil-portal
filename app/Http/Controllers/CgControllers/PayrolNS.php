@@ -88,6 +88,7 @@ class PayrolNS extends Controller
             $absen = Absen::where('nik', $nik)
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->get();
+            $totalWorkingDays = count($absen);
 
             $totalHari = 0;
             $totalGaji = 0;
@@ -199,8 +200,8 @@ class PayrolNS extends Controller
                 }
                 
                 if ($totalHari < $totalDaysInSchedules) {
-                    $totalGaji -= $rate_potongan * ($totalDaysInSchedules - $totalHari);
-                    $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalHari);
+                    $totalGaji -= $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
+                    $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
                 }
                 
                 // backup rate

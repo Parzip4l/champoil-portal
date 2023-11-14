@@ -76,22 +76,10 @@
                                     <td>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Daily Salary</span>
+                                                <span>Basic Salary</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($allowencesData->rate_harian ?? 0, 0, ',', '.') }} </span>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <span></span>
-                                            </div>
-                                            <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right text-muted mb-4"> {{ $allowencesData->totalHari ?? 0, 0, ',', '.'}} Hari</span>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <span></span>
-                                            </div>
-                                            <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($allowencesData->totalGaji ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right mb-4">Rp. {{ number_format($payroll->basic_salary ?? 0, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -142,26 +130,10 @@
                                         @foreach($projectDeductions as $deduction)
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Potongan BPJS Ketenagakerjaan</span>
+                                                <span>Potongan Absensi</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_bpjstk ?? 0, 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <span>Potongan Seragam</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_tseragam ?? 0, 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <span>Potongan Operasional</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deduction->p_operasional ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_absen ?? 0, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -185,7 +157,7 @@
                                                 <span>Taxes Income</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right text-danger">Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -210,22 +182,6 @@
                             <div class="table-responsive">
                                 <table class="table">
                                     <tbody>
-                                        <tr>
-                                            <td class="text-bold-800">Gaji Pokok</td>
-                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($allowencesData->totalGaji ?? 0, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-800">Backup Sallary</td>
-                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($allowencesData->totalGajiBackup ?? 0, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-800">Total Allowences</td>
-                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($allowencesData->allowence_total ?? 0, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-bold-800">Total Deductions</td>
-                                            <td class="text-bold-800 text-end text-danger"> Rp. {{ number_format($deductionData->deductions_total ?? 0, 0, ',', '.') }}</td>
-                                        </tr>
                                         <tr style="font-size: 18px; font-weight: 800;">
                                             <td class="text-bold-800">Take Home Pay</td>
                                             <td class="text-bold-800 text-end"> Rp. {{ number_format($payroll->thp ?? 0, 0, ',', '.') }} </td>
@@ -268,31 +224,6 @@
                 </div>
             </div>
 
-            <!-- Basic salary -->
-            <div class="card mb-3">
-                <div class="card-header text-center">
-                    <h4>Daily Salary</h4>
-                </div>
-                <div class="card-body">
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Daily Salary
-                        </span>
-                        <span>
-                            Rp. {{ number_format($allowencesData->rate_harian ?? 0, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Works Days
-                        </span>
-                        <span>
-                            {{ $allowencesData->totalHari ?? 0 }} Days
-                        </span>
-                    </div>
-                </div>
-            </div>
-
             <!-- Lembur -->
             <div class="card mb-3">
                 <div class="card-header text-center">
@@ -309,7 +240,7 @@
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
-                            Total Salary
+                            Total Backup Salary
                         </span>
                         <span>
                             Rp. {{ number_format($allowencesData->totalGajiBackup ?? 0, 0, ',', '.') }}
@@ -328,7 +259,7 @@
                             Gaji Pokok
                         </span>
                         <span>
-                            Rp. {{ number_format($allowencesData->totalGaji ?? 0, 0, ',', '.') }}
+                        Rp. {{ number_format($payroll->basic_salary ?? 0, 0, ',', '.') }}
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
@@ -368,12 +299,6 @@
                         </span>
                     </div>
                 </div>
-                <div class="card-header text-center">
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <h4>Total Earnings</h4>
-                        <h4 id="totalAmount">Rp. 0 </h4>
-                    </div>
-                </div>
             </div>
 
             <!-- Deductions -->
@@ -389,40 +314,30 @@
                                 PPH 21
                             </span>
                             <span>
-                                Rp. 0
+                                Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}
                             </span>
                         </div>
                         <div class="details-earning d-flex justify-content-between mb-2">
                             <span>
-                                Potongan BPJS TK
+                                Potongan Diksar
                             </span>
                             <span>
-                            Rp. {{ number_format($deduction->p_bpjstk ?? 0, 0, ',', '.') }}
+                                Rp. {{ number_format($deductionData->potongan_gp ?? 0, 0, ',', '.') }}
                             </span>
                         </div>
                         <div class="details-earning d-flex justify-content-between mb-2">
                             <span>
-                                Potongan GP
+                                Potongan Absensi
                             </span>
                             <span>
-                                Rp. 0
+                            Rp. {{ number_format($deductionData->potongan_absen ?? 0, 0, ',', '.') }}
                             </span>
                         </div>
                         <div class="details-earning d-flex justify-content-between mb-2">
                             <span>
-                                Potongan Seragam
+                                Potongan Hutang
                             </span>
-                            <span>
-                            Rp. {{ number_format($deduction->p_tseragam ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                Potongan Operasional
-                            </span>
-                            <span>
-                                Rp. {{ number_format($deduction->p_operasional ?? 0, 0, ',', '.') }}
-                            </span>
+                            <span>Rp. {{ number_format($deductionData->potongan_hutang ?? 0, 0, ',', '.') }}</span>
                         </div>
                         <div class="details-earning d-flex justify-content-between mb-2">
                             <span>
@@ -435,23 +350,17 @@
                     </div>
                     @endforeach
                 @endif
-                <div class="card-header text-center">
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <h4>Total Deductions</h4>
-                        <h4>Rp. 0 </h4>
-                    </div>
-                </div>
             </div>
 
             <!-- THP -->
             <div class="thp-wrap text-center mb-3">
                 <h5 class="text-danger mb-2">TAKE HOME PAY</h5>
-                <h2 style="font-weight:900;"> Rp. 0  </h2>
+                <h2 style="font-weight:900;"> Rp. {{ number_format($payroll->thp ?? 0, 0, ',', '.') }} </h2>
             </div>
             <div class="button-download-slip mb-2">
                 <a href="#" class="btn btn-primary w-100">Download Payslip </a>
             </div>
-            <p class="text-muted text-center">*This is a computer generated payslip and no signature is required.</p>
+            <p class="text-muted text-center mb-6">*This is a computer generated payslip and no signature is required.</p>
         </div>
     </div>
 </div>

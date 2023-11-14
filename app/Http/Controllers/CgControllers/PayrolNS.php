@@ -9,6 +9,7 @@ use App\Employee;
 use App\Loan\LoanModel;
 Use App\GardaPratama\Gp;
 use App\Absen;
+use App\ModelCG\Schedule;
 use Carbon\Carbon;
 use App\ModelCG\Project;
 use App\ModelCG\ProjectDetails;
@@ -175,15 +176,31 @@ class PayrolNS extends Controller
                 if (!empty($projectIds)) {
                     $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
-                        ->pluck('rate_harian', 'project_code');
+                        ->pluck('tp_bulanan', 'project_code');
+                        
+                        $totalGaji = $projectDetails->sum();
+                        $montlySalary = $projectDetails->sum();
 
-                    foreach ($projectIds as $projectId) {
-                        if (isset($projectDetails[$projectId])) {
-                            // Jika absensi berada dalam periode, tambahkan gaji
-                            $rate_harian = $projectDetails[$projectId];
-                            $totalGaji += $inPeriode ? $projectDetails[$projectId] : 0;
-                        }
-                    }
+                }
+
+                // Rate Potongan
+                $rate_potongan  = 0;
+                // cek jumlah schedule
+                $schedules = Schedule::where('employee', $nik)
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->where('shift', '!=', 'Off')
+                    ->get();
+
+                $totalDaysInSchedules = $schedules->count();
+
+                // Calculate rate_potongan
+                if ($totalDaysInSchedules > 0) {
+                    $rate_potongan = round($totalGaji / 20);
+                }
+                
+                if ($totalHari < $totalDaysInSchedules) {
+                    $totalGaji -= $rate_potongan * ($totalDaysInSchedules - $totalHari);
+                    $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalHari);
                 }
                 
                 // backup rate
@@ -212,10 +229,10 @@ class PayrolNS extends Controller
                         $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
                     }
 
-                // Deducitons
+                // deductions
                 $ProjectDeduction = ProjectDetails::whereIn('project_code', $projectIds)
                     ->where('jabatan', $jabatan)
-                    ->select('p_bpjstk', 'p_tseragam', 'p_operasional')
+                    ->select('p_bpjstk')
                     ->get();
 
                 $dataPengurangBPJS = ProjectDetails::whereIn('project_code', $projectIds)
@@ -229,10 +246,14 @@ class PayrolNS extends Controller
                 }
 
                 // Perhitungan PPH21
-                $PenghasilanBruto = $totalGaji + $projectAllowancesTotal + $totalGajiBackup;
-                $penghasilanNeto = $PenghasilanBruto - $dataPengurangBPJS;
+                $PenghasilanBruto = $totalGaji + $projectAllowancesTotal + $totalGajiBackup + 61300;
+                $biayaJabatan = $PenghasilanBruto * 0.05;
+
+                $penghasilanNeto = $PenghasilanBruto - $biayaJabatan;
+                
                 $totalNeto = $penghasilanNeto*12;
                 $dataPTKP = $totalNeto -  54000000;
+                
                 // Penghasilan Kena Pajak Setahun / Disetahunkan
                 $persentasePTKP = 0.05;
                 $dataSetahun = $dataPTKP * $persentasePTKP;
@@ -261,6 +282,7 @@ class PayrolNS extends Controller
                     'projectDeductions' => $ProjectDeduction->toArray(),
                     'deductions_total' => $projectDedutionsTotal + $totalPotonganHutang,
                     'potongan_hutang' => $totalPotonganHutang,
+                    'potongan_absen' => $potonganAbsen,
                     'potongan_gp' => $TotalGP,
                     'PPH21' => $totalPPH,
                 ];
@@ -277,6 +299,7 @@ class PayrolNS extends Controller
             $payroll = new Payroll();
             $payroll->employee_code = $nik;
             $payroll->periode = $request->periode;
+            $payroll->basic_salary = $montlySalary;
             $payroll->thp = $thp;
             $payroll->allowences = $allowenceData;
             $payroll->deductions = $deductionData;

@@ -43,8 +43,9 @@ $(document).ready(function() {
         // Mengalikan total allowances dengan total kebutuhan anggota
         const TotalSeluruh = total * totalKebutuhan;
         const UbahDataPersen = realDeduction / 100;
-        const GajiBulan = Math.round(penawaranGajiPokok + kerja + Lain) * (1 - UbahDataPersen);
-        const rateHarian = (penawaranGajiPokok * 12) / 244;
+        const DataPenambah = seragam + kerja + Lain;
+        const GajiBulan = Math.round(penawaranGajiPokok * (1 - UbahDataPersen)) + DataPenambah;
+        const rateHarian = (penawaranGajiPokok * 12) / 243;
 
         // Mengembalikan total
         return {

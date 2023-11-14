@@ -225,7 +225,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="" class="form-label">Bulanan</label>
-                                                <input type="number" name="tp_bulanan" class="form-control rate_bulan" id="rate_bulan" required readonly>
+                                                <input type="number" name="tp_bulanan" class="form-control rate_bulan" id="rate_bulan" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">

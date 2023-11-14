@@ -184,7 +184,7 @@ class PayrolNS extends Controller
 
                     $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
-                        ->select('p_gajipokok', 't_kerja', 't_lain')
+                        ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
                         ->get();
                         $gajiPPH = $projectDetailsPPH->sum();
                 }

@@ -200,7 +200,6 @@ class PayrolNS extends Controller
                 }
                 
                 if ($totalHari < $totalDaysInSchedules) {
-                    $totalGaji -= $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
                     $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
                 }
                 

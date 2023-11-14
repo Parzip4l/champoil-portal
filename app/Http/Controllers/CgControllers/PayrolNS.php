@@ -182,6 +182,11 @@ class PayrolNS extends Controller
                         $totalGaji = $projectDetails->sum();
                         $montlySalary = $projectDetails->sum();
 
+                    $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
+                        ->where('jabatan', $jabatan)
+                        ->select('p_gajipokok', 't_kerja', 't_lain')
+                        ->get();
+                        $gajiPPH = $projectDetailsPPH->sum();
                 }
 
                 // Rate Potongan
@@ -292,7 +297,7 @@ class PayrolNS extends Controller
                 $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 
                 // THP
-                $pendapatanBersih = $totalGaji + $totalGajiBackup + $bpjsMandiri + $tunjanganLain;
+                $pendapatanBersih = $gajiPPH + $totalGajiBackup + $bpjsMandiri;
                 $thp = $pendapatanBersih - $potonganAbsen - $totalPotonganHutang - $TotalGP - $totalPPH;
 
                 $allowenceData = json_encode($allowenceData);

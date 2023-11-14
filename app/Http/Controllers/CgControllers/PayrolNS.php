@@ -222,10 +222,11 @@ class PayrolNS extends Controller
                 // Allowence 
                 $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                     ->where('jabatan', $jabatan)
-                    ->select('p_bpjs_ks', 'p_tkerja', 'p_tlain')
+                    ->select('p_bpjs_ks', 'p_tlain')
                     ->get();
 
                 $bpjsMandiri = $ProjectAllowances->sum('p_bpjs_ks');
+                $tunjanganLain = $ProjectAllowances->sum('p_tlain');
 
                 $projectAllowancesTotal = 0;
                     foreach ($ProjectAllowances as $projectDetailallowence) {
@@ -292,7 +293,7 @@ class PayrolNS extends Controller
                 $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 
                 // THP
-                $thp = $totalGaji + $totalGajiBackup + $projectAllowancesTotal - $dataDeduction - $totalPPH;
+                $thp = $totalGaji + $totalGajiBackup + $bpjsMandiri + $tunjanganLain - $dataDeduction - $totalPPH;
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);

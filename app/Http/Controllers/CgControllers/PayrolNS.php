@@ -195,7 +195,7 @@ class PayrolNS extends Controller
 
                 // Calculate rate_potongan
                 if ($totalDaysInSchedules > 0) {
-                    $rate_potongan = round($totalGaji / 20);
+                    $rate_potongan = round($totalGaji / $totalDaysInSchedules);
                 }
                 
                 if ($totalHari < $totalDaysInSchedules) {
@@ -224,6 +224,8 @@ class PayrolNS extends Controller
                     ->select('p_bpjs_ks', 'p_tkerja', 'p_tlain')
                     ->get();
 
+                $bpjsMandiri = $ProjectAllowances->sum('p_bpjs_ks');
+
                 $projectAllowancesTotal = 0;
                     foreach ($ProjectAllowances as $projectDetailallowence) {
                         $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
@@ -246,7 +248,7 @@ class PayrolNS extends Controller
                 }
 
                 // Perhitungan PPH21
-                $PenghasilanBruto = $totalGaji + $projectAllowancesTotal + $totalGajiBackup + 61300;
+                $PenghasilanBruto = $totalGaji + $bpjsMandiri + $totalGajiBackup + 61300;
                 $biayaJabatan = $PenghasilanBruto * 0.05;
 
                 $penghasilanNeto = $PenghasilanBruto - $biayaJabatan;

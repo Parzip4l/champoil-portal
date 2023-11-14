@@ -186,7 +186,22 @@ class PayrolNS extends Controller
                         ->where('jabatan', $jabatan)
                         ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
                         ->get();
-                        $gajiPPH = $projectDetailsPPH->p_gajipokok + $projectDetailsPPH->p_tkerja + $projectDetailsPPH->p_tlain;
+                       
+                    // Initialize variables to store each selected field
+                    $p_gajipokok = 0;
+                    $p_tkerja = 0;
+                    $p_tlain = 0;
+
+                    // Check if the collection is not empty
+                    if ($projectDetailsPPH->isNotEmpty()) {
+                        // Access the values using array keys
+                        $p_gajipokok = $projectDetailsPPH->sum('p_gajipokok');
+                        $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
+                        $p_tlain = $projectDetailsPPH->sum('p_tlain');
+                    }
+
+                    // Calculate the total salary
+                    $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
                 }
 
                 // Rate Potongan

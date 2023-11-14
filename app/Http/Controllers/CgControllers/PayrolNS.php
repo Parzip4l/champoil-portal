@@ -186,7 +186,7 @@ class PayrolNS extends Controller
                         ->where('jabatan', $jabatan)
                         ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
                         ->get();
-                        $gajiPPH = $projectDetailsPPH->sum();
+                        $gajiPPH = $projectDetailsPPH->p_gajipokok + $projectDetailsPPH->p_tkerja + $projectDetailsPPH->p_tlain;
                 }
 
                 // Rate Potongan

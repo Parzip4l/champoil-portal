@@ -293,7 +293,8 @@ class PayrolNS extends Controller
                 $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 
                 // THP
-                $thp = $totalGaji + $totalGajiBackup + $bpjsMandiri + $tunjanganLain - $dataDeduction - $totalPPH;
+                $pendapatanBersih = $totalGaji + $totalGajiBackup + $bpjsMandiri + $tunjanganLain;
+                $thp = $pendapatanBersih - $potonganAbsen - $dataDeduction - $totalPPH;
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);

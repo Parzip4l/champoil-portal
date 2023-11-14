@@ -250,7 +250,7 @@ class PayrolNS extends Controller
                 }
 
                 // Perhitungan PPH21
-                $PenghasilanBruto = $totalGaji + $bpjsMandiri + $totalGajiBackup + 61300;
+                $PenghasilanBruto = $totalGaji + $bpjsMandiri + $totalGajiBackup + 61300 - $potonganAbsen;
                 $biayaJabatan = $PenghasilanBruto * 0.05;
 
                 $penghasilanNeto = $PenghasilanBruto - $biayaJabatan;
@@ -294,7 +294,7 @@ class PayrolNS extends Controller
 
                 // THP
                 $pendapatanBersih = $totalGaji + $totalGajiBackup + $bpjsMandiri + $tunjanganLain;
-                $thp = $pendapatanBersih - $potonganAbsen - $dataDeduction - $totalPPH;
+                $thp = $pendapatanBersih - $potonganAbsen - $totalPotonganHutang - $TotalGP - $totalPPH;
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);

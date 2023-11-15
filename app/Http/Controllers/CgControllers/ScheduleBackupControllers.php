@@ -63,7 +63,6 @@ class ScheduleBackupControllers extends Controller
     {
         $project = $request->input('project');
         $employeeReplace = Schedule::where('project', $project)
-                                ->where('')
                                 ->pluck('employee');
 
         $employeesData = Employee::whereIn('nik', $employeeReplace)

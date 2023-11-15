@@ -10,6 +10,8 @@ use App\ModelCG\ProjectDetails;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProjectDetailsImport;
 
 class ProjectDetailsController extends Controller
 {
@@ -29,11 +31,11 @@ class ProjectDetailsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function createDetails($id)
-{
-    $project = Project::find($id);
-    $jabatan = Jabatan::all();
-    return view('pages.hc.kas.project.createdetails', compact('project', 'jabatan'));
-}
+    {
+        $project = Project::find($id);
+        $jabatan = Jabatan::all();
+        return view('pages.hc.kas.project.createdetails', compact('project', 'jabatan'));
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -115,6 +117,21 @@ class ProjectDetailsController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
                     // Other exceptions
             return response()->json(['error' => 'An error occurred. Please try again.'], 500);
+        }
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            $request->validate([
+                'csv_file' => 'required|mimes:xlsx,csv,txt',
+            ]);
+
+            Excel::import(new ProjectDetailsImport, $request->csv_file);
+
+            return redirect()->route('project.index')->with('success', 'Import berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
         }
     }
 

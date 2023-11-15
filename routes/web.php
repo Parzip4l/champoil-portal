@@ -142,8 +142,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);
+        // Project
         Route::resource('project', App\Http\Controllers\CgControllers\ProjectControllers::class);
         Route::resource('project-details', App\Http\Controllers\CgControllers\ProjectDetailsController::class);
+        Route::post('/import-excel', [App\Http\Controllers\CgControllers\ProjectDetailsController::class, 'importExcel'])->name('import.excel');
+
         Route::resource('shift', App\Http\Controllers\CgControllers\ShiftControllers::class);
         Route::resource('schedule', App\Http\Controllers\CgControllers\ScheduleControllers::class);
         Route::resource('backup-schedule', App\Http\Controllers\CgControllers\ScheduleBackupControllers::class);

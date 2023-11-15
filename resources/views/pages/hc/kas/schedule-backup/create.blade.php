@@ -35,7 +35,7 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Project</label>
-                                    <select class="js-example-basic-single form-select" data-width="100%" name="project[]">
+                                    <select class="js-example-basic-single form-select project" data-width="100%" name="project[]" id="projectSelect">
                                         <option disabled selected>Select Project</option>
                                         @foreach($project as $project)
                                             <option value="{{$project->id}}">{{$project->name}}</option>
@@ -54,9 +54,8 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power Replace</label>
-                                    <select class="js-example-basic-single form-select" data-width="100%" name="project[]">
+                                    <select class="js-example-basic-single form-select replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect">
                                         <option disabled selected>Select Man Power</option>
-                                        
                                     </select>
                                 </div>
                             </div>
@@ -73,7 +72,6 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" id="AddEmployee" class="btn btn-success mt-1 mb-3">Tambah Schedule Baru</button>
                     <button type="submit" class="btn btn-primary w-100">Simpan Data</button>
                 </form>
             </div>
@@ -204,6 +202,32 @@
     // Panggil saat tanggal berubah
     $('.tanggal').change(function() {
         updateEmployeeOptions();
+    });
+</script>
+<script>
+    function SearchEmployee() {
+        var SelectProject = document.querySelector('.project').value;
+
+        // AJAX Request
+        $.ajax({
+            url: "{{ route('getManPower.backup') }}",
+            type: "GET",
+            data: {
+                project: SelectProject
+            },
+            success: function(response) {
+                var selectEmployee2 = $('#manpowerSelect');
+                selectEmployee2.empty().append('<option disabled selected>Select Employee</option>');
+                $.each(response.EmployeeReplace, function(key, value) {
+                    selectEmployee2.append('<option value="' + value.nik + '">' + value.nama + '</option>');
+                });
+            }
+        });
+    }
+
+    // Panggil saat tanggal berubah
+    $('.project').change(function() {
+        SearchEmployee();
     });
 </script>
 @endpush

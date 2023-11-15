@@ -10,6 +10,7 @@ use App\Loan\LoanModel;
 Use App\GardaPratama\Gp;
 use App\Absen;
 use App\ModelCG\Schedule;
+use App\ModelCG\ScheduleBackup;
 use Carbon\Carbon;
 use App\ModelCG\Project;
 use App\ModelCG\ProjectDetails;
@@ -94,7 +95,7 @@ class PayrolNS extends Controller
             // Deklarasi Variable
             $totalHari = 0;
             $totalGaji = 0;
-            $totalHariBackup = 0;
+            $TotalHariBackup = 0;
             $totalGajiBackup = 0;
             $allowenceData= [];
             $deductiondata = [];
@@ -103,6 +104,9 @@ class PayrolNS extends Controller
             $thp = 0;
             $allowenceData = null;
             $deductionData = null;
+            $montlySalary = 0;
+            $rate_harian = 0;
+            $rate_harianbackup = 0;
 
             //Potongan Hutang
             $potonganHutang = LoanModel::where('employee_id', $nik)
@@ -156,6 +160,61 @@ class PayrolNS extends Controller
             }
             // End Perhitunga GP
 
+            // Hitungan Backup
+
+                // Ambil Project Backup
+                $projectBackup = ScheduleBackup::where('employee',$nik)
+                                ->whereBetween('tanggal', [$startDate, $endDate])
+                                ->select('project','employee','man_backup')
+                                ->get();
+
+                $backupTotals = [];
+
+                foreach ($projectBackup as $backupData) {
+                    $manBackup = $backupData->man_backup;
+                    $projectIDBackup = $backupData->project;
+                    $totalHariBackupmentah = 0;
+                
+                    // Tentukan Rate Harian
+                    $schedulesManBackup = Schedule::where('employee', $manBackup)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->where('shift', '!=', 'Off')
+                        ->get();
+                
+                    $totalScheduleManBackup = $schedulesManBackup->count();
+                
+                    $projectDetailsBackupData = ProjectDetails::where('project_code', $projectIDBackup)
+                        ->where('jabatan', $jabatan)
+                        ->pluck('tp_bulanan', 'project_code');
+                
+                    $monthlySalaryProject = $projectDetailsBackupData->sum();
+                    $rateHarianBackup = round($monthlySalaryProject / $totalScheduleManBackup);
+                    $totalHariBackupmentah = 1;
+                    $totalGajiBackupmentah = $totalHariBackupmentah  * $rateHarianBackup;
+                
+                    // Simpan total bayaran untuk setiap project backup dalam array
+                    if (!isset($backupTotals[$projectIDBackup])) {
+                        $backupTotals[$projectIDBackup] = [
+                            'ProjectCodeBackup' => 0,
+                            'totalGajiBackupmentah' => 0,
+                            'rateHarianBackup' => 0,
+                            'totalHariBackupmentah' => 0,
+                        ];
+                    }
+
+                    $backupTotals[$projectIDBackup]['ProjectCodeBackup'] = $projectIDBackup;
+                    $backupTotals[$projectIDBackup]['rateHarianBackup'] = $rateHarianBackup;
+                    $backupTotals[$projectIDBackup]['totalHariBackupmentah'] += 1;
+                    $backupTotals[$projectIDBackup]['totalGajiBackupmentah'] += $totalGajiBackupmentah;
+
+                    if (!isset($totalGajiBackup)) {
+                        $totalGajiBackup = 0;
+                    }
+                    $totalGajiBackup += $totalGajiBackupmentah;
+                    $TotalHariBackup += $totalHariBackupmentah;
+                }
+                // Akhir perhitungan Backup
+
             // Mengakumulasi jumlah hari dan total gaji dari setiap absensi
             foreach ($absen as $absensi) {
 
@@ -167,16 +226,10 @@ class PayrolNS extends Controller
                     $totalHari++;
                 }
 
-                if (!empty($absensi->project_backup)) {
-                    // Jika ada project_backup, tambahkan jumlah hari backup
-                    $totalHariBackup++;
-                }
-
                 // Ambil ID proyek dari kolom project dan project_backup
                 $projectIds = [$absensi->project];
-                $projectBackup = [$absensi->project_backup];
-
-                // Dapatkan data project details dan rate harian dari project
+                
+                // Dapatkan data project details dan rate harian dari project Backup
                 $rate_harian = 0;
                 if (!empty($projectIds)) {
                     $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
@@ -227,23 +280,6 @@ class PayrolNS extends Controller
                     $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
                 }
                 // End Potongan Daily
-                
-                // backup rate
-                $rate_harianbackup = 0;
-                if (!empty($projectBackup)) {
-                    $projectDetailsBackup = ProjectDetails::whereIn('project_code', $projectBackup)
-                        ->where('jabatan', $jabatan)
-                        ->pluck('rate_harian', 'project_code');
-
-                    foreach ($projectBackup as $projectIdBackup) {
-                        if (isset($projectDetailsBackup[$projectIdBackup])) {
-                            // Jika absensi berada dalam periode, tambahkan gaji backup
-                            $rate_harianbackup = $projectDetailsBackup[$projectIdBackup];
-                            $totalGajiBackup += $inPeriode ? $projectDetailsBackup[$projectIdBackup] : 0;
-                        }
-                    }
-                }
-                // Akhir perhitungan Backup
 
                 // Allowence 
                 $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
@@ -302,7 +338,7 @@ class PayrolNS extends Controller
                 // Masukan data allowence ke json
                 $allowenceData = [
                     'totalHari' => $totalHari,
-                    'totalHariBackup' => $totalHariBackup,
+                    'totalHariBackup' => $TotalHariBackup,
                     'totalGaji' => $totalGaji,
                     'totalGajiBackup' => $totalGajiBackup,
                     'rate_harian' => $rate_harian,
@@ -329,8 +365,8 @@ class PayrolNS extends Controller
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);
+               
             }
-
             // Simpan data ke tabel payroll
             $payroll = new Payroll();
             $payroll->employee_code = $nik;

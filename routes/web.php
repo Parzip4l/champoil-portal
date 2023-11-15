@@ -147,6 +147,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('shift', App\Http\Controllers\CgControllers\ShiftControllers::class);
         Route::resource('schedule', App\Http\Controllers\CgControllers\ScheduleControllers::class);
         Route::resource('backup-schedule', App\Http\Controllers\CgControllers\ScheduleBackupControllers::class);
+        // Get manpower Backup
+        Route::get('/get-employees/{projectId}',[ App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getManPower']);
 
         // Schedule Details
         Route::get('/schedule/details/{project}/{periode}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetails'])->name('schedule.details');
@@ -154,6 +156,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // Day Off
         Route::get('/getEmployeesWithDayOff', [App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getEmployeesWithDayOff'])->name('getEmployeesWithDayOff.backup');
+        Route::get('/getEmployeesReplaceSchedule', [App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getManPower'])->name('getManPower.backup');
 
         // Payroll
         Route::resource('payroll-kas', App\Http\Controllers\CgControllers\PayrolNS::class);

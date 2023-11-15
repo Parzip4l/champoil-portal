@@ -99,6 +99,7 @@ class PayrolNS extends Controller
             $totalPotonganHutang = 0;
             $TotalGP = 0;
             $thp = 0;
+            $gajiPPH = 0;
             $allowenceData = null;
             $deductionData = null;
 

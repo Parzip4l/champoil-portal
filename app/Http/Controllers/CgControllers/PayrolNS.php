@@ -79,10 +79,6 @@ class PayrolNS extends Controller
         $startDate = \Carbon\Carbon::createFromFormat('d-m-Y', $periodeDates[0])->format('Y-m-d');
         $endDate = \Carbon\Carbon::createFromFormat('d-m-Y', $periodeDates[1])->format('Y-m-d');
 
-        // Inisialisasi variabel untuk seluruh periode
-        $allProjectIds = [];
-        $allProjectBackup = [];
-
         foreach ($request->employee_code as $nik) {
             // Dapatkan data karyawan
             $employee = Employee::where('nik', $nik)->first();
@@ -98,7 +94,7 @@ class PayrolNS extends Controller
             $totalGaji = 0;
             $totalHariBackup = 0;
             $totalGajiBackup = 0;
-            $allowenceData = [];
+            $allowenceData= [];
             $deductiondata = [];
             $totalPotonganHutang = 0;
             $TotalGP = 0;
@@ -108,16 +104,16 @@ class PayrolNS extends Controller
 
             //Potongan Hutang
             $potonganHutang = LoanModel::where('employee_id', $nik)
-                ->where('is_paid', 0)
-                ->pluck('installment_amount');
+            ->where('is_paid', 0)
+            ->pluck('installment_amount');
 
             $SisaHutangData = LoanModel::where('employee_id', $nik)
                 ->where('is_paid', 0)
                 ->pluck('remaining_amount');
-
+            
             $totalPotonganHutang = $potonganHutang->sum();
             $SisaHutangData1 = $SisaHutangData->sum();
-
+            
             $sisahutangTotal = $SisaHutangData1 - $totalPotonganHutang;
 
             if ($sisahutangTotal === 0) {
@@ -125,7 +121,7 @@ class PayrolNS extends Controller
                 LoanModel::where('employee_id', $nik)
                     ->where('is_paid', 0)
                     ->update(['is_paid' => 1, 'remaining_amount' => 0]);
-            } else {
+            }else{
                 LoanModel::where('employee_id', $nik)
                     ->where('is_paid', 0)
                     ->update(['is_paid' => 0, 'remaining_amount' => $sisahutangTotal]);
@@ -133,16 +129,16 @@ class PayrolNS extends Controller
 
             // Garda Pratama
             $potonganGP = Gp::where('employee_id', $nik)
-                ->where('is_paid', 0)
-                ->pluck('installment_amount');
+            ->where('is_paid', 0)
+            ->pluck('installment_amount');
 
             $sisaGp = Gp::where('employee_id', $nik)
                 ->where('is_paid', 0)
                 ->pluck('remaining_amount');
-
+            
             $TotalGP = $potonganGP->sum();
             $SisaGP = $sisaGp->sum();
-
+            
             $SistaTotalGP = $SisaGP - $TotalGP;
 
             if ($SistaTotalGP === 0) {
@@ -150,7 +146,7 @@ class PayrolNS extends Controller
                 Gp::where('employee_id', $nik)
                     ->where('is_paid', 0)
                     ->update(['is_paid' => 1, 'remaining_amount' => 0]);
-            } else {
+            }else{
                 Gp::where('employee_id', $nik)
                     ->where('is_paid', 0)
                     ->update(['is_paid' => 0, 'remaining_amount' => $SistaTotalGP]);
@@ -172,7 +168,7 @@ class PayrolNS extends Controller
                     $totalHariBackup++;
                 }
 
-                // Ambil ID proyek dari kolom project dan project_backup untuk seluruh iterasi
+                // Ambil ID proyek dari kolom project dan project_backup
                 $projectIds = [$absensi->project];
                 $projectBackup = [$absensi->project_backup];
 
@@ -182,15 +178,15 @@ class PayrolNS extends Controller
                     $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
                         ->pluck('tp_bulanan', 'project_code');
-
-                    $totalGaji = $projectDetails->sum();
-                    $montlySalary = $projectDetails->sum();
+                        
+                        $totalGaji = $projectDetails->sum();
+                        $montlySalary = $projectDetails->sum();
 
                     $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
                         ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
                         ->get();
-
+                       
                     // Initialize variables to store each selected field
                     $p_gajipokok = 0;
                     $p_tkerja = 0;
@@ -222,11 +218,11 @@ class PayrolNS extends Controller
                 if ($totalDaysInSchedules > 0) {
                     $rate_potongan = round($totalGaji / $totalDaysInSchedules);
                 }
-
+                
                 if ($totalHari < $totalDaysInSchedules) {
                     $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
                 }
-
+                
                 // backup rate
                 $rate_harianbackup = 0;
                 if (!empty($projectBackup)) {
@@ -242,12 +238,6 @@ class PayrolNS extends Controller
                         }
                     }
                 }
-
-                $totalGaji += $inPeriode ? $projectDetails->sum() : 0;
-                $totalHari += $inPeriode ? $totalHari : 0;
-                $totalGajiBackup += $inPeriode ? $totalGajiBackup : 0;
-                $totalHariBackup += $inPeriode ? $totalHariBackup : 0;
-                
                 // Allowence 
                 $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                     ->where('jabatan', $jabatan)
@@ -258,9 +248,9 @@ class PayrolNS extends Controller
                 $tunjanganLain = $ProjectAllowances->sum('p_tlain');
 
                 $projectAllowancesTotal = 0;
-                foreach ($ProjectAllowances as $projectDetailallowence) {
-                    $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
-                }
+                    foreach ($ProjectAllowances as $projectDetailallowence) {
+                        $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
+                    }
 
                 // deductions
                 $ProjectDeduction = ProjectDetails::whereIn('project_code', $projectIds)
@@ -283,22 +273,22 @@ class PayrolNS extends Controller
                 $biayaJabatan = $PenghasilanBruto * 0.05;
 
                 $penghasilanNeto = $PenghasilanBruto - $biayaJabatan;
-
-                $totalNeto = $penghasilanNeto * 12;
+                
+                $totalNeto = $penghasilanNeto*12;
                 $dataPTKP = $totalNeto -  54000000;
-
+                
                 // Penghasilan Kena Pajak Setahun / Disetahunkan
                 $persentasePTKP = 0.05;
                 $dataSetahun = $dataPTKP * $persentasePTKP;
 
                 $totalPPH = $dataSetahun / 12;
 
-                if ($totalPPH <= 0) {
+                if($totalPPH <= 0) {
                     $totalPPH = 0;
-                } else {
+                }else{
                     $totalPPH = $totalPPH;
                 }
-
+                
                 $allowenceData = [
                     'totalHari' => $totalHari,
                     'totalHariBackup' => $totalHariBackup,
@@ -308,7 +298,7 @@ class PayrolNS extends Controller
                     'rate_harian_backup' => $rate_harianbackup,
                     'allowence_total' => $projectAllowancesTotal,
                     'projectAllowances' => $ProjectAllowances->toArray(),
-
+                    
                 ];
 
                 $deductiondata = [
@@ -327,17 +317,17 @@ class PayrolNS extends Controller
 
                 $allowenceData = json_encode($allowenceData);
                 $deductionData = json_encode($deductiondata);
-
-                // Simpan data ke tabel payroll
-                $payroll = new Payroll();
-                $payroll->employee_code = $nik;
-                $payroll->periode = $request->periode;
-                $payroll->basic_salary = $montlySalary;
-                $payroll->thp = $thp;
-                $payroll->allowences = $allowenceData;
-                $payroll->deductions = $deductionData;
-                $payroll->save();
             }
+
+            // Simpan data ke tabel payroll
+            $payroll = new Payroll();
+            $payroll->employee_code = $nik;
+            $payroll->periode = $request->periode;
+            $payroll->basic_salary = $montlySalary;
+            $payroll->thp = $thp;
+            $payroll->allowences = $allowenceData;
+            $payroll->deductions = $deductionData;
+            $payroll->save();
         }
 
         // Redirect atau tampilkan pesan sukses

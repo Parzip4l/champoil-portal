@@ -176,55 +176,36 @@ class PayrolNS extends Controller
                 $projectIds = [$absensi->project];
                 $projectBackup = [$absensi->project_backup];
 
-                $allProjectIds = array_merge($allProjectIds, $projectIds);
-                $allProjectBackup = array_merge($allProjectBackup, $projectBackup);
-
                 // Dapatkan data project details dan rate harian dari project
-                if (count(array_unique(array_merge($allProjectIds, $allProjectBackup))) > 1) {
-                    $rate_harian = 0;
-                    if (!empty($projectIds)) {
-                        $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
-                            ->where('jabatan', $jabatan)
-                            ->pluck('tp_bulanan', 'project_code');
-    
-                        $totalGaji += $projectDetails->sum();
-    
-                        // Hitung rate harian untuk setiap iterasi
-                        $rate_harian += round($projectDetails->sum() / $totalDaysInSchedules);
-                        $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
-                            ->where('jabatan', $jabatan)
-                            ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
-                            ->get();
+                $rate_harian = 0;
+                if (!empty($projectIds)) {
+                    $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
+                        ->where('jabatan', $jabatan)
+                        ->pluck('tp_bulanan', 'project_code');
                         
-                        // Initialize variables to store each selected field
-                        $p_gajipokok = 0;
-                        $p_tkerja = 0;
-                        $p_tlain = 0;
+                        $totalGaji = $projectDetails->sum();
+                        $montlySalary = $projectDetails->sum();
 
-                        // Check if the collection is not empty
-                        if ($projectDetailsPPH->isNotEmpty()) {
-                            // Access the values using array keys
-                            $p_gajipokok = $projectDetailsPPH->sum('p_gajipokok');
-                            $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
-                            $p_tlain = $projectDetailsPPH->sum('p_tlain');
-                        }
+                    $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
+                        ->where('jabatan', $jabatan)
+                        ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
+                        ->get();
+                       
+                    // Initialize variables to store each selected field
+                    $p_gajipokok = 0;
+                    $p_tkerja = 0;
+                    $p_tlain = 0;
 
-                        // Calculate the total salary
-                        $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
+                    // Check if the collection is not empty
+                    if ($projectDetailsPPH->isNotEmpty()) {
+                        // Access the values using array keys
+                        $p_gajipokok = $projectDetailsPPH->sum('p_gajipokok');
+                        $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
+                        $p_tlain = $projectDetailsPPH->sum('p_tlain');
                     }
-                } else {
-                    if (!empty($allProjectIds)) {
-                        $projectDetails = ProjectDetails::whereIn('project_code', $allProjectIds)
-                            ->where('jabatan', $jabatan)
-                            ->pluck('tp_bulanan', 'project_code');
-        
-                        // Ambil nilai monthly_rate dari proyek
-                        $monthly_rate = $projectDetails->first();
-        
-                        // Ganti totalGaji dengan nilai monthly_rate
-                        $totalGaji = $monthly_rate;
-                        $montlySalary = $monthly_rate;
-                    }
+
+                    // Calculate the total salary
+                    $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
                 }
 
                 // Rate Potongan

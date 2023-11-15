@@ -12,11 +12,6 @@
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Data Project</h5>
                 <a href="{{route('project.create')}}" class="btn btn-sm btn-primary">Tambah Project Baru</a>
-                <form action="{{ route('import.excel') }}" method="post" enctype="multipart/form-data">
-                    @csrf
-                    <input type="file" name="csv_file" required accept=".xlsx">
-                    <button type="submit">Import Excel</button>
-                </form>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

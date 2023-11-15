@@ -126,8 +126,11 @@ class ProjectDetailsController extends Controller
             $request->validate([
                 'csv_file' => 'required|mimes:xlsx,csv,txt',
             ]);
+            $data = $request->file('csv_file');
 
-            Excel::import(new ProjectDetailsImport, $request->csv_file);
+            $namaFIle = $data->getClientOriginalName();
+            $data->move('ProjectData', $namaFIle);
+            Excel::import(new ProjectDetailsImport, \public_path('/ProjectData/'.$namaFIle));
 
             return redirect()->route('project.index')->with('success', 'Import berhasil!');
         } catch (\Exception $e) {

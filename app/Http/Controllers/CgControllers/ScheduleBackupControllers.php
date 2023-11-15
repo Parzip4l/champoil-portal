@@ -52,7 +52,9 @@ class ScheduleBackupControllers extends Controller
                                 ->where('shift', 'Off')
                                 ->pluck('employee');
 
-        $employees = Employee::whereIn('nik', $employeesWithDayOff)->get();
+        $employees = Employee::whereIn('nik', $employeesWithDayOff)
+                            ->where('unit_bisnis', 'Kas')
+                            ->get();
 
         return response()->json(['employees' => $employees]);
     }
@@ -61,9 +63,12 @@ class ScheduleBackupControllers extends Controller
     {
         $project = $request->input('project');
         $employeeReplace = Schedule::where('project', $project)
+                                ->where('')
                                 ->pluck('employee');
 
-        $employeesData = Employee::whereIn('nik', $employeeReplace)->get();
+        $employeesData = Employee::whereIn('nik', $employeeReplace)
+                                ->where('unit_bisnis', 'Kas')
+                                ->get();
 
         return response()->json(['EmployeeReplace' => $employeesData]);
     }

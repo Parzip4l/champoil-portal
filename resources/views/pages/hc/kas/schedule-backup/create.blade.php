@@ -9,7 +9,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Create Backup Schedule</h5>
             </div>
@@ -18,17 +18,28 @@
                     @csrf
                     <div class="schedule-backup-wrap">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Tanggal</label>
                                     <input type="date" class="form-control tanggal" name="tanggal[]" id="tanggal">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power</label>
                                     <select class="js-example-basic-single form-select employee" data-width="100%" name="employee[]" id="employee">
                                         <option disabled selected>Select Employee</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Project</label>
+                                    <select class="js-example-basic-single form-select project" data-width="100%" name="project[]" id="projectSelect">
+                                        <option disabled selected>Select Project</option>
+                                        @foreach($project as $project)
+                                            <option value="{{$project->id}}">{{$project->name}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -42,12 +53,9 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
-                                    <label for="" class="form-label">Project</label>
-                                    <select class="js-example-basic-single form-select" data-width="100%" name="project[]">
-                                        <option disabled selected>Select Project</option>
-                                        @foreach($project as $project)
-                                            <option value="{{$project->id}}">{{$project->name}}</option>
-                                        @endforeach
+                                    <label for="" class="form-label">Man Power Replace</label>
+                                    <select class="js-example-basic-single form-select replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect">
+                                        <option disabled selected>Select Man Power</option>
                                     </select>
                                 </div>
                             </div>
@@ -64,7 +72,6 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" id="AddEmployee" class="btn btn-success mt-1 mb-3">Tambah Schedule Baru</button>
                     <button type="submit" class="btn btn-primary w-100">Simpan Data</button>
                 </form>
             </div>
@@ -195,6 +202,32 @@
     // Panggil saat tanggal berubah
     $('.tanggal').change(function() {
         updateEmployeeOptions();
+    });
+</script>
+<script>
+    function SearchEmployee() {
+        var SelectProject = document.querySelector('.project').value;
+
+        // AJAX Request
+        $.ajax({
+            url: "{{ route('getManPower.backup') }}",
+            type: "GET",
+            data: {
+                project: SelectProject
+            },
+            success: function(response) {
+                var selectEmployee2 = $('#manpowerSelect');
+                selectEmployee2.empty().append('<option disabled selected>Select Employee</option>');
+                $.each(response.EmployeeReplace, function(key, value) {
+                    selectEmployee2.append('<option value="' + value.nik + '">' + value.nama + '</option>');
+                });
+            }
+        });
+    }
+
+    // Panggil saat tanggal berubah
+    $('.project').change(function() {
+        SearchEmployee();
     });
 </script>
 @endpush

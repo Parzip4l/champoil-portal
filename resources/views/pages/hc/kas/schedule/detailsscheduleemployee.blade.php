@@ -42,7 +42,7 @@
                                             </thead>
                                             <tbody>
                                                 @php
-                                                $nomor = 1;
+                                                    $nomor = 1;
                                                 @endphp
                                                 @foreach($schedules as $schedules)
                                                 <tr>
@@ -51,7 +51,7 @@
                                                     @endphp
                                                     <td><input type="number" class="form-control" value="{{$nomor++}}"></td>
                                                     <td>
-                                                        <input type="text" class="form-control" value="{{ \Carbon\Carbon::createFromFormat('Y-m-d', $schedules->tanggal)->format('l') }}, {{$schedules->tanggal}}">
+                                                        <input type="text" class="form-control" value="{{$schedules->tanggal}}">
                                                         <input type="hidden" name="tanggal" value="{{$schedules->tanggal}}">
                                                     </td>
                                                     <td>

@@ -113,7 +113,7 @@
                 @endphp
                 @if($employee->organisasi === 'Management Leaders')
                 <a href="{{route('payslip.show', $data->id)}}" class="mb-3">
-                    <div class="payslip-wrap d-flex">
+                    <div class="payslip-wrap d-flex mb-3">
                         <div class="icon-wrap-slip me-3">
                             <i class="icon-lg text-white" data-feather="file-text"></i>
                         </div>
@@ -126,7 +126,7 @@
                 @endif
                 @if($employee->organisasi === 'Frontline Officer')
                 <a href="{{route('payslip-ns.show', $data->id)}}">
-                    <div class="payslip-wrap d-flex">
+                    <div class="payslip-wrap d-flex mb-3">
                         <div class="icon-wrap-slip me-2">
                             <i class="icon-lg text-white" data-feather="file-text"></i>
                         </div>
@@ -185,4 +185,9 @@
     }
     });
     </script>
+    <style>
+        .payslip-wrap.d-flex.mb-3:last-child{
+            margin-bottom : 0!important;
+        }
+    </style>
 @endpush

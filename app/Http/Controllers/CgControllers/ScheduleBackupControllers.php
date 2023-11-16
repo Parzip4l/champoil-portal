@@ -52,9 +52,24 @@ class ScheduleBackupControllers extends Controller
                                 ->where('shift', 'Off')
                                 ->pluck('employee');
 
-        $employees = Employee::whereIn('nik', $employeesWithDayOff)->get();
+        $employees = Employee::whereIn('nik', $employeesWithDayOff)
+                            ->where('unit_bisnis', 'Kas')
+                            ->get();
 
         return response()->json(['employees' => $employees]);
+    }
+
+    public function getManPower(Request $request)
+    {
+        $project = $request->input('project');
+        $employeeReplace = Schedule::where('project', $project)
+                                ->pluck('employee');
+
+        $employeesData = Employee::whereIn('nik', $employeeReplace)
+                                ->where('unit_bisnis', 'Kas')
+                                ->get();
+
+        return response()->json(['EmployeeReplace' => $employeesData]);
     }
 
     /**
@@ -81,11 +96,13 @@ class ScheduleBackupControllers extends Controller
                 $periode = $request->input('periode')[$key];
                 $project = $request->input('project')[$key];
                 $shift = $request->input('shift')[$key];
+                $manpowerreplace = $request->input('manpower')[$key];
 
                 // Lakukan penyimpanan data di sini
                 $schedule = new ScheduleBackup();
                 $schedule->tanggal = $tanggal;
                 $schedule->employee = $employee;
+                $schedule->man_backup = $manpowerreplace;
                 $schedule->periode = $periode;
                 $schedule->project = $project;
                 $schedule->shift = $shift;
@@ -111,7 +128,8 @@ class ScheduleBackupControllers extends Controller
     {
         //
     }
-
+    // get manpower
+    
     /**
      * Show the form for editing the specified resource.
      *
@@ -143,6 +161,8 @@ class ScheduleBackupControllers extends Controller
      */
     public function destroy($id)
     {
-        //
+        $backup = ScheduleBackup::find($id);
+        $backup->delete();
+        return redirect()->route('backup-schedule.index')->with('success', 'Backup Successfully Deleted');
     }
 }

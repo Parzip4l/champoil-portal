@@ -84,8 +84,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                    
-
                 </div>
             </div>
         </div>
@@ -112,6 +110,7 @@
                             <label for="" class="form-label">Project</label>
                             <select name="project_id" id="project_id" class="form-control">
                                 <option value="">PILIH PROJECT</option>
+                                
                                 @foreach($project as $row)
                                 <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach

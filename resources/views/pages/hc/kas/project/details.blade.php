@@ -16,6 +16,10 @@
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="project-name-wrap mb-3 d-flex justify-content-between">
+                            <p>Project Code</p>
+                            <p class="text-muted">{{ $project->id }}</p>
+                        </div>
+                        <div class="project-name-wrap mb-3 d-flex justify-content-between">
                             <p>Project Name</p>
                             <p class="text-muted">{{ $project->name }}</p>
                         </div>
@@ -30,6 +34,26 @@
                         <div class="project-name-wrap mb-3 d-flex justify-content-between">
                             <p>Contract End</p>
                             <p class="text-muted text-right">{{ $project->end_contract }}</p>
+                        </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            Import Data
+                        </button>
+                    </div>
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Upload Data Project Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('import.excel') }}" method="post" enctype="multipart/form-data">
+                                        @csrf
+                                        <input type="file" class="form-control mb-2" name="csv_file" required accept=".xlsx">
+                                        <button type="submit" class="btn btn-primary w-100">Import Excel</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,9 @@ use App\Employee;
 use App\ModelCG\Project;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ScheduleImport;
+use App\Exports\ScheduleExport;
 
 class ScheduleControllers extends Controller
 {
@@ -79,6 +82,31 @@ class ScheduleControllers extends Controller
         }
 
         return $code;
+    }
+
+    // Schedule Import
+    public function importSchedule(Request $request)
+    {
+        try {
+            $request->validate([
+                'csv_file' => 'required|mimes:xlsx,csv,txt',
+            ]);
+            $data = $request->file('csv_file');
+
+            $namaFIle = $data->getClientOriginalName();
+            $data->move('ScheduleImport', $namaFIle);
+            Excel::import(new ScheduleImport, \public_path('/ScheduleImport/'.$namaFIle));
+
+            return redirect()->route('schedule.index')->with('success', 'Import berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
+        }
+    }
+
+    public function exportSchedule() 
+    {
+        return Excel::download(new ScheduleExport, 'schedule.xlsx');
+        return redirect()->back()->with('success', 'Download Berhasil !');
     }
 
     /**
@@ -194,8 +222,14 @@ class ScheduleControllers extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($schedule_code)
     {
-        //
+        $affectedRows = Schedule::where('schedule_code', $schedule_code)->delete();
+
+        if ($affectedRows > 0) {
+            return redirect()->route('schedule.index')->with('success', 'Schedule Successfully Deleted');
+        } else {
+            return redirect()->route('schedule.index')->with('error', 'Schedule Not Found');
+        }
     }
 }

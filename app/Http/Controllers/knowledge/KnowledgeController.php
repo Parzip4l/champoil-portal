@@ -9,7 +9,7 @@ use App\ModelCG\Knowledge_soal;
 use App\ModelCG\Knowledge_jawaban;
 use App\ModelCG\asign_test;
 use App\ModelCG\Jawaban_user;
-use App\ModelCG\User_read_module;
+use App\ModelCG\user_read_module;
 use App\Employee;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

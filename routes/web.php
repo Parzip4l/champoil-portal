@@ -152,6 +152,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('backup-schedule', App\Http\Controllers\CgControllers\ScheduleBackupControllers::class);
         // Get manpower Backup
         Route::get('/get-employees/{projectId}',[ App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getManPower']);
+        Route::post('/import-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'importSchedule'])->name('import.schedule');
+        Route::get('export-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'exportSchedule'])->name('export.schedule');
 
         // Schedule Details
         Route::get('/schedule/details/{project}/{periode}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetails'])->name('schedule.details');

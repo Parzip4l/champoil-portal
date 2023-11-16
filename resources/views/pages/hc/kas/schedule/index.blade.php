@@ -10,8 +10,15 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Schedule</h5>
-                <a href="{{route('schedule.create')}}" class="btn btn-sm btn-primary">Create Schedule</a>
+                <div class="judul">
+                    <h5 class="mb-0 align-self-center">Data Schedule</h5>
+                </div>
+                <div class="button-actions">
+                    <a href="{{route('export.schedule')}}" class="btn btn-sm btn-primary">Download Template</a>
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Import Schedule
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -40,6 +47,24 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal IMport -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Import Data Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('import.schedule') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" class="form-control mb-2" name="csv_file" required accept=".xlsx">
+                    <button type="submit" class="btn btn-primary w-100">Import Excel</button>
+                </form>
             </div>
         </div>
     </div>

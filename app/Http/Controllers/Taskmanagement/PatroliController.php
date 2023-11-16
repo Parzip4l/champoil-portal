@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\ModelCG\Task;
 use App\ModelCG\List_task;
 use App\ModelCG\Patroli;
+use App\ModelCG\Absen;
+use App\ModelCG\Temuan;
 use Illuminate\Support\Facades\Auth;
 
 class PatroliController extends Controller
@@ -82,19 +84,22 @@ class PatroliController extends Controller
         }
 
         // insert looping to table temuan
+
         $no2=0;
         foreach($data['temuan'] as $temuan){
             $ins2=[
-                "temuan"=>$data['temuan'][$no],
-                "tindakan"=>$data['tindakan'][$no],
+                "temuan"=>$data['temuan'][$no2],
+                "tindakan"=>$data['tindakan'][$no2],
                 "shift"=>"",
                 "unix_code"=>$data['unix_code'],
                 "employee_code"=>Auth::user()->employee_code,
             ];
-        }
+            Temuan::insert($ins2);
 
-        dd($data);
-        return view('pages.operational.patroli.index',$data);
+            $no2++;
+        }
+        return redirect()->route('patroli')->with('success', 'Successfully');
+        
     }
 }
 

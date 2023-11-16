@@ -220,12 +220,12 @@
                 </a>
             </div>
             <div class="item">
-                <a href="javascript:void(0)">
+                <a href="{{ route('patroli') }}">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="book"></i>
                     </div>
                     <div class="menu-name text-center">
-                        <p class="text-muted">E-Workplan</p>
+                        <p class="text-muted">Patroli</p>
                     </div>
                 </a>
             </div>

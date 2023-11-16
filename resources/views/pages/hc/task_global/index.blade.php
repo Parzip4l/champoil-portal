@@ -10,10 +10,10 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Class Room</h5>
+                <h5 class="mb-0 align-self-center">Data Task</h5>
                 <div class="btn-group">
                     <a href="#" class="btn btn-success">Report</a>
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#knowledgeModal">Tambah Class Room</a>
+                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#knowledgeModal">Tambah Task</a>
                 </div>
             </div>
             <div class="card-body">
@@ -22,8 +22,9 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Judul</th>
-                                <th>Dokument</th>
+                                <th>Task</th>
+                                <th>Project</th>
+                                <th>Mengulang<th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -33,9 +34,10 @@
                             @endphp
                             @foreach ($records as $record)
                             <tr>
-                                <td> {{$nomor++}} </td>
-                                <td> {{ $record->title }} </td>
-                                <td> <img src="{{ asset('assets/images/pdf.png') }}"> </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -85,30 +87,64 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Class Room</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Task</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{route('knowledge.store')}}" method="POST" enctype="multipart/form-data">
+            <form
+                    action="{{route('knowledge.store')}}"
+                    method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Judul</label>
-                            <input type="text" class="form-control" name="title" required>    
-                        </div>
-                        <div class="input-group mb-3">
-                            <input type="number" name="durasi" class="form-control" >
-                            <span class="input-group-text" id="basic-addon2">Jam</span>
+                            <label for="" class="form-label">Unit Bisnis</label>
+                            <select name="unit_bisnis" class="form-control">
+                                <option value="Champoil">CHAMPOIL</option>
+                                <option value="Kas">KAS</option>
+                            </select>
                         </div>
                         <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Dokumen</label>
-                            <input type="file" class="form-control" name="file_name" required>    
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
-                        </div>
-                    </div>
-                </form>
+                            <label for="" class="form-label">Nama Task</label>
+                            <input type="text" class="form-control" name="task_name" required="required"></div>
+                            <div class="col-md-12 mb-2">
+                                <label for="" class="form-label">Upload Photo</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="1" id="flexCheckDefault">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        YES
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="0" id="flexCheckChecked">
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        NO
+                                    </label>
+                                </div>
+                                <label for="" class="form-label">Mengulang</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Harian
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Mingguan
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                                    <label class="form-check-label" for="flexRadioDefault3">
+                                        Bulanan
+                                    </label>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
+                                </div>
+                            </div>
+                        </form>
             </div>
         </div>
     </div>

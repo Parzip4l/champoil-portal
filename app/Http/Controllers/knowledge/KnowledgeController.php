@@ -143,7 +143,7 @@ class KnowledgeController extends Controller
         $data['record'] = Knowledge::where('id', $id)->first();
 
         $fileName = $data['record']->file_name;
-
+        
         // Check if the record exists
         if (!$data['record']) {
             return redirect()->route('some_error_route')->with('error', 'Knowledge record not found');

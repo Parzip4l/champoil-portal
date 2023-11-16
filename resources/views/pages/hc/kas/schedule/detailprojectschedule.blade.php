@@ -30,17 +30,35 @@
                                     $projectname = \App\ModelCG\Project::find($schedule->project)->name;
                                     $employee = \App\Employee::where('nik', $schedule->employee)->first();
                                 @endphp
-                                <td> 
+                                <td> <a href="{{route('schedule.employee', ['project' => $schedule->project, 'periode' => $schedule->periode, 'employee' => $schedule->employee])}}">
                                     @if($employee && $employee->nama)
                                         {{ $employee->nama }}
                                     @else
                                         Tidak ada
                                     @endif
+                                    </a>
                                 </td>
                                 <td> {{ $projectname }} </td>
                                 <td> {{ $schedule->periode }} </td>
                                 <td>
-                                    <a href="{{route('schedule.employee', ['project' => $schedule->project, 'periode' => $schedule->periode, 'employee' => $schedule->employee])}}" class="btn btn-primary btn-sm">Details</a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
+                                                @csrf @method('DELETE')
+                                                <a class="dropdown-item d-flex align-items-center" href="{{route('schedule.employee', ['project' => $schedule->project, 'periode' => $schedule->periode, 'employee' => $schedule->employee])}}">
+                                                    <i data-feather="eye" class="icon-sm me-2"></i>
+                                                    <span class="">Details</span>
+                                                </a>
+                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $schedule->schedule_code }}')">
+                                                    <i data-feather="trash" class="icon-sm me-2"></i>
+                                                    <span class="">Delete</span>
+                                                </a>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -74,7 +92,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('shift.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('schedule.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {
@@ -84,7 +102,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Shift Successfully Deleted',
+                            title: 'Schedule Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert
@@ -92,7 +110,7 @@
                     } else {
                         // Handle error response if needed
                         Swal.fire({
-                            title: 'Shift Failed to Delete',
+                            title: 'Schedule Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });

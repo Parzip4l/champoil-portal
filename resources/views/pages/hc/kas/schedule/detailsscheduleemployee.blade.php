@@ -42,7 +42,7 @@
                                             </thead>
                                             <tbody>
                                                 @php
-                                                $nomor = 1;
+                                                    $nomor = 1;
                                                 @endphp
                                                 @foreach($schedules as $schedules)
                                                 <tr>

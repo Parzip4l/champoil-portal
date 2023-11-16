@@ -222,8 +222,14 @@ class ScheduleControllers extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($schedule_code)
     {
-        //
+        $affectedRows = Schedule::where('schedule_code', $schedule_code)->delete();
+
+        if ($affectedRows > 0) {
+            return redirect()->route('schedule.index')->with('success', 'Schedule Successfully Deleted');
+        } else {
+            return redirect()->route('schedule.index')->with('error', 'Schedule Not Found');
+        }
     }
 }

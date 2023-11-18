@@ -29,6 +29,10 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
+
+    // Export Attendence
+    Route::get('export-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'exportAttendence'])->name('export.attendence');
+
     Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
 
     // Backup

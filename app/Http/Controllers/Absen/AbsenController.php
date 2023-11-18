@@ -13,6 +13,8 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Exports\AttendenceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AbsenController extends Controller
 {
@@ -25,9 +27,10 @@ class AbsenController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-
-        $startDate = Carbon::now()->startOfMonth();
-        $endDate = Carbon::now()->endOfMonth();
+        
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
         $data1 = DB::table('users')
                     ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
@@ -41,6 +44,24 @@ class AbsenController extends Controller
                     ->get();
 
         return view('pages.absen.index',compact('data1','endDate','startDate'));
+    }
+
+    public function exportAttendence()
+    {
+        // Get Bulan
+        $currentMonth = now()->format('F');
+        // Validasi request jika diperlukan
+        $loggedInUserNik = Auth::user()->employee_code;
+        $company = Employee::where('nik', $loggedInUserNik)->first();
+
+        // Dapatkan nilai unit bisnis dari request
+        $unitBisnis = $company->unit_bisnis;
+
+        // Buat instance dari kelas AttendenceExport
+        $export = new AttendenceExport($unitBisnis, $loggedInUserNik);
+
+        // Ekspor data ke Excel
+        return Excel::download($export, 'attendence_export_' . strtolower($currentMonth) . '.xlsx');
     }
 
     /**

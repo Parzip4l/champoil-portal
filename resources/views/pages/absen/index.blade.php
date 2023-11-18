@@ -29,6 +29,7 @@
             <div class="card-body">
                 <div class="head-card d-flex justify-content-between mb-3">
                     <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
+                    <a href="{{route('export.attendence')}}" class="btn btn-sm btn-primary">Export Absen</a>
                 </div>
                 <hr>
                 <div class="table-responsive">

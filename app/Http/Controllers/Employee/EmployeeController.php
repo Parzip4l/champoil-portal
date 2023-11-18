@@ -103,6 +103,7 @@ class EmployeeController extends Controller
             $userinfo->password = Hash::make($request->password);
             $userinfo->permission = json_encode($request->permissions);
             $userinfo->employee_code = $request->nik;
+            $userinfo->company = $request->unit_bisnis;
             $userinfo->save();
 
             DB::commit();

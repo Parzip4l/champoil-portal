@@ -49,19 +49,22 @@ class AbsenController extends Controller
     public function exportAttendence()
     {
         // Get Bulan
-        $currentMonth = now()->format('F');
-        // Validasi request jika diperlukan
-        $loggedInUserNik = Auth::user()->employee_code;
+        $loggedInUserNik = auth()->user()->employee_code;
         $company = Employee::where('nik', $loggedInUserNik)->first();
 
         // Dapatkan nilai unit bisnis dari request
         $unitBisnis = $company->unit_bisnis;
 
-        // Buat instance dari kelas AttendenceExport
-        $export = new AttendenceExport($unitBisnis, $loggedInUserNik);
+        // Dapatkan tanggal awal dan akhir periode
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+        // Buat instance dari kelas AttendenceExport dengan rentang waktu
+        $export = new AttendenceExport($unitBisnis, $loggedInUserNik, $startDate, $endDate);
 
         // Ekspor data ke Excel
-        return Excel::download($export, 'attendence_export_' . strtolower($currentMonth) . '.xlsx');
+        return Excel::download($export, 'attendence_export_' . strtolower($startDate->format('F')) . '.xlsx');
     }
 
     /**

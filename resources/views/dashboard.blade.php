@@ -91,10 +91,10 @@
                                     ->whereDate('tanggal', $today)
                                     ->first();
                                 $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
-                                    ->select('unit_bisnis')
+                                    ->select('unit_bisnis','organisasi')
                                     ->first();
                             @endphp
-                            @if($hasScheduleForToday || ($karyawanLogin->unit_bisnis === 'CHAMPOIL' && !$hasScheduleForToday))
+                            @if($hasScheduleForToday || ($karyawanLogin->organisasi === 'Management Leaders' && !$hasScheduleForToday))
                                 @if ($clockin)
                                 <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
                                 @csrf   

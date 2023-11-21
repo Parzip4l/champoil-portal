@@ -10,7 +10,27 @@ class Employee extends Model
 {
     use HasFactory;
     protected $table = 'karyawan';
-    protected $fillable = ['id'];
+    protected $fillable = [
+        'ktp',
+        'nik',
+        'alamat',
+        'jabatan',
+        'organisasi',
+        'status_kontrak',
+        'joindate',
+        'berakhirkontrak',
+        'email',
+        'telepon',
+        'organisasi',
+        'status_pernikahan',
+        'tanggungan',
+        'agama',
+        'tanggal_lahir',
+        'tempat_lahir',
+        'jenis_kelamin',
+        'unit_bisnis',
+        'manager',
+    ];
 
     public function karyawan()
     {

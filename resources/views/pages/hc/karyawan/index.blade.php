@@ -20,64 +20,71 @@
 @endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <div class="head-card d-flex justify-content-between mb-3">
-            <h6 class="card-title align-self-center mb-0">Employees</h6>
-            <a class="btn btn-primary d-flex align-items-center" href="{{ route('employee.create') }}"><i data-feather="plus" class="icon-sm me-2"></i> <span class="">Tambah Karyawan</span></a>
+    <div class="card custom-card2">
+        <div class="card-header">
+            <div class="head-card d-flex justify-content-between">
+                <div class="header-title align-self-center">
+                    <h6 class="card-title align-self-center mb-0">Employees</h6>
+                </div>
+                <div class="tombol-pembantu d-flex">
+                    <a class="btn btn-info d-flex align-items-center me-2 text-white" href="#">Import</a>
+                    <a class="btn btn-success d-flex align-items-center me-2" href="{{ route('export.employee') }}">Export</a>
+                    <a class="btn btn-primary d-flex align-items-center" href="{{ route('employee.create') }}">Tambah Karyawan</a>
+                </div>
+            </div>
         </div>
-        <hr>
-        <div class="table-responsive">
-          <table id="dataTableExample" class="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nama</th>
-                <th>Kode Karyawan</th>
-                <th>Jenis Kelamin</th>
-                <th>Organisasi</th>
-                <th>Jabatan</th>
-                <th>Status Karyawan</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-                @php 
-                    $no = 1;
-                @endphp
-                @foreach ($karyawan as $data)
-              <tr>
-                <td>{{ $no++ }}</td>
-                <td>{{ $data->nama }}</td>
-                <td>{{ $data->nik }}</td>
-                <td>{{ $data->jenis_kelamin }}</td>
-                <td>{{ $data->organisasi }}</td>
-                <td>{{ $data->jabatan }}</td>
-                <td><span class="@if($data->status_kontrak == 'Permanent') badge rounded-pill bg-primary @else badge rounded-pill bg-success @endif">{{ $data->status_kontrak }}</span></td>
-                <td>
-                    <div class="dropdown">
-                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.edit', ['employee' => $data->nik]) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                        <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.show', $data->id) }}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View Detail</span></a>
-                        <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                            @csrf @method('DELETE') 
-                            <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                <i data-feather="trash" class="icon-sm me-2"></i>
-                                <span class="">Delete</span>
-                            </a>
-                        </form>
+        <div class="card-body">
+            <div class="table-responsive">
+            <table id="dataTableExample" class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nama</th>
+                    <th>Kode Karyawan</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Organisasi</th>
+                    <th>Jabatan</th>
+                    <th>Status Karyawan</th>
+                    <th>Aksi</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @php 
+                        $no = 1;
+                    @endphp
+                    @foreach ($karyawan as $data)
+                <tr>
+                    <td>{{ $no++ }}</td>
+                    <td>{{ $data->nama }}</td>
+                    <td>{{ $data->nik }}</td>
+                    <td>{{ $data->jenis_kelamin }}</td>
+                    <td>{{ $data->organisasi }}</td>
+                    <td>{{ $data->jabatan }}</td>
+                    <td><span class="@if($data->status_kontrak == 'Permanent') badge rounded-pill bg-primary @else badge rounded-pill bg-success @endif">{{ $data->status_kontrak }}</span></td>
+                    <td>
+                        <div class="dropdown">
+                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.edit', ['employee' => $data->nik]) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.show', $data->id) }}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View Detail</span></a>
+                            <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
+                                @csrf @method('DELETE') 
+                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                    <i data-feather="trash" class="icon-sm me-2"></i>
+                                    <span class="">Delete</span>
+                                </a>
+                            </form>
+                        </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
+                    </td>
+                </tr>
+                @endforeach
+                </tbody>
+            </table>
+            </div>
         </div>
-      </div>
     </div>
   </div>
 </div>

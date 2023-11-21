@@ -15,6 +15,9 @@ use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Exports\EmployeeExport;
+use App\Imports\EmployeeImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
@@ -357,6 +360,42 @@ class EmployeeController extends Controller
             return redirect()->back()->with('success', 'Data Absensi berhasil diubah');
         } else {
             return redirect()->back()->with('error', 'Data tidak ditemukan untuk tanggal yang dipilih');
+        }
+    }
+
+    // Export Karyawan
+    public function exportEmployee()
+    {
+        // Get Bulan
+        $loggedInUserNik = auth()->user()->employee_code;
+        $company = Employee::where('nik', $loggedInUserNik)->first();
+
+        // Dapatkan nilai unit bisnis dari request
+        $unitBisnis = $company->unit_bisnis;
+
+        // Buat instance dari kelas AttendenceExport dengan rentang waktu
+        $export = new EmployeeExport($unitBisnis, $loggedInUserNik);
+
+        // Ekspor data ke Excel
+        return Excel::download($export, 'truest_employee_export.xlsx');
+    }
+
+    // Import Karyawan
+    public function importEmployee(Request $request)
+    {
+        try {
+            $request->validate([
+                'csv_file' => 'required|mimes:xlsx,csv,txt',
+            ]);
+            $data = $request->file('csv_file');
+
+            $namaFIle = $data->getClientOriginalName();
+            $data->move('KaryawanImport', $namaFIle);
+            Excel::import(new EmployeeImport, \public_path('/KaryawanImport/'.$namaFIle));
+
+            return redirect()->back()->with('success', 'Import berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
         }
     }
 

@@ -104,6 +104,7 @@ class AbsenController extends Controller
             ->whereDate('tanggal', $today)
             ->get();
 
+        $project_id = null;
         foreach($schedulebackup as $databackup)
         {
             $project_id = $databackup->project;
@@ -112,12 +113,19 @@ class AbsenController extends Controller
             $periode = $databackup->periode;
         }
         
-        $dataProject = Project::where('id', $project_id)->first();
-        $latitudeProject = $dataProject->latitude;
-        $longtitudeProject = $dataProject->longtitude;
-
-        $kantorLatitude = $latitudeProject;
-        $kantorLongtitude = $longtitudeProject;
+        if ($project_id !== null) {
+            $dataProject = Project::where('id', $project_id)->first();
+            $latitudeProject = $dataProject->latitude;
+            $longtitudeProject = $dataProject->longtitude;
+        
+            $kantorLatitude = $latitudeProject;
+            $kantorLongtitude = $longtitudeProject;
+        } else {
+            $latitudeProject = -6.1366045;
+            $longtitudeProject = 106.7601449;
+            $kantorLatitude = -6.1366045; 
+            $kantorLongtitude = 106.7601449; 
+        }
 
         $time_in = Carbon::now()->format('H:i');
         $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');

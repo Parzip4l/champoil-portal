@@ -144,8 +144,8 @@ class AbsenController extends Controller
             $absensi->nik = $nik;
             $absensi->tanggal = now()->toDateString();
             $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $lat;
-            $absensi->longtitude = $long;
+            $absensi->latitude = $latitudeProject;
+            $absensi->longtitude = $longtitudeProject;
             $absensi->status = $status;
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');

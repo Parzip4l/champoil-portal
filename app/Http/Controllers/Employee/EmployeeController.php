@@ -197,7 +197,7 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::where('nik', $id)->with('payrolinfo')->first();
+        $employee = Employee::where('nik', $id)->with('payrolinfo','user')->first();
         return view('pages.hc.karyawan.edit', compact('employee'));
         
     }
@@ -260,6 +260,8 @@ class EmployeeController extends Controller
                 'nama' => 'required|string|max:255',
                 'ktp' => 'required|numeric',
             ]);
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
             DB::beginTransaction();
             // Find the employee by ID
             $employee = Employee::where('nik', $id)->first();
@@ -314,6 +316,28 @@ class EmployeeController extends Controller
                 $payrolinfo->bank_number = $request->bank_number;
                 $payrolinfo->ptkp = $request->tanggungan;
                 $payrolinfo->save();
+            }
+
+            $userInfo = User::where('name', $id)->first();
+
+            if ($userInfo) {
+                $userInfo->name = $request->input('nik');
+                $userInfo->email = $request->input('email');
+                $userInfo->password = Hash::make($request->password);
+                $userInfo->permission = json_encode($request->permissions);
+                $userInfo->employee_code = $request->input('nik');
+                $userInfo->company = $company->unit_bisnis;
+                $userInfo->save();
+            } else {
+                // Jika tidak ditemukan maka buat baru
+                $userInfo = new User();
+                $userInfo->name = $request->nik;
+                $userInfo->email = $request->email;
+                $userInfo->password = Hash::make($request->password);
+                $userInfo->permission = json_encode($request->permissions);
+                $userInfo->employee_code = $request->nik;
+                $userInfo->company = $company->unit_bisnis;
+                $userInfo->save();
             }
 
             DB::commit();

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Payrolinfo\Payrolinfo;
+use App\User;
 
 class Employee extends Model
 {
@@ -13,6 +14,7 @@ class Employee extends Model
     protected $fillable = [
         'ktp',
         'nik',
+        'nama',
         'alamat',
         'jabatan',
         'organisasi',
@@ -40,5 +42,10 @@ class Employee extends Model
     public function payrolinfo()
     {
         return $this->hasOne(Payrolinfo::class, 'employee_code', 'nik');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'employee_code', 'nik');
     }
 }

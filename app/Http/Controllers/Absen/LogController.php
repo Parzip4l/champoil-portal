@@ -41,7 +41,7 @@ class LogController extends Controller
                         ->get();
                         
                     $today = now();
-                    $startOfMonth = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+                    $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
                     $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
                     $bulan = $request->input('bulan');

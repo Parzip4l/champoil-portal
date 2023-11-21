@@ -27,7 +27,7 @@
                     <h6 class="card-title align-self-center mb-0">Employees</h6>
                 </div>
                 <div class="tombol-pembantu d-flex">
-                    <a class="btn btn-info d-flex align-items-center me-2 text-white" href="#">Import</a>
+                    <a class="btn btn-info d-flex align-items-center me-2 text-white" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">Import</a>
                     <a class="btn btn-success d-flex align-items-center me-2" href="{{ route('export.employee') }}">Export</a>
                     <a class="btn btn-primary d-flex align-items-center" href="{{ route('employee.create') }}">Tambah Karyawan</a>
                 </div>
@@ -87,6 +87,23 @@
         </div>
     </div>
   </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Import Data Karyawan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('import.employee') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" class="form-control mb-2" name="csv_file" required accept=".xlsx">
+                    <button type="submit" class="btn btn-primary w-100">Import Excel</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 

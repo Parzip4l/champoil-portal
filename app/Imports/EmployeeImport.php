@@ -26,6 +26,8 @@ class EmployeeImport implements ToCollection, WithHeadingRow
                 'status_kontrak' => $row['status_kontrak'],
                 'joindate' => $row['joindate'],
                 'berakhirkontrak' => $row['berakhirkontrak'],
+                'email' => $row['email'],
+                'telepon' => $row['telepon'],
                 'status_pernikahan' => $row['status_pernikahan'],
                 'agama' => $row['agama'],
                 'tanggal_lahir' => $row['tanggal_lahir'],

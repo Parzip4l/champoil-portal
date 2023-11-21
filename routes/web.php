@@ -174,6 +174,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // Get Employee
         Route::get('/get-employees', [App\Http\Controllers\CgControllers\PayrolNS::class, 'getEmployees'])->name('employee.unit');
+        Route::post('/import-employees', [App\Http\Controllers\Employee\EmployeeController::class, 'importEmployee'])->name('import.employee');
 
         // Learning
         Route::resource('knowledge_base',App\Http\Controllers\knowledge\KnowledgeController::class);

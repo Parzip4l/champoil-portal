@@ -185,9 +185,4 @@
     }
     });
     </script>
-    <style>
-        .payslip-wrap.d-flex.mb-3:last-child{
-            margin-bottom : 0!important;
-        }
-    </style>
 @endpush

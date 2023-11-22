@@ -21,4 +21,14 @@ Route::prefix('v1')->group(function () {
     Route::post('/logout', [ApiLoginController::class, 'logout']);
     Route::get('/employee', [EmployeeController::class, 'ApiEmployee']);
     Route::get('/mySlip', [ApiLoginController::class, 'payslipuser']);
+    Route::get('/Payslip/{id}', [ApiLoginController::class, 'PayslipDetails']);
+
+    // Employee Details
+    Route::get('/employee/{nik}', [ApiLoginController::class, 'getEmployeeByNik']);
+
+    // Profile Employee
+    Route::get('/profile/{nik}', [ApiLoginController::class, 'getMyProfile']);
+
+    // Absen Request
+    Route::post('/absence-request', [ApiLoginController::class, 'submitAbsenceRequest']);
 });

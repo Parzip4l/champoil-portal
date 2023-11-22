@@ -94,7 +94,7 @@
                                     ->select('unit_bisnis','organisasi')
                                     ->first();
                             @endphp
-                            @if($hasScheduleForToday || ($karyawanLogin->organisasi === 'Management Leaders' && !$hasScheduleForToday))
+                            @if($hasScheduleForToday || ($karyawanLogin->organisasi === 'Management Leaders' && $karyawanLogin->unit_bisnis === 'CHAMPOIL' && !$hasScheduleForToday))
                                 @if ($clockin)
                                 <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
                                 @csrf   

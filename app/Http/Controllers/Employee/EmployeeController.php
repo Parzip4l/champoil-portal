@@ -34,6 +34,31 @@ class EmployeeController extends Controller
         return view('pages.hc.karyawan.index', compact('karyawan'));
     }
 
+    public function ApiEmployee()
+    {
+        if (Auth::check()) {
+            $code = Auth::user()->employee_code;
+    
+            // Pastikan properti "employee_code" ada pada objek pengguna
+            if ($code) {
+                $company = Employee::where('nik', $code)->first();
+    
+                // Pastikan objek "company" tidak null sebelum mengakses properti "unit_bisnis"
+                if ($company) {
+                    $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
+    
+                    return response()->json(['karyawan' => $karyawan], 200);
+                } else {
+                    return response()->json(['error' => 'Data perusahaan tidak ditemukan.'], 404);
+                }
+            } else {
+                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+            }
+        } else {
+            return response()->json(['error' => 'Pengguna tidak terautentikasi.'], 401);
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      *

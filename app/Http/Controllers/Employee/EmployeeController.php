@@ -38,11 +38,10 @@ class EmployeeController extends Controller
     {
         // Mendapatkan token dari header Authorization
         $token = $request->bearerToken();
-        dd($token);
         // Memeriksa apakah token valid
-        $user = \Auth::guard('api')->user();
+        $user = Auth::guard('api')->user();
 
-        if ($user && $user->token() && hash_equals($user->token()->id, $token)) {
+        if ($user) {
             $code = $user->employee_code;
 
             // Pastikan properti "employee_code" ada pada objek pengguna

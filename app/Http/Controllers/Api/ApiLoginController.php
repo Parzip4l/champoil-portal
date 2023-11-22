@@ -68,8 +68,11 @@ class ApiLoginController extends Controller
     // Absen Masuk
     public function clockin(Request $request)
     {   
-        $user = Auth::user();
-        $nik = Auth::user()->employee_code;
+        $token = $request->bearerToken();
+
+            // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+        $nik = $user->employee_code;
 
         $today = Carbon::now()->format('Y-m-d');
 
@@ -170,11 +173,16 @@ class ApiLoginController extends Controller
     }
 
 
-    public function payslipuser()
+    public function payslipuser(Request $request)
     {
         try {
-            if (auth()->check()) {
-                $employeeCode = auth()->user()->employee_code;
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            if ($user) {
+                $employeeCode = $user->employee_code;
 
                 // Pastikan employeeCode tidak null sebelum mengakses database
                 if ($employeeCode) {
@@ -209,10 +217,19 @@ class ApiLoginController extends Controller
     }
 
     // Details Payslip
-    public function PayslipDetails($id)
+    public function PayslipDetails(Request $request, $id)
     {
+        $token = $request->bearerToken();
+
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
         try {
-            $payslip = Payrol::findOrFail($id);
+            if ($user['organisasi'] === 'Management Leaders') {
+                $payslip = Payrol::findOrFail($id);
+            }else{
+                $payslip = Payrollns::findOrFail($id);
+            }
+            
             // Jika ditemukan, kembalikan data dalam format JSON
             return response()->json(['data' => $payslip], 200);
         } catch (ModelNotFoundException $e) {
@@ -335,10 +352,15 @@ class ApiLoginController extends Controller
     }
 
     // History Request
-    public function HistoryDataRequest()
+    public function HistoryDataRequest(Request $request)
     {
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+        
         try {
-            $user = Auth::user();
 
             if (!$user) {
                 return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);

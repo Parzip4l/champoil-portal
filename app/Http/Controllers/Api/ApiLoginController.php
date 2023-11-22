@@ -295,6 +295,26 @@ class ApiLoginController extends Controller
         }
     }
 
+    // History Request
+    public function HistoryDataRequest()
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+            }
+
+            $employeeCode = $user->employee_code;
+            $historyData = RequestAbsen::where('employee', $employeeCode)->get();
+
+            return response()->json(['employeeCode' => $employeeCode, 'historyData' => $historyData], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        }
+    }
+
+
     // Request Absen
     public function submitAbsenceRequest(Request $request)
     {

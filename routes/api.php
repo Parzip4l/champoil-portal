@@ -31,4 +31,5 @@ Route::prefix('v1')->group(function () {
 
     // Absen Request
     Route::post('/absence-request', [ApiLoginController::class, 'submitAbsenceRequest']);
+    Route::get('/history-absence-request', [ApiLoginController::class, 'HistoryDataRequest']);
 });

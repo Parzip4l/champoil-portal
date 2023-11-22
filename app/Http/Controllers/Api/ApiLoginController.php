@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
@@ -16,6 +17,7 @@ use App\absen;
 use App\Payrol;
 use App\Payrollns;
 use App\Employee;
+use App\User;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -25,51 +27,45 @@ class ApiLoginController extends Controller
 {
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            $user = $request->user();
-            $token = $request->user()->createToken('web')->plainTextToken;
-
-            $userData = [
-                'name' => $user->name,
-                'email' => $user->email,
-                'permission' => $user->permission,
-                'employee_code' => $user->employee_code,
-            ];
-
-            Cache::put('nik' . $request->user()->name, $token, 250000);
-
-            // Tambahkan "Bearer " sebagai prefix pada token
-            $bearerToken = 'Bearer ' . $token;
-
-            return response()->json(['token' => $bearerToken, 'user' => $userData], 200);
-        } else {
-            return response()->json(['error' => 'Email atau password salah.'], 401);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
-    }
 
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Login Failed!',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login Success!',
+            'data'    => $user,
+            'token'   => $user->createToken('authToken')->accessToken    
+        ]);
+    }
 
     public function logout(Request $request)
     {
-        $user = $request->user();
+        $removeToken = $request->user()->tokens()->delete();
 
-        if ($user) {
-            $user->tokens()->delete(); // Revoke all user tokens
-            Auth::logout(); // Optional: Log the user out of the web guard
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return response()->json(['message' => 'Logout berhasil.'], 200);
-        } else {
-            return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+        if($removeToken) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout Success!',  
+            ]);
         }
     }
 
+    // Absen Masuk
     public function clockin(Request $request)
     {   
         $user = Auth::user();
@@ -130,6 +126,49 @@ class ApiLoginController extends Controller
             return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
         }
     }
+
+    // Absen Balik
+    public function clockout(Request $request)
+    {
+        try {
+            $nik = Auth::user()->employee_code;
+            $lat2 = $request->input('latitude_out');
+            $long2 = $request->input('longitude_out');
+            $currentDate = now()->format('Y-m-d');
+
+            $absensi = Absen::where('nik', $nik)
+                ->whereDate('tanggal', $currentDate)
+                ->orderBy('clock_in', 'desc')
+                ->first();
+
+            if ($absensi) {
+                $absensi->clock_out = now()->format('H:i');
+                $absensi->latitude_out = $lat2;
+                $absensi->longtitude_out = $long2;
+                $absensi->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Clockout success! Selamat Beristirahat!',
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No clock-in record found for today.',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            // Log the exception for debugging purposes
+            // You may want to customize this based on your logging setup
+            \Log::error($e);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while processing the request.',
+            ], 500);
+        }
+    }
+
 
     public function payslipuser()
     {

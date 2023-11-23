@@ -467,26 +467,11 @@ class ApiLoginController extends Controller
                         ->get();
                 }
 
-                if ($bulan) {
-                    $logsfilter = DB::table('absens')
-                        ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
-                        ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
-                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
-                        ->where('user_id',$employeCode->employee_code)
-                        ->orderBy('tanggal')
-                        ->get();
-                } else {
-                    $logsfilter = DB::table('absens')
-                        ->where('user_id', $employeCode->employee_code)
-                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
-                        ->orderBy('tanggal')
-                        ->get();
-                }
-
                 // Remove Absen Button
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
+
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
                         $alreadyClockIn = true;
@@ -532,7 +517,6 @@ class ApiLoginController extends Controller
                     'isSameDay' => $isSameDay,
                     'logs' => $logs,
                     'logsmonths' => $logsmonths,
-                    'logsfilter' => $logsfilter,
                     'daysWithNoLogs' => $daysWithNoLogs,
                     'bulanSelected' => $bulanSelected,
                 ], 200);

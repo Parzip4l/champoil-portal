@@ -1,6 +1,7 @@
 @extends('layout.master')
 
 @push('plugin-styles')
+  <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
@@ -24,7 +25,9 @@
                                 <th>#</th>
                                 <th>Task</th>
                                 <th>Project</th>
-                                <th>Mengulang<th>
+                                <th>User</th>
+                                <th>Mengulang</th>
+                                <th>Upload Photo</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -34,10 +37,12 @@
                             @endphp
                             @foreach ($records as $record)
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ $nomor }}</td>
+                                <td>{{ $record->task_name }}</td>
+                                <td>{{ $record->project }}</td>
+                                <td>{{ $record->assign }}</td>
+                                <td>{{ $record->repeat_task }}</td>
+                                <td>{{ $record->upload_file }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -48,21 +53,13 @@
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
                                             </a>
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('add_soal', ['id' => $record->id]) }}">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Tambah Soal</span>
-                                            </a>
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('asign_user', ['id' => $record->id]) }}">
-                                                <i data-feather="users" class="icon-sm me-2"></i>
-                                                <span class="">Asign User</span>
-                                            </a>
                                             @if($record->count_cek > 0)
                                                 <a class="dropdown-item d-flex align-items-center" href="{{ route('start_class', ['id' => $record->id]) }}">
                                                     <i data-feather="book" class="icon-sm me-2"></i>
                                                     <span class="">Start Class </span>
                                                 </a>
                                             @endif
-                                            <form action="{{ route('knowledge.destroy', $record->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
+                                            <form action="{{ route('taskg.destroy', $record->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
                                                 <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $record->id }}')">
                                                     <i data-feather="trash" class="icon-sm me-2"></i>
@@ -92,16 +89,24 @@
             </div>
             <div class="modal-body">
             <form
-                    action="{{route('knowledge.store')}}"
+                    action="{{route('taskg.store')}}"
                     method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Unit Bisnis</label>
-                            <select name="unit_bisnis" class="form-control">
+                            <select name="unit_bisnis" id="unit_bisnis" class="form-control">
                                 <option value="Champoil">CHAMPOIL</option>
                                 <option value="Kas">KAS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-2" id="div_project">
+                            <label for="" class="form-label">Project</label>
+                            <select name="project" class="form-control">
+                                @foreach($project as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-12 mb-2">
@@ -110,7 +115,7 @@
                             <div class="col-md-12 mb-2">
                                 <label for="" class="form-label">Upload Photo</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="1" id="flexCheckDefault">
+                                    <input class="form-check-input" type="checkbox" name="upload_file" value="1" id="flexCheckDefault">
                                     <label class="form-check-label" for="flexCheckDefault">
                                         YES
                                     </label>
@@ -121,21 +126,33 @@
                                         NO
                                     </label>
                                 </div>
+                                
+                                Employee
+                                <select class="form-control employeeSelect" id="employeeSelect" name="assign[]" multiple>
+                                    <!-- Add options for employees here -->
+                                </select>
+
                                 <label for="" class="form-label">Mengulang</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                    <input class="form-check-input" type="radio" name="repeat_task" value="1" id="flexRadioDefault1">
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Hanya Satu Kali
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="repeat_task" value="2"  id="flexRadioDefault1">
                                     <label class="form-check-label" for="flexRadioDefault1">
                                         Harian
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                    <input class="form-check-input" type="radio" name="repeat_task" value="3"  id="flexRadioDefault2">
                                     <label class="form-check-label" for="flexRadioDefault2">
                                         Mingguan
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                                    <input class="form-check-input" type="radio" name="repeat_task" value="4"  id="flexRadioDefault3">
                                     <label class="form-check-label" for="flexRadioDefault3">
                                         Bulanan
                                     </label>
@@ -154,14 +171,98 @@
 @endsection
 
 @push('plugin-scripts')
+<script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
   <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
+<script src="{{ asset('assets/js/select2.js') }}"></script>
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+
+  <script>
+        $(document).ready(function() {
+            // Event listener for changes in the UnitBisnis select
+            $('#unit_bisnis').change(function() {
+                // Get the selected unit bisnis
+                const selectedUnitBisnis = $(this).val();
+
+                // Update the list of employees based on the selected unit bisnis
+                updateEmployeeOptions(selectedUnitBisnis);
+            });
+
+            // Function to update the list of employees based on unit bisnis
+            function updateEmployeeOptions(unitBisnis) {
+    const employeeSelect = $('.employeeSelect');
+
+    // Perform an AJAX request to fetch employees based on the unit bisnis
+    $.ajax({
+        url: "{{ route('employee.unit') }}", // Adjust the URL accordingly
+        method: 'GET',
+        data: { unit_bisnis: unitBisnis },
+        success: function(response) {
+
+            // Clear previous options
+            employeeSelect.empty();
+
+            // Add options for employees
+            if (Array.isArray(response.employees)) {
+                $.each(response.employees, function(key, value) {
+                    employeeSelect.append('<option value="' + value.nik + '">' + value.nama + '</option>');
+                });
+            } else {
+                console.error('Invalid response format: employees is not an array.');
+            }
+
+            // Initialize Select2 after updating options
+            employeeSelect.select2({
+                dropdownCss: {
+                    'z-index': 1000 // Adjust the value as needed
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching employees:', error);
+        }
+    });
+}
+
+// Assuming your modal has an ID of 'yourModal'
+$('#yourModal').on('shown.bs.modal', function () {
+    // Update employee options after the modal is fully shown
+    updateEmployeeOptions(yourUnitBisnisValue);
+});
+
+
+            // Event listener to select all employees
+            $('#selectAll').click(function() {
+                $('.employeeSelect option').prop('selected', true);
+                $('.employeeSelect').trigger('change');
+            });
+
+            // Event listener to deselect all employees
+            $('#deselectAll').click(function() {
+                $('.employeeSelect option').prop('selected', false);
+                $('.employeeSelect').trigger('change');
+            });
+        });
+    </script>
+  <script>
+        $('#div_project').hide();
+        $('#unit_bisnis').on('change', function(){
+            var unit_bisni = $(this).val();
+            if(unit_bisni === "Kas"){
+                $('#div_project').show();
+            }else{
+                $('#div_project').hide();
+            }
+            // Add your custom logic here
+        });
+  </script>
+
   <script>
     function showDeleteDataDialog(id) {
         Swal.fire({
@@ -174,7 +275,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('knowledge.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('taskg.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

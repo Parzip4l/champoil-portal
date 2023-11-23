@@ -142,7 +142,12 @@ class KnowledgeController extends Controller
         $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
         $data['record'] = Knowledge::where('id', $id)->first();
 
-        $fileName = $data['record']->file_name;
+        $fileName="";
+        
+        if($data['record']){
+            $fileName = $data['record']->file_name;
+
+        }
         
         // Check if the record exists
         if (!$data['record']) {

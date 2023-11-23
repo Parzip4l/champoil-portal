@@ -150,10 +150,18 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url('task') }}" class="nav-link">
-                    <i class="link-icon" data-feather="book"></i>
+                <a href="{{ url('#') }}" class="nav-link">
+                    <i class="link-icon" data-feather="clock"></i>
                     <span class="menu-title">Task Management</span>
+                    <i class="link-arrow"></i>
                 </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item"><a href="{{ url('task') }}" class="nav-link {{ active_class(['task']) }}">Patroli</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link {{ active_class(['kas/schedule']) }}">Audit</a></li>
+                        <li class="nav-item"><a href="{{ route('taskg.index') }}" class="nav-link {{ active_class(['tasg']) }}">Task</a></li>
+                    </ul>
+                </div>
             </li>
         @endif
         @if(in_array('superadmin_access', $dataLogin))

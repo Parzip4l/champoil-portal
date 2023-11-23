@@ -112,6 +112,9 @@ Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
+
+    //task management global
+    Route::resource('taskg', App\Http\Controllers\Ops\TaskgController::class);
 });
 
 // Superadmin Access

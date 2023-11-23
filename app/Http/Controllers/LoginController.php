@@ -29,7 +29,10 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+            $token = $request->user()->createToken('authToken')->accessToken;
+            // Simpan token dalam cache server selama satu jam
+            Cache::put('nik' . $request->user()->name, $token, 250000);
+            return redirect()->intended('dashboard')->with('token', $token);
         } else {
             // Jika login gagal, tambahkan notifikasi ke flash session
             Session::flash('error', 'Email atau password salah.');

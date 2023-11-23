@@ -435,7 +435,6 @@ class ApiLoginController extends Controller
         if (Auth::guard('api')->check()) {
             $user = Auth::guard('api')->user();
             if ($user->id) {
-                $karyawan = Employee::all();
                 $lastAbsensi = $user->absen()->latest()->first();
                 
                 // Get Data Karyawan
@@ -531,7 +530,6 @@ class ApiLoginController extends Controller
                     'alreadyClockIn' => $alreadyClockIn,
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
-                    'datakaryawan' => $datakaryawan,
                     'logs' => $logs,
                     'greeting' => $greeting,
                     'logsmonths' => $logsmonths,

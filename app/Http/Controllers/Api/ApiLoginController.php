@@ -428,4 +428,122 @@ class ApiLoginController extends Controller
             return response()->json(['error' => 'Terjadi kesalahan.'. $e], 500);
         }
     }
+
+    // Log Absen
+    public function MyLogsAbsen(Request $request)
+    {
+        if (Auth::guard('api')->check()) {
+            $user = Auth::guard('api')->user();
+            if ($user->id) {
+                $karyawan = Employee::all();
+                $lastAbsensi = $user->absen()->latest()->first();
+                
+                // Get Data Karyawan
+                $userId = $user->id;
+                $hariini = now()->format('Y-m-d');
+                $employeCode = User::where('id',$userId)->first();
+
+                // Get Log Absensi
+                $logs = Absen::where('user_id', $employeCode->employee_code)
+                    ->whereDate('tanggal', $hariini)
+                    ->get();
+                    
+                $today = now();
+                $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+                $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+                $bulan = $request->input('bulan');
+                // Get logs for the month
+                if($bulan) {
+                    $logsmonths = Absen::where('user_id', $employeCode->employee_code)
+                        ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
+                        ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
+                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                        ->orderBy('tanggal')
+                        ->get();
+                } else {
+                    $logsmonths = Absen::where('user_id', $employeCode->employee_code)
+                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                        ->orderBy('tanggal')
+                        ->get();
+                }
+
+                if ($bulan) {
+                    $logsfilter = DB::table('absens')
+                        ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
+                        ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
+                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                        ->where('user_id',$employeCode->employee_code)
+                        ->orderBy('tanggal')
+                        ->get();
+                } else {
+                    $logsfilter = DB::table('absens')
+                        ->where('user_id', $employeCode->employee_code)
+                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                        ->orderBy('tanggal')
+                        ->get();
+                }
+
+                // Remove Absen Button
+                $alreadyClockIn = false;
+                $alreadyClockOut = false;
+                $isSameDay = false;
+                if ($lastAbsensi) {
+                    if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
+                        $alreadyClockIn = true;
+                    } elseif ($lastAbsensi->clock_in && $lastAbsensi->clock_out) {
+                        $alreadyClockOut = true;
+                        $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
+                        $today = Carbon::today();
+                        $isSameDay = $lastClockOut->isSameDay($today);
+                    }
+                }
+
+                // Greating
+                date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda
+                $hour = date('H'); // Ambil jam saat ini
+
+                $totalDaysInMonth = $startOfMonth->diffInDays($endOfMonth);
+                
+                // Calculate the number of weekend days in the current month
+                $weekendDays = 0;
+                $currentDate = Carbon::now()->startOfMonth();
+                $endOfMonth = Carbon::now()->endOfMonth();
+
+                while ($currentDate <= $endOfMonth) {
+                    if ($currentDate->isWeekend()) {
+                        $weekendDays++;
+                    }
+                    $currentDate->addDay();
+                }
+                
+                // Calculate the total weekdays in the current month (excluding weekends)
+                $weekdaysInMonth = $totalDaysInMonth - $weekendDays;
+                
+                // Calculate the number of logs in the current month
+                $logsCount = $logsmonths->count();
+                
+                // Calculate the number of weekdays with no logs
+                $daysWithNoLogs = $weekdaysInMonth - $logsCount;
+
+                $bulanSelected = $bulan ? date('F', strtotime($bulan)) : date('F');
+                return response()->json([
+                    'alreadyClockIn' => $alreadyClockIn,
+                    'alreadyClockOut' => $alreadyClockOut,
+                    'isSameDay' => $isSameDay,
+                    'datakaryawan' => $datakaryawan,
+                    'logs' => $logs,
+                    'greeting' => $greeting,
+                    'logsmonths' => $logsmonths,
+                    'logsfilter' => $logsfilter,
+                    'daysWithNoLogs' => $daysWithNoLogs,
+                    'bulanSelected' => $bulanSelected,
+                ], 200);
+            } else {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
 }

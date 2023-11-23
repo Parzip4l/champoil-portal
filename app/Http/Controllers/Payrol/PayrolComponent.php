@@ -53,13 +53,23 @@ class PayrolComponent extends Controller
      */
     public function create()
     {
-        $employee = Employee::where('organisasi', 'Management Leaders')->get();
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
+
+        $employee = Employee::where('organisasi', 'Management Leaders')
+        ->where('unit_bisnis', $DataCode->unit_bisnis)
+        ->get();
         return view('pages.hc.payrol.create',compact('employee'));
     }
 
     public function createns()
     {
-        $employee = Employee::where('organisasi', 'Frontline Officer')->get();
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
+        
+        $employee = Employee::where('organisasi', 'Frontline Officer')
+        ->where('unit_bisnis', $DataCode->unit_bisnis)
+        ->get();
         return view('pages.hc.payrol.ns.createcomponent',compact('employee'));
     }
 

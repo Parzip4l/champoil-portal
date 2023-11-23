@@ -18,24 +18,35 @@
                     @csrf
                     <div class="schedule-backup-wrap">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Tanggal</label>
-                                    <input type="date" class="form-control tanggal" name="tanggal[]" id="tanggal">
+                                    <input type="date" class="form-control tanggal" name="tanggal[]" id="tanggal" required>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Shift</label>
+                                    <select class="js-example-basic-single form-select shift-backup" data-width="100%" name="shift[]" required>
+                                        <option disabled selected>Select Shift</option>
+                                        <option value="NS-P">Backup Pagi</option>
+                                        <option value="NS-M">Backup Middle</option>
+                                        <option value="NS-ML">Backup Malam</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power</label>
-                                    <select class="js-example-basic-single form-select employee" data-width="100%" name="employee[]" id="employee">
+                                    <select class="js-example-basic-single form-select employee" data-width="100%" name="employee[]" id="employee" required>
                                         <option disabled selected>Select Employee</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Project</label>
-                                    <select class="js-example-basic-single form-select project" data-width="100%" name="project[]" id="projectSelect">
+                                    <select class="js-example-basic-single form-select project" data-width="100%" name="project[]" id="projectSelect" required>
                                         <option disabled selected>Select Project</option>
                                         @foreach($project as $project)
                                             <option value="{{$project->id}}">{{$project->name}}</option>
@@ -45,31 +56,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Periode</label>
-                                    <input type="text" class="form-control" name="periode[]" value="{{$current_month}}-{{$current_year}}" readonly>
+                                    <input type="text" class="form-control" name="periode[]" value="{{$current_month}}-{{$current_year}}" readonly >
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power Replace</label>
-                                    <select class="js-example-basic-single form-select replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect">
+                                    <select class="js-example-basic-single form-select replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect" required>
                                         <option disabled selected>Select Man Power</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group mb-3">
-                                    <label for="" class="form-label">Shift</label>
-                                    <select class="js-example-basic-single form-select" data-width="100%" name="shift[]">
-                                        <option disabled selected>Select Shift</option>
-                                        <option value="BCK-P">Backup Pagi</option>
-                                        <option value="BCK-M">Backup Middle</option>
-                                        <option value="BCK-ML">Backup Malam</option>
-                                    </select>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Simpan Data</button>
@@ -110,97 +111,31 @@
         @endif
     </script>
 <script>
-    function addProductRow() {
-        const newRow = `
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                    <label for="" class="form-label">Tanggal</label>
-                    <input type="date" class="form-control tanggal" name="tanggal[]" id="tanggal">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                    <label for="" class="form-label">Man Power</label>
-                    <select class="js-example-basic-single form-select employee" data-width="100%" name="employee[]" id="employee">
-                        <option disabled selected>Select Employee</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group mb-3">
-                    <label for="" class="form-label">Periode</label>
-                    <input type="text" class="form-control" name="periode[]" value="{{$current_month}}-{{$current_year}}" readonly>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group mb-3">
-                    <label for="" class="form-label">Project</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="project[]">
-                        <option disabled selected>Select Project</option>
-                        @foreach($project2 as $project)
-                            <option value="{{$project->id}}">{{$project->name}}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group mb-3">
-                    <label for="" class="form-label">Shift</label>
-                    <select class="js-example-basic-single form-select form-control" data-width="100%" name="shift[]">
-                        <option disabled selected>Select Shift</option>
-                        <option value="BCK-P">Backup Pagi</option>
-                        <option value="BCK-M">Backup Middle</option>
-                        <option value="BCK-ML">Backup Malam</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        `;
-        document.querySelector('.schedule-backup-wrap').insertAdjacentHTML('beforeend', newRow);
-        const newRowElement = document.querySelector('.schedule-backup-wrap .tanggal:last-child');
-        newRowElement.addEventListener('change', function() {
-            updateEmployeeOptions();
-        });
-    }
-    document.getElementById('AddEmployee').addEventListener('click', addProductRow);
-
-    $('.tanggal').change(function() {
-        updateEmployeeOptions();
-    });
-
-    // Panggil saat tombol "Add Employee" diklik
-    $('#AddEmployee').click(function() {
-        updateEmployeeOptions();
-    });
-
-</script>
-<script>
     function updateEmployeeOptions() {
         var selectedDate = document.querySelector('.tanggal').value;
+        var selectedShift = document.querySelector('.shift-backup').value;
 
         // AJAX Request
         $.ajax({
             url: "{{ route('getEmployeesWithDayOff.backup') }}",
             type: "GET",
             data: {
-                tanggal: selectedDate
+                tanggal: selectedDate,
+                shift: selectedShift
             },
             success: function(response) {
                 var selectEmployee = $('.employee');
                 selectEmployee.empty().append('<option disabled selected>Select Employee</option>');
                 $.each(response.employees, function(key, value) {
-                    selectEmployee.append('<option value="' + value.nik + '">' + value.nama + '</option>');
+                    // Fix: Change 'value.nik' to 'value.id' or another unique identifier if 'nik' is not available
+                    selectEmployee.append('<option value="' + value.id + '">' + value.nama + '</option>');
                 });
             }
         });
     }
 
-    // Panggil saat tanggal berubah
-    $('.tanggal').change(function() {
+    // Panggil saat tanggal atau shift berubah
+    $('.tanggal, .shift-backup').change(function() {
         updateEmployeeOptions();
     });
 </script>

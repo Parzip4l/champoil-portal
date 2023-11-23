@@ -132,7 +132,7 @@ class KnowledgeController extends Controller
 
     public function asign_user($id){
         
-        $data['records']= Employee::where('organisasi','Frontline Officer')->get();
+        $data['records']= Employee::all();
         $data['id_test']=$id;
         return view('pages.hc.knowledge.asign_user',$data);
     }

@@ -47,7 +47,7 @@
                     <h5>Log Absensi</h5>
                 </div>
                 <div class="card-body">
-                    @foreach ($logsfilter as $log)
+                    @foreach ($logsmonths as $log)
                     <div class="clock-in-wrap d-flex justify-content-between">
                         <div class="con">
                             <h6 class="mb-1">{{ date('M', strtotime($log->tanggal)) }}</h6>

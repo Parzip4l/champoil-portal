@@ -15,6 +15,9 @@ use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Exports\EmployeeExport;
+use App\Imports\EmployeeImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
@@ -30,6 +33,37 @@ class EmployeeController extends Controller
         $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
         return view('pages.hc.karyawan.index', compact('karyawan'));
     }
+
+    public function ApiEmployee(Request $request)
+    {
+        // Mendapatkan token dari header Authorization
+        $token = $request->bearerToken();
+        // Memeriksa apakah token valid
+        $user = Auth::guard('api')->user();
+
+        if ($user) {
+            $code = $user->employee_code;
+
+            // Pastikan properti "employee_code" ada pada objek pengguna
+            if ($code) {
+                $company = Employee::where('nik', $code)->first();
+
+                // Pastikan objek "company" tidak null sebelum mengakses properti "unit_bisnis"
+                if ($company) {
+                    $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
+
+                    return response()->json(['karyawan' => $karyawan], 200);
+                } else {
+                    return response()->json(['error' => 'Data perusahaan tidak ditemukan.'], 404);
+                }
+            } else {
+                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+            }
+        } else {
+            return response()->json(['error' => 'Token tidak valid atau pengguna tidak terautentikasi.'], 401);
+        }
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -103,6 +137,7 @@ class EmployeeController extends Controller
             $userinfo->password = Hash::make($request->password);
             $userinfo->permission = json_encode($request->permissions);
             $userinfo->employee_code = $request->nik;
+            $userinfo->company = $request->unit_bisnis;
             $userinfo->save();
 
             DB::commit();
@@ -193,7 +228,7 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::where('nik', $id)->with('payrolinfo')->first();
+        $employee = Employee::where('nik', $id)->with('payrolinfo','user')->first();
         return view('pages.hc.karyawan.edit', compact('employee'));
         
     }
@@ -256,6 +291,8 @@ class EmployeeController extends Controller
                 'nama' => 'required|string|max:255',
                 'ktp' => 'required|numeric',
             ]);
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
             DB::beginTransaction();
             // Find the employee by ID
             $employee = Employee::where('nik', $id)->first();
@@ -312,6 +349,28 @@ class EmployeeController extends Controller
                 $payrolinfo->save();
             }
 
+            $userInfo = User::where('name', $id)->first();
+
+            if ($userInfo) {
+                $userInfo->name = $request->input('nik');
+                $userInfo->email = $request->input('email');
+                $userInfo->password = Hash::make($request->password);
+                $userInfo->permission = json_encode($request->permissions);
+                $userInfo->employee_code = $request->input('nik');
+                $userInfo->company = $company->unit_bisnis;
+                $userInfo->save();
+            } else {
+                // Jika tidak ditemukan maka buat baru
+                $userInfo = new User();
+                $userInfo->name = $request->nik;
+                $userInfo->email = $request->email;
+                $userInfo->password = Hash::make($request->password);
+                $userInfo->permission = json_encode($request->permissions);
+                $userInfo->employee_code = $request->nik;
+                $userInfo->company = $company->unit_bisnis;
+                $userInfo->save();
+            }
+
             DB::commit();
             // Redirect to a view or return a response as needed
             return redirect()->route('employee.index')->with('success', 'Employee data updated successfully.');
@@ -356,6 +415,42 @@ class EmployeeController extends Controller
             return redirect()->back()->with('success', 'Data Absensi berhasil diubah');
         } else {
             return redirect()->back()->with('error', 'Data tidak ditemukan untuk tanggal yang dipilih');
+        }
+    }
+
+    // Export Karyawan
+    public function exportEmployee()
+    {
+        // Get Bulan
+        $loggedInUserNik = auth()->user()->employee_code;
+        $company = Employee::where('nik', $loggedInUserNik)->first();
+
+        // Dapatkan nilai unit bisnis dari request
+        $unitBisnis = $company->unit_bisnis;
+
+        // Buat instance dari kelas AttendenceExport dengan rentang waktu
+        $export = new EmployeeExport($unitBisnis, $loggedInUserNik);
+
+        // Ekspor data ke Excel
+        return Excel::download($export, 'truest_employee_export.xlsx');
+    }
+
+    // Import Karyawan
+    public function importEmployee(Request $request)
+    {
+        try {
+            $request->validate([
+                'csv_file' => 'required|mimes:xlsx,csv,txt',
+            ]);
+            $data = $request->file('csv_file');
+
+            $namaFIle = $data->getClientOriginalName();
+            $data->move('KaryawanImport', $namaFIle);
+            Excel::import(new EmployeeImport, \public_path('/KaryawanImport/'.$namaFIle));
+
+            return redirect()->back()->with('success', 'Import berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
         }
     }
 

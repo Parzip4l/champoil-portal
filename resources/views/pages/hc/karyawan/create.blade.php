@@ -269,7 +269,6 @@
   <script src="{{ asset('assets/js/flatpickr.js') }}"></script>
   <script src="{{ asset('assets/js/password.js') }}"></script>
   <script>
-
     const authCheck = document.getElementById('authCheck');
     const passwordInput = document.getElementById('passwordInput');
     const passwordConfirmationInput = document.getElementById('passwordConfirmationInput');
@@ -283,5 +282,5 @@
             passwordConfirmationInput.type = 'password';
         }
     });
-    </script>
+</script>
 @endpush

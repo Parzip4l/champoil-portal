@@ -13,6 +13,8 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Exports\AttendenceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AbsenController extends Controller
 {
@@ -25,9 +27,10 @@ class AbsenController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-
-        $startDate = Carbon::now()->startOfMonth();
-        $endDate = Carbon::now()->endOfMonth();
+        
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
         $data1 = DB::table('users')
                     ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
@@ -41,6 +44,27 @@ class AbsenController extends Controller
                     ->get();
 
         return view('pages.absen.index',compact('data1','endDate','startDate'));
+    }
+
+    public function exportAttendence()
+    {
+        // Get Bulan
+        $loggedInUserNik = auth()->user()->employee_code;
+        $company = Employee::where('nik', $loggedInUserNik)->first();
+
+        // Dapatkan nilai unit bisnis dari request
+        $unitBisnis = $company->unit_bisnis;
+
+        // Dapatkan tanggal awal dan akhir periode
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+        // Buat instance dari kelas AttendenceExport dengan rentang waktu
+        $export = new AttendenceExport($unitBisnis, $loggedInUserNik, $startDate, $endDate);
+
+        // Ekspor data ke Excel
+        return Excel::download($export, 'attendence_export_' . strtolower($startDate->format('F')) . '.xlsx');
     }
 
     /**
@@ -80,6 +104,7 @@ class AbsenController extends Controller
             ->whereDate('tanggal', $today)
             ->get();
 
+        $project_id = null;
         foreach($schedulebackup as $databackup)
         {
             $project_id = $databackup->project;
@@ -88,12 +113,19 @@ class AbsenController extends Controller
             $periode = $databackup->periode;
         }
         
-        $dataProject = Project::where('id', $project_id)->first();
-        $latitudeProject = $dataProject->latitude;
-        $longtitudeProject = $dataProject->longtitude;
-
-        $kantorLatitude = $latitudeProject;
-        $kantorLongtitude = $longtitudeProject;
+        if ($project_id !== null) {
+            $dataProject = Project::where('id', $project_id)->first();
+            $latitudeProject = $dataProject->latitude;
+            $longtitudeProject = $dataProject->longtitude;
+        
+            $kantorLatitude = $latitudeProject;
+            $kantorLongtitude = $longtitudeProject;
+        } else {
+            $latitudeProject = -6.1366045;
+            $longtitudeProject = 106.7601449;
+            $kantorLatitude = -6.1366045; 
+            $kantorLongtitude = 106.7601449; 
+        }
 
         $time_in = Carbon::now()->format('H:i');
         $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
@@ -112,8 +144,8 @@ class AbsenController extends Controller
             $absensi->nik = $nik;
             $absensi->tanggal = now()->toDateString();
             $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $lat;
-            $absensi->longtitude = $long;
+            $absensi->latitude = $latitudeProject;
+            $absensi->longtitude = $longtitudeProject;
             $absensi->status = $status;
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');

@@ -39,11 +39,12 @@ class LogController extends Controller
                     $logs = Absen::where('user_id', $employeCode->employee_code)
                         ->whereDate('tanggal', $hariini)
                         ->get();
+                        
                     $today = now();
-                    $startOfMonth = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+                    $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
                     $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
-                    $bulan = $request->input('bulan');
 
+                    $bulan = $request->input('bulan');
                     // Get logs for the month
                     if($bulan) {
                         $logsmonths = Absen::where('user_id', $employeCode->employee_code)

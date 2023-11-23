@@ -90,11 +90,14 @@
                                 $clockin = \App\Absen::where('nik', $user->employee_code)
                                     ->whereDate('tanggal', $today)
                                     ->first();
+                                $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+                                    ->select('unit_bisnis','organisasi')
+                                    ->first();
                             @endphp
-                            @if($hasScheduleForToday)
+                            @if($hasScheduleForToday || ($karyawanLogin->organisasi === 'Management Leaders' && $karyawanLogin->unit_bisnis === 'CHAMPOIL' && !$hasScheduleForToday))
                                 @if ($clockin)
                                 <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
-                                @csrf
+                                @csrf   
                                     <input type="hidden" name="latitude_out" id="latitude_out">
                                     <input type="hidden" name="longitude_out" id="longitude_out">
                                     <input type="hidden" name="status" value="H">

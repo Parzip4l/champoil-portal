@@ -47,16 +47,28 @@ class ScheduleBackupControllers extends Controller
 
     public function getEmployeesWithDayOff(Request $request)
     {
-        $tanggal = $request->input('tanggal');
-        $employeesWithDayOff = Schedule::where('tanggal', $tanggal)
-                                ->where('shift', 'Off')
-                                ->pluck('employee');
+        try {
+            $tanggal = $request->input('tanggal');
+            $originalShift  = $request->input('shift');
 
-        $employees = Employee::whereIn('nik', $employeesWithDayOff)
-                            ->where('unit_bisnis', 'Kas')
-                            ->get();
+            $employeesWithShift = Schedule::where('tanggal', $tanggal)
+                ->where('shift','!=', $originalShift)
+                ->pluck('employee');
 
-        return response()->json(['employees' => $employees]);
+            // Ambil data karyawan yang memiliki shift dan tanggal yang sesuai dari tabel Employee
+            $employees = Employee::whereIn('nik', $employeesWithShift)
+                ->where('unit_bisnis', 'Kas')
+                ->get();
+    
+            return response()->json(['employees' => $employees]);
+        } catch (\Exception $e) {
+            // Log the exception
+            \Log::error($e);
+    
+            // Return an error response
+            return response()->json(['error' => 'Internal Server Error'. $e], 500);
+        }
+        
     }
 
     public function getManPower(Request $request)
@@ -98,6 +110,15 @@ class ScheduleBackupControllers extends Controller
                 $shift = $request->input('shift')[$key];
                 $manpowerreplace = $request->input('manpower')[$key];
 
+
+                if ($shift == 'NS-P') {
+                    $ShiftDataChange = 'BCK-P';
+                } else if ($shift == 'NS-M'){
+                    $ShiftDataChange = 'BCK-M';
+                } else {
+                    $ShiftDataChange = 'BCK-ML';
+                }
+                
                 // Lakukan penyimpanan data di sini
                 $schedule = new ScheduleBackup();
                 $schedule->tanggal = $tanggal;
@@ -105,7 +126,7 @@ class ScheduleBackupControllers extends Controller
                 $schedule->man_backup = $manpowerreplace;
                 $schedule->periode = $periode;
                 $schedule->project = $project;
-                $schedule->shift = $shift;
+                $schedule->shift = $ShiftDataChange;
                 $schedule->save();
             }
 

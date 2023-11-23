@@ -29,6 +29,10 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
+
+    // Export Attendence
+    Route::get('export-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'exportAttendence'])->name('export.attendence');
+
     Route::get('/mylogs', [App\Http\Controllers\Absen\LogController::class, 'index'])->name('mylogs');
 
     // Backup
@@ -117,7 +121,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
-    Route::put('/manual-delivery/{id}/update-kiriman', 'ManualDeliveryController@UpdateSeluruhData')->name('manual-delivery.UpdateData');
+
+    Route::get('export-employee', [App\Http\Controllers\Employee\EmployeeController::class, 'exportEmployee'])->name('export.employee');
 
     // Payrol Data
     Route::resource('payrol-component', App\Http\Controllers\Payrol\PayrolComponent::class);
@@ -168,6 +173,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // Get Employee
         Route::get('/get-employees', [App\Http\Controllers\CgControllers\PayrolNS::class, 'getEmployees'])->name('employee.unit');
+        Route::post('/import-employees', [App\Http\Controllers\Employee\EmployeeController::class, 'importEmployee'])->name('import.employee');
 
         // Learning
         Route::resource('knowledge_base',App\Http\Controllers\knowledge\KnowledgeController::class);

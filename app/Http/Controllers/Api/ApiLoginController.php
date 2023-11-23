@@ -11,7 +11,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
-use App\Schedule;
+use App\ModelCG\Schedule;
+use App\ModelCG\ScheduleBackup;
 use App\Project;
 use App\absen;
 use App\Payrol;
@@ -63,6 +64,21 @@ class ApiLoginController extends Controller
                 'message' => 'Logout Success!',  
             ]);
         }
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; 
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c; 
+
+        return $distance;
     }
 
     // Absen Masuk
@@ -356,7 +372,6 @@ class ApiLoginController extends Controller
     {
         // Retrieve the token from the request
         $token = $request->bearerToken();
-
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
         
@@ -525,6 +540,69 @@ class ApiLoginController extends Controller
             }
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
+    // My Schedule
+    public function myschedule(Request $request)
+    {
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+
+        try {
+            if (!$user) {
+                return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+            } else {
+                $employeeCode = $user->employee_code;
+                $bulan = now()->format('F-Y');
+                
+                $mySchedule = Schedule::with('project:id,name') // Eager loading
+                    ->where('employee', $employeeCode)
+                    ->where('periode', $bulan)
+                    ->select('project', 'tanggal', 'shift')
+                    ->get();
+
+                return response()->json(['data' => $mySchedule], 200);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            return response()->json(['error' => $e->validator->errors()], 400);
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return response()->json(['error' => 'Terjadi kesalahan.' . $e], 500);
+        }
+    }
+
+    public function BackupSchedule(Request $request) 
+    {
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+
+        try {
+            if (!$user) {
+                return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+            } else {
+                $employeeCode = $user->employee_code;
+                $bulan = now()->format('F-Y');
+                
+                $mySchedule = ScheduleBackup::with('project:id,name') // Eager loading
+                    ->where('employee', $employeeCode)
+                    ->where('periode', $bulan)
+                    ->select('project', 'tanggal', 'shift')
+                    ->get();
+
+                return response()->json(['data' => $mySchedule], 200);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            return response()->json(['error' => $e->validator->errors()], 400);
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return response()->json(['error' => 'Terjadi kesalahan.' . $e], 500);
         }
     }
 }

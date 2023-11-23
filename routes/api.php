@@ -25,6 +25,10 @@ Route::prefix('v1')->group(function () {
     // Log Absen
     Route::get('/log-absensi', [ApiLoginController::class, 'MyLogsAbsen']);
 
+    // Schedule 
+    Route::get('/mySchedule', [ApiLoginController::class, 'myschedule']);
+    Route::get('/mySchedule-Backup', [ApiLoginController::class, 'BackupSchedule']);
+
     // Clock in/out (tanpa middleware auth:api)
     Route::post('/clockin', [ApiLoginController::class, 'clockin']);
     Route::post('/clockout', [ApiLoginController::class, 'clockout']);

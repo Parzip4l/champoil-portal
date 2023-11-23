@@ -13,11 +13,16 @@ class Schedule extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'id');
+        return $this->belongsTo(Project::class, 'project');
     }
 
     public function employees()
     {
         return $this->hasMany(Employee::class);
+    }
+
+    public function project2()
+    {
+        return $this->belongsTo(Project::class, 'id');
     }
 }

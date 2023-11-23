@@ -13,7 +13,12 @@ class Project extends Model
     protected $fillable = ['id','name']; 
 
     public function schedules()
-{
-    return $this->hasMany(Schedule::class, 'project_id');
-}
+    {
+        return $this->hasMany(Schedule::class, 'project_id');
+    }
+
+    public function schedulebackup()
+    {
+        return $this->hasMany(ScheduleBackup::class, 'project_id');
+    }
 }

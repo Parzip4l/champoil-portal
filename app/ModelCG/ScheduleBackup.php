@@ -19,4 +19,9 @@ class ScheduleBackup extends Model
     {
         return $this->hasMany(Employee::class);
     }
+
+    public function projects()
+    {
+        return $this->belongsTo(Project::class, 'project');
+    }
 }

@@ -531,7 +531,6 @@ class ApiLoginController extends Controller
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
                     'logs' => $logs,
-                    'greeting' => $greeting,
                     'logsmonths' => $logsmonths,
                     'logsfilter' => $logsfilter,
                     'daysWithNoLogs' => $daysWithNoLogs,

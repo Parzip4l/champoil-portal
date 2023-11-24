@@ -25,7 +25,7 @@ Portfolio: https://behance.net/muhamadsobirin3
   <!-- CSRF Token -->
   <meta name="_token" content="{{ csrf_token() }}">
   
-  <link rel="shortcut icon" href="{{ asset('/champortal.png') }}">
+  <link rel="shortcut icon" href="{{ asset('/faviconbaru.png') }}">
 
   <!-- plugin css -->
   <link href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}" rel="stylesheet" />

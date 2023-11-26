@@ -130,6 +130,24 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Payrol Data
     Route::resource('payrol-component', App\Http\Controllers\Payrol\PayrolComponent::class);
     Route::resource('payroll', App\Http\Controllers\Payrol\PayrolController::class);
+    Route::get('/payrol-history/{month}/{year}', [App\Http\Controllers\Payrol\PayslipController::class, 'showByMonth'])->name('payslip.showByMonth');
+    Route::get('/payrolns-history/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'showByPeriode'])->name('payslip.showbyperiode');
+
+    // Publish Payrol And Lock
+    Route::get('/lock-payroll/{month}/{year}', [App\Http\Controllers\Payrol\PayslipController::class, 'lockPayroll'])->name('lockPayroll');
+    Route::get('/publish-payslip/{month}/{year}', [App\Http\Controllers\Payrol\PayslipController::class, 'publishPayslip'])->name('PublishPayslipData');
+    Route::get('/unlock-payroll/{month}/{year}', [App\Http\Controllers\Payrol\PayslipController::class, 'unlockPayroll'])->name('unlockPayroll');
+    Route::get('/unpublish-payslip/{month}/{year}', [App\Http\Controllers\Payrol\PayslipController::class, 'unpublishPayslip'])->name('UnpublishPayslip');
+
+    // Publish Payrol And Lock NS
+    Route::get('/lock-payrollns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'lockPayrollNS'])->name('lockPayrollns');
+    Route::get('/publish-payslipns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'publishPayslipNS'])->name('PublishPayslipDataNS');
+    Route::get('/unlock-payrollns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'unlockPayrollns'])->name('unlockPayrollns');
+    Route::get('/unpublish-payslipns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'unpublishPayslipns'])->name('UnpublishPayslipns');
+
+    // Edit Payroll NS
+    Route::get('/edit-payrollns/{id}', [App\Http\Controllers\Payrol\PayslipController::class, 'editNS'])->name('editns.payroldata');
+    Route::put('/update-payrollns/{id}', [App\Http\Controllers\Payrol\PayslipController::class, 'updateNS'])->name('updateNS.payroldata');
     
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');

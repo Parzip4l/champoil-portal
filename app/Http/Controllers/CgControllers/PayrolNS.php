@@ -375,6 +375,8 @@ class PayrolNS extends Controller
             $payroll->thp = $thp;
             $payroll->allowences = $allowenceData;
             $payroll->deductions = $deductionData;
+            $payroll->payrol_status = 'Unlocked';
+            $payroll->payslip_status = 'Unpublish';
             $payroll->save();
         }
 

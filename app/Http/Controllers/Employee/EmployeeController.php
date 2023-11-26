@@ -161,7 +161,7 @@ class EmployeeController extends Controller
         $nikdata = $employee->nik;
 
         $today = now();
-        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
         $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
         // Hitung jumlah hari kerja tanpa absensi (termasuk akhir pekan)

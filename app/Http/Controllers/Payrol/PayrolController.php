@@ -102,6 +102,9 @@ class PayrolController extends Controller
      */
     public function store(Request $request)
     {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $unit_bisnis = $employee->unit_bisnis;
         $employeeCodes = $request->input('employee_code');
         $bulan = $request->input('month');
         $tahun = $request->input('year');
@@ -126,11 +129,14 @@ class PayrolController extends Controller
                 $payroll->allowances = $allowancesData;
                 $payroll->deductions = $deductionsData;
                 $payroll->net_salary = $NetSalary;
+                $payroll->payrol_status = 'Unlocked';
+                $payroll->payslip_status = 'Unpublish';
+                $payroll->unit_bisnis = $unit_bisnis;
                 $payroll->save();
             }
         }
 
-        return redirect()->route('payroll.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        return redirect()->route('payslip.showByMonth', ['month' => $bulan, 'year' => $tahun])->with('success', 'Payroll successfully created');
     }
 
     public function storens(Request $request)

@@ -11,6 +11,8 @@ use App\PayrolCM;
 use App\Payrollns;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Route;
 
 class PayslipController extends Controller
 {
@@ -26,14 +28,60 @@ class PayslipController extends Controller
 
         if ($employee) {
             $unit_bisnis = $employee->unit_bisnis;
+                
+            $data = Payrol::select('month', 'year','payrol_status','payslip_status', \DB::raw('SUM(net_salary) as total_net_salary'))
+                    ->where('unit_bisnis',$unit_bisnis)
+                    ->groupBy('month', 'year', 'payrol_status', 'payslip_status')
+                    ->get();
 
-            // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
+            if ($unit_bisnis == 'Kas') {
+                $dbSecondary = DB::connection('mysql_secondary');
+
+                $datans = $dbSecondary->table('payrolls')
+                    ->select('periode','payrol_status','payslip_status', \DB::raw('SUM(thp) as total_payroll')) // Tambahkan id pada select clause
+                    ->groupBy('periode','payrol_status','payslip_status')
+                    ->get();
+            } else {
+                $datans = Payrollns::select('month', 'year','periode','payrol_status','payslip_status', \DB::raw('SUM(thp) as total_payroll'))
+                    ->groupBy('month', 'year','periode','payrol_status', 'payslip_status')
+                    ->get();
+            }
+
+        } else {
+            $data = [];
+            $datans = [];
+        }
+
+        return view('pages.hc.payrol.payslip', compact('data', 'datans'));
+    }
+
+    public function showByMonth($month, $year)
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        if ($employee) {
+            $unit_bisnis = $employee->unit_bisnis;
             $data = Payrol::join('karyawan', 'payrols.employee_code', '=', 'karyawan.nik')
-                ->select('payrols.id', 'payrols.*') // Tambahkan id pada select clause
+                ->select('payrols.id', 'payrols.*')
                 ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->where('payrols.month', $month)
+                ->where('payrols.year', $year)
                 ->get();
+        } else {
+            $data = [];
+        }
+        
+        return view('pages.hc.payrol.payslipbymonth', compact('data','month'));
+    }
 
-            // Cek Data CG
+    public function showByPeriode($periode)
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        if ($employee) {
+            $unit_bisnis = $employee->unit_bisnis;
             if ($unit_bisnis == 'Kas') {
                 $dbSecondary = DB::connection('mysql_secondary');
 
@@ -42,18 +90,112 @@ class PayslipController extends Controller
                     ->select('payrolls.id', 'payrolls.*') // Tambahkan id pada select clause
                     ->where('karyawan.unit_bisnis', $unit_bisnis)
                     ->get();
-            } else {
+            }else{
                 $datans = Payrollns::join('karyawan', 'payrollns.employee_code', '=', 'karyawan.nik')
-                    ->select('payrollns.id', 'payrollns.*') // Tambahkan id pada select clause
-                    ->where('karyawan.unit_bisnis', $unit_bisnis)
-                    ->get();
+                            ->select('payrollns.id', 'payrollns.*') // Tambahkan id pada select clause
+                            ->where('karyawan.unit_bisnis', $unit_bisnis)
+                            ->where('payrollns.periode', $periode)
+                            ->get();
             }
         } else {
-            $data = [];
             $datans = [];
         }
+        
+        return view('pages.hc.payrol.payrolbyperiode', compact('datans','periode'));
+    }
 
-        return view('pages.hc.payrol.payslip', compact('data', 'datans'));
+    // Locked Payroll
+    public function lockPayroll($month, $year)
+    {
+        // Logic to update the status to 'Locked' for the specified month and year
+        Payrol::where('month', $month)->where('year', $year)->update(['payrol_status' => 'Locked']);
+
+        return redirect()->back()->with('success', 'Payroll locked successfully');
+    }
+
+    public function publishPayslip($month, $year)
+    {
+        // Check if the payroll is locked
+        $isPayrollLocked = Payrol::where('month', $month)->where('year', $year)->where('payrol_status', 'Locked')->exists();
+
+        if ($isPayrollLocked) {
+            // If the payroll is locked, update the payslip status to 'Published'
+            Payrol::where('month', $month)->where('year', $year)->update(['payslip_status' => 'Published']);
+            return redirect()->back()->with('success', 'Payslip published successfully');
+        } else {
+            // If the payroll is not locked, display an error message
+            return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+        }
+    }
+
+    public function lockPayrollNS($periode)
+    {
+        // Logic to update the status to 'Locked' for the specified month and year
+        Payrollns::where('periode', $periode)->update(['payrol_status' => 'Locked']);
+
+        return redirect()->back()->with('success', 'Payroll locked successfully');
+    }
+
+    public function publishPayslipNS($periode)
+    {
+        // Check if the payroll is locked
+        $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Locked')->exists();
+
+        if ($isPayrollLocked) {
+            // If the payroll is locked, update the payslip status to 'Published'
+            Payrollns::where('periode', $periode)->update(['payslip_status' => 'Published']);
+            return redirect()->back()->with('success', 'Payslip published successfully');
+        } else {
+            // If the payroll is not locked, display an error message
+            return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+        }
+    }
+
+    // Unlock
+    public function unlockPayroll($month, $year)
+    {
+        // Logic to update the status to 'Locked' for the specified month and year
+        Payrol::where('month', $month)->where('year', $year)->update(['payrol_status' => 'Unlocked']);
+
+        return redirect()->back()->with('success', 'Payroll unlocked successfully');
+    }
+
+    public function unpublishPayslip($month, $year)
+    {
+        // Check if the payroll is locked
+        $isPayrollLocked = Payrol::where('month', $month)->where('year', $year)->where('payrol_status', 'Unlocked')->exists();
+
+        if ($isPayrollLocked) {
+            // If the payroll is locked, update the payslip status to 'Published'
+            Payrol::where('month', $month)->where('year', $year)->update(['payslip_status' => 'Unpublish']);
+            return redirect()->back()->with('success', 'Payslip published successfully');
+        } else {
+            // If the payroll is not locked, display an error message
+            return redirect()->back()->with('error', 'Cannot unpublish payslip. Payroll is locked.');
+        }
+    }
+
+    public function unlockPayrollns($periode)
+    {
+        // Logic to update the status to 'Locked' for the specified month and year
+        Payrollns::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
+
+        return redirect()->back()->with('success', 'Payroll unlocked successfully');
+    }
+
+    public function unpublishPayslipns($periode)
+    {
+        // Check if the payroll is locked
+        $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Unlocked')->exists();
+
+        if ($isPayrollLocked) {
+            // If the payroll is locked, update the payslip status to 'Published'
+            Payrollns::where('periode', $periode)->update(['payslip_status' => 'Unpublish']);
+            return redirect()->back()->with('success', 'Payslip published successfully');
+        } else {
+            // If the payroll is not locked, display an error message
+            return redirect()->back()->with('error', 'Cannot unpublish payslip. Payroll is locked.');
+        }
     }
 
     public function payslipuser()
@@ -64,7 +206,9 @@ class PayslipController extends Controller
         $dataKaryawan = Employee::where('nik', $employeeCode)->first();
         $karyawan = json_decode($dataKaryawan, true);
         if($karyawan['organisasi'] === 'Management Leaders') {
-            $payslips = Payrol::where('employee_code', $employeeCode)->get();
+            $payslips = Payrol::where('employee_code', $employeeCode)
+                ->where('payslip_status', 'Published')
+                ->get();
         }else{
             $payslips = Payrollns::where('employee_code', $employeeCode)->get();
         }
@@ -127,7 +271,20 @@ class PayslipController extends Controller
      */
     public function edit($id)
     {
-        //
+        $payrolComponent = Payrol::findOrFail($id);
+        if (!$payrolComponent) {
+            return redirect()->back()->with('error', 'Payrol Component not found.');
+        }
+        return view('pages.hc.payrol.editpayrol.edit', compact('payrolComponent'));
+    }
+
+    public function editNS($id)
+    {
+        $payrolComponent = Payrollns::findOrFail($id);
+        if (!$payrolComponent) {
+            return redirect()->back()->with('error', 'Payrol Component not found.');
+        }
+        return view('pages.hc.payrol.editpayrol.editns', compact('payrolComponent'));
     }
 
     /**
@@ -139,7 +296,95 @@ class PayslipController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate the request data
+            $request->validate([
+                'basic_salary' => 'required|numeric',
+            ]);
+    
+            // Retrieve the payroll component by ID
+            $payrolComponent = Payrol::findOrFail($id);
+    
+            // Update the payroll component fields
+            $payrolComponent->basic_salary = $request->input('basic_salary');
+            $payrolComponent->net_salary = $request->input('thp');
+    
+            // Update allowances
+            $allowances = [
+                't_struktural' => [$request->input('allowances')['t_struktural'][0]],
+                't_kinerja' => [$request->input('allowances')['t_kinerja'][0]],
+                't_alatkerja' => [$request->input('allowances')['t_alatkerja'][0]],
+                't_allowance' => [$request->input('allowances')['t_allowance'][0]],
+            ];
+    
+            // Update deductions
+            $deductions = [
+                'bpjs_ks' => [$request->input('deductions')['bpjs_ks'][0]],
+                'bpsj_tk' => [$request->input('deductions')['bpsj_tk'][0]],
+                'pph21' => [$request->input('deductions')['pph21'][0]],
+                'p_hutang' => [$request->input('deductions')['p_hutang'][0]],
+                't_deduction' => [$request->input('deductions')['t_deduction'][0]],
+            ];
+    
+            $payrolComponent->allowances = json_encode($allowances);
+            $payrolComponent->deductions = json_encode($deductions);
+            $payrolComponent->net_salary = $request->input('thp');
+    
+            // Save the updated payroll component
+            $payrolComponent->save();
+    
+            $bulan = $request->input('month');
+            $tahun = $request->input('year');
+    
+            // Redirect back with a success message
+            return redirect()->route('payslip.showByMonth', ['month' => $bulan, 'year' => $tahun])->with('success', 'Payroll component updated successfully');
+        } catch (QueryException $exception) {
+            // Handle database-related exceptions
+            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
+        } catch (\Exception $exception) {
+            // Handle other exceptions
+            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
+        }
+    }
+
+    public function updateNS(Request $request, $id)
+    {
+        try {
+            // Validate the request data
+            $request->validate([
+                'daily_salary' => 'required|numeric',
+            ]);
+    
+            // Retrieve the payroll component by ID
+            $payrolComponent = Payrollns::findOrFail($id);
+    
+            // Update the payroll component fields
+            $payrolComponent->daily_salary = $request->input('daily_salary');
+            $payrolComponent->total_absen = $request->input('total_absen');
+            $payrolComponent->lembur_salary = $request->input('lembur_salary');
+            $payrolComponent->jam_lembur = $request->input('jam_lembur');
+            $payrolComponent->total_lembur = $request->input('total_lembur');
+            $payrolComponent->uang_makan = $request->input('uang_makan');
+            $payrolComponent->uang_kerajinan = $request->input('uang_kerajinan');
+            $payrolComponent->potongan_hutang = $request->input('potongan_hutang');
+            $payrolComponent->potongan_mess = $request->input('potongan_mess');
+            $payrolComponent->potongan_lain = $request->input('potongan_lain');
+            $payrolComponent->total_daily = $request->input('total_daily');
+            $payrolComponent->thp = $request->input('thp');
+            // Save the updated payroll component
+            $payrolComponent->save();
+    
+            $periode = $request->input('periode');
+    
+            // Redirect back with a success message
+            return redirect()->route('payslip.showbyperiode', ['periode' => $periode])->with('success', 'Payroll component updated successfully');
+        } catch (QueryException $exception) {
+            // Handle database-related exceptions
+            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
+        } catch (\Exception $exception) {
+            // Handle other exceptions
+            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
+        }
     }
 
     /**

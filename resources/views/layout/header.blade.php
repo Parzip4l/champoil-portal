@@ -117,9 +117,8 @@
                 </a>
                 <div class="submenu">
                     <ul class="submenu-item">
-                        <li class="nav-item"><a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payslip</a></li>
                         <li class="nav-item"><a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payroll</a></li>
-
+                        <li class="nav-item"><a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payrol History</a></li>
                         @if($employee && $employee->unit_bisnis == 'CHAMPOIL')
                             <li class="nav-item"><a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payroll Frontline Officer</a></li>
                         @endif

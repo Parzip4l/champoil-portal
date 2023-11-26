@@ -24,7 +24,7 @@ class ScheduleControllers extends Controller
     public function index()
     {
         $schedulesByProject = Schedule::with('project')
-        ->select('project', 'periode', DB::raw('count(*) as schedule_count'))
+            ->select('project', 'periode', DB::raw('count(*) as schedule_count'))
             ->groupBy('project', 'periode')
             ->get();
 

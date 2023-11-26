@@ -20,129 +20,158 @@
     </div>
 @endif
 <div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card custom-card2">
-      <div class="card-body">
-        <div class="card-header mb-3">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="" class="form-label">Payslip Filter</label>
-                        <select name="month" id="" class="form-control" required>
-                            <option value="Januari">Januari</option>
-                            <option value="Februari">Februari</option>
-                            <option value="Maret">Maret</option>
-                            <option value="April">April</option>
-                            <option value="Mei">Mei</option>
-                            <option value="Juni">Juni</option>
-                            <option value="Juli">Juli</option>
-                            <option value="Agustus">Agustus</option>
-                            <option value="September">September</option>
-                            <option value="Oktober">Oktober</option>
-                            <option value="November">November</option>
-                            <option value="Desember">Desember</option>
-                        </select>
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header mb-3">
+                <h5>Payrol History</h5>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Frontline Officer</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="lineTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
+                        <div class="table-responsive">
+                            <table id="dataTableExample" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Periode</th>
+                                        <th>Total</th>
+                                        <th>Payroll Status</th>
+                                        <th>Payslip Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($data as $dataBulan)
+                                    <tr>
+                                        <td><a href="{{ route('payslip.showByMonth', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}">{{$dataBulan->month}} / {{$dataBulan->year}}</a></td>
+                                        <td>Rp {{ number_format($dataBulan->total_net_salary, 0, ',', '.') }}</td>
+                                        <td>
+                                        @if($dataBulan->payrol_status === 'Locked')
+                                            <span class="text-danger">{{$dataBulan->payrol_status}}</span>
+                                        @else
+                                            <span class="text-success">{{$dataBulan->payrol_status}}</span>
+                                        @endif
+                                        </td>
+                                        <td>
+                                        @if($dataBulan->payslip_status === 'Published')
+                                            <span class="text-success">{{$dataBulan->payslip_status}}</span>
+                                        @else
+                                            <span class="text-danger">{{$dataBulan->payslip_status}}</span>
+                                        @endif
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    @if($dataBulan->payrol_status === 'Locked')
+                                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('unlockPayroll', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}">
+                                                            <i data-feather="unlock" class="icon-sm me-2"></i> <span class="">Unlock Payrol</span>
+                                                        </a>
+                                                    @else
+                                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('lockPayroll', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}">
+                                                            <i data-feather="lock" class="icon-sm me-2"></i> <span class="">Lock Payrol</span>
+                                                        </a>
+                                                    @endif
+
+                                                    @if($dataBulan->payslip_status === 'Published')
+                                                        <a href="{{ route('UnpublishPayslip', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}" class="dropdown-item d-flex align-items-center" aria-disabled="true">
+                                                            <i data-feather="slash" class="icon-sm me-2"></i> <span class="">Unpublish Payslip</span>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('PublishPayslipData', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}" class="dropdown-item d-flex align-items-center">
+                                                            <i data-feather="send" class="icon-sm me-2"></i> <span class="">Publish Payslip</span>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
+                        <div class="table-responsive">
+                            <table id="dataPayslipNS" class="table">
+                                <thead>
+                                <tr>
+                                    <th>Periode</th>
+                                    <th>Total Payrol</th>
+                                    <th>Payroll Status</th>
+                                    <th>Payslip Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($datans as $data)
+                                    @php 
+                                        $dateParts = explode(" - ", $data->periode);
+                                        $startDate = \Carbon\Carbon::parse($dateParts[0])->format('j F Y');
+                                        $endDate = \Carbon\Carbon::parse($dateParts[1])->format('j F Y');
+                                    @endphp
+                                    <tr>
+                                        <td><a href="{{ route('payslip.showbyperiode', ['periode' => $data->periode]) }}">{{ \Carbon\Carbon::parse($dateParts[1])->format('j F Y') }}</a></td>
+                                        <td>Rp {{ number_format($data->total_payroll, 0, ',', '.') }}</td>
+                                        <td>
+                                        @if($data->payrol_status === 'Locked')
+                                            <span class="text-danger">{{$data->payrol_status}}</span>
+                                        @else
+                                            <span class="text-success">{{$data->payrol_status}}</span>
+                                        @endif
+                                        </td>
+                                        <td>
+                                        @if($data->payslip_status === 'Published')
+                                            <span class="text-success">{{$data->payslip_status}}</span>
+                                        @else
+                                            <span class="text-danger">{{$data->payslip_status}}</span>
+                                        @endif
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    @if($data->payrol_status === 'Locked')
+                                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('unlockPayrollns', ['periode' => $data->periode]) }}">
+                                                            <i data-feather="unlock" class="icon-sm me-2"></i> <span class="">Unlock Payrol</span>
+                                                        </a>
+                                                    @else
+                                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('lockPayrollns', ['periode' => $data->periode]) }}">
+                                                            <i data-feather="lock" class="icon-sm me-2"></i> <span class="">Lock Payrol</span>
+                                                        </a>
+                                                    @endif
+
+                                                    @if($data->payslip_status === 'Published')
+                                                        <a href="{{ route('UnpublishPayslipns', ['periode' => $data->periode]) }}" class="dropdown-item d-flex align-items-center" aria-disabled="true">
+                                                            <i data-feather="slash" class="icon-sm me-2"></i> <span class="">Unpublish Payslip</span>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('PublishPayslipDataNS', ['periode' => $data->periode]) }}" class="dropdown-item d-flex align-items-center">
+                                                            <i data-feather="send" class="icon-sm me-2"></i> <span class="">Publish Payslip</span>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Frontline Officer</a>
-            </li>
-        </ul>
-        <div class="tab-content mt-3" id="lineTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
-                <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Employe Name</th>
-                            <th>Thp</th>
-                            <th>Payroll Periode</th>
-                            <th>Send Payslip</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @php 
-                                $no = 1;
-                            @endphp
-                            @foreach ($data as $data)
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            @php
-                                $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                            @endphp
-                            <td>
-                                @if ($employee)
-                                    <a href="{{ route('payslip.show', $data->id) }}">{{ $employee->nama }}</a>
-                                @else
-                                    Karyawan tidak ditemukan
-                                @endif
-                            </td>
-                            <td>Rp {{ number_format($data->net_salary, 0, ',', '.') }}</td>
-                            <td>{{ $data->year }} - {{ $data->month }}</td>
-                            <td>
-                                @if ($employee)
-                                    <a href="{{ route('send-email', $data->id) }}" class="btn btn-primary btn-sm" onclick="return showSweetAlert()">Send Email</a>
-                                @else
-                                    Karyawan tidak ditemukan
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
-                <div class="table-responsive">
-                    <table id="dataPayslipNS" class="table">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Employe Name</th>
-                            <th>THP</th>
-                            <th>Payroll Periode</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @php 
-                                $no = 1;
-                                
-                            @endphp
-                            @foreach ($datans as $data)
-                            <tr>
-                                <td>{{ $no++ }}</td>
-                                @php
-                                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                                    $dates = explode(' - ', $data->periode);
-                                    $startDate = date('j M Y', strtotime($dates[0]));
-                                    $endDate = date('j M Y', strtotime($dates[1]));
-                                @endphp
-                                <td>
-                                    @if ($employee)
-                                        <a href="{{ route('payslip-ns.show', $data->id) }}">{{ $employee->nama }}</a>
-                                    @else
-                                        Karyawan tidak ditemukan
-                                    @endif
-                                </td>
-                                <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
-                                <td>{{ $endDate }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 @endsection
 

@@ -13,7 +13,7 @@ class ScheduleExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return Schedule::where('periode','October-2023')
+        return Schedule::where('periode','November-2023')
         ->select('schedule_code', 'project', 'employee', 'tanggal', 'shift', 'periode')
         ->get();
     }

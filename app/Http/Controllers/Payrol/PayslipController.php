@@ -201,7 +201,8 @@ class PayslipController extends Controller
     public function payslipuser()
     {
         $employeeCode = auth()->user()->employee_code;
-
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
         // Ambil semua payslip berdasarkan employee_code
         $dataKaryawan = Employee::where('nik', $employeeCode)->first();
         $karyawan = json_decode($dataKaryawan, true);
@@ -210,7 +211,16 @@ class PayslipController extends Controller
                 ->where('payslip_status', 'Published')
                 ->get();
         }else{
-            $payslips = Payrollns::where('employee_code', $employeeCode)->get();
+            if ($unit_bisnis == 'Kas') {
+                $payslips = $dbSecondary->table('payrolls')
+                            ->where('payslip_status', 'Published')
+                            ->get();
+            }else{
+                $payslips = Payrollns::where('employee_code', $employeeCode)
+                        ->where('payslip_status', 'Published')
+                        ->get();
+            }
+            
         }
 
         return view('pages.hc.payrol.payslip-user', compact('payslips'));

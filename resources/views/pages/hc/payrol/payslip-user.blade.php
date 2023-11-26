@@ -76,24 +76,27 @@
                         <tbody>
                             @php 
                                 $no = 1;
-                                
+                                $employeeCode = auth()->user()->employee_code;
+                                $employee = \App\Employee::where('nik', $employeeCode)->first();
                             @endphp
-                            @foreach ($payslips as $data)
-                            <tr>
-                                <td>{{ $no++ }}</td>
-                                @php
-                                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
-                                @endphp
-                                @if($employee->organisasi === 'Management Leaders')
-                                <td><a href="{{route('payslip.show', $data->id)}}">{{ $data->employee_code }}</a></td>
-                                <td>{{ $data->month }} - {{ $data->year }}</td>
-                                @endif
-                                @if($employee->organisasi === 'Frontline Officer')
-                                <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $data->employee_code }}</a></td>
-                                <td>{{ $data->month }} - {{ $data->year }}</td>
-                                @endif
-                            </tr>
-                        @endforeach
+                            @if($employee->organisasi === 'Management Leaders')
+                                @foreach ($payslips as $data)
+                                <tr>
+                                    <td>{{ $no++ }}</td>
+                                    <td><a href="{{route('payslip.show', $data->id)}}">{{ $data->employee_code }}</a></td>
+                                    <td>{{ $data->month }} - {{ $data->year }}</td>
+                                </tr>
+                                @endforeach
+                            @endif
+                            @if($employee->organisasi === 'Frontline Officer')
+                                @foreach ($payslips as $data)
+                                <tr>
+                                    <td>{{ $no++ }}</td>
+                                    <td><a href="{{route('payslip-ns.show', $data->id)}}">{{ $data->employee_code }}</a></td>
+                                    <td>{{ $data->periode}}</td>
+                                </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -125,13 +128,18 @@
                 </a>
                 @endif
                 @if($employee->organisasi === 'Frontline Officer')
+                @php 
+                $dateParts = explode(" - ", $data->periode);
+                    $startDate = \Carbon\Carbon::parse($dateParts[0])->format('j F Y');
+                    $endDate = \Carbon\Carbon::parse($dateParts[1])->format('j F Y');
+                @endphp
                 <a href="{{route('payslip-ns.show', $data->id)}}">
                     <div class="payslip-wrap d-flex mb-3">
                         <div class="icon-wrap-slip me-2">
                             <i class="icon-lg text-white" data-feather="file-text"></i>
                         </div>
                         <div class="payslip-info align-self-center">
-                            <h5 class="color-custom mb-1">Periode {{ $data->month }} {{ $data->year }}</h5>
+                            <h5 class="color-custom mb-1">Periode {{ \Carbon\Carbon::parse($dateParts[1])->format('j F Y') }}</h5>
                             <p class="text-muted">{{ $data->employee_code }}</p>
                         </div>
                     </div>

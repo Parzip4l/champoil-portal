@@ -210,6 +210,8 @@ class PayrolController extends Controller
                 $payroll->potongan_lain = $dataDeductions['lain_lain'][0];
                 $payroll->thp = $thpdetails;
                 $payroll->total_daily = $totaldaily;
+                $payroll->payrol_status = 'Unlocked';
+                $payroll->payslip_status = 'Unpublish';
                 $payroll->save();
             }
         }

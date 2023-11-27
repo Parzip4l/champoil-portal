@@ -24,14 +24,16 @@
             <div class="card-body">
                 <div class="container-fluid d-flex justify-content-between">
                     <div class="col-lg-6 ps-0">
-                        <a href="#" class="noble-ui-logo d-block mt-3">CHAMPOIL<span> LOGO</span></a>                 
-                        <p class="mt-1 mb-1"><b>CHAMPOIL INDONESIA</b></p>
-                        <p>Jl. Kapuk Kencana No.36A, RT.2/RW.3, Kapuk Muara, <br>Kec. Penjaringan, Jkt Utara, Daerah Khusus Ibukota Jakarta 14460</p>
+                        <a href="#" class="noble-ui-logo d-block mt-3 mb-6">TRUEST<span> LOGO</span></a>                 
                         <h5 class="mt-5 mb-2 text-muted">Payslip Details</h5>
                         @php
                             $employee = \App\Employee::where('nik', $dataPayslip[0]['employee_code'])->first();
                             $dataEarnings = json_decode($dataPayslip[0]['allowances'], true);
                             $datadeductions = json_decode($dataPayslip[0]['deductions'], true);
+                            $user = Auth::user();
+                            $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+                                ->select('unit_bisnis','organisasi')
+                                ->first();
                         @endphp
                         <div class="row">
                             <div class="col-md-12">
@@ -97,6 +99,24 @@
                                                 <span class="text-right">Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
+                                        @if($karyawanLogin->unit_bisnis === 'Kas')
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Tunjangan Makan</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_makan'][0], 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Tunjangan Transportasi</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_transportasi'][0], 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="row mb-2">
@@ -247,6 +267,24 @@
                             Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}
                         </span>
                     </div>
+                    @if($karyawanLogin->unit_bisnis === 'Kas')
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Makan
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_makan'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Transportasi
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_transportasi'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    @endif
                 </div>
                 <div class="card-header text-center">
                     <div class="details-earning d-flex justify-content-between mb-2">

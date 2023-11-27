@@ -10,6 +10,7 @@ use App\User;
 use App\Payrolinfo\Payrolinfo;
 use App\UserActivities;
 use App\ModelCG\Jabatan;
+use App\ModelCG\Schedule;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
@@ -460,6 +461,12 @@ class EmployeeController extends Controller
         // Lakukan pemrosesan untuk menambahkan data baru
         // Misalnya, simpan data baru ke database
         try{
+            // Cek Project
+            $schedule = Schedule::where('employee', $request->input('user'))
+                                ->where('tanggal', $request->input('tanggal'))
+                                ->pluck('project')
+                                ->first();
+
             $attendance = new Absen;
             $attendance->user_id = $request->input('user');
             $attendance->nik = $request->input('user');
@@ -469,6 +476,7 @@ class EmployeeController extends Controller
             $attendance->latitude = $request->input('latitude');
             $attendance->longtitude = $request->input('longtitude');
             $attendance->status = $request->input('status');
+            $attendance->project = $schedule;
             $attendance->save();
     
             return redirect()->back()->with('success', 'Absensi berhasil ditambahkan');

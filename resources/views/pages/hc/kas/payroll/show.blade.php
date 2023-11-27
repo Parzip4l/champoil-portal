@@ -96,44 +96,36 @@
                                                 <span class="text-right mb-4">Rp. {{ number_format($allowencesData->totalGajiBackup ?? 0, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
-                                        @if (isset($projectAllowances) && is_array($projectAllowances))
-                                            @foreach ($projectAllowances as $projectAllowance)
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <span>Tunjangan Kerja</span>
-                                                </div>
-                                                <div class="col-md-6 text-right">
-                                                    <span class="text-right">Rp. {{ number_format($projectAllowance->p_tkerja ?? 0, 0, ',', '.') }} </span>
-                                                </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <span>Tunjangan Lain Lain</span>
                                             </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <span>Tunjangan Lain Lain</span>
-                                                </div>
-                                                <div class="col-md-6 text-right">
-                                                    <span class="text-right">Rp. {{ number_format($projectAllowance->p_tlain ?? 0, 0, ',', '.') }} </span>
-                                                </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($allowencesData->tunjangan_lain ?? 0, 0, ',', '.') }} </span>
                                             </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <span>BPJS Kesehatan Mandiri</span>
-                                                </div>
-                                                <div class="col-md-6 text-right">
-                                                    <span class="text-right">Rp. {{ number_format($projectAllowance->p_bpjs_ks ?? 0, 0, ',', '.') }} </span>
-                                                </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <span>BPJS Kesehatan Mandiri</span>
                                             </div>
-                                            @endforeach
-                                        @endif
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($allowencesData->bpjs_mandiri ?? 0, 0, ',', '.') }} </span>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
-                                    @if (isset($projectDeductions) && is_array($projectDeductions))
-                                        @foreach($projectDeductions as $deduction)
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <span>Potongan Absensi</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_absen ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right mb-4">Rp. {{ number_format($deductionData->potongan_absen ?? 0, 0, ',', '.') }}</span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span></span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right text-muted"> {{$deductionData->tidak_absen ?? 0}} Hari</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -168,8 +160,6 @@
                                                 <span class="text-right">Rp. 0</span>
                                             </div>
                                         </div>
-                                        @endforeach
-                                        @endif
                                     </td>
                                 </tr>
                             </tbody>
@@ -270,18 +260,14 @@
                             Rp. {{ number_format($allowencesData->totalGajiBackup ?? 0, 0, ',', '.') }}
                         </span>
                     </div>
-                    @if (isset($projectAllowances) && is_array($projectAllowances))
-                        @foreach ($projectAllowances as $projectAllowance)
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                Bpjs Kesehatan
-                            </span>
-                            <span>
-                                Rp. {{ number_format($projectAllowance->p_bpjs_ks ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        @endforeach
-                    @endif
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Bpjs Kesehatan
+                        </span>
+                        <span>
+                            Rp. {{ number_format($allowencesData->bpjs_mandiri ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Tunjangan Jabatan
@@ -307,49 +293,53 @@
                     <h4>Deductions</h4>
                 </div>
                 <div class="card-body">
-                @if (isset($projectDeductions) && is_array($projectDeductions))
-                    @foreach($projectDeductions as $deduction)
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                PPH 21
-                            </span>
-                            <span>
-                                Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                Potongan Diksar
-                            </span>
-                            <span>
-                                Rp. {{ number_format($deductionData->potongan_gp ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                Potongan Absensi
-                            </span>
-                            <span>
-                            Rp. {{ number_format($deductionData->potongan_absen ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                Potongan Hutang
-                            </span>
-                            <span>Rp. {{ number_format($deductionData->potongan_hutang ?? 0, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="details-earning d-flex justify-content-between mb-2">
-                            <span>
-                                Potongan Lain Lain
-                            </span>
-                            <span>
-                                Rp. 0
-                            </span>
-                        </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            PPH 21
+                        </span>
+                        <span>
+                            Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}
+                        </span>
                     </div>
-                    @endforeach
-                @endif
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Potongan Diksar
+                        </span>
+                        <span>
+                            Rp. {{ number_format($deductionData->potongan_gp ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tidak Absen
+                        </span>
+                        <span class="text-muted">
+                            {{$deductionData->tidak_absen}} Hari
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Potongan Absensi
+                        </span>
+                        <span>
+                            Rp. {{ number_format($deductionData->potongan_absen ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Potongan Hutang
+                        </span>
+                        <span>Rp. {{ number_format($deductionData->potongan_hutang ?? 0, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Potongan Lain Lain
+                        </span>
+                        <span>
+                            Rp. 0
+                        </span>
+                    </div>
+                </div>
             </div>
 
             <!-- THP -->

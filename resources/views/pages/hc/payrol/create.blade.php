@@ -12,9 +12,11 @@
 @section('content')
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Payrol Component</h4>
+        </div>
       <div class="card-body">
-        <h4 class="card-title">Payrol Component</h4>
         <form method="POST" action="{{ route('payrol-component.store') }}" enctype="multipart/form-data">
             @csrf
             <div class="row mb-3">
@@ -43,6 +45,24 @@
                     <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required>
                 </div>
             </div>
+            @php
+                $user = Auth::user();
+                $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+                    ->select('unit_bisnis','organisasi')
+                    ->first();
+            @endphp
+            @if($karyawanLogin->unit_bisnis === 'Kas')
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3">
+                    <label for="kode_karyawan" class="form-label">Tunjangan Makan</label>
+                    <input type="number" id="t_makan" class="form-control allowance" name="allowances[t_makan][]" placeholder="Rp. " required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="kode_karyawan" class="form-label">Tunjangan Transportasi</label>
+                    <input type="number" id="t_transportasi" class="form-control allowance" name="allowances[t_transportasi][]" placeholder="Rp. " required>
+                </div>
+            </div>
+            @endif
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>

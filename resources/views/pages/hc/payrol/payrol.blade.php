@@ -60,16 +60,20 @@
                                 <label for="" class="form-label">Select Employee</label>
                                 <select class="js-example-basic-multiple form-select" id="employeeSelect" name="employee_code[]" multiple="multiple" data-width="100%">
                                     @foreach ($payrol as $data)
-                                    @php
-                                        $employee = \App\Employee::where('nik', $data->employee_code)
-                                                        ->where('unit_bisnis', 'CHAMPOIL')
-                                                        ->first();
-                                    @endphp
-                                    @if ($employee)
-                                        <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
-                                    @else
-                                        <option value="{{$data->employee_code}}">Karyawan Tidak Ditemukan</option>
-                                    @endif
+                                        @php
+                                            $user = Auth::user();
+                                            $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+                                                ->select('unit_bisnis','organisasi')
+                                                ->first();
+                                            $employee = \App\Employee::where('nik', $data->employee_code)
+                                                            ->where('unit_bisnis', $karyawanLogin->unit_bisnis)
+                                                            ->first();
+                                        @endphp
+                                        @if ($employee)
+                                            <option value="{{$data->employee_code}}">{{$employee->nama}}</option>
+                                        @else
+                                            <option value="{{$data->employee_code}}">Karyawan Tidak Ditemukan</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>

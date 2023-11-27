@@ -56,7 +56,10 @@ class ScheduleControllers extends Controller
         }
 
         $shift = Shift::all();
-        $employee = Employee::all();
+        $employeeCode = auth()->user()->employee_code;
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        $employee = Employee::where('unit_bisnis', $unit_bisnis)->get();
         $project = Project::all();
 
         $current_month = $today->format('F');

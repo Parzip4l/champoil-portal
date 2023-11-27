@@ -270,7 +270,7 @@ class PayrolNS extends Controller
                     ->get();
 
                 $totalDaysInSchedules = $schedules->count();
-
+                $tidakmasukkerja = 0;
                 // Calculate rate_potongan
                 if ($totalDaysInSchedules > 0) {
                     $rate_potongan = round($totalGaji / $totalDaysInSchedules);
@@ -278,6 +278,7 @@ class PayrolNS extends Controller
                 
                 if ($totalHari < $totalDaysInSchedules) {
                     $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
+                    $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
                 }
                 // End Potongan Daily
 
@@ -306,6 +307,8 @@ class PayrolNS extends Controller
                     ->where('jabatan', $jabatan)
                     ->pluck('p_bpjstk')
                     ->first();
+
+                $bpjs_tk = $dataPengurangBPJS;
 
                 $projectDedutionsTotal = 0;
                 foreach ($ProjectDeduction as $projectDetaildeductions) {
@@ -338,24 +341,25 @@ class PayrolNS extends Controller
                 // Masukan data allowence ke json
                 $allowenceData = [
                     'totalHari' => $totalHari,
+                    'totalHariSchedule' => $totalDaysInSchedules,
                     'totalHariBackup' => $TotalHariBackup,
                     'totalGaji' => $totalGaji,
                     'totalGajiBackup' => $totalGajiBackup,
                     'rate_harian' => $rate_potongan,
                     'rate_harian_backup' => $rate_harianbackup,
-                    'allowence_total' => $projectAllowancesTotal,
-                    'projectAllowances' => $ProjectAllowances->toArray(),
-                    
+                    'bpjs_mandiri' => $bpjsMandiri,
+                    'tunjangan_lain' => $tunjanganLain,
                 ];
 
                 // Data Deduction   
                 $deductiondata = [
-                    'projectDeductions' => $ProjectDeduction->toArray(),
-                    'deductions_total' => $projectDedutionsTotal + $totalPotonganHutang,
+                    'bpjs_tk' => $bpjs_tk,
                     'potongan_hutang' => $totalPotonganHutang,
                     'potongan_absen' => $potonganAbsen,
+                    'tidak_absen' => $tidakmasukkerja,
                     'potongan_gp' => $TotalGP,
                     'PPH21' => $totalPPH,
+                    'deductions_total' => $projectDedutionsTotal + $totalPotonganHutang,
                 ];
                 $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 

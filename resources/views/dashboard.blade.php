@@ -61,25 +61,6 @@
             <div class="card custom-card2">
                 <div class="card-body">
                     <div class="button-absen">
-                        @foreach ($datakaryawan as $data)
-                            @if (Auth::check())
-                                @php
-                                    $user = Auth::user();
-                                    $today = \Carbon\Carbon::now()->format('Y-m-d');
-                                    $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->exists();
-                                    $clockin = \App\Absen::where('nik', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->first();
-                                @endphp
-                                @if ($clockin)
-                                <h5 class="text-center mb-3">Let's Get To Home !</h5>
-                                @else
-                                <h5 class="text-center mb-3">Let's Get To Work !</h5>
-                                @endif
-                            @endif
-                        @endforeach
                         @if (Auth::check())
                             @php
                                 $user = Auth::user();
@@ -94,7 +75,7 @@
                                     ->select('unit_bisnis','organisasi')
                                     ->first();
                             @endphp
-                            @if($hasScheduleForToday || ($karyawanLogin->organisasi === 'Management Leaders' && $karyawanLogin->unit_bisnis === 'CHAMPOIL' && !$hasScheduleForToday))
+                            @if($karyawanLogin->organisasi === 'Management Leaders' || $karyawanLogin->unit_bisnis === 'CHAMPOIL' || ($hasScheduleForToday))
                                 @if ($clockin)
                                 <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
                                 @csrf   

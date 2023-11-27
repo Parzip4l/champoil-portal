@@ -208,9 +208,13 @@ class ApiLoginController extends Controller
                         $karyawan = json_decode($dataKaryawan, true);
 
                         if ($karyawan['organisasi'] === 'Management Leaders') {
-                            $payslips = Payrol::where('employee_code', $employeeCode)->get();
+                            $payslips = Payrol::where('employee_code', $employeeCode)
+                                                ->where('payslip_status','Published')
+                                                ->get();
                         } else {
-                            $payslips = Payrollns::where('employee_code', $employeeCode)->get();
+                            $payslips = Payrollns::where('employee_code', $employeeCode)
+                                                ->where('payslip_status','Published')
+                                                ->get();
                         }
 
                         // Modify the response to return JSON data

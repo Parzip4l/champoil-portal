@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
-use App\Project;
+use App\ModelCG\Project;
 use App\absen;
 use App\Payrol;
 use App\Payrollns;

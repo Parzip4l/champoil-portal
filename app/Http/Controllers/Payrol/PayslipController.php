@@ -84,9 +84,9 @@ class PayslipController extends Controller
             $unit_bisnis = $employee->unit_bisnis;
             if ($unit_bisnis == 'Kas') {
                 $dbSecondary = DB::connection('mysql_secondary');
-
+                $dbMain = DB::connection('mysql');
                 $datans = $dbSecondary->table('payrolls')
-                    ->join('chag4694_champ_portal.karyawan', 'payrolls.employee_code', '=', 'karyawan.nik')
+                    ->join($dbMain->getDatabaseName() . '.karyawan', 'payrolls.employee_code', '=', 'karyawan.nik')
                     ->select('payrolls.id', 'payrolls.*') // Tambahkan id pada select clause
                     ->where('karyawan.unit_bisnis', $unit_bisnis)
                     ->get();
@@ -130,24 +130,46 @@ class PayslipController extends Controller
 
     public function lockPayrollNS($periode)
     {
-        // Logic to update the status to 'Locked' for the specified month and year
-        Payrollns::where('periode', $periode)->update(['payrol_status' => 'Locked']);
-
+        $employeeCode = auth()->user()->employee_code;
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        if ($unit_bisnis == 'Kas') {
+            Payroll::where('periode', $periode)->update(['payrol_status' => 'Locked']);
+        }else{
+            Payrollns::where('periode', $periode)->update(['payrol_status' => 'Locked']);
+        }
         return redirect()->back()->with('success', 'Payroll locked successfully');
     }
 
     public function publishPayslipNS($periode)
     {
         // Check if the payroll is locked
-        $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Locked')->exists();
+        $employeeCode = auth()->user()->employee_code;
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        if ($unit_bisnis == 'Kas') {
+            $isPayrollLocked = Payroll::where('periode', $periode)->where('payrol_status', 'Locked')->exists();
 
-        if ($isPayrollLocked) {
-            // If the payroll is locked, update the payslip status to 'Published'
-            Payrollns::where('periode', $periode)->update(['payslip_status' => 'Published']);
-            return redirect()->back()->with('success', 'Payslip published successfully');
-        } else {
-            // If the payroll is not locked, display an error message
-            return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            if ($isPayrollLocked) {
+                // If the payroll is locked, update the payslip status to 'Published'
+                Payroll::where('periode', $periode)->update(['payslip_status' => 'Published']);
+                return redirect()->back()->with('success', 'Payslip published successfully');
+            } else {
+                // If the payroll is not locked, display an error message
+                return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            }
+            
+        }else {
+            $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Locked')->exists();
+
+            if ($isPayrollLocked) {
+                // If the payroll is locked, update the payslip status to 'Published'
+                Payrollns::where('periode', $periode)->update(['payslip_status' => 'Published']);
+                return redirect()->back()->with('success', 'Payslip published successfully');
+            } else {
+                // If the payroll is not locked, display an error message
+                return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            }
         }
     }
 
@@ -177,24 +199,46 @@ class PayslipController extends Controller
 
     public function unlockPayrollns($periode)
     {
-        // Logic to update the status to 'Locked' for the specified month and year
-        Payrollns::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
-
-        return redirect()->back()->with('success', 'Payroll unlocked successfully');
+        $employeeCode = auth()->user()->employee_code;
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        if ($unit_bisnis == 'Kas') {
+            Payroll::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
+        }else{
+            Payrollns::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
+        }
+        return redirect()->back()->with('success', 'Payroll locked successfully');
     }
 
     public function unpublishPayslipns($periode)
     {
         // Check if the payroll is locked
-        $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Unlocked')->exists();
+        $employeeCode = auth()->user()->employee_code;
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        if ($unit_bisnis == 'Kas') {
+            $isPayrollLocked = Payroll::where('periode', $periode)->where('payrol_status', 'Unlocked')->exists();
 
-        if ($isPayrollLocked) {
-            // If the payroll is locked, update the payslip status to 'Published'
-            Payrollns::where('periode', $periode)->update(['payslip_status' => 'Unpublish']);
-            return redirect()->back()->with('success', 'Payslip published successfully');
-        } else {
-            // If the payroll is not locked, display an error message
-            return redirect()->back()->with('error', 'Cannot unpublish payslip. Payroll is locked.');
+            if ($isPayrollLocked) {
+                // If the payroll is locked, update the payslip status to 'Published'
+                Payroll::where('periode', $periode)->update(['payslip_status' => 'Unpublish']);
+                return redirect()->back()->with('success', 'Payslip published successfully');
+            } else {
+                // If the payroll is not locked, display an error message
+                return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            }
+            
+        }else {
+            $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Unlocked')->exists();
+
+            if ($isPayrollLocked) {
+                // If the payroll is locked, update the payslip status to 'Published'
+                Payrollns::where('periode', $periode)->update(['payslip_status' => 'Unpublish']);
+                return redirect()->back()->with('success', 'Payslip published successfully');
+            } else {
+                // If the payroll is not locked, display an error message
+                return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            }
         }
     }
 
@@ -290,11 +334,22 @@ class PayslipController extends Controller
 
     public function editNS($id)
     {
-        $payrolComponent = Payrollns::findOrFail($id);
-        if (!$payrolComponent) {
-            return redirect()->back()->with('error', 'Payrol Component not found.');
+        $employeeCode = auth()->user()->employee_code;
+        $employee = Employee::where('nik', $employeeCode)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        if ($unit_bisnis == 'Kas') {
+            $payrolComponent = Payroll::findOrFail($id);
+            if (!$payrolComponent) {
+                return redirect()->back()->with('error', 'Payrol Component not found.');
+            }
+            return view('pages.hc.payrol.editpayrol.editpayrolnscg', compact('payrolComponent'));
+        }else {
+            $payrolComponent = Payrollns::findOrFail($id);
+            if (!$payrolComponent) {
+                return redirect()->back()->with('error', 'Payrol Component not found.');
+            }
+            return view('pages.hc.payrol.editpayrol.editns', compact('payrolComponent'));
         }
-        return view('pages.hc.payrol.editpayrol.editns', compact('payrolComponent'));
     }
 
     /**

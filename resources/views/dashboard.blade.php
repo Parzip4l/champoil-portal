@@ -101,7 +101,7 @@
                                     <input type="hidden" name="latitude_out" id="latitude_out">
                                     <input type="hidden" name="longitude_out" id="longitude_out">
                                     <input type="hidden" name="status" value="H">
-                                    <button type="submit" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out</button>
+                                    <a href="#" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out</a>
                                 </form>
                                 @else
                                 <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
@@ -560,33 +560,18 @@ $(function() {
 <script>
     $(document).ready(function () {
         // Mengambil data lokasi pengguna saat tombol absen ditekan
-        $('#btn-absen').on('click', function () {
+        $('#btn-absen').on('click', function (e) {
+            e.preventDefault(); // Prevent the default behavior of the link
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
-
-                    function successCallback(position) {
-                        console.log('Latitude:', position.coords.latitude);
-                        console.log('Longitude:', position.coords.longitude);
-                    }
-
-                    function errorCallback(error) {
-                        console.error('Error getting location:', error.message);
-                    }
-
-                    document.addEventListener('DOMContentLoaded', function () {
-                        // Jika tombol di klik, maka akan meminta lokasi
-                        document.getElementById('get-location-btn').addEventListener('click', function () {
-                            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-                        });
-                    });
-                    
                     // Mengisi nilai hidden input dengan data lokasi pengguna
                     $('#latitude').val(position.coords.latitude);
                     $('#longitude').val(position.coords.longitude);
 
                     // Mengirim form absen
                     $('#form-absen').submit();
-                }, function(error) {
+                }, function (error) {
                     if (error.code === error.PERMISSION_DENIED) {
                         // Pengguna menolak izin lokasi
                         alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');

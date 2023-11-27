@@ -341,7 +341,7 @@ class PayrolNS extends Controller
                     'totalHariBackup' => $TotalHariBackup,
                     'totalGaji' => $totalGaji,
                     'totalGajiBackup' => $totalGajiBackup,
-                    'rate_harian' => $rate_harian,
+                    'rate_harian' => $rate_potongan,
                     'rate_harian_backup' => $rate_harianbackup,
                     'allowence_total' => $projectAllowancesTotal,
                     'projectAllowances' => $ProjectAllowances->toArray(),

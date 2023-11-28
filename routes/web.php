@@ -29,6 +29,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
+    Route::get('absen/show/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'detailsAbsen'])->name('absen.details');
 
     // Export Attendence
     Route::get('export-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'exportAttendence'])->name('export.attendence');
@@ -157,7 +158,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
 
     // Update Absen
-    Route::post('/action/edit/{date}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');
+    Route::post('/action/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');
     Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsen'])->name('attendance.createData');
 
 

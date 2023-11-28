@@ -54,7 +54,7 @@
                                 <tr>
                                     <td>
                                         @if($employee)
-                                        {{ $employee->nama }}
+                                            <a href="{{route('absen.details', ['nik' => $previousName])}}">{{ $employee->nama }}</a>
                                         @else
                                         <p>Employee Not Found</p>
                                         @endif

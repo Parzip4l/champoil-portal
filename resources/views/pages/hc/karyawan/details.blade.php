@@ -92,7 +92,7 @@
                                             </div>
                                         </div>
                                         @php
-                                        use Carbon\Carbon;
+                                            use Carbon\Carbon;
                                             $joinDate = \Carbon\Carbon::parse($employee->joindate);
                                             $now = \Carbon\Carbon::now();
                                             $masaKerja = $joinDate->diff($now)->format('%y tahun, %m bulan, %d hari');
@@ -249,6 +249,7 @@
                                                             data-date="{{ $currentDate->format('Y-m-d') }}"
                                                             data-clock-in="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_in }}"
                                                             data-clock-out="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_out }}"
+                                                            data-nik="{{ $employee->nik }}"
                                                         >Edit</a>
                                                     </td>
                                                     @endif
@@ -499,25 +500,28 @@ $(document).ready(function() {
         var date = button.data('date');
         var clockIn = button.data('clock-in');
         var clockOut = button.data('clock-out');
+        var nik = button.data('nik');
         var modal = $(this);
 
         // Mengisi nilai tanggal pada formulir
         modal.find('#editDate').val(date);
         modal.find('#clockIn').val(clockIn);
         modal.find('#clockOut').val(clockOut);
+        modal.find('#nik').val(nik);
 
         // Set the action URL based on whether data exists for the date
         var actionUrl = "";
 
         if (clockIn) {
             // Data sudah ada, atur URL edit
-            actionUrl = "{{ route('attendance.editData', ':date') }}";
+            actionUrl = "{{ route('attendance.editData', [':date', ':nik']) }}";
         } else {
             // Data belum ada, atur URL create
             actionUrl = "{{ route('attendance.createData') }}";
         }
 
         actionUrl = actionUrl.replace(':date', date);
+        actionUrl = actionUrl.replace(':nik', nik);
 
         // Mengganti aksi formulir
         modal.find('form').attr('action', actionUrl);

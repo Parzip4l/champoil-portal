@@ -103,12 +103,12 @@
     <div class="col-md-12">
         <div class="menu-profile-wrap">
             <div class="menu-item-profile">
-                <a href="https://apkpure.com/p/com.example.sima09" class="d-flex justify-content-between menu-profile mb-3">
+                <a href="{{ route('employee.edit', ['employee' => $employee->nik]) }}" class="d-flex justify-content-between menu-profile mb-3">
                     <div class="d-flex">
-                        <div class="icon-profile-menu p-3 me-3" style="background: #D2E0FB;">
-                            <i class="icon-lg text-white" data-feather="download-cloud"></i>
+                        <div class="icon-profile-menu p-3 me-3 bg-warning">
+                            <i class="icon-lg text-white" data-feather="edit"></i>
                         </div>
-                        <h5 class="align-self-center color-custom">Download Apps</h5>
+                        <h5 class="align-self-center color-custom">Edit Profile</h5>
                     </div>
                     <div class="icon-right align-self-center">
                     </div>

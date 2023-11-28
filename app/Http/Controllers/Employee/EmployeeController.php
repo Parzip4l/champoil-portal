@@ -320,6 +320,22 @@ class EmployeeController extends Controller
             $employee->alamat = $request->input('alamat');
             $employee->status_pernikahan = $request->input('status_pernikahan');
             $employee->tanggungan = $request->input('tanggungan');
+
+            // Update the employee's photo if a new one is provided
+            if ($request->hasFile('gambar')) {
+                $photo = $request->file('gambar');
+                $photoFileName = time() . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('/images'), $photoFileName);
+                
+                // Delete old photo if exists
+                if ($employee->photo) {
+                    $oldPhotoPath = public_path('/images') . $employee->photo;
+                    if (file_exists($oldPhotoPath)) {
+                        unlink($oldPhotoPath);
+                    }
+                }
+                $employee->gambar = $photoFileName;
+            }
             
             // Save the updated employee
             $employee->save();
@@ -352,16 +368,7 @@ class EmployeeController extends Controller
 
             $userInfo = User::where('name', $id)->first();
 
-            if ($userInfo) {
-                $userInfo->name = $request->input('nik');
-                $userInfo->email = $request->input('email');
-                $userInfo->password = Hash::make($request->password);
-                $userInfo->permission = json_encode($request->permissions);
-                $userInfo->employee_code = $request->input('nik');
-                $userInfo->company = $company->unit_bisnis;
-                $userInfo->save();
-            } else {
-                // Jika tidak ditemukan maka buat baru
+            if (!$userInfo) {
                 $userInfo = new User();
                 $userInfo->name = $request->nik;
                 $userInfo->email = $request->email;
@@ -374,7 +381,7 @@ class EmployeeController extends Controller
 
             DB::commit();
             // Redirect to a view or return a response as needed
-            return redirect()->route('employee.index')->with('success', 'Employee data updated successfully.');
+            return redirect()->back()->with('success', 'Employee data updated successfully.');
         }catch (ValidationException $exception) {
             DB::rollBack();
             $errorMessage = $exception->validator->errors()->first(); // ambil pesan error pertama dari validator

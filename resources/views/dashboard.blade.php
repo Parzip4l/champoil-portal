@@ -325,6 +325,24 @@
 </div>
 <!-- End Task -->
 
+<!-- Modal Announcement -->
+<div class="modal fade" id="announcementModal" tabindex="-1" role="dialog" aria-labelledby="announcementModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="announcementModalLabel">TRUEST HRIS Announcement</h5>
+            </div>
+            <div class="modal-body">
+                <!-- Add your announcement content here -->
+                <p>1. Aplikasi TRUEST HRIS Untuk saat ini sedang dilakukan maintenance. Mohon Maaf Untuk Ketidaknyamanannya.</p><br>
+                <p>2. Dikarenakan Aplikasi Sedang Dilakukan Meiantenance, Absensi bisa digunakan di browser HP Masing Masing.</p><br>
+                <p>3. Saat untuk update data pribadi sudah bisa dilukan masing masing termasuk foto profile.</p>
+                <button type="button" class="btn btn-primary mt-2" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Feedback Form -->
 <div class="feedback-button-wrap">
     <a href="#" data-bs-toggle="modal" data-bs-target=".Feedback">
@@ -511,7 +529,41 @@
         });
     @endif
 </script>
+<script>
+    $(document).ready(function () {
+        // Check if the modal has been closed before using a cookie
+        if (!getCookie("announcementModalClosed")) {
+            $('#announcementModal').modal('show');
+        }
 
+        // Set a cookie when the modal is closed
+        $('#announcementModal').on('hidden.bs.modal', function () {
+            setCookie("announcementModalClosed", "true", 365);
+        });
+    });
+
+    // Cookie functions
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+</script>
 <script>
 $(function() {
     'use strict';

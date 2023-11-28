@@ -19,7 +19,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        'http://hris.truest.co.id/api/v1/login',
-        'http://staging.truest.co.id/api/v1/login',
+        'https://hris.truest.co.id/api/v1/login',
+        'https://staging.truest.co.id/api/v1/login',
     ];
 }

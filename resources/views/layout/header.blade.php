@@ -141,6 +141,14 @@
                 </a>
             </li>
         @endif
+        @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin))
+            <li class="nav-item">
+                <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">
+                    <i class="link-icon" data-feather="calendar"></i>
+                    <span class="menu-title">Pengajuan Schedule</span>
+                </a>
+            </li>
+        @endif
         @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ route('knowledge_base.index') }}" class="nav-link">

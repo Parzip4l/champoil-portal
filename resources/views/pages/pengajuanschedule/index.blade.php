@@ -7,12 +7,12 @@
 @endpush
 
 @section('content')
-<div class="row">
+<div class="row desktop">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Pinjaman Karyawan</h5>
-                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#JabatanModal">Tambah Data Pinjaman</a>
+                <h5 class="mb-0 align-self-center">Data Pengajuan Schedule</h5>
+                <a href="{{route('pengajuan-schedule.create')}}" class="btn btn-sm btn-primary">Buat Pengajuan</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -20,14 +20,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Karyawan</th>
-                                <th>Bulan Pinjam</th>
-                                <th>Bulan Akhir Pinjaman</th>
-                                <th>Jumlah Pijaman</th>
-                                <th>Potongan Perbulan</th>
-                                <th>Sisa Pinjaman</th>
-                                
-                                <th>Status</th>
+                                <th>Project</th>
+                                <th>Periode</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -35,27 +29,15 @@
                             @php 
                                 $nomor = 1;
                             @endphp
-                            @foreach ($Loandata as $data)
+                            @foreach ($datapengajuan as $data)
                             <tr>
                                 <td>{{ $nomor++ }}</td>
                                 @php 
                                     // Ambil nama produk berdasarkan product_id
-                                    $Employee = \App\Employee::where('nik',$data->employee_id)->first();
-                                    $endDate = $data->created_at->copy()->addMonths($data->installments);
+                                    $project = \App\ModelCG\Project::where('id',$data->project)->first();
                                 @endphp
-                                <td>{{ $Employee->nama }}</td>
-                                <td>{{ $data->created_at->format('F Y') }}</td>
-                                <td>{{ $endDate->format('F Y') }}</td>
-                                <td>Rp {{ number_format($data->amount, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($data->installment_amount, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($data->remaining_amount, 0, ',', '.') }}</td>
-                                <td>
-                                    @if($data->is_paid)
-                                        Lunas
-                                    @else
-                                        Belum Lunas
-                                    @endif
-                                </td>
+                                <td><a href="{{ route('pengajuanschedule.details', ['project' => $data->project, 'periode' => $data->periode]) }}">{{ $project->name }}</a></td>
+                                <td>{{ $data->periode }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -63,16 +45,13 @@
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id }}">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Details</span>
+                                                <i data-feather="check" class="icon-sm me-2"></i>
+                                                <span class="">Setujui</span>
                                             </a>
-                                            <form action="#" method="POST" id="delete_contact" class="contactdelete">
-                                                @csrf @method('DELETE')
-                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                                    <i data-feather="trash" class="icon-sm me-2"></i>
-                                                    <span class="">Delete</span>
-                                                </a>
-                                            </form>
+                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id }}">
+                                                <i data-feather="x" class="icon-sm me-2"></i>
+                                                <span class="">Tolak</span>
+                                            </a>
                                         </div>
                                     </div>
                                 </td>
@@ -86,44 +65,41 @@
     </div>
 </div>
 
-<!-- Modal Data FNG -->
-<div class="modal fade bd-example-modal-xl" id="JabatanModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Pinjaman</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+<div class="row mobile">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="mb-0 align-self-center">Data Pengajuan Schedule</h5>
             </div>
-            <div class="modal-body">
-                <form action="{{route('employee-loan.store')}}" method="POST">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Employee</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="employee_id">
-                                @foreach($karyawan as $data)
-                                    <option value="{{$data->nik}}">{{$data->nama}}</option>
-                                @endforeach
-                            </select>    
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Jumlah Pinjaman</label>
-                            <input type="number" name="amount" class="form-control" required>   
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Tenor Pinjaman</label>
-                            <input type="number" name="installments" class="form-control" required>   
-                        </div>
-                    </div>
-                    <div class="col-md-12 mt-2">
-                        <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
-                    </div>
-                </form>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="" class="table">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Periode</th>
+                                <th>Status Pengajuan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($datapengajuan as $data)
+                            <tr>
+                                @php 
+                                    // Ambil nama produk berdasarkan product_id
+                                    $project = \App\ModelCG\Project::where('id',$data->project)->first();
+                                @endphp
+                                <td><a href="{{ route('pengajuanschedule.details', ['project' => $data->project, 'periode' => $data->periode]) }}">{{ $project->name }}</a></td>
+                                <td>{{ $data->periode }}</td>
+                                <td>{{ $data->status }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <!-- End -->
 @endsection
 

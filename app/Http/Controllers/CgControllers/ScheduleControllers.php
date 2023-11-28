@@ -181,9 +181,9 @@ class ScheduleControllers extends Controller
     public function showDetailsEmployee($project, $periode, $employee)
     {
         $schedulesWithDetails = Schedule::where('project', $project)
-        ->where('periode', $periode)
-        ->where('employee', $employee)
-        ->get();
+                                ->where('periode', $periode)
+                                ->where('employee', $employee)
+                                ->get();
 
         $employeeName = Employee::where('nik', $employee)->value('nama');
         $shift = Shift::all();

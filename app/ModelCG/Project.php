@@ -21,4 +21,9 @@ class Project extends Model
     {
         return $this->hasMany(ScheduleBackup::class, 'project_id');
     }
+
+    public function schedulesPengajuan()
+    {
+        return $this->hasMany(PengajuanSchedule::class, 'project_id');
+    }
 }

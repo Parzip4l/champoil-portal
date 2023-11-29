@@ -368,8 +368,11 @@
             <div class="modal-body">
                 <!-- Add your announcement content here -->
                 <p>1. Aplikasi TRUEST HRIS Untuk saat ini sedang dilakukan maintenance. Mohon Maaf Untuk Ketidaknyamanannya.</p><br>
-                <p>2. Dikarenakan Aplikasi Sedang Dilakukan Meiantenance, Absensi bisa digunakan di browser HP Masing Masing.</p><br>
+                <p>2. Dikarenakan Aplikasi Sedang Dilakukan Meiantenance, Absensi bisa digunakan di browser HP Masing Masing. Klik <a href="https://hris.truest.co.id">Disini</a></p><br>
                 <p>3. Saat untuk update data pribadi sudah bisa dilukan masing masing termasuk foto profile.</p>
+                @if($employee === 'Kas' )
+                <p>4. Untuk PIC Project Sudah Bisa Membuat Pengajuan Schedule Yang Akan Disetujui Oleh Area Manager.</p>
+                @endif
                 <button type="button" class="btn btn-primary mt-2" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

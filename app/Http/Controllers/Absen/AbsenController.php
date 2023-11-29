@@ -151,16 +151,7 @@ class AbsenController extends Controller
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
         } else {
-            $absensi = new absen();
-            $absensi->user_id = $nik;
-            $absensi->nik = $nik;
-            $absensi->tanggal = now()->toDateString();
-            $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $latitudeProject;
-            $absensi->longtitude = $longtitudeProject;
-            $absensi->status = $status;
-            $absensi->save();
-            return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
+            return redirect()->back()->with('error', 'Anda Diluar Radius');
         }
     }
 

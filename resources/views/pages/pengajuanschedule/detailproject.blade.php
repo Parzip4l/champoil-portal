@@ -10,6 +10,8 @@
     $projectname = \App\ModelCG\Project::find($project)->name;
     $picProject = \App\Employee::where('nik', $namapengaju)->first();
     $datastatus = \App\PengajuanSchedule\PengajuanSchedule::where('project',$project)->where('periode',$periode)->pluck('status')->first();
+    $dataApprove = \App\PengajuanSchedule\PengajuanSchedule::where('project',$project)->where('periode',$periode)->pluck('disetujui_oleh')->first();
+    $namaaprroval = \App\Employee::where('nik', $dataApprove)->first();
 @endphp
 <div class="row mb-3 desktop">
     <div class="topbar-wrap d-flex justify-content-between">
@@ -31,8 +33,8 @@
         </div>
     </div>
 </div>
-<div class="row mb-3 desktop">
-    <div class="col-md-6 mb-3">
+<div class="row mb-3">
+    <div class="col-md-6 grid-margin stretch-card mb-3 desktop">
         <div class="card custom-card2">
             <div class="card-header">
                 <h5>Details Pengajuan</h5>
@@ -55,7 +57,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 grid-margin stretch-card mb-3">
+    <div class="col-md-6 grid-margin stretch-card mb-3 desktop">
         <div class="card custom-card2">
             <div class="card-header">
                 <h5>Action</h5>
@@ -80,7 +82,7 @@
                     @else 
                     <div class="col-md-12">
                         <div class="detail-project-data me-2">
-                            <button class="btn btn-success w-100" disabled>Sudah Disetujui</button>
+                            <button class="btn btn-success w-100" disabled>Sudah Disetujui Oleh {{$namaaprroval->nama}}  </button>
                         </div>
                     </div>
                     @endif
@@ -96,7 +98,7 @@
                     @elseif($datastatus === 'Rejected' )
                     <div class="col-md-6 d-none">
                         <div class="detail-project-data">
-                            <button class="btn btn-danger w-100" disabled>Pengajuan Sudah Ditolak</button>
+                            <button class="btn btn-danger w-100" disabled>Pengajuan Sudah Ditolak Oleh {{$namaaprroval->nama}}</button>
                         </div>
                     </div>
                     @endif
@@ -146,7 +148,7 @@
                     @else 
                     <div class="col-md-12">
                         <div class="detail-project-data me-2">
-                            <button class="btn btn-success w-100" disabled>Sudah Disetujui</button>
+                            <button class="btn btn-success w-100" disabled>Sudah Disetujui Oleh {{$namaaprroval->nama}}</button>
                         </div>
                     </div>
                     @endif
@@ -162,7 +164,7 @@
                     @elseif($datastatus === 'Rejected' )
                     <div class="col-md-6 d-none">
                         <div class="detail-project-data">
-                            <button class="btn btn-danger w-100" disabled>Pengajuan Sudah Ditolak</button>
+                            <button class="btn btn-danger w-100" disabled>Pengajuan Ditolak Oleh {{$namaaprroval->nama}}</button>
                         </div>
                     </div>
                     @endif

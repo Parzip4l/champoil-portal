@@ -44,14 +44,16 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id }}">
-                                                <i data-feather="check" class="icon-sm me-2"></i>
-                                                <span class="">Setujui</span>
-                                            </a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id }}">
-                                                <i data-feather="x" class="icon-sm me-2"></i>
-                                                <span class="">Tolak</span>
-                                            </a>
+                                            
+                                            @if($data->status != 'Approved' )
+                                            <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
+                                                @csrf @method('DELETE') 
+                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                    <i data-feather="trash" class="icon-sm me-2"></i>
+                                                    <span class="">Batalkan Pengajuan</span>
+                                                </a>
+                                            </form>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -118,7 +120,7 @@
     function showDeleteDataDialog(id) {
         Swal.fire({
             title: 'Hapus Data',
-            text: 'Anda Yakin Akan Menghapus Data Ini?',
+            text: 'Anda Yakin Akan Membatalkan Pengajuan Ini?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Delete',
@@ -126,7 +128,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "#".replace(':id', id);
+                const deleteUrl = "{{ route('pengajuan-schedule.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {
@@ -136,7 +138,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Contact Successfully Deleted',
+                            title: 'Pengajuan Berhasil Dibatalkan',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert

@@ -29,10 +29,11 @@ class PengajuanController extends Controller
             $datapengajuan = PengajuanSchedule::groupBy('project')->get();
         } else {
             $datapengajuan = PengajuanSchedule::with('project')
-                    ->select('project', 'periode', 'status', DB::raw('count(*) as schedule_count'))
-                    ->groupBy('project', 'periode','status')
-                    ->get();
+                ->select('id', 'project', 'periode', 'status', DB::raw('count(*) as schedule_count'))
+                ->groupBy('id', 'project', 'periode', 'status')
+                ->get();
         }
+
 
         return view('pages.pengajuanschedule.index', compact('datapengajuan'));
     }
@@ -336,6 +337,13 @@ class PengajuanController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $pengajuan = PengajuanSchedule::find($id);
+            $pengajuan->delete();
+
+            return redirect()->back()->with('success', 'Pengajuan Berhasil Dibatalkan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 }

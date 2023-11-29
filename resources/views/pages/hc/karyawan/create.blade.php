@@ -8,7 +8,10 @@
   <link href="{{ asset('assets/plugins/pickr/themes/classic.min.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 @endpush
-
+@php 
+    $dataLogin = json_decode(Auth::user()->permission);
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+@endphp 
 @section('content')
 <nav class="page-breadcrumb">
   <ol class="breadcrumb">
@@ -226,6 +229,20 @@
                                     <label class="form-check-label">HR</label>
                                 </div>
                             </div>
+                            @if($employee->unit_bisnis === 'Kas')
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access">
+                                    <label class="form-check-label">Area Manager</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access">
+                                    <label class="form-check-label">Project PIC</label>
+                                </div>
+                            </div>
+                            @endif
                             <div class="col-md-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">

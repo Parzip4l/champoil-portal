@@ -422,6 +422,18 @@
                                     <label class="form-check-label">Super Admin</label>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access" {{ in_array('am_access', $employee->permissions) ? 'checked' : '' }}>
+                                    <label class="form-check-label">Area Manager</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access" {{ in_array('pic_access', $employee->permissions) ? 'checked' : '' }}>
+                                    <label class="form-check-label">PIC Project</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @endif

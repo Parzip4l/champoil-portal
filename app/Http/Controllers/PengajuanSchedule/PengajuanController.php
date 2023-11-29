@@ -128,6 +128,11 @@ class PengajuanController extends Controller
         for ($i = 0; $i < count($tanggal); $i++) {
             $scheduleTanggal[] = [
                 'tanggal' => $tanggal[$i],
+            ];
+        }
+
+        for ($i = 0; $i < count($tanggal); $i++) {
+            $scheduleShift[] = [
                 'shift' => $shifts[$i],
             ];
         }
@@ -144,7 +149,7 @@ class PengajuanController extends Controller
             'schedule_code' => $randomCode,
             'project' => $project,
             'tanggal' => $jsonScheduleData,
-            'shift' => $jsonScheduleData,
+            'shift' => $jsonshiftData,
             'namapengaju' => $employeeCode,
             'status' => 'Ditinjau',
         ]);
@@ -255,15 +260,60 @@ class PengajuanController extends Controller
     {
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
-
-        $requestSchedule = PengajuanSchedule::where('project', $project)->where('periode', $periode)->firstOrFail();
-        if ($requestSchedule->status !== 'Approved') {
-            $requestSchedule->status = 'Approved';
-            $requestSchedule->disetujui_oleh = $EmployeeCode;
-            $requestSchedule->save();
+        
+        try {
+            $requestSchedule = PengajuanSchedule::where('project', $project)->where('periode', $periode)->firstOrFail();
+            
+            if ($requestSchedule->status != 'Approved') {
+                $requestSchedule->status = 'Approved';
+                $requestSchedule->disetujui_oleh = $EmployeeCode;
+                $requestSchedule->save();
+        
+                $tanggalArray = json_decode($requestSchedule->tanggal, true);
+                $shiftArray = json_decode($requestSchedule->shift, true);
+        
+                if (!is_array($tanggalArray) || !is_array($shiftArray)) {
+                    throw new \Exception('Invalid JSON format in database for tanggal or shift.');
+                }
+        
+                for ($i = 0; $i < count($tanggalArray); $i++) {
+                    $schedule = new Schedule();
+                    $schedule->schedule_code = $requestSchedule->schedule_code;
+                    $schedule->employee = $requestSchedule->employee;
+                    $schedule->project = $requestSchedule->project;
+                    $schedule->tanggal = $tanggalArray[$i]['tanggal'];
+                    $schedule->shift = $shiftArray[$i]['shift'];
+                    $schedule->periode = $requestSchedule->periode;
+                    $schedule->save();
+                }
+            }
+        
+            return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error updating data: ' . $e->getMessage());
         }
+        
+    }
 
-        return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
+    public function RejectSchedule($project, $periode)
+    {
+        $userId = Auth::id();
+        $EmployeeCode = Auth::user()->employee_code;
+        
+        try {
+            $requestSchedule = PengajuanSchedule::where('project', $project)->where('periode', $periode)->firstOrFail();
+            
+            if ($requestSchedule->status != 'Approved') {
+                $requestSchedule->status = 'Rejected';
+                $requestSchedule->disetujui_oleh = $EmployeeCode;
+                $requestSchedule->save();
+            }
+        
+            return redirect()->back()->with('success', 'Data Pengajuan Berhasil Diupdate.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error updating data: ' . $e->getMessage());
+        }
+        
     }
 
     /**

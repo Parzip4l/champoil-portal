@@ -77,8 +77,11 @@
                     @if ($datastatus === 'Ditinjau' )
                     <div class="col-md-6">
                         <div class="detail-project-data">
-                            <a href="" class="btn btn-danger w-100">Tolak Pengajuan</a>
+                            <a href="#" class="btn btn-danger w-100" onclick="event.preventDefault(); document.getElementById('tolak-usulan-form-{{ $project }}').submit();">Tolak Pengajuan</a>
                         </div>
+                        <form id="tolak-usulan-form-{{ $project }}" action="{{ route('reject.requestschedule', ['project' => $project, 'periode' => $periode]) }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </div>
                     @elseif($datastatus === 'Rejected' )
                     <div class="col-md-6 d-none">

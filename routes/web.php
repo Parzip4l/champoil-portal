@@ -214,6 +214,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/schedule/details/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'showDetails'])->name('pengajuanschedule.details');
             // Setujui Pengajuan Schedule
             Route::post('/schedule-request/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'updateStatusSetuju'])->name('approve.requestschedule');
+            Route::post('/reject-schedule-request/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'RejectSchedule'])->name('reject.requestschedule');
     });
 });
 

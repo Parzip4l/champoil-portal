@@ -218,6 +218,39 @@
 </div>
 <!-- End Menu -->
 
+@if(in_array('am_access', $dataLogin) || $employee === 'Kas' )
+<!-- Pengajuan Schedule -->
+<div class="row mb-3">
+    <h5 class="mb-2">Pengajuan Schedule</h5>
+    <div class="col-md-12">
+        <div class="card custom-card2">
+            <div class="card-body">
+                @foreach($pengajuanSchedule as $pengajuanData)
+                <div class="wrapper-pengajuan d-flex justify-content-between mb-4">
+                    @php 
+                        $pic = \App\Employee::where('nik', $pengajuanData->namapengaju)->first();
+                        $project = \App\ModelCG\Project::where('id', $pengajuanData->project)->first();
+                    @endphp
+                    <div class="nama-karyawan align-self-center">
+                        <a href="{{ route('pengajuanschedule.details', ['project' => $pengajuanData->project, 'periode' => $pengajuanData->periode]) }}" class="color-custom mb-2">
+                            <h5 class="mb-2">{{$project->name}}</h5>
+                        </a>
+                        <span class="text-muted">{{$pengajuanData->periode}}</span>
+                    </div>
+                    <div class="nama-pic">
+                        <h5 class="color-custom mb-2 text-right">PIC Name</h5>
+                        <span class="text-muted">{{$pic->nama}}</span>
+                    </div>
+                </div>
+                <hr>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Pengajuan -->
+@endif
+
 <!-- Announcement -->
 <div class="row mb-3">
     <h5 class="mb-2">Announcement</h5>

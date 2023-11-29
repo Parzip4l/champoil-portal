@@ -11,7 +11,7 @@
     $picProject = \App\Employee::where('nik', $namapengaju)->first();
     $datastatus = \App\PengajuanSchedule\PengajuanSchedule::where('project',$project)->where('periode',$periode)->pluck('status')->first();
 @endphp
-<div class="row mb-3">
+<div class="row mb-3 desktop">
     <div class="topbar-wrap d-flex justify-content-between">
         <div class="arrow-back">
             <a href="{{url('kas/pengajuan-schedule')}}" class="d-flex color-custom">
@@ -21,7 +21,17 @@
         </div>
     </div>
 </div>
-<div class="row mb-3">
+<div class="row mb-3 mobile">
+    <div class="topbar-wrap d-flex justify-content-between">
+        <div class="arrow-back">
+            <a href="{{url('dashboard')}}" class="d-flex color-custom">
+                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
+                <h5 class="align-self-center">Kembali</h5>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row mb-3 desktop">
     <div class="col-md-6 mb-3">
         <div class="card custom-card2">
             <div class="card-header">
@@ -95,6 +105,72 @@
         </div>
     </div>
 </div>
+<!-- Mobile Version -->
+<div class="row mobile">
+    <div class="col-md-12 mb-3">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Details Pengajuan</h5>
+            </div>
+            <div class="card-body">
+                <div class="detail-wrap">
+                    <div class="detail-project-data mb-2">
+                        <h6 class="mb-1">Project Name</h6>
+                        <p class="text-muted">{{$projectname}}</p>
+                    </div>
+                    <div class="detail-project-data mb-2">
+                        <h6 class="mb-1">Schedule Periode</h6>
+                        <p class="text-muted">{{$periode}}</p>
+                    </div>
+                    <div class="detail-project-data mb-2">
+                        <h6 class="mb-1">PIC Project</h6>
+                        <p class="text-muted">{{$picProject->nama}}</p>
+                    </div>
+                </div>
+                <div class="detail-wrap grid-margin stretch-card mb-0">
+                    @if ($datastatus === 'Ditinjau')
+                    <div class="col-md-6">
+                        <div class="detail-project-data me-2">
+                            <a href="{{ route('approve.requestschedule', ['project' => $project, 'periode' => $periode]) }}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $project }}').submit();" class="btn btn-success w-100 me-2">Setujui Pengajuan</a>
+                        </div>
+                        <form id="setujui-usulan-form-{{ $project }}" action="{{ route('approve.requestschedule', ['project' => $project, 'periode' => $periode]) }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </div>
+                    @elseif($datastatus === 'Rejected' )
+                    <div class="col-md-12">
+                        <div class="detail-project-data">
+                            <button class="btn btn-danger w-100" disabled>Pengajuan Sudah Ditolak</button>
+                        </div>
+                    </div>
+                    @else 
+                    <div class="col-md-12">
+                        <div class="detail-project-data me-2">
+                            <button class="btn btn-success w-100" disabled>Sudah Disetujui</button>
+                        </div>
+                    </div>
+                    @endif
+                    @if ($datastatus === 'Ditinjau' )
+                    <div class="col-md-6">
+                        <div class="detail-project-data">
+                            <a href="#" class="btn btn-danger w-100" onclick="event.preventDefault(); document.getElementById('tolak-usulan-form-{{ $project }}').submit();">Tolak Pengajuan</a>
+                        </div>
+                        <form id="tolak-usulan-form-{{ $project }}" action="{{ route('reject.requestschedule', ['project' => $project, 'periode' => $periode]) }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </div>
+                    @elseif($datastatus === 'Rejected' )
+                    <div class="col-md-6 d-none">
+                        <div class="detail-project-data">
+                            <button class="btn btn-danger w-100" disabled>Pengajuan Sudah Ditolak</button>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
@@ -119,7 +195,7 @@
                         </h2>
                         <div id="Data{{$schedule->id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
-                                <div class="card custom-card2 mb-2">
+                                <div class="card custom-card2 mb-2 desktop">
                                     <div class="card-body">
                                         <div class="detail-wrap d-flex justify-content-between">
                                             <div class="detail-project-data">
@@ -141,6 +217,32 @@
                                             <div class="detail-project-data">
                                                 <h6 class="mb-1">Total Shift Malam</h6>
                                                 <p class="text-muted">{{$malam}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card custom-card2 mb-2 mobile">
+                                    <div class="card-body">
+                                        <div class="detail-wrap">
+                                            <div class="detail-project-data d-flex justify-content-between mb-2 ">
+                                                <h6 class="mb-1">Total Schedule</h6>
+                                                <p class="text-muted">{{$totalshift}} Hari</p>
+                                            </div>
+                                            <div class="detail-project-data d-flex justify-content-between mb-2">
+                                                <h6 class="mb-1">Total Off</h6>
+                                                <p class="text-muted">{{$libur}} Hari</p>
+                                            </div>
+                                            <div class="detail-project-data d-flex justify-content-between mb-2">
+                                                <h6 class="mb-1">Total Shift Pagi</h6>
+                                                <p class="text-muted">{{$pagi}} Hari</p>
+                                            </div>
+                                            <div class="detail-project-data d-flex justify-content-between mb-2">
+                                                <h6 class="mb-1">Total Shift Middle</h6>
+                                                <p class="text-muted">{{$middle}} Hari</p>
+                                            </div>
+                                            <div class="detail-project-data d-flex justify-content-between mb-2">
+                                                <h6 class="mb-1">Total Shift Malam</h6>
+                                                <p class="text-muted">{{$malam}} Hari</p>
                                             </div>
                                         </div>
                                     </div>

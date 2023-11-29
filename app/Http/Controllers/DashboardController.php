@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\PayslipEmail;
 use Illuminate\Support\Facades\Mail;
+use App\PengajuanSchedule\PengajuanSchedule;
 use PDF;
 
 class DashboardController extends Controller
@@ -32,6 +33,8 @@ class DashboardController extends Controller
             ->where('aprrove_status', 'Pending')
             ->select('requests_attendence.*', 'karyawan.*')
             ->get();
+        
+        $pengajuanSchedule = PengajuanSchedule::where('status', 'Ditinjau')->get();
 
 
         // Absen Data
@@ -83,7 +86,7 @@ class DashboardController extends Controller
         $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
 
-        return view('dashboard', compact('karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest'
+        return view('dashboard', compact('karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule'
         ));
     }
 

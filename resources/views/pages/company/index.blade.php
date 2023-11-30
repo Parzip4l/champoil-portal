@@ -1,0 +1,160 @@
+@extends('layout.master')
+
+@push('plugin-styles')
+  <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
+@endpush
+
+@section('content')
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6 align-self-center">
+                        <h6 class="card-title mb-0">Company List</h6>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <a href="#" class="btn btn-primary" data-bs-target="#CompanyModal" data-bs-toggle="modal">Add Company</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                            <tr>
+                                <th>Company Code</th>
+                                <th>Company Name</th>
+                                <th>Company Address</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($companyData as $data)
+                            <tr>
+                                <td>{{$data->company_code}}</td>
+                                <td>{{$data->company_name}}</td>
+                                <td>{{$data->company_address}}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('company.show', $data->id)}}">
+                                                <i data-feather="eye" class="icon-sm me-2"></i>
+                                                <span class="">Details</span>
+                                            </a>
+                                            <form action="{{ route('company.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
+                                                @csrf @method('DELETE') 
+                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                    <i data-feather="trash" class="icon-sm me-2"></i>
+                                                    <span class="">Delete</span>
+                                                </a>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Company -->
+<!-- Modal Tambah User -->
+<div class="modal fade" id="CompanyModal" tabindex="-1" aria-labelledby="CompanyModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CompanyModal">Tambah Data Company</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('company.store')}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Company Name</label>
+                            <input type="text" name="company_name" class="form-control" placholder="e.g Indolumas Grease, PT" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Company Address</label>
+                            <textarea name="company_address" id="" cols="30" rows="10" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Use Schedule</label>
+                            <select name="use_scedule" class="form-control" id="">
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Schedule Type</label>
+                            <select name="schedule_type" class="form-control" id="">
+                                <option value="No">No</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Latitude</label>
+                            <input type="text" name="latitude" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Longitude</label>
+                            <input type="text" name="longitude" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Radius(KM)</label>
+                            <input type="number" name="radius" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Company Logo</label>
+                            <input type="file" name="logo" class="form-control" required>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Add Company</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@push('plugin-scripts')
+    <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+@endpush
+
+@push('custom-scripts')
+  <script src="{{ asset('assets/js/data-table.js') }}"></script>
+  <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+  <script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ session('success') }}',
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session('error') }}',
+        });
+    @endif
+</script>
+@endpush

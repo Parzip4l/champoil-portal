@@ -73,6 +73,7 @@ class ApiLoginController extends Controller
             $token = $request->bearerToken();
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
             $today = now()->toDateString();
 
             $schedulebackup = Schedule::where('employee', $nik)
@@ -83,10 +84,13 @@ class ApiLoginController extends Controller
                 $dataProject = Project::find($schedulebackup->project);
                 $kantorLatitude = $dataProject->latitude;
                 $kantorLongitude = $dataProject->longtitude;
+                $allowedRadius = 5;
             } else {
-                // Jika tidak ada jadwal, gunakan nilai default
-                $kantorLatitude = -6.13661;
-                $kantorLongitude = 106.76038;
+                $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+           
+                $kantorLatitude = $dataCompany->latitude;
+                $kantorLongtitude = $dataCompany->longitude;
+                $allowedRadius = $dataCompany->radius;
             }
 
             $lat = $request->input('latitude');
@@ -94,7 +98,6 @@ class ApiLoginController extends Controller
             $status = $request->input('status');
 
             $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
-            $allowedRadius = 5;
 
             if ($distance <= $allowedRadius) {
                 $filename = null;

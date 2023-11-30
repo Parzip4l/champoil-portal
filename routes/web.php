@@ -161,6 +161,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::post('/action/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');
     Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsen'])->name('attendance.createData');
 
+    // Company Settings
+    Route::resource('company', App\Http\Controllers\Company\CompanyController::class);
 
     // Payroll
     // Component Master

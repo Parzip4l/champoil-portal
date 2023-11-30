@@ -181,6 +181,7 @@
                 <div class="submenu">
                     <ul class="submenu-item">
                         <li class="nav-item"><a href="{{ url('slack-account') }}" class="nav-link {{ active_class(['slack-account']) }}">Automation</a></li>
+                        <li class="nav-item"><a href="{{ url('company') }}" class="nav-link {{ active_class(['company']) }}">Company Settings</a></li>
                         <li class="nav-item"><a href="{{ url('users') }}" class="nav-link {{ active_class(['users']) }}">User Settings</a></li>
                         <li class="nav-item"><a href="{{ route('jabatan.index') }}" class="nav-link {{ active_class(['kas/jabatan']) }}">Jabatan</a></li>
                         <li class="nav-item"><a href="{{ route('project.index') }}" class="nav-link {{ active_class(['kas/project']) }}">Project</a></li>

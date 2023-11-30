@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Exports\AttendenceExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Company\CompanyModel;
 
 class AbsenController extends Controller
 {
@@ -98,6 +99,7 @@ class AbsenController extends Controller
     {   
         $user = Auth::user();
         $nik = Auth::user()->employee_code;
+        $unit_bisnis = Employee::where('nik',$nik)->first();
 
         $today = Carbon::now()->format('Y-m-d');
 
@@ -121,23 +123,21 @@ class AbsenController extends Controller
         
             $kantorLatitude = $latitudeProject;
             $kantorLongtitude = $longtitudeProject;
+            $allowedRadius = 5;
         } else {
-            $latitudeProject = -6.1366045;
-            $longtitudeProject = 106.7601449;
-            $kantorLatitude = -6.1366045; 
-            $kantorLongtitude = 106.7601449; 
+            $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+           
+            $kantorLatitude = $dataCompany->latitude;
+            $kantorLongtitude = $dataCompany->longitude;
+            $allowedRadius = $dataCompany->radius;
         }
-
-        $time_in = Carbon::now()->format('H:i');
-        $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
-
+        // Fet Data From Device User
         $lat = $request->input('latitude');
         $long = $request->input('longitude');
         $status = $request->input('status');
         
+        // Hitung Radius
         $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
-        $allowedRadius = 5;
 
         if ($distance <= $allowedRadius) {
             // Simpan Data

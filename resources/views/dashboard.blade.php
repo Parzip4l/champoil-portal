@@ -88,11 +88,20 @@
                                 <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
                                     @csrf
                                         <!-- Add an input for taking a photo -->
-                                        <label for="photo">Take Photo:</label>
-                                        <input type="file" name="photo" class="form-control" accept="image/*" capture="camera" id="photoInput">
-
+                                        <div class="card custom-card2 mb-3">
+                                            <div class="card-body">
+                                                <div class="photo-take d-flex">
+                                                    <label for="photo" class="custom-file-upload">
+                                                        <i class="icon-lg" data-feather="camera"></i>
+                                                        <input type="file" name="photo" class="form-control custom-file-upload" accept="image/*" capture="camera" id="photoInput">
+                                                    </label>
+                                                    <p class="text-muted">Take Selfie</p>
+                                                </div>
+                                                <div id="photoPreview"></div>
+                                            </div>
+                                        </div>
                                         <!-- Add a preview container for the captured photo -->
-                                        <div id="photoPreview"></div>
+                                        
                                         <input type="hidden" name="latitude" id="latitude">
                                         <input type="hidden" name="longitude" id="longitude">
                                         <input type="hidden" name="status" value="H">
@@ -630,34 +639,77 @@ $(function() {
     }
 });
 </script>
-
+<style>
+    label {
+  position: relative;
+  margin: 0;
+  margin-left : 10px;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  font-size: 0;
+}
+label:hover i {
+  color: #27ae60;
+}
+label input[type='file'] {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+div#photoPreview img {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 100%;
+}
+</style>
 <!-- Absen -->
 <script>
     $(document).ready(function () {
-        // Mengambil data lokasi pengguna saat tombol absen ditekan
+        // Mengambil data lokasi dan izin kamera saat tombol absen ditekan
         $('#btn-absen').on('click', function (e) {
             e.preventDefault(); // Prevent the default behavior of the link
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    // Mengisi nilai hidden input dengan data lokasi pengguna
-                    $('#latitude').val(position.coords.latitude);
-                    $('#longitude').val(position.coords.longitude);
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Meminta izin kamera
+                navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    // Izin diberikan, akses kamera berhasil
+                    // Hentikan akses kamera setelah mendapatkan izin
+                    stream.getTracks().forEach(track => track.stop());
 
-                    // Mengirim form absen
-                    $('#form-absen').submit();
-                }, function (error) {
-                    if (error.code === error.PERMISSION_DENIED) {
-                        // Pengguna menolak izin lokasi
-                        alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            // Mengisi nilai hidden input dengan data lokasi pengguna
+                            $('#latitude').val(position.coords.latitude);
+                            $('#longitude').val(position.coords.longitude);
+
+                            // Mengirim form absen
+                            $('#form-absen').submit();
+                        }, function (error) {
+                            if (error.code === error.PERMISSION_DENIED) {
+                                // Pengguna menolak izin lokasi
+                                alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+                            }
+                        });
+                    } else {
+                        alert('Geolocation tidak didukung oleh browser Anda');
                     }
+                })
+                .catch(function (error) {
+                    // Izin kamera ditolak atau perangkat tidak memiliki kamera
+                    alert('Anda perlu memberikan izin kamera untuk menggunakan fitur ini');
                 });
             } else {
-                alert('Geolocation tidak didukung oleh browser Anda');
+                alert('MediaDevices.getUserMedia tidak didukung oleh browser Anda');
             }
         });
     });
 </script>
+
 <script>
     $(document).ready(function () {
         // Mengambil data lokasi pengguna saat tombol absen ditekan
@@ -705,7 +757,6 @@ $(function() {
     });
 </script>
 <script>
-    <script>
     document.getElementById('photoInput').addEventListener('change', function (event) {
         var previewContainer = document.getElementById('photoPreview');
         previewContainer.innerHTML = '';
@@ -720,6 +771,5 @@ $(function() {
             previewContainer.appendChild(image);
         }
     });
-</script>
 </script>
 @endpush

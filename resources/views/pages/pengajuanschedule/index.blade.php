@@ -44,7 +44,6 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            
                                             @if($data->status != 'Approved' )
                                             <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 

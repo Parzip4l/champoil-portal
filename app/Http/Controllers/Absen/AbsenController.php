@@ -140,6 +140,15 @@ class AbsenController extends Controller
         $allowedRadius = 5;
 
         if ($distance <= $allowedRadius) {
+            #request Photo
+            if ($request->hasFile('photo')) {
+                $photo = $request->file('photo');
+                $photoPath = $photo->store('photos', 'public'); #Penyimpanan
+            } else {
+                $photoPath = null;
+            }
+
+            // Simpan Data
             $absensi = new absen();
             $absensi->user_id = $nik;
             $absensi->nik = $nik;
@@ -148,6 +157,7 @@ class AbsenController extends Controller
             $absensi->latitude = $latitudeProject;
             $absensi->longtitude = $longtitudeProject;
             $absensi->status = $status;
+            $absensi->photo_path = $photoPath;
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
         } else {

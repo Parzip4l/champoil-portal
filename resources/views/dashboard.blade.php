@@ -87,6 +87,12 @@
                                 @else
                                 <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
                                     @csrf
+                                        <!-- Add an input for taking a photo -->
+                                        <label for="photo">Take Photo:</label>
+                                        <input type="file" name="photo" class="form-control" accept="image/*" capture="camera" id="photoInput">
+
+                                        <!-- Add a preview container for the captured photo -->
+                                        <div id="photoPreview"></div>
                                         <input type="hidden" name="latitude" id="latitude">
                                         <input type="hidden" name="longitude" id="longitude">
                                         <input type="hidden" name="status" value="H">
@@ -697,5 +703,23 @@ $(function() {
             }
         });
     });
+</script>
+<script>
+    <script>
+    document.getElementById('photoInput').addEventListener('change', function (event) {
+        var previewContainer = document.getElementById('photoPreview');
+        previewContainer.innerHTML = '';
+
+        var fileInput = event.target;
+        var files = fileInput.files;
+
+        if (files.length > 0) {
+            var image = document.createElement('img');
+            image.src = URL.createObjectURL(files[0]);
+            image.style.maxWidth = '100%';
+            previewContainer.appendChild(image);
+        }
+    });
+</script>
 </script>
 @endpush

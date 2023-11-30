@@ -68,62 +68,42 @@ class ApiLoginController extends Controller
 
     // Absen Masuk
     public function clockin(Request $request)
-    {   
+    {
         $token = $request->bearerToken();
-
-            // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
         $nik = $user->employee_code;
-
-        $today = Carbon::now()->format('Y-m-d');
+        $today = Carbon::now()->toDateString();
 
         $schedulebackup = Schedule::where('employee', $nik)
             ->whereDate('tanggal', $today)
-            ->get();
+            ->first();
 
-        $project_id = null;
-        foreach ($schedulebackup as $databackup) {
-            $project_id = $databackup->project;
-            $tanggal_backup = $databackup->tanggal;
-            $shift = $databackup->shift;
-            $periode = $databackup->periode;
-        }
-
-        if ($project_id !== null) {
-            $dataProject = Project::where('id', $project_id)->first();
-            $latitudeProject = $dataProject->latitude;
-            $longtitudeProject = $dataProject->longtitude;
-
-            $kantorLatitude = $latitudeProject;
-            $kantorLongtitude = $longtitudeProject;
+        if ($schedulebackup) {
+            $dataProject = Project::find($schedulebackup->project);
+            $kantorLatitude = $dataProject->latitude;
+            $kantorLongitude = $dataProject->longtitude;
         } else {
-            $latitudeProject = -6.1366045;
-            $longtitudeProject = 106.7601449;
-            $kantorLatitude = -6.1366045; 
-            $kantorLongtitude = 106.7601449; 
+            // Jika tidak ada jadwal, gunakan nilai default
+            $kantorLatitude = -6.13661;
+            $kantorLongitude = 106.76038;
         }
-
-        $time_in = Carbon::now()->format('H:i');
-        $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
 
         $lat = $request->input('latitude');
         $long = $request->input('longitude');
         $status = $request->input('status');
 
-        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
+        $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
         $allowedRadius = 5;
-
         if ($distance <= $allowedRadius) {
-            $absensi = new absen();
-            $absensi->user_id = $nik;
-            $absensi->nik = $nik;
-            $absensi->tanggal = now()->toDateString();
-            $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $lat;
-            $absensi->longtitude = $long;
-            $absensi->status = $status;
-            $absensi->save();
+            Absen::create([
+                'user_id' => $nik,
+                'nik' => $nik,
+                'tanggal' => now()->toDateString(),
+                'clock_in' => now()->format('H:i'),
+                'latitude' => $lat,
+                'longtitude' => $long,
+                'status' => $status,
+            ]);
 
             return response()->json(['message' => 'Clockin success, Happy Working Day!']);
         } else {

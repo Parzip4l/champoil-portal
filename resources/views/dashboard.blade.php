@@ -669,47 +669,30 @@ div#photoPreview img {
 <!-- Absen -->
 <script>
     $(document).ready(function () {
-        // Mengambil data lokasi dan izin kamera saat tombol absen ditekan
+        // Mengambil data lokasi pengguna saat tombol absen ditekan
         $('#btn-absen').on('click', function (e) {
             e.preventDefault(); // Prevent the default behavior of the link
 
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                // Meminta izin kamera
-                navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    // Izin diberikan, akses kamera berhasil
-                    // Hentikan akses kamera setelah mendapatkan izin
-                    stream.getTracks().forEach(track => track.stop());
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    // Mengisi nilai hidden input dengan data lokasi pengguna
+                    $('#latitude').val(position.coords.latitude);
+                    $('#longitude').val(position.coords.longitude);
 
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(function (position) {
-                            // Mengisi nilai hidden input dengan data lokasi pengguna
-                            $('#latitude').val(position.coords.latitude);
-                            $('#longitude').val(position.coords.longitude);
-
-                            // Mengirim form absen
-                            $('#form-absen').submit();
-                        }, function (error) {
-                            if (error.code === error.PERMISSION_DENIED) {
-                                // Pengguna menolak izin lokasi
-                                alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
-                            }
-                        });
-                    } else {
-                        alert('Geolocation tidak didukung oleh browser Anda');
+                    // Mengirim form absen
+                    $('#form-absen').submit();
+                }, function (error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        // Pengguna menolak izin lokasi
+                        alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
                     }
-                })
-                .catch(function (error) {
-                    // Izin kamera ditolak atau perangkat tidak memiliki kamera
-                    alert('Anda perlu memberikan izin kamera untuk menggunakan fitur ini');
                 });
             } else {
-                alert('MediaDevices.getUserMedia tidak didukung oleh browser Anda');
+                alert('Geolocation tidak didukung oleh browser Anda');
             }
         });
     });
 </script>
-
 <script>
     $(document).ready(function () {
         // Mengambil data lokasi pengguna saat tombol absen ditekan

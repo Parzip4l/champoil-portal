@@ -151,7 +151,9 @@ class ApiLoginController extends Controller
     public function clockout(Request $request)
     {
         try {
-            $nik = Auth::user()->employee_code;
+            $token = $request->bearerToken();
+            $user = Auth::guard('api')->user();
+            $nik = $user->employee_code;
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
             $currentDate = now()->format('Y-m-d');
@@ -180,7 +182,7 @@ class ApiLoginController extends Controller
         } catch (\Exception $e) {
             // Log the exception for debugging purposes
             // You may want to customize this based on your logging setup
-            \Log::error($e);
+            Log::error($e);
 
             return response()->json([
                 'status' => 'error',

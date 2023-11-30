@@ -152,7 +152,7 @@ class AbsenController extends Controller
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');
                 $filename = time() . '.' . $image->getClientOriginalExtension();
-                $destinationPath = public_path('/images');
+                $destinationPath = public_path('/images/absen');
                 $image->move($destinationPath, $filename);
                 $absensi->photo = $filename;
             }

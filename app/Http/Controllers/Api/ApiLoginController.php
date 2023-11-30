@@ -14,7 +14,7 @@ use App\Http\Controllers\Controller;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
-use App\absen;
+use App\Absen;
 use App\Payrol;
 use App\Payrollns;
 use App\Employee;

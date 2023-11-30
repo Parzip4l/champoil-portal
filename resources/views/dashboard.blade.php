@@ -85,7 +85,7 @@
                                     <a href="#" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out</a>
                                 </form>
                                 @else
-                                <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen">
+                                <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen" enctype="multipart/form-data">
                                     @csrf
                                         <!-- Add an input for taking a photo -->
                                         <div class="card custom-card2 mb-3">

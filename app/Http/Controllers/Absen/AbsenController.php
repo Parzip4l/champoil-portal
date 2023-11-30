@@ -140,14 +140,6 @@ class AbsenController extends Controller
         $allowedRadius = 5;
 
         if ($distance <= $allowedRadius) {
-            #request Photo
-            if ($request->hasFile('photo')) {
-                $photo = $request->file('photo');
-                $photoPath = $photo->store('photos', 'public'); #Penyimpanan
-            } else {
-                $photoPath = null;
-            }
-
             // Simpan Data
             $absensi = new absen();
             $absensi->user_id = $nik;
@@ -157,11 +149,35 @@ class AbsenController extends Controller
             $absensi->latitude = $latitudeProject;
             $absensi->longtitude = $longtitudeProject;
             $absensi->status = $status;
-            $absensi->photo_path = $photoPath;
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/images');
+                $image->move($destinationPath, $filename);
+                $absensi->photo = $filename;
+            }
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
         } else {
-            return redirect()->back()->with('error', 'Anda Diluar Radius');
+            #request Photo
+
+            $absensi = new absen();
+            $absensi->user_id = $nik;
+            $absensi->nik = $nik;
+            $absensi->tanggal = now()->toDateString();
+            $absensi->clock_in = now()->format('H:i');
+            $absensi->latitude = $latitudeProject;
+            $absensi->longtitude = $longtitudeProject;
+            $absensi->status = $status;
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/images');
+                $image->move($destinationPath, $filename);
+                $absensi->photo = $filename;
+            }
+            $absensi->save();
+            return redirect()->back()->with('success', 'Clockin success, Anda Diluar Radius');
         }
     }
 

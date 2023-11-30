@@ -23,6 +23,7 @@ use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use Carbon\Carbon;
+use App\Company\CompanyModel;
 
 class ApiLoginController extends Controller
 {
@@ -89,7 +90,7 @@ class ApiLoginController extends Controller
                 $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
            
                 $kantorLatitude = $dataCompany->latitude;
-                $kantorLongtitude = $dataCompany->longitude;
+                $kantorLongitude = $dataCompany->longitude;
                 $allowedRadius = $dataCompany->radius;
             }
 

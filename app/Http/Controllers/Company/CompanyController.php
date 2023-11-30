@@ -108,7 +108,13 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $company = CompanyModel::findOrFail($id);
+            $employeeTotal = Employee::where('unit_bisnis',$company->company_name)->count();
+            return view('pages.company.show', compact('company','employeeTotal'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
+        }
     }
 
     /**

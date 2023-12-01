@@ -25,28 +25,48 @@ class AbsenController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-        
+
+        // Mendapatkan data organisasi terpilih (jika ada)
+        $selectedOrganization = $request->input('organization');
+
+        // Menghitung tanggal mulai dan tanggal akhir berdasarkan aturan bisnis
         $today = now();
         $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
         $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
-        $data1 = DB::table('users')
-                    ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
-                    ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
-                        $join->on('absens.nik', '=', 'users.employee_code')
-                            ->whereBetween('absens.tanggal', [$startDate, $endDate]);
-                    })
-                    ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-                    ->select('users.*', 'absens.*')
-                    ->orderBy('users.name')
-                    ->get();
+        // Query untuk data absensi
+        $query = DB::table('users')
+            ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
+            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
+                $join->on('absens.nik', '=', 'users.employee_code')
+                    ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+            })
+            ->where('karyawan.unit_bisnis', $company->unit_bisnis);
 
-        return view('pages.absen.index',compact('data1','endDate','startDate'));
+        // Memfilter berdasarkan organisasi jika terpilih
+        if ($selectedOrganization) {
+            $query->where('karyawan.organisasi', $selectedOrganization);
+        }
+
+        // Mengambil data absensi dari database
+        $data1 = $query->select('users.*', 'absens.*')
+            ->orderBy('users.name')
+            ->get();
+
+        // Mengirim data ke tampilan
+        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization'));
     }
+
+    public function filterByOrganization(Request $request)
+    {
+        $selectedOrganization = $request->input('organization');
+        return redirect()->route('absen.index', ['organization' => $selectedOrganization]);
+    }
+
 
     public function exportAttendence()
     {

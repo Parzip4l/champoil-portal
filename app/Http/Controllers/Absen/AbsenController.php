@@ -97,69 +97,74 @@ class AbsenController extends Controller
 
     public function clockin(Request $request)
     {   
-        $user = Auth::user();
-        $nik = Auth::user()->employee_code;
-        $unit_bisnis = Employee::where('nik',$nik)->first();
+        try {
+            $user = Auth::user();
+            $nik = Auth::user()->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
 
-        $today = Carbon::now()->format('Y-m-d');
+            $today = Carbon::now()->format('Y-m-d');
 
-        $schedulebackup = Schedule::where('employee', $nik)
-            ->whereDate('tanggal', $today)
-            ->get();
+            $schedulebackup = Schedule::where('employee', $nik)
+                ->whereDate('tanggal', $today)
+                ->get();
 
-        $project_id = null;
-        foreach($schedulebackup as $databackup)
-        {
-            $project_id = $databackup->project;
-            $tanggal_backup = $databackup->tanggal;
-            $shift = $databackup->shift;
-            $periode = $databackup->periode;
-        }
-        
-        if ($project_id !== null) {
-            $dataProject = Project::where('id', $project_id)->first();
-            $latitudeProject = $dataProject->latitude;
-            $longtitudeProject = $dataProject->longtitude;
-        
-            $kantorLatitude = $latitudeProject;
-            $kantorLongtitude = $longtitudeProject;
-            $allowedRadius = 5;
-        } else {
-            $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-           
-            $kantorLatitude = $dataCompany->latitude;
-            $kantorLongtitude = $dataCompany->longitude;
-            $allowedRadius = $dataCompany->radius;
-        }
-        // Fet Data From Device User
-        $lat = $request->input('latitude');
-        $long = $request->input('longitude');
-        $status = $request->input('status');
-        
-        // Hitung Radius
-        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
-        if ($distance <= $allowedRadius) {
-            // Simpan Data
-            $absensi = new absen();
-            $absensi->user_id = $nik;
-            $absensi->nik = $nik;
-            $absensi->tanggal = now()->toDateString();
-            $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $kantorLatitude;
-            $absensi->longtitude = $kantorLongtitude;
-            $absensi->status = $status;
-            if ($request->hasFile('photo')) {
-                $image = $request->file('photo');
-                $filename = time() . '.' . $image->getClientOriginalExtension();
-                $destinationPath = public_path('/images/absen');
-                $image->move($destinationPath, $filename);
-                $absensi->photo = $filename;
+            $project_id = null;
+            foreach($schedulebackup as $databackup)
+            {
+                $project_id = $databackup->project;
+                $tanggal_backup = $databackup->tanggal;
+                $shift = $databackup->shift;
+                $periode = $databackup->periode;
             }
-            $absensi->save();
-            return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
-        } else {
-            return redirect()->back()->with('error', 'Clockin Rejected, Anda Diluar Radius');
+            
+            if ($project_id !== null) {
+                $dataProject = Project::where('id', $project_id)->first();
+                $latitudeProject = $dataProject->latitude;
+                $longtitudeProject = $dataProject->longtitude;
+            
+                $kantorLatitude = $latitudeProject;
+                $kantorLongtitude = $longtitudeProject;
+                $allowedRadius = 5;
+            } else {
+                $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+            
+                $kantorLatitude = $dataCompany->latitude;
+                $kantorLongtitude = $dataCompany->longitude;
+                $allowedRadius = $dataCompany->radius;
+            }
+            // Fet Data From Device User
+            $lat = $request->input('latitude');
+            $long = $request->input('longitude');
+            $status = $request->input('status');
+            
+            // Hitung Radius
+            $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+
+            if ($distance <= $allowedRadius) {
+                // Simpan Data
+                $absensi = new absen();
+                $absensi->user_id = $nik;
+                $absensi->nik = $nik;
+                $absensi->tanggal = now()->toDateString();
+                $absensi->clock_in = now()->format('H:i');
+                $absensi->latitude = $kantorLatitude;
+                $absensi->longtitude = $kantorLongtitude;
+                $absensi->status = $status;
+                if ($request->hasFile('photo')) {
+                    $image = $request->file('photo');
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
+                    $destinationPath = public_path('/images/absen');
+                    $image->move($destinationPath, $filename);
+                    $absensi->photo = $filename;
+                }
+                $absensi->save();
+                return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
+            } else {
+                return redirect()->back()->with('error', 'Clockin Rejected, Anda Diluar Radius');
+            }
+        } catch (\Exception $e) {
+            // Handle the exception here
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
 

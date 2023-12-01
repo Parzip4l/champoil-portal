@@ -3,7 +3,7 @@
     <div class="container">
       <div class="navbar-content">
         <a href="#" class="navbar-brand">
-          TRUE<span>ST</span>
+          <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="">
         </a>
         <form class="search-form">
           <div class="input-group">
@@ -194,7 +194,6 @@
     </div>
   </nav>
 </div>
-
 <!-- Mobile Menu -->
 <div class="row">
     <div class="container">

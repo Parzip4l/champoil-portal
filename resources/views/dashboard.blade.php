@@ -640,31 +640,31 @@ $(function() {
 });
 </script>
 <style>
-    label {
-  position: relative;
-  margin: 0;
-  margin-left : 10px;
-  width: 30px;
-  height: 30px;
-  overflow: hidden;
-  font-size: 0;
-}
-label:hover i {
-  color: #27ae60;
-}
-label input[type='file'] {
-  z-index: 3;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-}
-div#photoPreview img {
-    height: 100px;
-    width: 100px;
-    object-fit: cover;
-    border-radius: 100%;
-}
+    label.custom-file-upload {
+        position: relative;
+        margin: 0;
+        margin-left : 10px;
+        width: 30px;
+        height: 30px;
+        overflow: hidden;
+        font-size: 0;
+    }
+    label.custom-file-upload:hover i {
+        color: #27ae60;
+    }
+    label.custom-file-upload input[type='file'] {
+        z-index: 3;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+    }
+    div#photoPreview img {
+        height: 100px;
+        width: 100px;
+        object-fit: cover;
+        border-radius: 100%;
+    }
 </style>
 <!-- Absen -->
 <script>

@@ -146,8 +146,8 @@ class AbsenController extends Controller
             $absensi->nik = $nik;
             $absensi->tanggal = now()->toDateString();
             $absensi->clock_in = now()->format('H:i');
-            $absensi->latitude = $latitudeProject;
-            $absensi->longtitude = $longtitudeProject;
+            $absensi->latitude = $kantorLatitude;
+            $absensi->longtitude = $kantorLongtitude;
             $absensi->status = $status;
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');

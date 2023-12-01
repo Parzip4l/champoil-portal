@@ -456,15 +456,15 @@ class ApiLoginController extends Controller
         if (Auth::guard('api')->check()) {
             $user = Auth::guard('api')->user();
             if ($user->id) {
-                $lastAbsensi = $user->absen()->latest()->first();
-                
+                $hariini = now()->format('Y-m-d');
+                $lastAbsensi = Absen::where('tanggal',$hariini)
+                ->where('nik', $user->employee_code)
+                ->first();
                 // Get Data Karyawan
                 $userId = $user->id;
-                $hariini = now()->format('Y-m-d');
-                $employeCode = User::where('id',$userId)->first();
 
                 // Get Log Absensi
-                $logs = Absen::where('user_id', $employeCode->employee_code)
+                $logs = Absen::where('user_id', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
                     ->get();
                     
@@ -475,14 +475,14 @@ class ApiLoginController extends Controller
                 $bulan = $request->input('bulan');
                 // Get logs for the month
                 if($bulan) {
-                    $logsmonths = Absen::where('user_id', $employeCode->employee_code)
+                    $logsmonths = Absen::where('user_id', $user->employee_code)
                         ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
                         ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
                         ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                         ->orderBy('tanggal')
                         ->get();
                 } else {
-                    $logsmonths = Absen::where('user_id', $employeCode->employee_code)
+                    $logsmonths = Absen::where('user_id', $user->employee_code)
                         ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                         ->orderBy('tanggal')
                         ->get();
@@ -503,7 +503,6 @@ class ApiLoginController extends Controller
                         $isSameDay = $lastClockOut->isSameDay($today);
                     }
                 }
-
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda
                 $hour = date('H'); // Ambil jam saat ini

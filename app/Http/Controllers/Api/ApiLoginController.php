@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use App\Http\Controllers\Controller;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
@@ -194,51 +195,62 @@ class ApiLoginController extends Controller
 
 
     public function payslipuser(Request $request)
-    {
-        try {
-            // Retrieve the token from the request
-            $token = $request->bearerToken();
+{
+    try {
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
 
-            // Authenticate the user based on the token
-            $user = Auth::guard('api')->user();
-            if ($user) {
-                $employeeCode = $user->employee_code;
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+        if ($user) {
+            $employeeCode = $user->employee_code;
 
-                // Pastikan employeeCode tidak null sebelum mengakses database
-                if ($employeeCode) {
-                    $dataKaryawan = Employee::where('nik', $employeeCode)->first();
+            // Ensure employeeCode is not null before accessing the database
+            if ($employeeCode) {
+                $cacheKey = 'payslips:' . $employeeCode;
 
-                    if ($dataKaryawan) {
-                        $karyawan = json_decode($dataKaryawan, true);
+                // Check if data is already in cache
+                $cachedData = Cache::get($cacheKey);
+                if ($cachedData) {
+                    return response()->json(['payslips' => $cachedData]);
+                }
 
-                        if ($karyawan['organisasi'] === 'Management Leaders') {
-                            $payslips = Payrol::where('employee_code', $employeeCode)
-                                                ->where('payslip_status','Published')
-                                                ->get();
-                        } else {
-                            $payslips = Payrollns::where('employee_code', $employeeCode)
-                                                ->where('payslip_status','Published')
-                                                ->get();
-                        }
+                $dataKaryawan = Employee::where('nik', $employeeCode)->first();
 
-                        // Modify the response to return JSON data
-                        $payslipsData = $payslips->toArray();
+                if ($dataKaryawan) {
+                    $karyawan = json_decode($dataKaryawan, true);
 
-                        return response()->json(['payslips' => $payslipsData]);
+                    if ($karyawan['organisasi'] === 'Management Leaders') {
+                        $payslips = Payrol::where('employee_code', $employeeCode)
+                            ->where('payslip_status', 'Published')
+                            ->get();
                     } else {
-                        return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
+                        $payslips = Payrollns::where('employee_code', $employeeCode)
+                            ->where('payslip_status', 'Published')
+                            ->get();
                     }
+
+                    // Modify the response to return JSON data
+                    $payslipsData = $payslips->toArray();
+
+                    // Store data in cache for future requests
+                    Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
+
+                    return response()->json(['payslips' => $payslipsData]);
                 } else {
-                    return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+                    return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
                 }
             } else {
-                return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
             }
-        } catch (\Exception $e) {
-            // Tangani kesalahan umum
-            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        } else {
+            return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
         }
+    } catch (\Exception $e) {
+        // Handle general errors
+        return response()->json(['error' => 'Terjadi kesalahan.'], 500);
     }
+}
 
     // Details Payslip
     public function PayslipDetails(Request $request, $id)
@@ -247,8 +259,12 @@ class ApiLoginController extends Controller
 
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
+        $organisasi = Employee::where('nik',$user->employee_code)
+                    ->select('organisasi')
+                    ->first();
+
         try {
-            if ($user['organisasi'] === 'Management Leaders') {
+            if ($organisasi === 'Management Leaders') {
                 $payslip = Payrol::findOrFail($id);
             }else{
                 $payslip = Payrollns::findOrFail($id);

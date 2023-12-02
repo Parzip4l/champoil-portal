@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use App\Employee;
 use App\Absen;
 use App\User;
@@ -37,31 +39,48 @@ class EmployeeController extends Controller
 
     public function ApiEmployee(Request $request)
     {
-        // Mendapatkan token dari header Authorization
-        $token = $request->bearerToken();
-        // Memeriksa apakah token valid
-        $user = Auth::guard('api')->user();
+        try {
+            // Get the token from the Authorization header
+            $token = $request->bearerToken();
+            // Check if the token is valid
+            $user = Auth::guard('api')->user();
 
-        if ($user) {
-            $code = $user->employee_code;
+            if ($user) {
+                $code = $user->employee_code;
 
-            // Pastikan properti "employee_code" ada pada objek pengguna
-            if ($code) {
-                $company = Employee::where('nik', $code)->first();
+                // Ensure the "employee_code" property exists in the user object
+                if ($code) {
+                    // Define the cache key
+                    $cacheKey = 'employee_data:' . $code;
 
-                // Pastikan objek "company" tidak null sebelum mengakses properti "unit_bisnis"
-                if ($company) {
-                    $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
+                    // Check if data is already in cache
+                    $cachedData = Cache::get($cacheKey);
+                    if ($cachedData) {
+                        return response()->json(['karyawan' => $cachedData], 200);
+                    }
 
-                    return response()->json(['karyawan' => $karyawan], 200);
+                    $company = Employee::where('nik', $code)->first();
+
+                    // Ensure the "company" object is not null before accessing the "unit_bisnis" property
+                    if ($company) {
+                        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
+
+                        // Store data in cache for future requests
+                        Cache::put($cacheKey, $karyawan, 60); // Set expiration time in minutes
+
+                        return response()->json(['karyawan' => $karyawan], 200);
+                    } else {
+                        return response()->json(['error' => 'Data perusahaan tidak ditemukan.'], 404);
+                    }
                 } else {
-                    return response()->json(['error' => 'Data perusahaan tidak ditemukan.'], 404);
+                    return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
                 }
             } else {
-                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+                return response()->json(['error' => 'Token tidak valid atau pengguna tidak terautentikasi.'], 401);
             }
-        } else {
-            return response()->json(['error' => 'Token tidak valid atau pengguna tidak terautentikasi.'], 401);
+        } catch (\Exception $e) {
+            // Handle general errors
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }
     }
 

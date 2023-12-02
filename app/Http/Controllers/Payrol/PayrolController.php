@@ -120,6 +120,9 @@ class PayrolController extends Controller
                 $deductionsData = $payrollComponents->deductions;
                 $NetSalary = $payrollComponents->net_salary;
 
+                // Perhitunga PPH21
+                
+
                 // Simpan data payroll
                 $payroll = new Payrol();
                 $payroll->employee_code = $code;

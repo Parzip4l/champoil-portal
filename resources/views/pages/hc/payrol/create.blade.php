@@ -8,7 +8,12 @@
   <link href="{{ asset('assets/plugins/pickr/themes/classic.min.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 @endpush
-
+@php
+    $user = Auth::user();
+    $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+        ->select('unit_bisnis','organisasi')
+        ->first();
+@endphp
 @section('content')
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
@@ -36,21 +41,23 @@
             <h5>Allowance</h5>
             <hr>
             <div class="row mb-3 allowance-group">
+                @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                 <div class="col-md-6">
                     <label class="form-label">Tunjangan Struktural</label>
                     <input type="number" class="form-control allowance" name="allowances[t_struktural][]" placeholder="Rp." required>
                 </div>
+                @endif
+                @if($karyawanLogin->unit_bisnis === 'Run')
+                <div class="col-md-6">
+                    <label class="form-label">Tunjangan Fasilitas</label>
+                    <input type="number" class="form-control allowance" name="allowances[t_fasilitas][]" placeholder="Rp." required>
+                </div>
+                @endif
                 <div class="col-md-6">
                     <label class="form-label">Tunjangan Kinerja</label>
                     <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required>
                 </div>
             </div>
-            @php
-                $user = Auth::user();
-                $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
-                    ->select('unit_bisnis','organisasi')
-                    ->first();
-            @endphp
             @if($karyawanLogin->unit_bisnis === 'Kas')
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
@@ -64,10 +71,18 @@
             </div>
             @endif
             <div class="row mb-3">
+                @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>
                     <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required>
                 </div>
+                @endif
+                @if($karyawanLogin->unit_bisnis === 'Run')
+                <div class="col-md-6 mb-3">
+                    <label for="kode_karyawan" class="form-label">Tunjangan Makan</label>
+                    <input type="number" id="t_makan" class="form-control allowance" name="allowances[t_makan][]" placeholder="Rp. " required>
+                </div>
+                @endif
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Total Allowance</label>
                     <input type="number" id="t_allowance" class="form-control" name="allowances[t_allowance][]" placeholder="Rp. " required readonly>

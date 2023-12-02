@@ -47,7 +47,7 @@
                     <input type="number" class="form-control allowance" name="allowances[t_struktural][]" placeholder="Rp." required>
                 </div>
                 @endif
-                @if($karyawanLogin->unit_bisnis === 'Run')
+                @if($karyawanLogin->unit_bisnis === 'RUN')
                 <div class="col-md-6">
                     <label class="form-label">Tunjangan Fasilitas</label>
                     <input type="number" class="form-control allowance" name="allowances[t_fasilitas][]" placeholder="Rp." required>
@@ -77,7 +77,7 @@
                     <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required>
                 </div>
                 @endif
-                @if($karyawanLogin->unit_bisnis === 'Run')
+                @if($karyawanLogin->unit_bisnis === 'RUN')
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Tunjangan Makan</label>
                     <input type="number" id="t_makan" class="form-control allowance" name="allowances[t_makan][]" placeholder="Rp. " required>

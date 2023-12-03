@@ -21,6 +21,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/profile/{nik}', [ApiLoginController::class, 'getMyProfile']);
     Route::post('/absence-request', [ApiLoginController::class, 'submitAbsenceRequest']);
     Route::get('/history-absence-request', [ApiLoginController::class, 'HistoryDataRequest']);
+    Route::get('/employee-resign', [App\Http\Controllers\Api\EmployeeController::class, 'resign'])->name('employee-resign');
 
     // Log Absen
     Route::get('/log-absensi', [ApiLoginController::class, 'MyLogsAbsen']);
@@ -32,5 +33,7 @@ Route::prefix('v1')->group(function () {
     // Clock in/out (tanpa middleware auth:api)
     Route::post('/clockin', [ApiLoginController::class, 'clockin']);
     Route::post('/clockout', [ApiLoginController::class, 'clockout']);
+
+    
 
 });

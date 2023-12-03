@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use App\Employee;
+use App\EmployeeResign;
 use App\Absen;
 use App\User;
 use App\Payrolinfo\Payrolinfo;
@@ -452,8 +453,22 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         $contact = Employee::find($id);
-        $contact->delete();
-        return redirect()->route('employee.index')->with('success', 'Employee Successfully Deleted');
+        if($contact){
+            $data=[
+                "employee_code"=>$contact->nik,
+                "ktp"=>$contact->ktp,
+                "join_date"=>$contact->joindate,
+                "meta_karyawan"=>json_encode($contact),
+                "created_at"=>date('Y-m-d')
+            ];
+            $insert_resign = EmployeeResign::insertGetId($data);
+            if($insert_resign){
+                $contact->delete();
+                return redirect()->route('employee.index')->with('success', 'Employee Successfully Deleted');
+            }else{
+                return redirect()->route('employee.index')->with('danger', 'Employee Failed Deleted');
+            }
+        }
     }
 
     public function CreateAbsen(Request $request)

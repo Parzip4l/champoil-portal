@@ -11,7 +11,7 @@ class EmployeeController extends Controller
 {
     // resign kurang dari 30 hari
     public function resign(){
-        $result[]=[];
+        $result=[];
 
         $records = EmployeeResign::all();
         if($records){
@@ -33,8 +33,6 @@ class EmployeeController extends Controller
                 }
                 
             }
-        }else{
-
         }
         return response()->json([
             'error'=>false,

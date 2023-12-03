@@ -456,6 +456,7 @@ class EmployeeController extends Controller
         if($contact){
             $data=[
                 "employee_code"=>$contact->nik,
+                "nama"=>$contact->nama,
                 "ktp"=>$contact->ktp,
                 "join_date"=>$contact->joindate,
                 "meta_karyawan"=>json_encode($contact),

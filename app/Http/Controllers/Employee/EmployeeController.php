@@ -460,7 +460,7 @@ class EmployeeController extends Controller
                 "ktp"=>$contact->ktp,
                 "join_date"=>$contact->joindate,
                 "meta_karyawan"=>json_encode($contact),
-                "created_at"=>date('Y-m-d')
+                "created_at"=>date('Y-m-d H:i:s')
             ];
             $insert_resign = EmployeeResign::insertGetId($data);
             if($insert_resign){

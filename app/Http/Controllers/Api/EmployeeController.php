@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\EmployeeResign;
 use App\Absen;
+use App\ModelCG\Project;
 
 
 class EmployeeController extends Controller
@@ -17,12 +18,14 @@ class EmployeeController extends Controller
         $records = EmployeeResign::all();
         if($records){
             foreach($records as $row){
-                $last_schdl = Absen::where('user_id', $row->employee_code)
-                ->first();
-                // Print the SQL query
-
+                $last_schdl = Absen::where('nik', $row->employee_code)->first();
                 
-                $row->project = $last_schdl;
+
+                if($last_schdl){
+                    $project = Project::where('id', $last_schdl->project)->first();
+                    $row->project = $project->name;
+                }
+                
                 
 
                 // Tanggal awal

@@ -18,6 +18,7 @@ class EmployeeController extends Controller
         $records = EmployeeResign::all();
         if($records){
             foreach($records as $row){
+                $row->project = "";
                 $last_schdl = Absen::where('nik', $row->employee_code)->first();
                 
 

@@ -12,6 +12,7 @@ use App\ModelCG\Project;
 use App\User;
 use App\Absen\RequestAbsen;
 use Carbon\Carbon;
+use App\Absen\RequestType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -103,9 +104,12 @@ class RequestControllers extends Controller
     {
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
-        $historyData = RequestAbsen::where('employee', $EmployeeCode)->get();
+        $company = Employee::where('nik',$EmployeeCode)->select('unit_bisnis')->first();
 
-        return view('pages.absen.request.create', compact('EmployeeCode','historyData'));
+        $historyData = RequestAbsen::where('employee', $EmployeeCode)->get();
+        $typeRequest = RequestType::where('company', $company->unit_bisnis)->get();
+
+        return view('pages.absen.request.create', compact('EmployeeCode','historyData','typeRequest'));
     }
 
     /**

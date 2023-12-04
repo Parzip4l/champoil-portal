@@ -34,12 +34,10 @@
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Type</label>
                                     <select name="status" class="js-example-basic-single form-select" data-width="100%" required>
-                                        <option value="Izin">Izin</option>
-                                        <option value="Sakit">Sakit</option>
-                                        <option value="Cuti">Cuti</option>
-                                        <option value="Visit Customer">Visit Customer</option>
-                                        <option value="A">WFE</option>
-                                        <option value="F">Lupa Absen</option>
+                                        <option value="">Select Type</option>
+                                        @foreach($typeRequest as $dataRequest)
+                                            <option value="{{$dataRequest->code}}">{{$dataRequest->name}}</option>
+                                        @endforeach
                                     </select>
                                     <input type="hidden" name="employee" value="{{$EmployeeCode}}">
                                 </div>

@@ -31,41 +31,10 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        try {
-            $user = Auth::user();
-            $code = $user->employee_code;
-
-            // Ensure the "employee_code" property exists in the user object
-            if ($code) {
-                // Define the cache key
-                $cacheKey = 'karyawan_data:' . $code;
-
-                // Check if data is already in cache
-                $cachedData = Cache::get($cacheKey);
-                if ($cachedData) {
-                    return view('pages.hc.karyawan.index', compact('karyawan', 'company'))->with('karyawan', $cachedData);
-                }
-
-                $company = Employee::where('nik', $code)->first();
-
-                // Ensure the "company" object is not null before accessing the "unit_bisnis" property
-                if ($company) {
-                    $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
-
-                    // Store data in cache for future requests
-                    Cache::put($cacheKey, $karyawan, 60); // Set expiration time in minutes
-
-                    return view('pages.hc.karyawan.index', compact('karyawan', 'company'))->with('karyawan', $karyawan);
-                } else {
-                    return response()->json(['error' => 'Data perusahaan tidak ditemukan.'], 404);
-                }
-            } else {
-                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
-            }
-        } catch (\Exception $e) {
-            // Handle general errors
-            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
-        }
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
+        return view('pages.hc.karyawan.index', compact('karyawan'));
     }
 
     public function ApiEmployee(Request $request)

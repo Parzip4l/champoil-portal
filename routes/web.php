@@ -171,7 +171,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Payroll
     // Component Master
     Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
-        
+
+    // Request Type
+    Route::resource('request-type', App\Http\Controllers\Absen\RequestTypeController::class);
+
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);

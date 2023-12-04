@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\EmployeeResign;
+use App\Absen;
 
 
 class EmployeeController extends Controller
@@ -16,6 +17,14 @@ class EmployeeController extends Controller
         $records = EmployeeResign::all();
         if($records){
             foreach($records as $row){
+                $last_schdl = Absen::where('user_id', $row->employee_code)
+                ->first();
+                // Print the SQL query
+
+                
+                $row->project = $last_schdl;
+                
+
                 // Tanggal awal
                 $tanggal_awal = date('Y-m-d',strtotime($row->join_date));
 
@@ -34,6 +43,7 @@ class EmployeeController extends Controller
                 
             }
         }
+
         return response()->json([
             'error'=>false,
             'result'=>$result    

@@ -34,6 +34,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/clockin', [ApiLoginController::class, 'clockin']);
     Route::post('/clockout', [ApiLoginController::class, 'clockout']);
 
+    // Request Type
+    Route::get('/type-absence-request', [ApiLoginController::class, 'TypeAttendenceRequest']);
+    
+
     
 
 });

@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use Carbon\Carbon;
 use App\Company\CompanyModel;
+use App\Absen\RequestType;
 
 class ApiLoginController extends Controller
 {
@@ -624,6 +625,34 @@ class ApiLoginController extends Controller
         } catch (\Exception $e) {
             // Handle other exceptions
             return response()->json(['error' => 'Terjadi kesalahan.' . $e], 500);
+        }
+    }
+
+    public function TypeAttendenceRequest(Request $request)
+    {
+        try {
+            // Get the token from the Authorization header
+            $token = $request->bearerToken();
+            // Check if the token is valid
+            $user = Auth::guard('api')->user();
+
+            if ($user) {
+                $code = $user->employee_code;
+                $company = Employee::where('nik', $code)->first();
+                // Ensure the "employee_code" property exists in the user object
+                if ($company) {
+                    $requestType = RequestType::where('company', $company->unit_bisnis)->get();
+
+                    return response()->json(['dataRequest' => $requestType], 200);
+                } else {
+                    return response()->json(['error' => 'Data Request tidak ditemukan.'], 404);
+                }
+            } else {
+                return response()->json(['error' => 'Token tidak valid atau pengguna tidak terautentikasi.'], 401);
+            }
+        } catch (\Exception $e) {
+            // Handle general errors
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }
     }
 }

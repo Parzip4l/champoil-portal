@@ -8,6 +8,8 @@ use App\Employee;
 use App\Payrol;
 use App\PayrolCM;
 use App\Payrollns;
+use Illuminate\Support\Facades\Auth;
+use App\ModelCG\Payroll;
 
 class PayslipnsController extends Controller
 {
@@ -50,13 +52,20 @@ class PayslipnsController extends Controller
      */
     public function show($id)
     {
-        $payslip = Payrollns::findOrFail($id);
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        if ($unit_bisnis == 'Kas') {
+            $dataPayslip = Payroll::findOrFail($id);
+        } else {
+            $dataPayslip = Payrollns::findOrFail($id);
 
-        $dataPayslip = Payrollns::where('id', $id)->get();
+            $dataPayslip = Payrollns::where('id', $id)->get();
 
-        $totalallowence = $dataPayslip[0]['total_daily'] + $dataPayslip[0]['total_lembur'] + $dataPayslip[0]['uang_makan'] + $dataPayslip[0]['uang_kerajinan'];
-        $totalDeductions = $dataPayslip[0]['potongan_hutang'] + $dataPayslip[0]['potongan_mess'] + $dataPayslip[0]['potongan_lain'];
-    
+            $totalallowence = $dataPayslip[0]['total_daily'] + $dataPayslip[0]['total_lembur'] + $dataPayslip[0]['uang_makan'] + $dataPayslip[0]['uang_kerajinan'];
+            $totalDeductions = $dataPayslip[0]['potongan_hutang'] + $dataPayslip[0]['potongan_mess'] + $dataPayslip[0]['potongan_lain'];
+        }
+        dd($dataPayslip);
         return view('pages.hc.payrol.ns.payslip', compact('dataPayslip','totalallowence','totalDeductions'));
     }
 

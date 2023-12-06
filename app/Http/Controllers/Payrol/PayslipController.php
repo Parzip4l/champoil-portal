@@ -87,12 +87,12 @@ class PayslipController extends Controller
                 $dbMain = DB::connection('mysql');
                 $datans = $dbSecondary->table('payrolls')
                     ->join($dbMain->getDatabaseName() . '.karyawan', 'payrolls.employee_code', '=', 'karyawan.nik')
-                    ->select('payrolls.id', 'payrolls.*') // Tambahkan id pada select clause
+                    ->select('payrolls.id', 'payrolls.*') 
                     ->where('karyawan.unit_bisnis', $unit_bisnis)
                     ->get();
             }else{
                 $datans = Payrollns::join('karyawan', 'payrollns.employee_code', '=', 'karyawan.nik')
-                            ->select('payrollns.id', 'payrollns.*') // Tambahkan id pada select clause
+                            ->select('payrollns.id', 'payrollns.*') 
                             ->where('karyawan.unit_bisnis', $unit_bisnis)
                             ->where('payrollns.periode', $periode)
                             ->get();
@@ -250,6 +250,7 @@ class PayslipController extends Controller
         // Ambil semua payslip berdasarkan employee_code
         $dataKaryawan = Employee::where('nik', $employeeCode)->first();
         $karyawan = json_decode($dataKaryawan, true);
+        $dbSecondary = DB::connection('mysql_secondary');
         if($karyawan['organisasi'] === 'Management Leaders') {
             $payslips = Payrol::where('employee_code', $employeeCode)
                 ->where('payslip_status', 'Published')

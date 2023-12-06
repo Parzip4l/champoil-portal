@@ -18,6 +18,7 @@ use App\ModelCG\Project;
 use App\Absen;
 use App\Payrol;
 use App\Payrollns;
+use App\ModelCG\Payroll;
 use App\Employee;
 use App\User;
 use App\Absen\RequestAbsen;
@@ -226,9 +227,18 @@ class ApiLoginController extends Controller
                             ->where('payslip_status', 'Published')
                             ->get();
                     } else {
-                        $payslips = Payrollns::where('employee_code', $employeeCode)
-                            ->where('payslip_status', 'Published')
-                            ->get();
+                        $unit_bisnis = $dataKaryawan->unit_bisnis;
+
+                        dd($unit_bisnis);
+                        if ($unit_bisnis == 'Kas') {
+                            $payslips = Payroll::where('employee_code', $employeeCode)
+                                        ->where('payslip_status', 'Published')
+                                        ->get();
+                        } else {
+                            $payslips = Payrollns::where('employee_code', $employeeCode)
+                                        ->where('payslip_status', 'Published')
+                                        ->get();
+                        }
                     }
 
                     // Modify the response to return JSON data
@@ -261,16 +271,20 @@ class ApiLoginController extends Controller
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
         $organisasi = Employee::where('nik',$user->employee_code)
-                    ->select('organisasi')
+                    ->select('organisasi','unit_bisnis')
                     ->first();
 
         try {
             if ($organisasi === 'Management Leaders') {
                 $payslip = Payrol::findOrFail($id);
             }else{
-                $payslip = Payrollns::findOrFail($id);
+                $unit_bisnis = $organisasi->unit_bisnis;
+                if ($unit_bisnis == 'Kas') {
+                    $payslip = Payroll::findOrFail($id);
+                } else {
+                    $payslip = Payrollns::findOrFail($id);
+                }
             }
-            
             // Jika ditemukan, kembalikan data dalam format JSON
             return response()->json(['data' => $payslip], 200);
         } catch (ModelNotFoundException $e) {

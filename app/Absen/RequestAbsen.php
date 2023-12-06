@@ -10,4 +10,9 @@ class RequestAbsen extends Model
     use HasFactory;
     protected $table = 'requests_attendence';
     protected $fillable = ['employee'];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee');
+    }
 }

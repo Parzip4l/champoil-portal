@@ -669,4 +669,95 @@ class ApiLoginController extends Controller
             return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }
     }
+
+    // List Request Absen
+    public function AbsenRequest(Request $request)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+            $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
+
+            $requestAbsen = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
+                ->where('requests_attendence.aprrove_status', 'Pending')
+                ->where('karyawan.unit_bisnis', $unitBisnis)
+                ->select('requests_attendence.*', 'karyawan.nama', 'karyawan.unit_bisnis')
+                ->get();
+
+            return response()->json(['dataRequest' => $requestAbsen], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // Approve Request Absen
+    public function updateStatusSetuju(Request $request, $id)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+
+            $requestabsen = RequestAbsen::where('id', $id)->firstOrFail();
+
+            if ($requestabsen->aprrove_status !== 'Approved') {
+                $requestabsen->aprrove_status = 'Approved';
+                $requestabsen->aprroved_by = $employeeCode;
+                $requestabsen->save();
+
+                // Simpan Kedalam Table Absen
+                $absen = new Absen();
+                $absen->user_id = $employeeCode;
+                $absen->nik = $employeeCode;
+                $absen->tanggal = $requestabsen->tanggal;
+
+                if ($requestabsen->status == 'F') {
+                    $absen->clock_in = $requestabsen->clock_in;
+                    $absen->clock_out = $requestabsen->clock_out;
+                } else {
+                    $absen->clock_in = '-';
+                    $absen->clock_out = '-';
+                }
+
+                $absen->latitude = '-';
+                $absen->longtitude = '-';
+                $absen->status = $requestabsen->status;
+                $absen->save();
+            }
+
+            return response()->json(['message' => 'Attendance Request has been Updated']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function updateStatusReject(Request $request, $id)
+    {
+        try {
+
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $employeeCode = $user->employee_code;
+
+            $requestAbsen = RequestAbsen::where('id', $id)->firstOrFail();
+
+            if ($requestAbsen->aprrove_status !== 'Reject') {
+                $requestAbsen->aprrove_status = 'Reject';
+                $requestAbsen->aprroved_by = $employeeCode;
+                $requestAbsen->save();
+            }
+
+            return response()->json(['message' => 'Data Pengajuan Berhasil Diupdate.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }
+    }
 }

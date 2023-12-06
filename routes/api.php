@@ -37,7 +37,8 @@ Route::prefix('v1')->group(function () {
     // Request Type
     Route::get('/type-absence-request', [ApiLoginController::class, 'TypeAttendenceRequest']);
     
-
-    
-
+    // Update Attendence Request
+    Route::get('/all-request', [ApiLoginController::class, 'AbsenRequest']);
+    Route::put('/attendence/{id}/update-status', [ApiLoginController::class, 'updateStatusSetuju']);
+    Route::put('/attendence/{id}/update-reject', [ApiLoginController::class, 'updateStatusReject']);
 });

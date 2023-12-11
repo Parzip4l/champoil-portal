@@ -157,23 +157,47 @@
                                     <td class="text-danger">{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_out }}</td>
                                     <td>{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->status }}</td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="modal" data-bs-target="#editModal"
-                                            data-date="{{ $currentDate->format('Y-m-d') }}"
-                                            data-clock-in="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_in }}"
-                                            data-clock-out="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_out }}"
-                                            data-nik="{{$namaKaryawan->nik}}"
-                                        >Edit</a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a href="#" class="btn btn-sm btn-warning dropdown-item"
+                                                    data-bs-toggle="modal" data-bs-target="#editModal"
+                                                    data-date="{{ $currentDate->format('Y-m-d') }}"
+                                                    data-clock-in="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_in }}"
+                                                    data-clock-out="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_out }}"
+                                                    data-nik="{{$namaKaryawan->nik}}"
+                                                ><i data-feather="edit" class="icon-sm me-2"></i>Edit</a>
+                                                <a href="#" class="btn btn-sm btn-danger dropdown-item"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                    data-date="{{ $currentDate->format('Y-m-d') }}"
+                                                    data-nik="{{$namaKaryawan->nik}}"
+                                                ><i data-feather="trash" class="icon-sm me-2"></i>Hapus</a>
+                                            </div>
+                                        </div>
                                     </td>
                                 @else
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-warning"
-                                            data-bs-toggle="modal" data-bs-target="#editModal"
-                                            data-date="{{ $currentDate->format('Y-m-d') }}"
-                                        >Edit</a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a href="#" class="btn btn-sm btn-warning dropdown-item"
+                                                    data-bs-toggle="modal" data-bs-target="#editModal"
+                                                    data-date="{{ $currentDate->format('Y-m-d') }}"
+                                                ><i data-feather="edit" class="icon-sm me-2"></i>Edit</a>
+                                                <a href="#" class="btn btn-sm btn-danger dropdown-item"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                    data-date="{{ $currentDate->format('Y-m-d') }}"
+                                                    data-nik="{{$namaKaryawan->nik}}"
+                                                ><i data-feather="trash" class="icon-sm me-2"></i>Hapus</a>
+                                            </div>
+                                        </div>
                                     </td>
                                 @endif
                             </tr>
@@ -218,6 +242,26 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Hapus -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus Absen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus absen untuk tanggal ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="deleteAttendanceBtn" class="btn btn-danger">Hapus</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('plugin-scripts')
@@ -301,6 +345,18 @@ function updateTable(data) {
         modal.find('form').attr('action', actionUrl);
     });
 });
+</script>
+<!-- Hapus Data Absen -->
+<script>
+    $(document).ready(function () {
+            $('#deleteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var date = button.data('date');
+                var nik = button.data('nik');
+                var modal = $(this);
+                modal.find('#deleteAttendanceBtn').attr('href', '/delete-attendance/' + date + '/' + nik);
+            });
+        });
 </script>
 <style>
     td {

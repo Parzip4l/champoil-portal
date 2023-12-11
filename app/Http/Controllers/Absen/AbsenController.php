@@ -328,7 +328,6 @@ class AbsenController extends Controller
     public function show($nik)
     {
         $absensi = Absen::where('nik', $nik)->get();
-        dd($absensi);
         
         return view('pages.absen.show', compact('absensi'));
     }
@@ -427,5 +426,13 @@ class AbsenController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function deleteAttendance($date, $nik)
+    {
+        $dataAbsen = Absen::where('tanggal', $date)
+        ->where('nik', $nik)
+        ->delete();
+        return redirect()->back()->with('success', 'Attendance successfully deleted');
     }
 }

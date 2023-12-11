@@ -30,6 +30,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
 
+    // Delete Absen
+    Route::get('/delete-attendance/{date}/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteAttendance']);
+
     // Get By Organisasi
     Route::get('/attendance/filter', [ App\Http\Controllers\Absen\AbsenController::class, 'filterByOrganization'])->name('attendance.filter');
 

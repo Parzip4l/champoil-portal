@@ -464,9 +464,11 @@ class ApiLoginController extends Controller
                     return response()->json(['error' => 'Hanya file PDF dan JPG yang diizinkan.'], 400);
                 }
 
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 // Jika file adalah PDF atau JPG maka simpan
-                $path = $file->store('public/files');
-                $pengajuan->dokumen = $path;
+                $path = public_path('/images/files_attendence');
+                $file->move($path, $filename);
+                $pengajuan->dokumen = $filename;
             }
 
             $pengajuan->save();

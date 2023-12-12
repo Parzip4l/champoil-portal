@@ -41,4 +41,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/all-request', [ApiLoginController::class, 'AbsenRequest']);
     Route::put('/attendence/{id}/update-status', [ApiLoginController::class, 'updateStatusSetuju']);
     Route::put('/attendence/{id}/update-reject', [ApiLoginController::class, 'updateStatusReject']);
+
+    // Download Files Attendence Request
+    Route::get('/download-files-attendence', [ApiLoginController::class, 'downloadFilesAttendence']);
 });

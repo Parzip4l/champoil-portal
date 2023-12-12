@@ -760,4 +760,25 @@ class ApiLoginController extends Controller
             return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
         }
     }
+
+    public function downloadFilesAttendence(Request $request, $id)
+    {
+        try {
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
+        
+            $file_path = storage_path('app/' . $requestabsen->dokumen);
+        
+            return response()->download($file_path);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle the case when no data is found
+            return response()->json(['error' => 'Data not found.'], 404);
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+        
+    }
 }

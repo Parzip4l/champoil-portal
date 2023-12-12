@@ -88,11 +88,19 @@ class RequestControllers extends Controller
 
     public function download($id)
     {
-        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
-
-        $file_path = storage_path('app/' .$requestabsen->dokumen);
-
-        return response()->download($file_path);
+        try {
+            $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
+        
+            $file_path = storage_path('app/' . $requestabsen->dokumen);
+        
+            return response()->download($file_path);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle the case when no data is found
+            return redirect()->back()->with('error','Data not found.');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->back()->with('error','Data not found.');
+        }
     }
 
     /**

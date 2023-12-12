@@ -779,6 +779,5 @@ class ApiLoginController extends Controller
             // Handle other exceptions
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
-        
     }
 }

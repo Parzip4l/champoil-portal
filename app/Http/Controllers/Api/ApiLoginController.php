@@ -453,7 +453,7 @@ class ApiLoginController extends Controller
             $pengajuan->alasan = $request->input('alasan');
             $pengajuan->aprrove_status = 'Pending';
 
-            if ($request->hasFile('dokumen')) {
+            if ($request->hasFile('dokumen')) { 
                 $file = $request->file('dokumen');
 
                 // Mendapatkan ekstensi file
@@ -464,11 +464,9 @@ class ApiLoginController extends Controller
                     return response()->json(['error' => 'Hanya file PDF dan JPG yang diizinkan.'], 400);
                 }
 
-                $filename = time() . '.' . $file->getClientOriginalExtension();
                 // Jika file adalah PDF atau JPG maka simpan
-                $path = public_path('/images/files_attendence');
-                $file->move($path, $filename);
-                $pengajuan->dokumen = $filename;
+                $path = $file->store('public/files');
+                $pengajuan->dokumen = $path;
             }
 
             $pengajuan->save();

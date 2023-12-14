@@ -40,12 +40,14 @@ class RequestControllers extends Controller
             $requestabsen->aprroved_by = $EmployeeCode;
             $requestabsen->save();
 
+            $dataKaryawanRequest = $requestabsen->employee;
+
             // Cek status jika lupa absen
             if ($requestabsen->status = 'F') {
                 // Simpan Kedalam Table Absen
                 $absen = new Absen();
-                $absen->user_id = $EmployeeCode;
-                $absen->nik = $EmployeeCode;
+                $absen->user_id = $dataKaryawanRequest;
+                $absen->nik = $dataKaryawanRequest;
                 $absen->tanggal = $requestabsen->tanggal;
                 $absen->clock_in = $requestabsen->clock_in;
                 $absen->clock_out = $requestabsen->clock_out;
@@ -56,8 +58,8 @@ class RequestControllers extends Controller
             } else {
                 // Simpan Kedalam Table Absen
                 $absen = new Absen();
-                $absen->user_id = $EmployeeCode;
-                $absen->nik = $EmployeeCode;
+                $absen->user_id = $dataKaryawanRequest;
+                $absen->nik = $dataKaryawanRequest;
                 $absen->tanggal = $requestabsen->tanggal;
                 $absen->clock_in = '-';
                 $absen->latitude = '-';

@@ -712,10 +712,11 @@ class ApiLoginController extends Controller
                 $requestabsen->aprroved_by = $employeeCode;
                 $requestabsen->save();
 
+                $dataKaryawanRequest = $requestabsen->employee;
                 // Simpan Kedalam Table Absen
                 $absen = new Absen();
-                $absen->user_id = $employeeCode;
-                $absen->nik = $employeeCode;
+                $absen->user_id = $dataKaryawanRequest;
+                $absen->nik = $dataKaryawanRequest;
                 $absen->tanggal = $requestabsen->tanggal;
 
                 if ($requestabsen->status == 'F') {

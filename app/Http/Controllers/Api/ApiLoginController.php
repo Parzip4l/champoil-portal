@@ -276,13 +276,13 @@ class ApiLoginController extends Controller
 
         try {
             if ($organisasi->unit_bisnis === 'CHAMPOIL') {
-                if($organisasi === 'Management Leaders') {
+                if($organisasi->organisasi === 'Management Leaders') {
                     $payslip = Payrol::findOrFail($id);
                 } else {
                     $payslip = Payrollns::findOrFail($id);
                 }
             }else{
-                if($organisasi === 'Management Leaders') {
+                if($organisasi->organisasi === 'Management Leaders') {
                     $payslip = Payrol::findOrFail($id);
                 } else {
                     $payslip = Payroll::findOrFail($id);

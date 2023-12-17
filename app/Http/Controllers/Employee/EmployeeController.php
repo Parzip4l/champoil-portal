@@ -34,7 +34,11 @@ class EmployeeController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
+        
+        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
+        ->where('resign_status',0)
+        ->get();
+
         return view('pages.hc.karyawan.index', compact('karyawan'));
     }
 

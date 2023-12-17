@@ -275,14 +275,17 @@ class ApiLoginController extends Controller
                     ->first();
 
         try {
-            if ($organisasi === 'Management Leaders') {
-                $payslip = Payrol::findOrFail($id);
-            }else{
-                $unit_bisnis = $organisasi->unit_bisnis;
-                if ($unit_bisnis == 'Kas') {
-                    $payslip = Payroll::findOrFail($id);
+            if ($organisasi->unit_bisnis === 'CHAMPOIL') {
+                if($organisasi === 'Management Leaders') {
+                    $payslip = Payrol::findOrFail($id);
                 } else {
                     $payslip = Payrollns::findOrFail($id);
+                }
+            }else{
+                if($organisasi === 'Management Leaders') {
+                    $payslip = Payrol::findOrFail($id);
+                } else {
+                    $payslip = Payroll::findOrFail($id);
                 }
             }
             // Jika ditemukan, kembalikan data dalam format JSON

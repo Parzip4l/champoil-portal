@@ -20,14 +20,11 @@ class EmployeeController extends Controller
             foreach($records as $row){
                 $row->project = "";
                 $last_schdl = Absen::where('nik', $row->employee_code)->first();
-                
 
                 if($last_schdl){
                     $project = Project::where('id', $last_schdl->project)->first();
                     $row->project = $project->name;
                 }
-                
-                
 
                 // Tanggal awal
                 $tanggal_awal = date('Y-m-d',strtotime($row->join_date));

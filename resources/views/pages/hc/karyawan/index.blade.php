@@ -93,7 +93,7 @@
                             <div class="modal-body">
                                 <form action="{{route('employee.resign')}}" method="POST" enctype="multipart/form-data">
                                     @csrf
-                                    <input type="text" name="id" value="{{ $data->id }}">
+                                    <input type="hidden" name="id" value="{{ $data->id }}">
                                     <div class="row">
                                         <div class="col-md-12 mb-2">
                                             <label for="" class="form-label">Reason</label>

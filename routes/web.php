@@ -131,6 +131,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
+    Route::resource('employee-resign', App\Http\Controllers\Employee\ResignController::class);
+    Route::post('/employee.resign', [App\Http\Controllers\Employee\EmployeeController::class, 'resign'])->name('employee.resign');
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
 
     Route::get('export-employee', [App\Http\Controllers\Employee\EmployeeController::class, 'exportEmployee'])->name('export.employee');

@@ -427,6 +427,35 @@ class EmployeeController extends Controller
     {
         $contact = Employee::find($id);
         if($contact){
+            // $data=[
+            //     "employee_code"=>$contact->nik,
+            //     "nama"=>$contact->nama,
+            //     "ktp"=>$contact->ktp,
+            //     "join_date"=>$contact->joindate,
+            //     "meta_karyawan"=>json_encode($contact),
+            //     "created_at"=>date('Y-m-d H:i:s')
+            // ];
+            // $insert_resign = EmployeeResign::insertGetId($data);
+            // if($insert_resign){
+                $contact->delete();
+                return redirect()->route('employee.index')->with('success', 'Employee Successfully Deleted');
+            // }else{
+            //     return redirect()->route('employee.index')->with('danger', 'Employee Failed Deleted');
+            // }
+        }
+    }
+
+    /**
+     * Resign the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function resign(Request $request)
+    {
+        $contact = Employee::find($request->input('id'));
+        $contact->reason = $request->input('reason');
+        if($contact){
             $data=[
                 "employee_code"=>$contact->nik,
                 "nama"=>$contact->nama,
@@ -437,10 +466,10 @@ class EmployeeController extends Controller
             ];
             $insert_resign = EmployeeResign::insertGetId($data);
             if($insert_resign){
-                $contact->delete();
-                return redirect()->route('employee.index')->with('success', 'Employee Successfully Deleted');
+                Employee::where('id',$request->input('id'))->update(['resign_status'=>1]);
+                return redirect()->route('employee.index')->with('success', 'Employee Successfully Resign');
             }else{
-                return redirect()->route('employee.index')->with('danger', 'Employee Failed Deleted');
+                return redirect()->route('employee.index')->with('danger', 'Employee Failed Resign');
             }
         }
     }

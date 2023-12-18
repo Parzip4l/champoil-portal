@@ -84,11 +84,19 @@
         </li>
         @endif
         @if(in_array('superadmin_access', $dataLogin))
+           
             <li class="nav-item">
-                <a href="{{ url('employee') }}" class="nav-link">
+                <a href="{{ url('#') }}" class="nav-link">
                     <i class="link-icon" data-feather="user"></i>
-                    <span class="menu-title">Employee</span>
+                        <span class="menu-title">Employee</span>
+                    <i class="link-arrow"></i>
                 </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item"><a href="{{ url('employee') }}" class="nav-link {{ active_class(['absen']) }}">Employee Directory</a></li>
+                        <li class="nav-item"><a href="{{ url('employee-resign') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Employee Resign</a></li>
+                    </ul>
+                </div>
             </li>
         @endif
         @if(in_array('superadmin_access', $dataLogin))

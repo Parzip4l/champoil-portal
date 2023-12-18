@@ -24,13 +24,9 @@
         <div class="card-header">
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-0">Employees</h6>
+                    <h6 class="card-title align-self-center mb-0">Employee Resign</h6>
                 </div>
-                <div class="tombol-pembantu d-flex">
-                    <a class="btn btn-info d-flex align-items-center me-2 text-white" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">Import</a>
-                    <a class="btn btn-success d-flex align-items-center me-2" href="{{ route('export.employee') }}">Export</a>
-                    <a class="btn btn-primary d-flex align-items-center" href="{{ route('employee.create') }}">Tambah Karyawan</a>
-                </div>
+                
             </div>
         </div>
         <div class="card-body">

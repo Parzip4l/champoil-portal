@@ -9,5 +9,5 @@ class Task extends Model
 {
     use HasFactory;
     protected $connection = 'mysql_secondary';
-    protected $table = 'task_globals';
+    protected $table = 'master_tasks';
 }

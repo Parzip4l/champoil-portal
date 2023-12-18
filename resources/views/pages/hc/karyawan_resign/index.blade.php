@@ -41,7 +41,6 @@
                     <th>Organisasi</th>
                     <th>Jabatan</th>
                     <th>Status Karyawan</th>
-                    <th>Aksi</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -57,27 +56,7 @@
                     <td>{{ $data->organisasi }}</td>
                     <td>{{ $data->jabatan }}</td>
                     <td><span class="@if($data->status_kontrak == 'Permanent') badge rounded-pill bg-primary @else badge rounded-pill bg-success @endif">{{ $data->status_kontrak }}</span></td>
-                    <td>
-                        <div class="dropdown"> 
-                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.edit', ['employee' => $data->nik]) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.show', $data->id) }}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View Detail</span></a>
-                                <a href="#" class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#resign-{{ $data->id }}">
-                                    <i data-feather="user-x" class="icon-sm me-2"></i> <span class="">Resign</span>
-                                </a>
-                                <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                                    @csrf @method('DELETE') 
-                                    <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                        <i data-feather="trash" class="icon-sm me-2"></i>
-                                        <span class="">Delete</span>
-                                    </a>
-                                </form>
-                            </div>
-                        </div>
-                    </td>
+                    
                 </tr>
                 <div class="modal fade" id="resign-{{ $data->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">

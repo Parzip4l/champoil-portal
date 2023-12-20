@@ -30,12 +30,18 @@
                             <tr>
                                 @php
                                     $projectname = \App\ModelCG\Project::find($data->project)->name;
-                                    $employee = \App\Employee::where('nik', $data->employee)->first();
+                                    $employee = \App\Employee::where('nik', $data->employee)->get();
                                 @endphp
                                 <td>
                                     {{ \Carbon\Carbon::parse($data->tanggal)->locale('id_ID')->isoFormat('dddd, D MMMM YYYY') }}
                                 </td>
-                                <td>{{$employee->nama}}</td>
+                                <td>
+                                @if($employee->nama)
+                                    {{ $employee->nama }}
+                                @else
+                                    Nama tidak ada
+                                @endif
+                                </td>
                                 <td>{{$projectname}}</td>
                                 <td>{{$data->periode}}</td>
                                 <td>

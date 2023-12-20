@@ -128,7 +128,7 @@
                 selectEmployee.empty().append('<option disabled selected>Select Employee</option>');
                 $.each(response.employees, function(key, value) {
                     // Fix: Change 'value.nik' to 'value.id' or another unique identifier if 'nik' is not available
-                    selectEmployee.append('<option value="' + value.id + '">' + value.nama + '</option>');
+                    selectEmployee.append('<option value="' + value.nik + '">' + value.nama + '</option>');
                 });
             }
         });

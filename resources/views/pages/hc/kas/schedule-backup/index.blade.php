@@ -30,7 +30,7 @@
                             <tr>
                                 @php
                                     $projectname = \App\ModelCG\Project::find($data->project)->name;
-                                    $employee = \App\Employee::where('nik', $data->employee)->get();
+                                    $employee = \App\Employee::where('nik', $data->employee)->first();
                                 @endphp
                                 <td>
                                     {{ \Carbon\Carbon::parse($data->tanggal)->locale('id_ID')->isoFormat('dddd, D MMMM YYYY') }}

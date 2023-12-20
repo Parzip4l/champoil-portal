@@ -184,7 +184,6 @@ class ApiLoginController extends Controller
                 ], 404);
             }
         } catch (\Exception $e) {
-            // Log the exception for debugging purposes
             // You may want to customize this based on your logging setup
             Log::error($e);
 
@@ -195,73 +194,147 @@ class ApiLoginController extends Controller
         }
     }
 
-
-    public function payslipuser(Request $request)
-{
-    try {
-        // Retrieve the token from the request
+    // Backup Absen
+    public function clockinbackup(Request $request)
+    {   
+        try {
         $token = $request->bearerToken();
-
-        // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
-        if ($user) {
-            $employeeCode = $user->employee_code;
+        $nik = $user->employee_code;
 
-            // Ensure employeeCode is not null before accessing the database
-            if ($employeeCode) {
-                $cacheKey = 'payslips:' . $employeeCode;
+        $today = Carbon::now()->format('Y-m-d');
 
-                // Check if data is already in cache
-                $cachedData = Cache::get($cacheKey);
-                if ($cachedData) {
-                    return response()->json(['payslips' => $cachedData]);
-                }
+        $schedulebackup = ScheduleBackup::where('employee', $nik)
+            ->whereDate('tanggal', $today)
+            ->get();
 
-                $dataKaryawan = Employee::where('nik', $employeeCode)->first();
+        foreach($schedulebackup as $databackup)
+        {
+            $project_id = $databackup->project;
+            $tanggal_backup = $databackup->tanggal;
+            $shift = $databackup->shift;
+            $periode = $databackup->periode;
+        }
 
-                if ($dataKaryawan) {
-                    $karyawan = json_decode($dataKaryawan, true);
+        $dataProject = Project::where('id', $project_id)->first();
 
-                    if ($karyawan['organisasi'] === 'Management Leaders') {
-                        $payslips = Payrol::where('employee_code', $employeeCode)
-                            ->where('payslip_status', 'Published')
-                            ->get();
-                    } else {
-                        $unit_bisnis = $dataKaryawan->unit_bisnis;
+        $latitudeProject = $dataProject->latitude;
+        $longtitudeProject = $dataProject->longtitude;
 
-                        dd($unit_bisnis);
-                        if ($unit_bisnis == 'Kas') {
-                            $payslips = Payroll::where('employee_code', $employeeCode)
-                                        ->where('payslip_status', 'Published')
-                                        ->get();
-                        } else {
-                            $payslips = Payrollns::where('employee_code', $employeeCode)
-                                        ->where('payslip_status', 'Published')
-                                        ->get();
-                        }
-                    }
+        $kantorLatitude = $latitudeProject;
+        $kantorLongtitude = $longtitudeProject;
 
-                    // Modify the response to return JSON data
-                    $payslipsData = $payslips->toArray();
+        $time_in = Carbon::now()->format('H:i');
+        $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
 
-                    // Store data in cache for future requests
-                    Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
+        $lat = $request->input('latitude');
+        $long = $request->input('longitude');
+        $status = $request->input('status');
+        
+        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
 
-                    return response()->json(['payslips' => $payslipsData]);
-                } else {
-                    return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
-                }
-            } else {
-                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+        $allowedRadius = 3;
+
+        if ($distance <= $allowedRadius) {
+            $filename = null;
+            $absensi = new absen();
+            $absensi->user_id = $nik;
+            $absensi->nik = $nik;
+            $absensi->tanggal = now()->toDateString();
+            $absensi->clock_in = now()->toTimeString();
+            $absensi->latitude = $lat;
+            $absensi->longtitude = $long;
+            $absensi->status = $status;
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+
+                // Use Laravel's store method to handle file uploads
+                $path = $image->storeAs('images/absen', $filename, 'public');
             }
+            $absensi->photo = $filename;
+            $absensi->project_backup = $project_id;
+            $absensi->save();
+            return response()->json(['message' => 'Clockin success, Happy Working Day!']);
         } else {
-            return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+            return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
         }
     } catch (\Exception $e) {
-        // Handle general errors
-        return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+
+        Log::error($e);
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'An error occurred while processing the request.',
+        ], 500);
     }
-}
+    }
+
+
+    public function payslipuser(Request $request)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            if ($user) {
+                $employeeCode = $user->employee_code;
+
+                // Ensure employeeCode is not null before accessing the database
+                if ($employeeCode) {
+                    $cacheKey = 'payslips:' . $employeeCode;
+
+                    // Check if data is already in cache
+                    $cachedData = Cache::get($cacheKey);
+                    if ($cachedData) {
+                        return response()->json(['payslips' => $cachedData]);
+                    }
+
+                    $dataKaryawan = Employee::where('nik', $employeeCode)->first();
+
+                    if ($dataKaryawan) {
+                        $karyawan = json_decode($dataKaryawan, true);
+
+                        if ($karyawan['organisasi'] === 'Management Leaders') {
+                            $payslips = Payrol::where('employee_code', $employeeCode)
+                                ->where('payslip_status', 'Published')
+                                ->get();
+                        } else {
+                            $unit_bisnis = $dataKaryawan->unit_bisnis;
+                            if ($unit_bisnis == 'Kas') {
+                                $payslips = Payroll::where('employee_code', $employeeCode)
+                                            ->where('payslip_status', 'Published')
+                                            ->get();
+                            } else {
+                                $payslips = Payrollns::where('employee_code', $employeeCode)
+                                            ->where('payslip_status', 'Published')
+                                            ->get();
+                            }
+                        }
+
+                        // Modify the response to return JSON data
+                        $payslipsData = $payslips->toArray();
+
+                        // Store data in cache for future requests
+                        Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
+
+                        return response()->json(['payslips' => $payslipsData]);
+                    } else {
+                        return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
+                    }
+                } else {
+                    return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+                }
+            } else {
+                return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+            }
+        } catch (\Exception $e) {
+            // Handle general errors
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        }
+    }
 
     // Details Payslip
     public function PayslipDetails(Request $request, $id)

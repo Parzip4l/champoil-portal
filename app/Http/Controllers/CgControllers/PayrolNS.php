@@ -107,6 +107,7 @@ class PayrolNS extends Controller
             $montlySalary = 0;
             $rate_harian = 0;
             $rate_harianbackup = 0;
+            $potonganAbsen = 0;
 
             //Potongan Hutang
             $potonganHutang = LoanModel::where('employee_id', $nik)

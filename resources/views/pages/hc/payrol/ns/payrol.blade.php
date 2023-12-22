@@ -221,30 +221,27 @@
                     ->where('unit_bisnis', 'CHAMPOIL') 
                     ->first();
         @endphp
-        const employeeName = "{{ $employee ? $employee->nama : 'Nama Tidak Ada' }}";
-const employeeCode = "{{ $data->employee_code }}";
-
-const newRow{{ employeeCode }} = `
-    <tr>
-        <td>
-            <select class="form-control" name="employee_code[]">
-                <option value="${employeeCode}">${employeeName}</option>
-            </select>
-        </td>
-        <td>
-            <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
-        </td>
-        <td>
-            <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
-        </td> 
-        <td class="purchase-uom-td">
-            <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
-        </td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
-        </td>
-    </tr>
-`;
+            const newRow{{ $data->employee_code }} = `
+                <tr>
+                    <td>
+                        <select class="form-control" name="employee_code[]">
+                            <option value="{{ $data->employee_code ?? 'Tidak Terdaftar' }}">{{ $employee->nama ?? 'Tidak Terdaftar' }}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
+                    </td>
+                    <td>
+                        <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
+                    </td> 
+                    <td class="purchase-uom-td">
+                        <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
+                    </td>
+                </tr>
+            `;
 
             employeeTableBody.insertAdjacentHTML('beforeend', newRow{{ $data->employee_code }});
         @endforeach

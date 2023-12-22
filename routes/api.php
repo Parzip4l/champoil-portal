@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiLoginController;
+use App\Http\Controllers\Api\LmsController;
 use App\Http\Controllers\Employee\EmployeeController;
 
 Route::prefix('v1')->group(function () {
@@ -48,4 +49,8 @@ Route::prefix('v1')->group(function () {
 
     // Download Files Attendence Request
     Route::get('/download-files-attendence/{id}', [ApiLoginController::class, 'downloadFilesAttendence']);
+
+
+    //LMS
+    Route::get('/read/{id}', [LmsController::class, 'read_test']);
 });

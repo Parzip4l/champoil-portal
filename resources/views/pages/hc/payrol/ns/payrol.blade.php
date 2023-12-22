@@ -221,11 +221,13 @@
                     ->where('unit_bisnis', 'CHAMPOIL') 
                     ->first();
         @endphp
+        const employeeName = "{{ $employee->nama }}";
+const employeeCode = "{{ $data->employee_code }}";
             const newRow{{ $data->employee_code }} = `
                 <tr>
                     <td>
                         <select class="form-control" name="employee_code[]">
-                            <option value="{{ $data->employee_code }}">{{ $employee->nama }}</option>
+                            <option value="${employeeCode}">${employeeName ? employeeName : 'Nama Tidak Ada'}</option>
                         </select>
                     </td>
                     <td>

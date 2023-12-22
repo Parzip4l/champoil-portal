@@ -49,7 +49,7 @@
                             @endphp
                             <td><a href="{{route('payrol-component.show', $data->id)}}">{{ $employee->nama; }}</a></td>
                             <td>Rp {{ number_format($data->basic_salary, 0, ',', '.') }}</td>
-                            <td>Rp {{ number_format($data->thp, 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($data->net_salary, 0, ',', '.') }}</td>
                             <td>
                                 <div class="dropdown">
                                 <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

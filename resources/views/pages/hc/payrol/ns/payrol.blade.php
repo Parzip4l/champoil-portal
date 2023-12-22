@@ -223,7 +223,7 @@
         @endphp
         const employeeName = "{{ $employee ? $employee->nama : 'Nama Tidak Ada' }}";
         const employeeCode = "{{ $data->employee_code }}";
-            const newRow{{ $employeeCode }} = `
+            const newRow{{ employeeCode }} = `
                 <tr>
                     <td>
                         <select class="form-control" name="employee_code[]">

@@ -185,7 +185,6 @@ class ApiLoginController extends Controller
             }
         } catch (\Exception $e) {
             // You may want to customize this based on your logging setup
-            Log::error($e);
 
             return response()->json([
                 'status' => 'error',

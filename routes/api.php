@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
     // Backup
     Route::post('/clockin-backup', [ApiLoginController::class, 'clockinbackup']);
     Route::post('/clockout-backup', [ApiLoginController::class, 'clockout']);
+    Route::get('/backup-log', [ApiLoginController::class, 'LogBackup']);
 
     // Request Type
     Route::get('/type-absence-request', [ApiLoginController::class, 'TypeAttendenceRequest']);
@@ -53,4 +54,5 @@ Route::prefix('v1')->group(function () {
 
     //LMS
     Route::get('/read/{id}', [LmsController::class, 'read_test']);
+    
 });

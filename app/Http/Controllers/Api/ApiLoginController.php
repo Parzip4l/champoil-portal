@@ -823,49 +823,49 @@ class ApiLoginController extends Controller
             // Get User Information
             $user = Auth::guard('api')->user();
             $employeeCode = $user->name;
-        
+
             // Define Today
             $today = now()->format('Y-m-d');
-        
+
             // Get Absen Backup Hari Ini
-            $backupLogabsen = Absen::where('nik', $employeeCode)
+            $backupLogHariIni = Absen::where('nik', $employeeCode)
                 ->where('tanggal', $today)
                 ->whereNotNull('project_backup')
                 ->first();
-        
+
             // Get Absen Backup Periode Bulan Sekarang
             $startDate = now()->day >= 21 ? now()->copy()->day(21) : now()->copy()->subMonth()->day(21);
             $endDate = now()->day >= 21 ? now()->copy()->addMonth()->day(20) : now()->copy()->day(20);
-        
+
             $BackupPeriodeLog = Absen::where('nik', $employeeCode)
                 ->whereNotNull('project_backup')
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->get();
-        
-            // Check if there are logs
-            if (!$backupLogabsen) {
-                return response()->json(['message' => 'Anda tidak memiliki jadwal backup hari ini.'], 200);
+
+            // Check if there are logs for today
+            if (!$backupLogHariIni) {
+                // Return logs for the whole month
                 return response()->json(['LogAbsenBackupPeriode' => $BackupPeriodeLog], 200);
             }
-        
+
             // Absensi Backup Check
-            $alreadyClockIn = $backupLogabsen->clock_in !== null;
-            $alreadyClockOut = $backupLogabsen->clock_out !== null;
-            $isSameDay = $alreadyClockOut ? Carbon::parse($backupLogabsen->clock_out)->isSameDay(Carbon::today()) : false;
-        
+            $alreadyClockIn = $backupLogHariIni->clock_in !== null;
+            $alreadyClockOut = $backupLogHariIni->clock_out !== null;
+            $isSameDay = $alreadyClockOut ? Carbon::parse($backupLogHariIni->clock_out)->isSameDay(Carbon::today()) : false;
+
             // Response
             return response()->json([
-                'backupHariIni' => $backupLogabsen,
-                'alreadyClockIn' => $alreadyClockIn, 
-                'alreadyClockOut' => $alreadyClockOut, 
+                'backupHariIni' => $backupLogHariIni,
+                'alreadyClockIn' => $alreadyClockIn,
+                'alreadyClockOut' => $alreadyClockOut,
                 'isSameDay' => $isSameDay,
                 'LogAbsenBackupPeriode' => $BackupPeriodeLog
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
         }
-        
     }
+
 
     public function updateStatusReject(Request $request, $id)
     {

@@ -198,76 +198,75 @@ class ApiLoginController extends Controller
     public function clockinbackup(Request $request)
     {   
         try {
-        $token = $request->bearerToken();
-        $user = Auth::guard('api')->user();
-        $nik = $user->employee_code;
+            $token = $request->bearerToken();
+            $user = Auth::guard('api')->user();
+            $nik = $user->employee_code;
 
-        $today = Carbon::now()->format('Y-m-d');
+            $today = Carbon::now()->format('Y-m-d');
 
-        $schedulebackup = ScheduleBackup::where('employee', $nik)
-            ->whereDate('tanggal', $today)
-            ->get();
+            $schedulebackup = ScheduleBackup::where('employee', $nik)
+                ->whereDate('tanggal', $today)
+                ->get();
 
-        foreach($schedulebackup as $databackup)
-        {
-            $project_id = $databackup->project;
-            $tanggal_backup = $databackup->tanggal;
-            $shift = $databackup->shift;
-            $periode = $databackup->periode;
-        }
-
-        $dataProject = Project::where('id', $project_id)->first();
-
-        $latitudeProject = $dataProject->latitude;
-        $longtitudeProject = $dataProject->longtitude;
-
-        $kantorLatitude = $latitudeProject;
-        $kantorLongtitude = $longtitudeProject;
-
-        $time_in = Carbon::now()->format('H:i');
-        $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
-
-        $lat = $request->input('latitude');
-        $long = $request->input('longitude');
-        $status = $request->input('status');
-        
-        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
-        $allowedRadius = 3;
-
-        if ($distance <= $allowedRadius) {
-            $filename = null;
-            $absensi = new absen();
-            $absensi->user_id = $nik;
-            $absensi->nik = $nik;
-            $absensi->tanggal = now()->toDateString();
-            $absensi->clock_in = now()->toTimeString();
-            $absensi->latitude = $lat;
-            $absensi->longtitude = $long;
-            $absensi->status = $status;
-            if ($request->hasFile('photo')) {
-                $image = $request->file('photo');
-                $filename = time() . '.' . $image->getClientOriginalExtension();
-
-                // Use Laravel's store method to handle file uploads
-                $path = $image->storeAs('images/absen', $filename, 'public');
+            foreach($schedulebackup as $databackup)
+            {
+                $project_id = $databackup->project;
+                $tanggal_backup = $databackup->tanggal;
+                $shift = $databackup->shift;
+                $periode = $databackup->periode;
             }
-            $absensi->photo = $filename;
-            $absensi->project_backup = $project_id;
-            $absensi->save();
-            return response()->json(['message' => 'Clockin success, Happy Working Day!']);
-        } else {
-            return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
+
+            $dataProject = Project::where('id', $project_id)->first();
+
+            $latitudeProject = $dataProject->latitude;
+            $longtitudeProject = $dataProject->longtitude;
+
+            $kantorLatitude = $latitudeProject;
+            $kantorLongtitude = $longtitudeProject;
+
+            $time_in = Carbon::now()->format('H:i');
+            $workday_start = Carbon::now()->startOfDay()->addHours(8)->addMinutes(30)->format('H:i');
+
+            $lat = $request->input('latitude');
+            $long = $request->input('longitude');
+            $status = $request->input('status');
+            
+            $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+
+            $allowedRadius = 3;
+
+            if ($distance <= $allowedRadius) {
+                $filename = null;
+                $absensi = new absen();
+                $absensi->user_id = $nik;
+                $absensi->nik = $nik;
+                $absensi->tanggal = now()->toDateString();
+                $absensi->clock_in = now()->toTimeString();
+                $absensi->latitude = $lat;
+                $absensi->longtitude = $long;
+                $absensi->status = $status;
+                if ($request->hasFile('photo')) {
+                    $image = $request->file('photo');
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
+
+                    // Use Laravel's store method to handle file uploads
+                    $path = $image->storeAs('images/absen', $filename, 'public');
+                }
+                $absensi->photo = $filename;
+                $absensi->project_backup = $project_id;
+                $absensi->save();
+                return response()->json(['message' => 'Clockin success, Happy Working Day!']);
+            } else {
+                return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
+            }
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while processing the request.',
+                'error_details' => $e->getMessage(),
+            ], 500);
         }
-    } catch (\Exception $e) {
-
-        Log::error($e);
-
-        return response()->json([
-            'status' => 'error',
-            'message' => 'An error occurred while processing the request.',
-        ], 500);
-    }
     }
 
 

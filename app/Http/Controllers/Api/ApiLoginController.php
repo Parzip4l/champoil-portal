@@ -844,8 +844,11 @@ class ApiLoginController extends Controller
 
             // Check if there are logs for today
             if (!$backupLogHariIni) {
-                // Return logs for the whole month
-                return response()->json(['LogAbsenBackupPeriode' => $BackupPeriodeLog], 200);
+                // Return logs for the whole month and a message
+                return response()->json([
+                    'message' => 'Anda tidak memiliki jadwal absen hari ini.',
+                    'LogAbsenBackupPeriode' => $BackupPeriodeLog
+                ], 200);
             }
 
             // Absensi Backup Check
@@ -865,6 +868,7 @@ class ApiLoginController extends Controller
             return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
         }
     }
+
 
 
     public function updateStatusReject(Request $request, $id)

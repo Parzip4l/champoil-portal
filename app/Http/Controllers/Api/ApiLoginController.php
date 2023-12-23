@@ -844,7 +844,8 @@ class ApiLoginController extends Controller
         
             // Check if there are logs
             if (!$backupLogabsen) {
-                return response()->json(['message' => 'Anda tidak memiliki log absen backup.'], 200);
+                return response()->json(['message' => 'Anda tidak memiliki jadwal backup hari ini.'], 200);
+                return response()->json(['LogAbsenBackupPeriode' => $BackupPeriodeLog], 200);
             }
         
             // Absensi Backup Check

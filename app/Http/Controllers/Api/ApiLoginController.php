@@ -219,7 +219,7 @@ class ApiLoginController extends Controller
 
             $latitudeProject = $dataProject->latitude;
             $longtitudeProject = $dataProject->longtitude;
-
+            
             $kantorLatitude = $latitudeProject;
             $kantorLongtitude = $longtitudeProject;
 
@@ -231,7 +231,6 @@ class ApiLoginController extends Controller
             $status = $request->input('status');
             
             $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
             $allowedRadius = 3;
 
             if ($distance <= $allowedRadius) {

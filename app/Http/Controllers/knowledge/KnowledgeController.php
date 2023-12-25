@@ -342,7 +342,13 @@ class KnowledgeController extends Controller
                             ->where('employee_code',Auth::user()->employee_code)
                             ->select('knowledge.*','asign_tests.total_point','asign_tests.updated_at')
                             ->get();
-        $data['asign_test'] = Asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
+        $data['asign_test'] = DB::connection('mysql_secondary')
+                            ->table('asign_tests')
+                            ->join('knowledge','asign_tests.id_test', '=', 'knowledge.id')
+                            ->where('status',0)
+                            ->where('employee_code',Auth::user()->employee_code)
+                            ->select('knowledge.*','asign_tests.*')
+                            ->get();
 
         return view('pages.hc.knowledge.list_class',$data);
     }

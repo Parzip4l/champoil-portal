@@ -15,48 +15,47 @@
         <form id="form_category" action="{{route('knowledge.save_soal')}}" method="POST" enctype="multipart/form-data">
         @csrf
             <input type="hidden" value="{{ $value_master->id }}" name="master_test">
-            <div id="list_queessioner">
-                
+                 <div id="list_queessioner">
                     <?php if(!empty($result)){ ?>
                     @foreach($result as $row)
                     <div id="list_soal">
-                    <div class="mb-3">
-                        <label class="form-label" for="basic-default-fullname">Quessioner</label>
-                        <textarea class="form-control" name="master_soal[]">{{ $row->master_soal }}</textarea>
-                        <?php 
-                            $no="A"; 
-                            $number=1;
-                        ?>
-                            @foreach($row->jawaban as $jawaban)
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
-                                        <span id="basic-icon-default-fullname2" 
-                                              class="input-group-text">{{ $no }}</span>
+                        <div class="mb-3">
+                            <label class="form-label" for="basic-default-fullname">Quessioner</label>
+                            <textarea class="form-control" name="master_soal[]">{{ $row->master_soal }}</textarea>
+                            <?php 
+                                $no="A"; 
+                                $number=1;
+                            ?>
+                                @foreach($row->jawaban as $jawaban)
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
+                                            <span id="basic-icon-default-fullname2" 
+                                                class="input-group-text">{{ $no }}</span>
+                                            <input type="text" 
+                                                class="form-control" 
+                                                name="jawaban_<?php echo $number ?>[]"
+                                                value="{{ $jawaban->jawaban }}"
+                                                id="basic-icon-default-fullname" 
+                                                placeholder="Option">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2  mt-3">
                                         <input type="text" 
-                                               class="form-control" 
-                                               name="jawaban_<?php echo $number ?>[]"
-                                               value="{{ $jawaban->jawaban }}"
-                                               id="basic-icon-default-fullname" 
-                                               placeholder="Option">
+                                            name="point_<?php echo $number ?>[]" 
+                                            class="form-control" 
+                                            value="{{ $jawaban->point }}"
+                                            placeholder="Point"
+                                            id="basic-default-fullname">
                                     </div>
                                 </div>
-                                <div class="col-md-2  mt-3">
-                                    <input type="text" 
-                                           name="point_<?php echo $number ?>[]" 
-                                           class="form-control" 
-                                           value="{{ $jawaban->point }}"
-                                           placeholder="Point"
-                                           id="basic-default-fullname">
-                                </div>
-                            </div>
-                            <?php 
-                                $no++; 
-                                $number++;    
-                            ?>
-                            @endforeach
-                        
-                    </div>
+                                <?php 
+                                    $no++; 
+                                    $number++;    
+                                ?>
+                                @endforeach
+                            
+                        </div>
                     </div>
                     @endforeach
                     <?php }else{ ?>

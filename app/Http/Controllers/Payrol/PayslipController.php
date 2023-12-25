@@ -38,8 +38,8 @@ class PayslipController extends Controller
                 $dbSecondary = DB::connection('mysql_secondary');
 
                 $datans = $dbSecondary->table('payrolls')
-                    ->select('periode','payrol_status','payslip_status', \DB::raw('SUM(thp) as total_payroll')) // Tambahkan id pada select clause
-                    ->groupBy('periode','payrol_status','payslip_status')
+                    ->select('periode','payrol_status','payslip_status','run_by', \DB::raw('SUM(thp) as total_payroll')) // Tambahkan id pada select clause
+                    ->groupBy('periode','payrol_status','payslip_status','run_by')
                     ->get();
             } else {
                 $datans = Payrollns::select('month', 'year','periode','payrol_status','payslip_status','run_by',\DB::raw('SUM(thp) as total_payroll'))

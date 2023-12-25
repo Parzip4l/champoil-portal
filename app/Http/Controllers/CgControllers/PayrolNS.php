@@ -13,6 +13,7 @@ use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use Carbon\Carbon;
 use App\ModelCG\Project;
+use Illuminate\Support\Facades\Auth;
 use App\ModelCG\ProjectDetails;
 
 class PayrolNS extends Controller
@@ -68,6 +69,8 @@ class PayrolNS extends Controller
      */
     public function store(Request $request)
     {
+        $code = Auth::user()->employee_code;
+        $dataLogin = Employee::where('nik', $code)->first();
         // Validasi request
         $request->validate([
             'month' => 'required',
@@ -382,6 +385,7 @@ class PayrolNS extends Controller
             $payroll->deductions = $deductionData;
             $payroll->payrol_status = 'Unlocked';
             $payroll->payslip_status = 'Unpublish';
+            $payroll->run_by = $dataLogin->nama;
             $payroll->save();
         }
 

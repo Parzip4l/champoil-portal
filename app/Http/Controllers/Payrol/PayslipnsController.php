@@ -65,7 +65,6 @@ class PayslipnsController extends Controller
             $totalallowence = $dataPayslip[0]['total_daily'] + $dataPayslip[0]['total_lembur'] + $dataPayslip[0]['uang_makan'] + $dataPayslip[0]['uang_kerajinan'];
             $totalDeductions = $dataPayslip[0]['potongan_hutang'] + $dataPayslip[0]['potongan_mess'] + $dataPayslip[0]['potongan_lain'];
         }
-        dd($dataPayslip);
         return view('pages.hc.payrol.ns.payslip', compact('dataPayslip','totalallowence','totalDeductions'));
     }
 

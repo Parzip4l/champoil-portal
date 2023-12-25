@@ -135,6 +135,7 @@ class PayrolController extends Controller
                 $payroll->payrol_status = 'Unlocked';
                 $payroll->payslip_status = 'Unpublish';
                 $payroll->unit_bisnis = $unit_bisnis;
+                $payroll->run_by = $employee->nama;
                 $payroll->save();
             }
         }
@@ -144,6 +145,8 @@ class PayrolController extends Controller
 
     public function storens(Request $request)
     {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
         // Mendapatkan input dari request
         $employeeCodes = $request->input('employee_code');
         $lembur_jam = $request->input('lembur_jam');
@@ -215,6 +218,7 @@ class PayrolController extends Controller
                 $payroll->total_daily = $totaldaily;
                 $payroll->payrol_status = 'Unlocked';
                 $payroll->payslip_status = 'Unpublish';
+                $payroll->run_by = $employee->nama;
                 $payroll->save();
             }
         }

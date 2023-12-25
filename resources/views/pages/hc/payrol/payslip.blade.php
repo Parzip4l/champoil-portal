@@ -44,6 +44,7 @@
                                         <th>Total</th>
                                         <th>Payroll Status</th>
                                         <th>Payslip Status</th>
+                                        <th>Run By</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -65,6 +66,7 @@
                                         @else
                                             <span class="text-danger">{{$dataBulan->payslip_status}}</span>
                                         @endif
+                                        <td>{{$dataBulan->run_by}}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -108,6 +110,7 @@
                                     <th>Total Payrol</th>
                                     <th>Payroll Status</th>
                                     <th>Payslip Status</th>
+                                    <th>Run By</th>
                                     <th>Aksi</th>
                                 </tr>
                                 </thead>
@@ -134,6 +137,7 @@
                                         @else
                                             <span class="text-danger">{{$data->payslip_status}}</span>
                                         @endif
+                                        <td>{{$data->run_by}}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

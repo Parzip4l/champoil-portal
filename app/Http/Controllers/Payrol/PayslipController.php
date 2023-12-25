@@ -29,9 +29,9 @@ class PayslipController extends Controller
         if ($employee) {
             $unit_bisnis = $employee->unit_bisnis;
                 
-            $data = Payrol::select('month', 'year','payrol_status','payslip_status', \DB::raw('SUM(net_salary) as total_net_salary'))
+            $data = Payrol::select('month', 'year','payrol_status','payslip_status','run_by', \DB::raw('SUM(net_salary) as total_net_salary'))
                     ->where('unit_bisnis',$unit_bisnis)
-                    ->groupBy('month', 'year', 'payrol_status', 'payslip_status')
+                    ->groupBy('month', 'year', 'payrol_status', 'payslip_status','run_by')
                     ->get();
 
             if ($unit_bisnis == 'Kas') {
@@ -42,8 +42,8 @@ class PayslipController extends Controller
                     ->groupBy('periode','payrol_status','payslip_status')
                     ->get();
             } else {
-                $datans = Payrollns::select('month', 'year','periode','payrol_status','payslip_status', \DB::raw('SUM(thp) as total_payroll'))
-                    ->groupBy('month', 'year','periode','payrol_status', 'payslip_status')
+                $datans = Payrollns::select('month', 'year','periode','payrol_status','payslip_status','run_by',\DB::raw('SUM(thp) as total_payroll'))
+                    ->groupBy('month', 'year','periode','payrol_status', 'payslip_status','run_by')
                     ->get();
             }
 

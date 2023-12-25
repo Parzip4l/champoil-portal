@@ -55,5 +55,4 @@ Route::prefix('v1')->group(function () {
     //LMS
     Route::get('/learning-read/{id}', [LmsController::class, 'ReadTest']);
     Route::get('/data-learning', [LmsController::class, 'DataLearning']);
-    
 });

@@ -297,17 +297,17 @@ class ApiLoginController extends Controller
                         if ($karyawan['organisasi'] === 'Management Leaders') {
                             $payslips = Payrol::where('employee_code', $employeeCode)
                                 ->where('payslip_status', 'Published')
-                                ->get();
+                                ->paginate(5);
                         } else {
                             $unit_bisnis = $dataKaryawan->unit_bisnis;
                             if ($unit_bisnis == 'Kas') {
                                 $payslips = Payroll::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->get();
+                                            ->paginate(5);
                             } else {
                                 $payslips = Payrollns::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->get();
+                                            ->paginate(5);
                             }
                         }
 
@@ -317,7 +317,12 @@ class ApiLoginController extends Controller
                         // Store data in cache for future requests
                         Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
 
-                        return response()->json(['payslips' => $payslipsData]);
+                        return response()->json([
+                            'payslips' => $payslips->items(),
+                            'current_page' => $payslips->currentPage(),
+                            'per_page' => $payslips->perPage(),
+                            'total' => $payslips->total(),
+                        ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
                     }
@@ -482,21 +487,35 @@ class ApiLoginController extends Controller
     // History Request
     public function HistoryDataRequest(Request $request)
     {
-        // Retrieve the token from the request
-        $token = $request->bearerToken();
-        // Authenticate the user based on the token
-        $user = Auth::guard('api')->user();
-        
         try {
 
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+
+            // Validate token
+            if (!$token) {
+                return response()->json(['error' => 'Token tidak valid.'], 401);
+            }
+
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            // Check if user is authenticated
             if (!$user) {
                 return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
             }
 
             $employeeCode = $user->employee_code;
-            $historyData = RequestAbsen::where('employee', $employeeCode)->get();
+            $historyData = RequestAbsen::where('employee', $employeeCode)->paginate(5);
 
-            return response()->json(['employeeCode' => $employeeCode, 'historyData' => $historyData], 200);
+            return response()->json([
+                'employeeCode' => $employeeCode,
+                'historyData' => $historyData->items(),
+                'current_page' => $historyData->currentPage(),
+                'per_page' => $historyData->perPage(),
+                'total' => $historyData->total(),
+            ], 200);
+
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }

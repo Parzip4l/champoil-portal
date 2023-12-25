@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 // models
 use App\Employee;
@@ -23,9 +24,23 @@ class LmsController extends Controller
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
 
-        $dataLearning = Knowledge::all();
+        $data=[];
+        $data['finished_tes']=DB::connection('mysql_secondary')
+                            ->table('asign_tests')
+                            ->join('knowledge','asign_tests.id_test', '=', 'knowledge.id')
+                            ->where('status',1)
+                            ->where('employee_code', $user->employee_code)
+                            ->select('knowledge.*','asign_tests.total_point','asign_tests.updated_at')
+                            ->get();
+        $data['my_tes'] = DB::connection('mysql_secondary')
+                            ->table('asign_tests')
+                            ->join('knowledge','asign_tests.id_test', '=', 'knowledge.id')
+                            ->where('status',0)
+                            ->where('employee_code', $user->employee_code)
+                            ->select('knowledge.*','asign_tests.*')
+                            ->get();
 
-        return response()->json(['dataLearning' => $dataLearning], 200);
+        return response()->json(['dataLearning' => $data], 200);
     }
     public function ReadTest($id,Request $request)
     {
@@ -48,7 +63,7 @@ class LmsController extends Controller
             
             // Check if the record exists
             if (!$data['record']) {
-                $redirect = redirect()->route('some_error_route')->with('error', 'Knowledge record not found');
+                return response()->json(['error' => 'Record Not Found.'], 500);
                 $error=true;
             }
         
@@ -56,7 +71,7 @@ class LmsController extends Controller
             $data['file_module'] = $fileName;
             // Check if the file exists
             if (!($data['file_module'])) {
-                $redirect = redirect()->route('some_error_route')->with('error', 'File not found');
+                return response()->json(['error' => 'File Not Found.'], 500);
                 $error=true;
             }
         
@@ -78,24 +93,18 @@ class LmsController extends Controller
                 $url =$data['file_module'];
             }
 
-        // }catch (\Exception $e) {
-        //     // Log the error or handle it appropriately
-        //     $url="";
-        //     $redirect="";
-        //     $error=true;
-        // }
-        
-
         $result=[
             "error"=>$error,
             "redirect"=>$redirect,
-            "url"=>$url
+            "filename"=>$url
         ];
 
         return response()->json($result);
     }
 
-    private function get_soal($data){
+    private function get_soal($data)
+    {
 
     }
+
 }

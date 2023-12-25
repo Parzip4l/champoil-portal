@@ -11,10 +11,24 @@ use Illuminate\Support\Facades\Hash;
 use App\Employee;
 use App\ModelCG\Knowledge;
 use App\ModelCG\User_read_module;
+use App\ModelCG\asign_test;
 
 class LmsController extends Controller
 {
-    public function read_test($id,Request $request){
+
+    // Data LMS
+    public function DataLearning(Request $request)
+    {
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+
+        $dataLearning = Knowledge::all();
+
+        return response()->json(['dataLearning' => $dataLearning], 200);
+    }
+    public function ReadTest($id,Request $request)
+    {
         $redirect="";
         $error=false;
         $result=[];

@@ -194,7 +194,7 @@ class PayslipController extends Controller
 
         // Logic to update the status to 'Locked' for the specified month and year
         Payrol::where('month', $month)->where('year', $year)
-        ->where('ubit_bisnis',$companyData)
+        ->where('unit_bisnis',$companyData)
         ->update(['payrol_status' => 'Unlocked']);
 
         return redirect()->back()->with('success', 'Payroll unlocked successfully');

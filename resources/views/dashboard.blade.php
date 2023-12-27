@@ -58,7 +58,7 @@
                 </div>
             </div>
             <!-- End  -->
-            <div class="card custom-card2">
+            <div class="card custom-card2 mobile">
                 <div class="card-body">
                     <div class="button-absen">
                         @if (Auth::check())
@@ -164,7 +164,7 @@
 </div>
 
 <!-- Menu -->
-<div class="row mb-3">
+<div class="row mb-3 mobile">
     <h5 class="mb-3">My Menu</h5>
     <div class="menu-absen-wrap">
         <div class="owl-carousel owl-theme owl-basic">
@@ -240,7 +240,7 @@
     <div class="col-md-12">
         <div class="card custom-card2">
             <div class="card-body">
-                @foreach($pengajuanSchedule as $pengajuanData)
+                @forelse($pengajuanSchedule as $pengajuanData)
                 <div class="wrapper-pengajuan d-flex justify-content-between mb-4">
                     @php 
                         $pic = \App\Employee::where('nik', $pengajuanData->namapengaju)->first();
@@ -258,7 +258,12 @@
                     </div>
                 </div>
                 <hr>
-                @endforeach
+                @empty
+                <div class="text-null text-center">
+                    <h5 class="mb-2">No Schedule Request</h5>
+                    <p class="text-muted">Schedule Request Will Show Here.</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -288,7 +293,7 @@
         <div class="card custom-card2">
             <div class="card-body">
                 <div class="item-request">
-                    @foreach($dataRequest as $dataAbsen)
+                @forelse($dataRequest as $dataAbsen)
                     <div class="wrapper-pengajuan d-flex mb-4">
                         <div class="foto-profile me-2">
                             <img src="{{ asset('images/' . $dataAbsen->gambar) }}" alt="" class="w-100">
@@ -300,7 +305,12 @@
                             <span class="text-muted">{{$dataAbsen->status}}</span>
                         </div>
                     </div>
-                    @endforeach
+                @empty
+                <div class="text-null text-center">
+                    <h5 class="mb-2">No Attendence Request</h5>
+                    <p class="text-muted">Attendence Request Will Show Here.</p>
+                </div>
+                @endforelse
                 </div>
             </div>
         </div>

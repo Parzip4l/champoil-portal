@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+// Modul
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,11 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
+use Carbon\Carbon;
+
+// Model
 use App\Http\Controllers\Controller;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
@@ -22,9 +28,6 @@ use App\ModelCG\Payroll;
 use App\Employee;
 use App\User;
 use App\Absen\RequestAbsen;
-use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\PersonalAccessToken;
-use Carbon\Carbon;
 use App\Company\CompanyModel;
 use App\Absen\RequestType;
 

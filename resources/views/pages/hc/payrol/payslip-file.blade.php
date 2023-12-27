@@ -24,7 +24,7 @@
             <div class="card-body">
                 <div class="container-fluid d-flex justify-content-between">
                     <div class="col-lg-6 ps-0">
-                        <a href="#" class="noble-ui-logo d-block mt-3 mb-6">TRUEST<span> LOGO</span></a>                 
+                        <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="" style="max-width:20%;">           
                         <h5 class="mt-5 mb-2 text-muted">Payslip Details</h5>
                         @php
                             $employee = \App\Employee::where('nik', $dataPayslip[0]['employee_code'])->first();
@@ -75,6 +75,17 @@
                             <tbody>
                                 <tr>
                                     <td>
+                                    @if($karyawanLogin->unit_bisnis === 'Kas')
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Tunjangan Jabatan</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_jabatan'][0], 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                                         <div class="row mb-2">
                                             <div class="col-md-6">
                                                 <span>Tunjangan Struktural</span>
@@ -83,6 +94,7 @@
                                                 <span class="text-right">Rp {{ number_format($dataEarnings['t_struktural'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
+                                    @endif
                                         <div class="row mb-2">
                                             <div class="col-md-6">
                                                 <span>Tunjangan Kinerja</span>
@@ -91,6 +103,17 @@
                                                 <span class="text-right">Rp {{ number_format($dataEarnings['t_kinerja'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
+                                        @if($karyawanLogin->unit_bisnis === 'Kas')
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Tunjangan Fasilitas</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_fasilitas'][0], 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                                         <div class="row mb-2">
                                             <div class="col-md-6">
                                                 <span>Tunjangan Alat Kerja</span>
@@ -99,6 +122,7 @@
                                                 <span class="text-right">Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
+                                        @endif
                                         @if($karyawanLogin->unit_bisnis === 'Kas')
                                         <div class="row mb-2">
                                             <div class="col-md-6">
@@ -114,6 +138,14 @@
                                             </div>
                                             <div class="col-md-6 text-right">
                                                 <span class="text-right">Rp {{ number_format($dataEarnings['t_transportasi'][0], 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <span>Gaji Rapel</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp {{ number_format($dataEarnings['g_rapel'][0], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         @endif
@@ -243,6 +275,7 @@
                     <h4>Earnings</h4>
                 </div>
                 <div class="card-body">
+                    @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Tunjangan Struktural
@@ -251,6 +284,17 @@
                             Rp {{ number_format($dataEarnings['t_struktural'][0], 0, ',', '.') }}
                         </span>
                     </div>
+                    @endif
+                    @if($karyawanLogin->unit_bisnis === 'Kas')
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Jabatan
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_jabatan'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    @endif
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Tunjangan Kinerja
@@ -259,6 +303,7 @@
                             Rp {{ number_format($dataEarnings['t_kinerja'][0], 0, ',', '.') }}
                         </span>
                     </div>
+                    @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Tunjangan Alat Kerja
@@ -267,6 +312,25 @@
                             Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}
                         </span>
                     </div>
+                    @endif
+                    @if($karyawanLogin->unit_bisnis === 'Kas')
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Tunjangan Fasilitas
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['t_fasilitas'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
+                            Gaji Rapel
+                        </span>
+                        <span>
+                            Rp {{ number_format($dataEarnings['g_rapel'][0], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    @endif
                     @if($karyawanLogin->unit_bisnis === 'Kas')
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>

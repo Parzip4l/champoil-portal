@@ -119,8 +119,6 @@ class PayrolController extends Controller
                 $allowancesData = $payrollComponents->allowances;
                 $deductionsData = $payrollComponents->deductions;
                 $NetSalary = $payrollComponents->net_salary;
-
-                // Perhitunga PPH21
                 
 
                 // Simpan data payroll

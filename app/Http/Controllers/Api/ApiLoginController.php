@@ -300,17 +300,17 @@ class ApiLoginController extends Controller
                         if ($karyawan['organisasi'] === 'Management Leaders') {
                             $payslips = Payrol::where('employee_code', $employeeCode)
                                 ->where('payslip_status', 'Published')
-                                ->paginate(5);
+                                ->get();
                         } else {
                             $unit_bisnis = $dataKaryawan->unit_bisnis;
                             if ($unit_bisnis == 'Kas') {
                                 $payslips = Payroll::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->paginate(5);
+                                            ->get();
                             } else {
                                 $payslips = Payrollns::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->paginate(5);
+                                            ->get();
                             }
                         }
 

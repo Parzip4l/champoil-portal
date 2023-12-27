@@ -107,20 +107,32 @@ class PayslipController extends Controller
     // Locked Payroll
     public function lockPayroll($month, $year)
     {
-        // Logic to update the status to 'Locked' for the specified month and year
-        Payrol::where('month', $month)->where('year', $year)->update(['payrol_status' => 'Locked']);
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
+
+        Payrol::where('month', $month)->where('year', $year)
+        ->where('unit_bisnis', $companyData)
+        ->update(['payrol_status' => 'Locked']);
 
         return redirect()->back()->with('success', 'Payroll locked successfully');
     }
 
     public function publishPayslip($month, $year)
     {
+        // Check User Login
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
+
         // Check if the payroll is locked
         $isPayrollLocked = Payrol::where('month', $month)->where('year', $year)->where('payrol_status', 'Locked')->exists();
 
         if ($isPayrollLocked) {
             // If the payroll is locked, update the payslip status to 'Published'
-            Payrol::where('month', $month)->where('year', $year)->update(['payslip_status' => 'Published']);
+            Payrol::where('month', $month)->where('year', $year)
+            ->where('unit_bisnis', $companyData)
+            ->update(['payslip_status' => 'Published']);
             return redirect()->back()->with('success', 'Payslip published successfully');
         } else {
             // If the payroll is not locked, display an error message
@@ -176,20 +188,32 @@ class PayslipController extends Controller
     // Unlock
     public function unlockPayroll($month, $year)
     {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
+
         // Logic to update the status to 'Locked' for the specified month and year
-        Payrol::where('month', $month)->where('year', $year)->update(['payrol_status' => 'Unlocked']);
+        Payrol::where('month', $month)->where('year', $year)
+        ->where('ubit_bisnis',$companyData)
+        ->update(['payrol_status' => 'Unlocked']);
 
         return redirect()->back()->with('success', 'Payroll unlocked successfully');
     }
 
     public function unpublishPayslip($month, $year)
     {
+        // Check User Login
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
         // Check if the payroll is locked
         $isPayrollLocked = Payrol::where('month', $month)->where('year', $year)->where('payrol_status', 'Unlocked')->exists();
 
         if ($isPayrollLocked) {
             // If the payroll is locked, update the payslip status to 'Published'
-            Payrol::where('month', $month)->where('year', $year)->update(['payslip_status' => 'Unpublish']);
+            Payrol::where('month', $month)->where('year', $year)
+            ->where('ubit_bisnis',$companyData)
+            ->update(['payslip_status' => 'Unpublish']);
             return redirect()->back()->with('success', 'Payslip published successfully');
         } else {
             // If the payroll is not locked, display an error message

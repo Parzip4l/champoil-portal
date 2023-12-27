@@ -212,7 +212,7 @@ class PayslipController extends Controller
         if ($isPayrollLocked) {
             // If the payroll is locked, update the payslip status to 'Published'
             Payrol::where('month', $month)->where('year', $year)
-            ->where('ubit_bisnis',$companyData)
+            ->where('unit_bisnis',$companyData)
             ->update(['payslip_status' => 'Unpublish']);
             return redirect()->back()->with('success', 'Payslip published successfully');
         } else {

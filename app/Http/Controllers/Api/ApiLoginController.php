@@ -819,12 +819,12 @@ class ApiLoginController extends Controller
                     $absen->clock_in = $requestabsen->clock_in;
                     $absen->clock_out = $requestabsen->clock_out;
                 } else {
-                    $absen->clock_in = '-';
-                    $absen->clock_out = '-';
+                    $absen->clock_in = null;
+                    $absen->clock_out = null;
                 }
 
-                $absen->latitude = '-';
-                $absen->longtitude = '-';
+                $absen->latitude = null;
+                $absen->longtitude = null;
                 $absen->status = $requestabsen->status;
                 $absen->save();
             }

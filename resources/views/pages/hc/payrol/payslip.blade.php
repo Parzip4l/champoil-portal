@@ -87,7 +87,7 @@
                                                         <a href="{{ route('UnpublishPayslip', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}" class="dropdown-item d-flex align-items-center" aria-disabled="true">
                                                             <i data-feather="slash" class="icon-sm me-2"></i> <span class="">Unpublish Payslip</span>
                                                         </a>
-                                                    @else
+                                                    @elseif($dataBulan->payrol_status === 'Locked')
                                                         <a href="{{ route('PublishPayslipData', ['month' => $dataBulan->month, 'year' => $dataBulan->year]) }}" class="dropdown-item d-flex align-items-center">
                                                             <i data-feather="send" class="icon-sm me-2"></i> <span class="">Publish Payslip</span>
                                                         </a>

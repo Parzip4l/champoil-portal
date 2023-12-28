@@ -6,13 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+use App\Employee;
+use App\User;
+use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
+use Carbon\Carbon;
+use App\Company\CompanyModel;
+use App\Absen\RequestType;
 
 // models
-use App\Employee;
 use App\ModelCG\Knowledge;
+use App\ModelCG\Knowledge_soal; 
+use App\ModelCG\Knowledge_jawaban;
 use App\ModelCG\User_read_module;
 use App\ModelCG\asign_test;
+use App\ModelCG\Jawaban_user;
 
 class LmsController extends Controller
 {
@@ -24,34 +38,21 @@ class LmsController extends Controller
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
 
-        $data=[];
-        $data['finished_tes']=DB::connection('mysql_secondary')
-                            ->table('asign_tests')
-                            ->join('knowledge','asign_tests.id_test', '=', 'knowledge.id')
-                            ->where('status',1)
-                            ->where('employee_code', $user->employee_code)
-                            ->select('knowledge.*','asign_tests.total_point','asign_tests.updated_at')
-                            ->get();
-        $data['my_tes'] = DB::connection('mysql_secondary')
-                            ->table('asign_tests')
-                            ->join('knowledge','asign_tests.id_test', '=', 'knowledge.id')
-                            ->where('status',0)
-                            ->where('employee_code', $user->employee_code)
-                            ->select('knowledge.*','asign_tests.*')
-                            ->get();
+        $dataLearning = Knowledge::all();
 
-        return response()->json(['dataLearning' => $data], 200);
+        return response()->json(['dataLearning' => $dataLearning], 200);
     }
     public function ReadTest($id,Request $request)
     {
         $redirect="";
         $error=false;
         $result=[];
-        // try{
-            // Retrieve the token from the request
-            $token = $request->bearerToken();
-            // Authenticate the user based on the token
-            $user = Auth::guard('api')->user();
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+        try{
+            
 
             $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
             $data['record'] = Knowledge::where('id', $id)->first();
@@ -63,7 +64,7 @@ class LmsController extends Controller
             
             // Check if the record exists
             if (!$data['record']) {
-                return response()->json(['error' => 'Record Not Found.'], 500);
+                $redirect = redirect()->route('some_error_route')->with('error', 'Knowledge record not found');
                 $error=true;
             }
         
@@ -71,7 +72,7 @@ class LmsController extends Controller
             $data['file_module'] = $fileName;
             // Check if the file exists
             if (!($data['file_module'])) {
-                return response()->json(['error' => 'File Not Found.'], 500);
+                $redirect = redirect()->route('some_error_route')->with('error', 'File not found');
                 $error=true;
             }
         
@@ -93,18 +94,112 @@ class LmsController extends Controller
                 $url =$data['file_module'];
             }
 
+        }catch (\Exception $e) {
+            // Log the error or handle it appropriately
+            $url="";
+            $redirect="";
+            $cek->module_read=0;
+            $error=true;
+            $auth=$user;
+        }
+        
+
         $result=[
             "error"=>$error,
             "redirect"=>$redirect,
-            "filename"=>$url
+            "status"=>$cek->module_read,
+            "url"=>$url,
+            "user"=>$user
         ];
 
         return response()->json($result);
     }
 
-    private function get_soal($data)
-    {
+    public function KnowledgeTest($id, Request $request){
 
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+
+        $data['id_module']=$id;
+        $data['soal']=[];
+        $response=[];
+        Asign_test::where('id_test',$id)
+                    ->where('employee_code',$user->employee_code)
+                    ->where('status',0)
+                    ->update(['module_read'=>1]);
+
+        $test = Knowledge::find($id);
+        if($test){
+            $soal = Knowledge_soal::where('master_test',$test->id)->inRandomOrder()->limit(30)->get();
+            if($soal){
+                foreach($soal as $row){
+                    $jawaban = Knowledge_jawaban::where('id_soal',$row->id)->inRandomOrder()->get();
+                    $row->jawaban = $jawaban;
+                    $response[]=$row;
+                }
+            }
+            $data['soal']=$response;
+
+        }
+
+        $result =[
+            "module"=>$test,
+            "durasi_test"=>$test->durasi,
+            "soal"=>$data['soal']
+        ];
+
+        return response()->json($result, 200);
     }
 
+    public function SubmitTest(Request $request){
+
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+
+
+        $data = $request->all();
+        $error=false;
+        $msg="Success";
+        
+        if($data){
+            $count = count($data);
+            $jml_test = $count-3;
+            $point=0;
+            for ($i = 0; $i <= $jml_test; $i++) {
+                $explode = explode("-",$data['test_'.$i]);
+                $id_soal = $explode[1];
+                $id_jawaban = $explode[0];
+                $cek_jawaban = Knowledge_jawaban::where('id',$id_jawaban)->first();
+
+                //rumus bobot
+                
+                $insert=[
+                    "id_soal"=>$id_soal,
+                    "id_jawaban"=>$cek_jawaban->id,
+                    "nilai_point"=>isset($cek_jawaban->point)?$cek_jawaban->point:0
+                ];
+                $point +=isset($cek_jawaban->point)?$cek_jawaban->point:0;
+                
+                Jawaban_user::insert($insert);
+            }
+            
+            Asign_test::where('employee_code',$user->employee_code)
+                        ->where('id_test',$data['id_module'])
+                        ->update(["status"=>1,"total_point"=>$point]);
+            
+        }
+
+        $result=[
+            "error"=>$error,
+            "msg"=>$msg
+        ];
+
+        return response()->json($result, 200);
+    }
+
+    
 }

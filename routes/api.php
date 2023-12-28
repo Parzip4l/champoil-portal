@@ -55,4 +55,7 @@ Route::prefix('v1')->group(function () {
     //LMS
     Route::get('/learning-read/{id}', [LmsController::class, 'ReadTest']);
     Route::get('/data-learning', [LmsController::class, 'DataLearning']);
+    Route::get('/knowledge_test/{id}', [LmsController::class, 'KnowledgeTest']);
+    Route::post('/post_test', [LmsController::class, 'SubmitTest']);
+    
 });

@@ -42,6 +42,7 @@ class LmsController extends Controller
 
         return response()->json(['dataLearning' => $dataLearning], 200);
     }
+
     public function ReadTest($id,Request $request)
     {
         $redirect="";
@@ -96,8 +97,8 @@ class LmsController extends Controller
 
         }catch (\Exception $e) {
             // Log the error or handle it appropriately
-            $url="";
-            $redirect="";
+            $url=0;
+            $redirect=0;
             $cek->module_read=0;
             $error=true;
             $auth=$user;

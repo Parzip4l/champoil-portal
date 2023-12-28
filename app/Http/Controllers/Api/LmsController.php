@@ -24,7 +24,7 @@ use App\Absen\RequestType;
 use App\ModelCG\Knowledge;
 use App\ModelCG\Knowledge_soal; 
 use App\ModelCG\Knowledge_jawaban;
-use App\ModelCG\User_read_module;
+use App\ModelCG\user_read_module;
 use App\ModelCG\asign_test;
 use App\ModelCG\Jawaban_user;
 
@@ -76,7 +76,7 @@ class LmsController extends Controller
                 $error=true;
             }
         
-            User_read_module::insert([
+            user_read_module::insert([
                 "created_at" => now(),
                 "employee_code" => $user->employee_code,
                 "id_module" => $id

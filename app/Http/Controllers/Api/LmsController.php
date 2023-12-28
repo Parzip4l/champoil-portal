@@ -94,7 +94,7 @@ class LmsController extends Controller
             } else {
                 $url =$data['file_module'];
             }
-
+            dd($cek->module_read);
         }catch (\Exception $e) {
             // Log the error or handle it appropriately
             $url=0;

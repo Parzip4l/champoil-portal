@@ -61,20 +61,29 @@ class KnowledgeController extends Controller
             'title' => 'required',
             'file_name' => 'required|file', // Add file validation rule
         ]);
-
-        $knowledge = new Knowledge();
-        $knowledge->title = $request->title;
-        $knowledge->durasi = $request->durasi;
-        if ($request->hasFile('file_name')) {
-            $image = $request->file('file_name');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-            $destinationPath = public_path('/knowledge_test');
-            $image->move($destinationPath, $filename);
-            $knowledge->file_name = $filename;
+    
+        try {
+            $knowledge = new Knowledge();
+            $knowledge->title = $request->title;
+            $knowledge->durasi = $request->durasi;
+    
+            if ($request->hasFile('file_name')) {
+                $file = $request->file('file_name');
+                $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
+    
+                // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
+                $path = $file->storeAs('knowledge_test', $filename, 'public');
+    
+                $knowledge->file_name = $path;
+            }
+    
+            $knowledge->save();
+    
+            return redirect()->route('knowledge_base.index')->with('success', 'Knowledge Successfully Added');
+        } catch (\Exception $e) {
+            // Log the error or handle it appropriately
+            return redirect()->route('knowledge_base.index')->with('error', 'Failed to add knowledge');
         }
-        $knowledge->save();
-
-        return redirect()->route('knowledge_base.index')->with('success', 'Knowledge Successfully Added');
     }
 
     /**

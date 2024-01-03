@@ -207,5 +207,34 @@ return response()->json($result);
         return response()->json($result, 200);
     }
 
+    public function hasilNilai(Request $request){
+        $msg="";
+        $error=false;
+
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+
+        $records = Asign_test::where('employee_code',$user->employee_code)->get();
+
+        if($records){
+            $error=false;
+            $msg="Data Nilai";
+        }else{
+            $error=true;
+            $msg="Data Empty";
+        }
+
+        $result=[
+            "msg"=>$msg,
+            "error"=>$error,
+            "records"=>$records
+        ];
+
+        return response()->json($result, 200);
+
+    }
+
     
 }

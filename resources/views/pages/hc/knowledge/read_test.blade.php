@@ -48,7 +48,7 @@
     function renderPage(num) {
         pageRendering = true;
         pdfDoc.getPage(num).then(function(page) {
-            var scale = 0.5;
+            var scale = 1;
             var viewport = page.getViewport({ scale: scale });
             var context = canvas.getContext('2d');
             canvas.width = viewport.width;

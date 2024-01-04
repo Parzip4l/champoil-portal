@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiLoginController;
 use App\Http\Controllers\Api\LmsController;
 use App\Http\Controllers\Employee\EmployeeController;
+use App\Http\Controllers\Api\ProfileController;
 
 Route::prefix('v1')->group(function () {
 
@@ -20,6 +21,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/Payslip/{id}', [ApiLoginController::class, 'PayslipDetails']);
     Route::get('/employee/{nik}', [ApiLoginController::class, 'getEmployeeByNik']);
     Route::get('/profile/{nik}', [ApiLoginController::class, 'getMyProfile']);
+    Route::post('/profile-update', [ProfileController::class, 'update']);
     Route::post('/absence-request', [ApiLoginController::class, 'submitAbsenceRequest']);
     Route::get('/history-absence-request', [ApiLoginController::class, 'HistoryDataRequest']);
     Route::get('/employee-resign', [App\Http\Controllers\Api\EmployeeController::class, 'resign'])->name('employee-resign');

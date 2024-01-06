@@ -220,6 +220,13 @@ return response()->json($result);
         if($records){
             foreach($records as $row){
                 $row->materi = Knowledge::where('id',$row->id_test)->first();
+                $row->status_lulus = "Belum Mengisi";
+                if($row->total_point < 70){
+                    $row->status_lulus = "Tidak Lulus";
+                }else if($row->total_point >= 70){
+                    $row->status_lulus = "Lulus";
+                }
+                
             }
         }
 

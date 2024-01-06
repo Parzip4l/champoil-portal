@@ -217,6 +217,11 @@ return response()->json($result);
         $user = Auth::guard('api')->user();
 
         $records = Asign_test::where('employee_code',$user->employee_code)->get();
+        if($records){
+            foreach($records as $row){
+                $row->materi = Knowledge::where('id',$row->id_test)->first();
+            }
+        }
 
         if($records){
             $error=false;

@@ -135,6 +135,7 @@ class EmployeeController extends Controller
             $data->jenis_kelamin = $request->jenis_kelamin;
             $data->tanggungan = $request->tanggungan;
             $data->unit_bisnis = $request->unit_bisnis;
+            $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
             if ($request->hasFile('gambar')) {
                 $image = $request->file('gambar');
@@ -252,7 +253,14 @@ class EmployeeController extends Controller
     public function edit($id)
     {
         $employee = Employee::where('nik', $id)->with('payrolinfo','user')->first();
-        return view('pages.hc.karyawan.edit', compact('employee'));
+        if(!empty($employee->referal_code)){
+            $unix = $employee->referal_code;
+        }else{
+            $unix = $this->generateCodeVisitor("karyawan","id", 4, "CITY");
+        }
+
+        // dd($unix);
+        return view('pages.hc.karyawan.edit', compact('employee','unix'));
         
     }
 
@@ -342,6 +350,7 @@ class EmployeeController extends Controller
             $employee->alamat = $request->input('alamat');
             $employee->status_pernikahan = $request->input('status_pernikahan');
             $employee->tanggungan = $request->input('tanggungan');
+            $employee->referal_code = $request->input('referal_code');
 
             // Update the employee's photo if a new one is provided
             if ($request->hasFile('gambar')) {
@@ -623,5 +632,19 @@ class EmployeeController extends Controller
         
         $leaveTotal = $sakit + $izin;
         return view('pages.user-pages.profile', compact('employee','attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin','leaveTotal'));
+    }
+
+    // generate referal code
+
+    public function unix_code(){
+        $unix = $this->generateCodeVisitor("karyawan","id", 4, "CITY");
+        dd($unix);
+    }
+
+    private function generateCodeVisitor($tbl, $field, $jml, $inisial){
+        $unixTimestampNumber = time();
+        $unixTimestampString = date('ymdHis', $unixTimestampNumber);
+
+        return "CITY".$unixTimestampString;
     }
 }

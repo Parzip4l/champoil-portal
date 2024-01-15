@@ -110,6 +110,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     
     // Feedback
     Route::post('/users/feedback', 'DashboardController@StoreFeedback')->name('feedback.store');
+    Route::get('/unix-code', [App\Http\Controllers\Employee\EmployeeController::class,'unix_code'])->name('unix-code');
 });
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {

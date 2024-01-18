@@ -149,7 +149,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "#".replace(':id', id);
+                const deleteUrl = "{{ route('garda-pratama.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

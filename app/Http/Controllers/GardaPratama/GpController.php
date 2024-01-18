@@ -106,6 +106,8 @@ class GpController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $component = Gp::find($id);
+        $component->delete();
+        return redirect()->route('garda-pratama.index')->with('success', 'Successfully Deleted');
     }
 }

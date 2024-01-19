@@ -20,6 +20,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Project</th>
+                                <th>Project Code</th>
                                 <th>Badan</th>
                                 <th>Start Contract</th>
                                 <th>End Contract</th>
@@ -34,6 +35,7 @@
                             <tr>
                                 <td> {{$nomor++}} </td>
                                 <td><a href="{{ route('project.show', $data->id) }}">{{ $data->name }}</a></td>
+                                <td>{{ $data->id }}</td>
                                 <td> {{ $data->badan }} </td>
                                 <td> {{ $data->contract_start }} </td>
                                 <td> {{ $data->end_contract }} </td>

@@ -313,10 +313,10 @@ function updateTable(data) {
 
         if (clockIn) {
             // Data sudah ada, atur URL edit
-            actionUrl = "{{ route('attendance.editData', [':date', ':nik']) }}";
+            actionUrl = "{{ route('backupdata.editData', [':date', ':nik']) }}";
         } else {
             // Data belum ada, atur URL create
-            actionUrl = "{{ route('attendance.createData') }}";
+            actionUrl = "{{ route('backupdata.createData') }}";
         }
 
         actionUrl = actionUrl.replace(':date', date);
@@ -335,7 +335,7 @@ function updateTable(data) {
                 var date = button.data('date');
                 var nik = button.data('nik');
                 var modal = $(this);
-                modal.find('#deleteAttendanceBtn').attr('href', '/delete-attendance/' + date + '/' + nik);
+                modal.find('#deleteAttendanceBtn').attr('href', '/delete-attendance-backup/' + date + '/' + nik);
             });
         });
 </script>

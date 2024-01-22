@@ -530,4 +530,12 @@ class AbsenController extends Controller
         ->delete();
         return redirect()->back()->with('success', 'Attendance successfully deleted');
     }
+
+    public function deleteAttendanceBackup($date, $nik)
+    {
+        $dataAbsen = Absen::where('tanggal', $date)
+        ->where('nik', $nik)
+        ->delete();
+        return redirect()->back()->with('success', 'Attendance successfully deleted');
+    }
 }

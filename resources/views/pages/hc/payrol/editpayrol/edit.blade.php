@@ -55,10 +55,12 @@
             <h5>Allowance</h5>
             <hr>
             <div class="row mb-3 allowance-group">
+                @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                 <div class="col-md-6">
                     <label class="form-label">Tunjangan Struktural</label>
                     <input type="number" class="form-control allowance" name="allowances[t_struktural][]" placeholder="Rp." required value="{{$allowences->t_struktural[0]}}">
                 </div>
+                @endif
                 <div class="col-md-6">
                     <label class="form-label">Tunjangan Kinerja</label>
                     <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required value="{{$allowences->t_kinerja[0]}}">

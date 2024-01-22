@@ -32,6 +32,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
     // Delete Absen
     Route::get('/delete-attendance/{date}/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteAttendance']);
+    Route::get('/delete-attendance-backup/{date}/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteAttendanceBackup']);
 
     // Get By Organisasi
     Route::get('/attendance/filter', [ App\Http\Controllers\Absen\AbsenController::class, 'filterByOrganization'])->name('attendance.filter');
@@ -172,6 +173,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Update Absen
     Route::post('/action/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');
     Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsen'])->name('attendance.createData');
+
+    // Update Backup
+    Route::post('/action/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsenBackup'])->name('backupdata.editData');
+    Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsenBackup'])->name('backupdata.createData');
 
     // Company Settings
     Route::resource('company', App\Http\Controllers\Company\CompanyController::class);

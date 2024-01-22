@@ -6,6 +6,12 @@
   <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
 @endpush
 
+@php
+    $user = Auth::user();
+    $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+        ->select('unit_bisnis','organisasi')
+        ->first();
+@endphp
 @section('content')
 
 @if(session('success'))

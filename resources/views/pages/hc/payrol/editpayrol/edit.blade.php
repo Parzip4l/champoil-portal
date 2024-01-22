@@ -9,7 +9,12 @@
   <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
-
+@php
+    $user = Auth::user();
+    $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+        ->select('unit_bisnis','organisasi')
+        ->first();
+@endphp
 @section('content')
 <div class="row">
   <div class="col-lg-12">

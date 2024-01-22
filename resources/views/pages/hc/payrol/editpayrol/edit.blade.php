@@ -71,11 +71,33 @@
                     <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required value="{{$allowences->t_kinerja[0]}}">
                 </div>
             </div>
+            @if($karyawanLogin->unit_bisnis === 'Kas')
             <div class="row mb-3">
+                <div class="col-md-6 mb-3">
+                    <label for="kode_karyawan" class="form-label">Tunjangan Transportasi</label>
+                    <input type="number" id="t_transportasi" class="form-control allowance" name="allowances[t_transportasi][]" placeholder="Rp. " required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tunjangan Fasilitas</label>
+                    <input type="number" class="form-control allowance" name="allowances[t_fasilitas][]" placeholder="Rp." required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tunjangan Jabatan</label>
+                    <input type="number" class="form-control allowance" name="allowances[t_jabatan][]" placeholder="Rp." required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="kode_karyawan" class="form-label">Gaji Rapel</label>
+                    <input type="number" id="t_makan" class="form-control allowance" name="allowances[g_rapel][]" placeholder="Rp. " required>
+                </div>
+            </div>
+            @endif
+            <div class="row mb-3">
+                @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>
                     <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required value="{{$allowences->t_alatkerja[0]}}">
                 </div>
+                @endif
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Total Allowance</label>
                     <input type="number" id="t_allowance" class="form-control" name="allowances[t_allowance][]" placeholder="Rp. " required readonly value="{{$allowences->t_allowance[0]}}">

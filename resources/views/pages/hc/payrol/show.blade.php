@@ -65,10 +65,12 @@
                         </div>
                     </div>
                     <div class="row mb-3">
+                        @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                         <div class="col-md-6 mb-3">
                             <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>
                             <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required value="{{ number_format($allowances['t_alatkerja'][0], 0, ',', '.') }}">
                         </div>
+                        @endif
                         <div class="col-md-6 mb-3">
                             <label for="kode_karyawan" class="form-label">Total Allowance</label>
                             <input type="number" id="t_allowance" class="form-control" name="allowances[t_allowance][]" placeholder="Rp. " required readonly value="{{ number_format($allowances['t_allowance'][0], 0, ',', '.') }}">

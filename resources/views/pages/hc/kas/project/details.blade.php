@@ -76,7 +76,10 @@
                                             <td>{{$data->kebutuhan}} {{$data->jabatan}}</td>
                                             <td>Rp {{ number_format($data->tp_bulanan, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($data->rate_harian, 0, ',', '.') }}</td>
-                                            <td><a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">Details</a></td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">Details</a>
+                                                <a href="{{route('project-details.edit', $data->id)}}" class="btn btn-warning btn-sm text-white">Edit Data</a>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>

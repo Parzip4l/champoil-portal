@@ -43,7 +43,8 @@ class AbsenController extends Controller
             ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
             ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
                 $join->on('absens.nik', '=', 'users.employee_code')
-                    ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+                    ->whereBetween('absens.tanggal', [$startDate, $endDate])
+                    ->whereNotNull('project');
             })
             ->where('karyawan.unit_bisnis', $company->unit_bisnis);
 
@@ -59,6 +60,35 @@ class AbsenController extends Controller
 
         // Mengirim data ke tampilan
         return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization'));
+    }
+
+    public function indexbackup()
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        // Menghitung tanggal mulai dan tanggal akhir berdasarkan aturan bisnis
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+        // Query untuk data absensi
+        $query = DB::table('users')
+            ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
+            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
+                $join->on('absens.nik', '=', 'users.employee_code')
+                    ->whereBetween('absens.tanggal', [$startDate, $endDate])
+                    ->whereNotNull('absens.project_backup');
+            })
+            ->where('karyawan.unit_bisnis', $company->unit_bisnis);
+
+        // Mengambil data absensi dari database
+        $data1 = $query->select('users.*', 'absens.*')
+            ->orderBy('users.name')
+            ->get();
+
+        // Mengirim data ke tampilan
+        return view('pages.absen.backup.databackup', compact('data1', 'endDate', 'startDate'));
     }
 
     public function filterByOrganization(Request $request)
@@ -344,6 +374,7 @@ class AbsenController extends Controller
 
             $absensi = Absen::where('nik', $nik)
                 ->whereBetween('tanggal', [$startDate, $endDate])
+                ->whereNotNull('project')
                 ->get();
 
             $ontime = count($absensi);
@@ -388,6 +419,70 @@ class AbsenController extends Controller
             $CountRequest = count($absensirequest);
 
             return view('pages.absen.show', compact('absensi', 'startDate', 'endDate','namaKaryawan','ontime','daysWithoutAttendance','daysWithClockInNoClockOut','sakit','izin','CountRequest'));
+        } catch (\Exception $e) {
+            // Handle the exception (e.g., log it, show an error page, etc.)
+            return response()->back()->with('error', 'No record found.');
+        }
+    }
+
+    // Backup Details
+    public function detailsAbsenBackup($nik)
+    {
+        try {
+            $today = now();
+            $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+            $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+            
+            // Hitung Total Hari Kerja
+            $totalWorkingDays = $startDate->diffInWeekdays($endDate);
+
+            $absensi = Absen::where('nik', $nik)
+                ->whereBetween('tanggal', [$startDate, $endDate])
+                ->whereNotNull('project_backup')
+                ->get();
+
+            $ontime = count($absensi);
+            $namaKaryawan = Employee::where('nik', $nik)
+                ->select('nama','nik')
+                ->first();
+
+            // Hitung Tidak Absen
+            $daysWithoutAttendance = $totalWorkingDays - $ontime;
+
+            // No ClockOut
+            $daysWithClockInNoClockOut = 0;
+
+            foreach ($absensi as $absendata) {
+                if (!empty($absendata->clock_in) && empty($absendata->clock_out)) {
+                    $daysWithClockInNoClockOut++;
+                }
+            }
+
+            // Sakit
+            $sakit = 0;
+
+            foreach ($absensi as $absendata) {
+                if ($absendata->status == 'Sakit') {
+                    $sakit++;
+                }
+            }
+
+            $izin = 0;
+
+            foreach ($absensi as $absendata) {
+                if ($absendata->status == 'Izin') {
+                    $izin++;
+                }
+            }
+
+            // Request Absen
+            $absensirequest = RequestAbsen::where('employee',$nik)
+                            ->whereBetween('tanggal', [$startDate, $endDate])
+                            ->get();
+
+            $CountRequest = count($absensirequest);
+
+            return view('pages.absen.backup.show', compact('absensi', 'startDate', 'endDate','namaKaryawan','ontime','daysWithoutAttendance','daysWithClockInNoClockOut','sakit','izin','CountRequest'));
         } catch (\Exception $e) {
             // Handle the exception (e.g., log it, show an error page, etc.)
             return response()->back()->with('error', 'No record found.');

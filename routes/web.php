@@ -37,6 +37,8 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/attendance/filter', [ App\Http\Controllers\Absen\AbsenController::class, 'filterByOrganization'])->name('attendance.filter');
 
     Route::get('absen/show/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'detailsAbsen'])->name('absen.details');
+    // Backup Details
+    Route::get('backup/show/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'detailsAbsenBackup'])->name('backup.details');
 
     // Export Attendence
     Route::get('export-attendence', [App\Http\Controllers\Absen\AbsenController::class, 'exportAttendence'])->name('export.attendence');
@@ -211,6 +213,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Get Employee
         Route::get('/get-employees', [App\Http\Controllers\CgControllers\PayrolNS::class, 'getEmployees'])->name('employee.unit');
         Route::post('/import-employees', [App\Http\Controllers\Employee\EmployeeController::class, 'importEmployee'])->name('import.employee');
+
+        // Backup Log
+        Route::get('/backup-log', [App\Http\Controllers\Absen\AbsenController::class, 'indexbackup'])->name('backup.log');
 
         // Learning
         Route::resource('knowledge_base',App\Http\Controllers\knowledge\KnowledgeController::class);

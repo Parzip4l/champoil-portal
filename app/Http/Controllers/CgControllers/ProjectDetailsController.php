@@ -159,7 +159,12 @@ class ProjectDetailsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $projectDetails = ProjectDetails::where('id', $id)->first();
+        $jabatan = Jabatan::where('parent_category', 'KAS')->get();
+        if (!$projectDetails) {
+            return abort(404); // Handle jika proyek tidak ditemukan
+        }
+        return view('pages.hc.kas.project.edit', compact('projectDetails','jabatan'));
     }
 
     /**

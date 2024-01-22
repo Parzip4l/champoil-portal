@@ -114,7 +114,14 @@ class ProjectControllers extends Controller
      */
     public function edit($id)
     {
-        //
+        $project = Project::where('id', $id)->first();  // Ubah sesuai dengan model dan kolom yang benar
+
+        if (!$project) {
+            return abort(404); // Handle jika proyek tidak ditemukan
+        }
+
+        $projectDetails = ProjectDetails::where('project_code', $project->id)->get();
+        return view('pages.hc.kas.project.edit', compact('projectDetails'));
     }
 
     /**

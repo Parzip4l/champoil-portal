@@ -35,9 +35,12 @@
                             <p>Contract End</p>
                             <p class="text-muted text-right">{{ $project->end_contract }}</p>
                         </div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                            Import Data
-                        </button>
+                        <div class="wrap d-flex">
+                            <button type="button" class="btn btn-primary mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                Import Data
+                            </button>
+                            <a href="https://gdurl.com/ARl7/download" class="btn btn-success">Download Template</a>
+                        </div>
                     </div>
                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">

@@ -43,8 +43,7 @@ class AbsenController extends Controller
             ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
             ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
                 $join->on('absens.nik', '=', 'users.employee_code')
-                    ->whereBetween('absens.tanggal', [$startDate, $endDate])
-                    ->whereNotNull('project');
+                    ->whereBetween('absens.tanggal', [$startDate, $endDate]);
             })
             ->where('karyawan.unit_bisnis', $company->unit_bisnis);
 

@@ -71,7 +71,6 @@
                             <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required value="{{ number_format($allowances['t_alatkerja'][0], 0, ',', '.') }}">
                         </div>
                         @endif
-                        
                     </div>
                     @if($karyawanLogin->unit_bisnis === 'Kas')
                     <div class="row mb-3">

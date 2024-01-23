@@ -373,7 +373,6 @@ class AbsenController extends Controller
 
             $absensi = Absen::where('nik', $nik)
                 ->whereBetween('tanggal', [$startDate, $endDate])
-                ->whereNotNull('project')
                 ->get();
 
             $ontime = count($absensi);

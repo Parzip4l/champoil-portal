@@ -14,8 +14,9 @@
             </div>
             <div class="card-body">
                 <div class="form-wrap">
-                    <form action="{{route('project-details.store')}}" method="POST">
+                    <form action="{{route('project-details.update', $projectDetails->id)}}" method="POST">
                         @csrf
+                        @method('PUT')
                         <div class="row">
                             <div class="kebutuhan detail-wrap" id="KebutuhanDetails">
                                 <div class="content-wrap">

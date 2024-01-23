@@ -133,7 +133,22 @@ class ProjectControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $Project = Project::findOrFail($id);
+            $Project->update([
+                'name' => $request->input('name'),
+                'latitude' => $request->input('latitude'),
+                'longtitude' => $request->input('longtitude'),
+                'contract_start' => $request->input('contract_start'),
+                'end_contract' => $request->input('end_contract'),
+                'badan' => $request->input('badan'),
+            ]);
+        
+            return redirect()->back()->with('success', 'Data updated successfully');
+        } catch (\Exception $e) {
+            // Handle the error, you can log it or return an error response
+            return back()->withErrors(['error' => 'Failed to update data.']);
+        }
     }
 
     /**

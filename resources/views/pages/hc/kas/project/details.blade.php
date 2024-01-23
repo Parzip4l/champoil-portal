@@ -24,6 +24,10 @@
                             <p class="text-muted">{{ $project->name }}</p>
                         </div>
                         <div class="project-name-wrap mb-3 d-flex justify-content-between">
+                            <p>Project Badan</p>
+                            <p class="text-muted">{{ $project->badan }}</p>
+                        </div>
+                        <div class="project-name-wrap mb-3 d-flex justify-content-between">
                             <p>Project Address</p>
                             <p class="text-muted text-right">{{ $project->latitude }}, {{ $project->longtitude }}</p>
                         </div>
@@ -40,8 +44,11 @@
                                 Import Data
                             </button>
                             <a href="https://gdurl.com/ARl7/download" class="btn btn-success">Download Template</a>
+                            <a href="" class="btn btn-warning text-white mx-2" data-bs-toggle="modal" data-bs-target="#ModalUpdateProject">Edit Project</a>
                         </div>
                     </div>
+
+                    <!-- Modal Import Project -->
                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -59,6 +66,58 @@
                             </div>
                         </div>
                     </div>
+                    <!-- End Modal -->
+
+                    <!-- Modal Edit Project -->
+                    <div class="modal fade" id="ModalUpdateProject" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Update Data Project</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('project.update', $project->id) }}" method="post">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Project Name</label>
+                                            <input type="text" name="name" class="form-control" value="{{$project->name}}" required>
+                                        </div>
+                                        
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Project Badan</label>
+                                            <input type="text" name="badan" class="form-control" value="{{$project->badan}}" required>
+                                        </div>
+
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Project Latitude</label>
+                                            <input type="text" name="latitude" class="form-control" value="{{$project->latitude}}" required>
+                                        </div>
+
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Project Longitude</label>
+                                            <input type="text" name="longtitude" class="form-control" value="{{$project->longtitude}}" required>
+                                        </div>
+
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Contract Start</label>
+                                            <input type="date" name="contract_start" class="form-control" value="{{$project->contract_start}}" required>
+                                        </div>
+
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Contract End</label>
+                                            <input type="date" name="end_contract" class="form-control" value="{{$project->end_contract}}" required>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100">Update Data Project</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Modal -->
+
                 </div>
                 <div class="row">
                     <div class="col-md-12">

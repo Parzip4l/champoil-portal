@@ -176,7 +176,29 @@ class ProjectDetailsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $projectDetails = ProjectDetails::findOrFail($id);
+            $projectDetails->update([
+                'jabatan' => $request->input('jabatan'),
+                'p_gajipokok' => $request->input('p_gajipokok'),
+                'p_bpjstk' => $request->input('p_bpjstk'),
+                'p_bpjs_ks' => $request->input('p_bpjs_ks'),
+                'p_thr' => $request->input('p_thr'),
+                'p_tkerja' => $request->input('p_tkerja'),
+                'p_tseragam' => $request->input('p_tseragam'),
+                'p_tlain' => $request->input('p_tlain'),
+                'p_training' => $request->input('p_training'),
+                'p_operasional' => $request->input('p_operasional'),
+                'p_membership' => $request->input('p_membership'),
+                'r_deduction' => $request->input('r_deduction'),
+                'p_deduction' => $request->input('p_deduction'),
+            ]);
+
+            return redirect()->route('project.index')->with('success', 'Data updated successfully');
+        } catch (\Exception $e) {
+            // Handle the error, you can log it or return an error response
+            return back()->withInput()->withErrors(['error' => 'Failed to update data.']);
+        }
     }
 
     /**

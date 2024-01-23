@@ -175,8 +175,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsen'])->name('attendance.createData');
 
     // Update Backup
-    Route::post('/action/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsenBackup'])->name('backupdata.editData');
-    Route::post('/action/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsenBackup'])->name('backupdata.createData');
+    Route::post('/actin-backupp/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsenBackup'])->name('backupdata.editData');
+    Route::post('/action-backup/create', [App\Http\Controllers\Employee\EmployeeController::class, 'CreateAbsenBackup'])->name('backupdata.createData');
 
     // Company Settings
     Route::resource('company', App\Http\Controllers\Company\CompanyController::class);

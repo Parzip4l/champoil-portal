@@ -9,7 +9,7 @@ class LoanModel extends Model
 {
     use HasFactory;
     protected $table = 'loans';
-    protected $fillable = ['employee_id'];
+    protected $fillable = ['employee_id','amount','installments','remaining_amount','is_paid'];
 
     public function employee()
     {

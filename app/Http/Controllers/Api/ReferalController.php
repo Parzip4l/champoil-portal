@@ -9,8 +9,8 @@ use App\Employee;
 class ReferalController extends Controller
 {
     public function search_referal($string){
-        $records = Employee::where('kode_referal',$string)->first();
-        
+        $records = Employee::where('referal_code',$string)->first();
+
         if($records){
             $error=false;
             $msg="Data Nilai";

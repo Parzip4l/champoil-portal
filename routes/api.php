@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiLoginController;
 use App\Http\Controllers\Api\LmsController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ReferalController;
 
 Route::prefix('v1')->group(function () {
 

@@ -114,7 +114,14 @@ class ProjectControllers extends Controller
      */
     public function edit($id)
     {
-        //
+        $project = Project::where('id', $id)->first();  // Ubah sesuai dengan model dan kolom yang benar
+
+        if (!$project) {
+            return abort(404); // Handle jika proyek tidak ditemukan
+        }
+
+        $projectDetails = ProjectDetails::where('project_code', $project->id)->get();
+        return view('pages.hc.kas.project.edit', compact('projectDetails'));
     }
 
     /**
@@ -126,7 +133,22 @@ class ProjectControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $Project = Project::findOrFail($id);
+            $Project->update([
+                'name' => $request->input('name'),
+                'latitude' => $request->input('latitude'),
+                'longtitude' => $request->input('longtitude'),
+                'contract_start' => $request->input('contract_start'),
+                'end_contract' => $request->input('end_contract'),
+                'badan' => $request->input('badan'),
+            ]);
+        
+            return redirect()->back()->with('success', 'Data updated successfully');
+        } catch (\Exception $e) {
+            // Handle the error, you can log it or return an error response
+            return back()->withErrors(['error' => 'Failed to update data.']);
+        }
     }
 
     /**

@@ -14,6 +14,7 @@ use App\Payrolinfo\Payrolinfo;
 use App\UserActivities;
 use App\ModelCG\Jabatan;
 use App\ModelCG\Schedule;
+use App\ModelCG\ScheduleBackup;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
@@ -492,6 +493,10 @@ class EmployeeController extends Controller
                                 ->where('tanggal', $request->input('tanggal'))
                                 ->pluck('project')
                                 ->first();
+            
+            if ($schedule === null) {
+                return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');
+            }
 
             $attendance = new Absen;
             $attendance->user_id = $request->input('user');
@@ -513,6 +518,57 @@ class EmployeeController extends Controller
 
     // Update Absen
     public function UpdateAbsen(Request $request, $date, $nik)
+    {
+        // Lakukan pemrosesan untuk mengedit data berdasarkan tanggal ($date) dan nik ($nik)
+        $attendance = Absen::where('tanggal', $date)->where('nik', $nik)->first();
+
+        if ($attendance) {
+            $attendance->clock_in = $request->input('clock_in');
+            $attendance->clock_out = $request->input('clock_out');
+            $attendance->status = $request->input('status');
+            $attendance->save();
+
+            return redirect()->back()->with('success', 'Data Berhasil di ubah');
+        } else {
+            return redirect()->back()->with('error', 'Data tidak ditemukan untuk tanggal dan nik yang dipilih');
+        }
+    }
+
+    public function CreateAbsenBackup(Request $request)
+    {
+        // Lakukan pemrosesan untuk menambahkan data baru
+        try{
+            // Cek Project
+            $schedule = ScheduleBackup::where('employee', $request->input('user'))
+                                ->where('tanggal', $request->input('tanggal'))
+                                ->pluck('project')
+                                ->first();
+            
+            // cek schedule
+            if ($schedule === null) {
+                return redirect()->back()->with('error', 'Tidak ada jadwal untuk anggota ini pada tanggal tersebut');
+            }
+
+            $attendance = new Absen;
+            $attendance->user_id = $request->input('user');
+            $attendance->nik = $request->input('user');
+            $attendance->tanggal = $request->input('tanggal');
+            $attendance->clock_in = $request->input('clock_in');
+            $attendance->clock_out = $request->input('clock_out');
+            $attendance->latitude = $request->input('latitude');
+            $attendance->longtitude = $request->input('longtitude');
+            $attendance->status = $request->input('status');
+            $attendance->project = $schedule;
+            $attendance->save();
+    
+            return redirect()->back()->with('success', 'Absensi berhasil ditambahkan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // Update Absen
+    public function UpdateAbsenBackup(Request $request, $date, $nik)
     {
         // Lakukan pemrosesan untuk mengedit data berdasarkan tanggal ($date) dan nik ($nik)
         $attendance = Absen::where('tanggal', $date)->where('nik', $nik)->first();

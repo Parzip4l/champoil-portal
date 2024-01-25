@@ -6,6 +6,12 @@
   <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
 @endpush
 
+@php
+    $user = Auth::user();
+    $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+        ->select('unit_bisnis','organisasi')
+        ->first();
+@endphp
 @section('content')
 
 @if(session('success'))
@@ -47,25 +53,49 @@
                     <h5>Allowance</h5>
                     <hr>
                     <div class="row mb-3 allowance-group">
+                        @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                         <div class="col-md-6">
                             <label class="form-label">Tunjangan Struktural</label>
                             <input type="number" class="form-control allowance" name="allowances[t_struktural][]" placeholder="Rp." required value="{{ number_format($allowances['t_struktural'][0], 0, ',', '.') }}">
                         </div>
+                        @endif
                         <div class="col-md-6">
                             <label class="form-label">Tunjangan Kinerja</label>
                             <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required value="{{ number_format($allowances['t_kinerja'][0], 0, ',', '.') }}">
                         </div>
                     </div>
                     <div class="row mb-3">
+                        @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
                         <div class="col-md-6 mb-3">
                             <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>
                             <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required value="{{ number_format($allowances['t_alatkerja'][0], 0, ',', '.') }}">
+                        </div>
+                        @endif
+                    </div>
+                    @if($karyawanLogin->unit_bisnis === 'Kas')
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="kode_karyawan" class="form-label">Tunjangan Transportasi</label>
+                            <input type="number" id="t_transportasi" class="form-control allowance" name="allowances[t_transportasi][]" placeholder="Rp. " required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tunjangan Fasilitas</label>
+                            <input type="number" class="form-control allowance" name="allowances[t_fasilitas][]" placeholder="Rp." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tunjangan Jabatan</label>
+                            <input type="number" class="form-control allowance" name="allowances[t_jabatan][]" placeholder="Rp." required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="kode_karyawan" class="form-label">Gaji Rapel</label>
+                            <input type="number" id="t_makan" class="form-control allowance" name="allowances[g_rapel][]" placeholder="Rp. " required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="kode_karyawan" class="form-label">Total Allowance</label>
                             <input type="number" id="t_allowance" class="form-control" name="allowances[t_allowance][]" placeholder="Rp. " required readonly value="{{ number_format($allowances['t_allowance'][0], 0, ',', '.') }}">
                         </div>
                     </div>
+                    @endif
                     <h5>Deductions</h5>
                     <hr>
                     <div class="row mb-3">

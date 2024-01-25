@@ -109,6 +109,9 @@
                 <div class="submenu">
                     <ul class="submenu-item">
                         <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
+                        @if($employee && $employee->unit_bisnis == 'Kas')
+                        <li class="nav-item"><a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a></li>
+                        @endif
                         <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
                         <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
                         <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['kas/shift']) }}">Shift</a></li>

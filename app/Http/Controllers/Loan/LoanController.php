@@ -95,7 +95,37 @@ class LoanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validasi input sesuai kebutuhan
+            $request->validate([
+                'amount' => 'required|numeric',
+                'installments' => 'required|numeric',
+                'remaining_amount' => 'required|numeric',
+                'is_paid' => 'required|in:0,1',
+            ]);
+
+            // Temukan data berdasarkan ID
+            $data = LoanModel::find($id);
+
+            // Periksa apakah data ditemukan
+            if (!$data) {
+                throw new \Exception('Data not found');
+            }
+
+            // Update data
+            $data->update([
+                'amount' => $request->amount,
+                'installments' => $request->installments,
+                'remaining_amount' => $request->remaining_amount,
+                'is_paid' => $request->is_paid,
+            ]);
+
+            // Redirect dengan pesan sukses
+            return redirect()->route('employee-loan.index')->with('success', 'Data berhasil diperbarui');
+        } catch (\Exception $e) {
+            // Redirect dengan pesan error
+            return redirect()->route('employee-loan.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     /**

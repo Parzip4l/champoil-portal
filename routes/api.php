@@ -26,6 +26,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/history-absence-request', [ApiLoginController::class, 'HistoryDataRequest']);
     Route::get('/employee-resign', [App\Http\Controllers\Api\EmployeeController::class, 'resign'])->name('employee-resign');
 
+    /**
+     * Referal
+     */
+    Route::get('/referal-search/{kode_referal}', [ReferalController::class, 'search_referal']);
+
     // Log Absen
     Route::get('/log-absensi', [ApiLoginController::class, 'MyLogsAbsen']);
 

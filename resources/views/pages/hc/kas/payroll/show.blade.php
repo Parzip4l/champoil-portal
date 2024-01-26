@@ -104,14 +104,6 @@
                                                 <span class="text-right">Rp. {{ number_format($allowencesData->tunjangan_lain ?? 0, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <span>BPJS Kesehatan Mandiri</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($allowencesData->bpjs_mandiri ?? 0, 0, ',', '.') }} </span>
-                                            </div>
-                                        </div>
                                     </td>
                                     <td>
                                         <div class="row mb-3">

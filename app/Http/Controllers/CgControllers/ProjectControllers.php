@@ -159,6 +159,23 @@ class ProjectControllers extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $project = Project::where('id',$id);
+            $projectDetails = ProjectDetails::where('project_code', $id)->firstOrFail();
+    
+            // Assuming you have defined a relationship between Project and ProjectDetails, you can also use:
+            // $projectDetails = $project->details;
+    
+            // Deleting the project and its details
+            $project->delete();
+            $projectDetails->delete();
+    
+            return redirect()->route('project.index')->with('success', 'Project Successfully Deleted');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('project.index')->with('error', 'Project not found');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->route('project.index')->with('error', 'An error occurred while deleting the project');
+        }
     }
 }

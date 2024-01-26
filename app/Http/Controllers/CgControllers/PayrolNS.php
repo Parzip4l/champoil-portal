@@ -292,7 +292,6 @@ class PayrolNS extends Controller
                     ->select('p_bpjs_ks', 'p_tlain')
                     ->get();
 
-                $bpjsMandiri = $ProjectAllowances->sum('p_bpjs_ks');
                 $tunjanganLain = $ProjectAllowances->sum('p_tlain');
 
                 $projectAllowancesTotal = 0;
@@ -321,7 +320,7 @@ class PayrolNS extends Controller
                 // End Deductions
 
                 // Perhitungan PPH21
-                $PenghasilanBruto = $gajiPPH + $bpjsMandiri + $totalGajiBackup + 61300 - $potonganAbsen;
+                $PenghasilanBruto = $gajiPPH + $totalGajiBackup + 61300 - $potonganAbsen;
                 $biayaJabatan = $PenghasilanBruto * 0.05;
 
                 $penghasilanNeto = $PenghasilanBruto - $biayaJabatan;
@@ -351,7 +350,6 @@ class PayrolNS extends Controller
                     'totalGajiBackup' => $totalGajiBackup,
                     'rate_harian' => $rate_potongan,
                     'rate_harian_backup' => $rate_harianbackup,
-                    'bpjs_mandiri' => $bpjsMandiri,
                     'tunjangan_lain' => $tunjanganLain,
                 ];
 
@@ -368,7 +366,7 @@ class PayrolNS extends Controller
                 $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
 
                 // THP
-                $pendapatanBersih = $totalGaji + $totalGajiBackup + $bpjsMandiri + $tunjanganLain;
+                $pendapatanBersih = $totalGaji + $totalGajiBackup + $tunjanganLain;
                 $thp = $pendapatanBersih - $potonganAbsen - $totalPotonganHutang - $TotalGP - $totalPPH;
 
                 $allowenceData = json_encode($allowenceData);

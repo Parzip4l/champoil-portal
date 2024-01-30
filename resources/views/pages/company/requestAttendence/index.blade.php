@@ -41,9 +41,9 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('company.show', $data->id)}}">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Details</span>
+                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-target="#CompanyModal{{$data->id}}" data-bs-toggle="modal">
+                                                <i data-feather="edit-2" class="icon-sm me-2"></i>
+                                                <span class="">Edit</span>
                                             </a>
                                             <form action="{{ route('company.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
@@ -96,6 +96,39 @@
     </div>
 </div>
 
+<!-- Modal Edit -->
+@foreach($dataRequest as $data)
+<div class="modal fade" id="CompanyModal{{$data->id}}" tabindex="-1" aria-labelledby="CompanyModal{{$data->id}}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CompanyModal{{$data->id}}">Edit Data Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('request-type.update', $data->id)}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Short Code</label>
+                            <input type="text" name="code" class="form-control" placeholder="S" value="{{$data->code}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Sakit" value="{{$data->name}}" required>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Update Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+
 @endsection
 
 @push('plugin-scripts')
@@ -123,5 +156,54 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+
+<!-- Delete Data -->
+<script>
+    function showDeleteDataDialog(id) {
+        Swal.fire({
+            title: 'Hapus Data',
+            text: 'Anda Yakin Akan Menghapus Data Ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform the delete action here (e.g., send a request to delete the data)
+                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
+                const deleteUrl = "{{ route('request-type.destroy', ':id') }}".replace(':id', id);
+                fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                }).then((response) => {
+                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Request Data Successfully Deleted',
+                            icon: 'success',
+                        }).then(() => {
+                            window.location.reload(); // Refresh halaman setelah menutup alert
+                        });
+                    } else {
+                        // Handle error response if needed
+                        Swal.fire({
+                            title: 'Request Data Failed to Delete',
+                            text: 'An error occurred while deleting data.',
+                            icon: 'error',
+                        });
+                    }
+                }).catch((error) => {
+                    // Handle fetch error if needed
+                    Swal.fire({
+                        title: 'Request Data Failed to Delete',
+                        text: 'An error occurred while deleting data.',
+                        icon: 'error',
+                    });
+                });
+            }
+        });
+    }
 </script>
 @endpush

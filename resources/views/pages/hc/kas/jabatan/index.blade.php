@@ -38,8 +38,8 @@
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id}}">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Details</span>
+                                                <i data-feather="edit-2" class="icon-sm me-2"></i>
+                                                <span class="">Edit</span>
                                             </a>
                                             <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
@@ -87,6 +87,35 @@
     </div>
 </div>
 
+<!-- Update Jabatan Modal -->
+@foreach ($jabatan as $data)
+<div class="modal fade" id="EditContact{{$data->id}}" tabindex="-1" aria-labelledby="EditContact{{$data->id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditContact{{$data->id}}">Update Data Jabatan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('jabatan.update', $data->id)}}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Nama Jabatan</label>
+                            <input type="text" class="form-control" name="name" value="{{$data->name}}" required>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Update Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+
 <!-- End -->
 @endsection
 
@@ -111,7 +140,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "#".replace(':id', id);
+                const deleteUrl = "{{ route('jabatan.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {
@@ -121,7 +150,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Contact Successfully Deleted',
+                            title: 'Jabatan Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert
@@ -129,7 +158,7 @@
                     } else {
                         // Handle error response if needed
                         Swal.fire({
-                            title: 'Contact Failed to Delete',
+                            title: 'Jabatan Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });
@@ -137,7 +166,7 @@
                 }).catch((error) => {
                     // Handle fetch error if needed
                     Swal.fire({
-                        title: 'Contact Failed to Delete',
+                        title: 'Jabatan Failed to Delete',
                         text: 'An error occurred while deleting data.',
                         icon: 'error',
                     });

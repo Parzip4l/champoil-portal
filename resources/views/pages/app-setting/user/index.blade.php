@@ -42,17 +42,6 @@
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ModalEditPass{{$data->id}}"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Ganti Password</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('users.edit', $data->id)}}">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Details</span>
-                                            </a>
-                                            <form action="{{ route('users.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
-                                                @csrf @method('DELETE') 
-                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                                    <i data-feather="trash" class="icon-sm me-2"></i>
-                                                    <span class="">Delete</span>
-                                                </a>
-                                            </form>
                                         </div>
                                     </div>
                                 </td>

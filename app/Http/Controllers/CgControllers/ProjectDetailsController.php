@@ -209,6 +209,21 @@ class ProjectDetailsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            // Find ProjectDetails by project_code
+            $projectDetails = ProjectDetails::findOrFail($id);
+
+            // If ProjectDetails exists, delete it
+            if ($projectDetails) {
+                $projectDetails->delete();
+            }
+
+            return redirect()->route('project.index')->with('success', 'Project Details Successfully Deleted');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('project.index')->with('error', 'Project not found');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->route('project.index')->with('error', 'An error occurred while deleting the project');
+        }
     }
 }

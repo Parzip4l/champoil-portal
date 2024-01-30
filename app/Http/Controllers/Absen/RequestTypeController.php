@@ -105,7 +105,23 @@ class RequestTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate the form data
+            $validatedData = $request->validate([
+                'code' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+            ]);
+    
+            // Update the data
+            $requestData = RequestType::findOrFail($id);
+            $requestData->update($validatedData);
+    
+            // Redirect back with a success message
+            return redirect()->route('request-type.index')->with('success', 'Data updated successfully');
+        } catch (\Exception $e) {
+            // Handle exceptions, you can log or return an error message
+            return redirect()->back()->with('error', 'Error updating data: ' . $e->getMessage())->withErrors($e->getMessage());
+        }
     }
 
     /**
@@ -116,6 +132,20 @@ class RequestTypeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $requestType = RequestType::findOrFail($id);
+            
+            // If ProjectDetails exists, delete it
+            if ($requestType) {
+                $requestType->delete();
+            }
+
+            return redirect()->route('request-type.index')->with('success', 'Request Type Successfully Deleted');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('request-type.index')->with('error', 'Project not found');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->route('request-type.index')->with('error', 'An error occurred while deleting the project');
+        }
     }
 }

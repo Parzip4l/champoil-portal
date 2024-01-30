@@ -137,7 +137,38 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate the form data
+            $validatedData = $request->validate([
+                'company_name' => 'required|string|max:255',
+                'company_address' => 'nullable|string',
+                'use_scedule' => 'required|in:Yes,No',
+                'schedule_type' => 'required|in:Daily,Monthly,No',
+                'latitude' => 'required|string',
+                'longitude' => 'required|string',
+                'radius' => 'required|numeric',
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+
+            // Handle file upload
+            if ($request->hasFile('logo')) {
+                $image = $request->file('logo');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/images/company_logo');
+                $image->move($destinationPath, $filename);
+                $validatedData['logo'] = $filename;
+            }
+
+            // Update the company data
+            $company = CompanyModel::findOrFail($id);
+            $company->update($validatedData);
+
+            // Redirect back with a success message
+            return redirect()->route('company.index')->with('success', 'Company updated successfully');
+        } catch (\Exception $e) {
+            // Handle exceptions, you can log or return an error message
+            return redirect()->back()->with('error', 'Error updating company: ' . $e->getMessage())->withErrors($e->getMessage());
+        }
     }
 
     /**
@@ -148,6 +179,20 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $company = CompanyModel::findOrFail($id);
+            
+            // If ProjectDetails exists, delete it
+            if ($company) {
+                $company->delete();
+            }
+
+            return redirect()->route('company.index')->with('success', 'Company Successfully Deleted');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('company.index')->with('error', 'Project not found');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->route('company.index')->with('error', 'An error occurred while deleting the project');
+        }
     }
 }

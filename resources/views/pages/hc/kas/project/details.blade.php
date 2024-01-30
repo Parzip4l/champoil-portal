@@ -141,6 +141,12 @@
                                             <td>
                                                 <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">Details</a>
                                                 <a href="{{route('project-details.edit', $data->id)}}" class="btn btn-warning btn-sm text-white">Edit Data</a>
+                                                <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
+                                                @csrf @method('DELETE') 
+                                                <a class="btn btn-sm btn-danger" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                    Delete
+                                                </a>
+                                            </form>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -395,4 +401,52 @@
             });
         @endif
     </script>
+
+<script>
+    function showDeleteDataDialog(id) {
+        Swal.fire({
+            title: 'Hapus Data',
+            text: 'Anda Yakin Akan Menghapus Data Ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform the delete action here (e.g., send a request to delete the data)
+                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
+                const deleteUrl = "{{ route('project-details.destroy', ':id') }}".replace(':id', id);
+                fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                }).then((response) => {
+                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Jabatan Successfully Deleted',
+                            icon: 'success',
+                        }).then(() => {
+                            window.location.reload(); // Refresh halaman setelah menutup alert
+                        });
+                    } else {
+                        // Handle error response if needed
+                        Swal.fire({
+                            title: 'Jabatan Failed to Delete',
+                            text: 'An error occurred while deleting data.',
+                            icon: 'error',
+                        });
+                    }
+                }).catch((error) => {
+                    // Handle fetch error if needed
+                    Swal.fire({
+                        title: 'Jabatan Failed to Delete',
+                        text: 'An error occurred while deleting data.',
+                        icon: 'error',
+                    });
+                });
+            }
+        });
+    }
+</script>
 @endpush

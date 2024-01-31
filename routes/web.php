@@ -194,6 +194,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Organisasi Routes
     Route::resource('organisasi', App\Http\Controllers\Organisasi\OrganisasiController::class);
 
+    // App Setting
+    Route::resource('setting', App\Http\Controllers\Setting\SettingController::class);
+
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);

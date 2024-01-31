@@ -184,10 +184,9 @@
         @endif
         @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
-                <a href="{{ url('#') }}" class="nav-link">
+                <a href="{{ route('setting.index') }}" class="nav-link {{ active_class(['setting']) }}">
                     <i class="link-icon" data-feather="settings"></i>
-                        <span class="menu-title">Apps Setting</span>
-                    <i class="link-arrow"></i>
+                    <span class="menu-title">Apps Setting</span>
                 </a>
                 <div class="submenu">
                     <ul class="submenu-item">

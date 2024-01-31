@@ -13,6 +13,8 @@ use App\User;
 use App\Payrolinfo\Payrolinfo;
 use App\UserActivities;
 use App\ModelCG\Jabatan;
+use App\Divisi\Divisi;
+Use App\Organisasi\Organisasi;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use Carbon\Carbon;
@@ -98,8 +100,13 @@ class EmployeeController extends Controller
      */
     public function create()
     {   
-        $jabatan = Jabatan::all();
-        return view('pages.hc.karyawan.create', compact('jabatan'));
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $jabatan = Jabatan::where('parent_category', $company->unit_bisnis)->get();
+        $divisi = Divisi::where('company', $company->unit_bisnis)->get();
+        $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
+        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi'));
     }
 
     /**
@@ -111,6 +118,10 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         try{
+
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+
             $request->validate([
                 'nama' => 'required',
                 'gambar' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -122,20 +133,27 @@ class EmployeeController extends Controller
             $data->nik = $request->nik;
             $data->nama = $request->nama;
             $data->alamat = $request->alamat;
+            $data->alamat_ktp = $request->alamat_ktp;
+            $data->divisi = $request->divisi;
             $data->jabatan = $request->jabatan;
             $data->organisasi = $request->organisasi;
             $data->status_kontrak = $request->status_kontrak;
             $data->joindate = $request->joindate;
             $data->berakhirkontrak = $request->berakhirkontrak;
             $data->email = $request->email;
+            $data->pendidikan_trakhir = $request->pendidikan_trakhir;
+            $data->jurusan = $request->jurusan;
+            $data->sertifikasi = $request->sertifikasi;
+            $data->expired_sertifikasi = $request->expired_sertifikasi;
             $data->telepon = $request->telepon;
+            $data->telepon_darurat = $request->telepon_darurat;
             $data->status_pernikahan = $request->status_pernikahan;
             $data->agama = $request->agama;
             $data->tanggal_lahir = $request->tanggal_lahir;
             $data->tempat_lahir = $request->tempat_lahir;
             $data->jenis_kelamin = $request->jenis_kelamin;
             $data->tanggungan = $request->tanggungan;
-            $data->unit_bisnis = $request->unit_bisnis;
+            $data->unit_bisnis = $company->unit_bisnis;
             $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
             if ($request->hasFile('gambar')) {
@@ -164,7 +182,7 @@ class EmployeeController extends Controller
             $userinfo->password = Hash::make($request->password);
             $userinfo->permission = json_encode($request->permissions);
             $userinfo->employee_code = $request->nik;
-            $userinfo->company = $request->unit_bisnis;
+            $userinfo->company = $company->unit_bisnis;
             $userinfo->save();
 
             DB::commit();

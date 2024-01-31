@@ -188,6 +188,12 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Request Type
     Route::resource('request-type', App\Http\Controllers\Absen\RequestTypeController::class);
 
+    // Divisi Routes
+    Route::resource('divisi', App\Http\Controllers\Divisi\DivisiController::class);
+
+    // Organisasi Routes
+    Route::resource('organisasi', App\Http\Controllers\Organisasi\OrganisasiController::class);
+
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);

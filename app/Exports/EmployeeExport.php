@@ -25,6 +25,7 @@ class EmployeeExport implements FromCollection, WithHeadings
         ->select([
             'ktp',
             'nik',
+            'nama',
             'alamat',
             'jabatan',
             'organisasi',
@@ -51,6 +52,7 @@ class EmployeeExport implements FromCollection, WithHeadings
         return [
             'ktp',
             'nik',
+            'nama',
             'alamat',
             'jabatan',
             'organisasi',

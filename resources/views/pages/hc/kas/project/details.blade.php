@@ -11,6 +11,7 @@
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Project Details</h5>
+                <a href="{{route('project-details.show', $project->id)}}" class="btn btn-sm btn-primary">Tambah Details</a>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
@@ -135,18 +136,25 @@
                                     <tbody>
                                         @foreach($projectDetails as $data)
                                         <tr>
-                                            <td>{{$data->kebutuhan}} {{$data->jabatan}}</td>
+                                            <td><a href="#" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">{{$data->kebutuhan}} {{$data->jabatan}}</a></td>
                                             <td>Rp {{ number_format($data->tp_bulanan, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($data->rate_harian, 0, ',', '.') }}</td>
                                             <td>
-                                                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">Details</a>
-                                                <a href="{{route('project-details.edit', $data->id)}}" class="btn btn-warning btn-sm text-white">Edit Data</a>
-                                                <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                                                @csrf @method('DELETE') 
-                                                <a class="btn btn-sm btn-danger" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                                    Delete
-                                                </a>
-                                            </form>
+                                                <div class="dropdown"> 
+                                                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        <a href="#" class="dropdown-item d-flex align-items-center me-2" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">Details</a>
+                                                        <a href="{{route('project-details.edit', $data->id)}}" class="dropdown-item d-flex align-items-center me-2 ">Edit Data</a>
+                                                        <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
+                                                            @csrf @method('DELETE') 
+                                                            <a class="dropdown-item d-flex align-items-center me-2" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                                Delete
+                                                            </a>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                         @endforeach

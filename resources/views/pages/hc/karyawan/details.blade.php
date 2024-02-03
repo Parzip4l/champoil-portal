@@ -14,7 +14,7 @@
 </div>
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-body">
                 <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
                     <li class="nav-item">

@@ -63,7 +63,7 @@
                     @foreach ($karyawan as $data)
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $data->nama }}</td>
+                    <td><a href="{{ route('employee.show', $data->id) }}">{{ $data->nama }}</a></td>
                     <td>{{ $data->nik }}</td>
                     <td>{{ $data->jenis_kelamin }}</td>
                     <td>{{ $data->organisasi }}</td>

@@ -19,7 +19,7 @@ class Employee extends Model
         'alamat_ktp',
         'alamat',
         'divisi',
-        'pendidikan_terakhir',
+        'pendidikan_trakhir',
         'jurusan',
         'sertifikasi',
         'expired_sertifikasi',

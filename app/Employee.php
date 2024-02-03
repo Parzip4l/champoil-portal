@@ -15,6 +15,7 @@ class Employee extends Model
         'ktp',
         'nik',
         'nama',
+        'referal_code',
         'alamat_ktp',
         'alamat',
         'divisi',

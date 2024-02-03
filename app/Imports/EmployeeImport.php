@@ -5,6 +5,7 @@ namespace App\Imports;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Auth;
 use App\Employee;
 use App\User;
 
@@ -15,33 +16,38 @@ class EmployeeImport implements ToCollection, WithHeadingRow
     */
     public function collection(Collection $rows)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         foreach ($rows as $row) {
+            $unit_bisnis = $company->unit_bisnis;
+
             Employee::create([
-                'nama' => $row['NAMA LENGKAP'],
-                'ktp' => $row['KTP'],
-                'nik' => $row['NIK'],
-                'referal_code' => $row['KODE REFERAL'],
-                'divisi' => $row['DIVISI'],
-                'jabatan' => $row['JABATAN'],
-                'agama' => $row['AGAMA'],
-                'jenis_kelamin' => $row['JENIS KELAMIN'],
-                'email' => $row['EMAIL'],
-                'telepon' => $row['NOMOR TELEPON'],
-                'telepon_darurat' => $row['NOMOR TELEPON DARURAT'],
-                'status_kontrak' => $row['STATUS KONTRAK'],
-                'organisasi' => $row['ORGANISASI'],
-                'joindate' => $row['TANGGAL MASUK'],
-                'berakhirkontrak' => $row['TANGGAL BERAKHIR'],
-                'tempat_lahir' => $row['TEMPAT LAHIR'],
-                'tanggal_lahir' => $row['TANGGAL LAHIR'],
-                'alamat' => $row['ALAMAT LENGKAP'],
-                'alamat_ktp' => $row['ALAMAT LENGKAP DOMISILI'],
-                'status_pernikahan' => $row['STATUS PERNIKAHAN'],
-                'tanggungan' => $row['JUMLAH TANGGUNGAN'],
-                'pendidikan_trakhir' => $row['PENDIDIKAN TERAKHIR'],
-                'jurusan' => $row['JURUSAN'],
-                'sertifikasi' => $row['SERTIFIKASI'],
-                'expired_sertifikasi' => $row['EXPIRED DATE'],
+                'nama' => $row['nama'],
+                'ktp' => $row['ktp'],
+                'nik' => $row['nik'],
+                'referal_code' => $row['referal_code'],
+                'divisi' => $row['divisi'],
+                'jabatan' => $row['jabatan'],
+                'agama' => $row['agama'],
+                'jenis_kelamin' => $row['jenis_kelamin'],
+                'email' => $row['email'],
+                'telepon' => $row['telepon'],
+                'telepon_darurat' => $row['telepon_darurat'],
+                'status_kontrak' => $row['status_kontrak'],
+                'organisasi' => $row['organisasi'],
+                'joindate' => $row['joindate'],
+                'berakhirkontrak' => $row['berakhirkontrak'],
+                'tempat_lahir' => $row['tempat_lahir'],
+                'tanggal_lahir' => $row['tanggal_lahir'],
+                'alamat' => $row['alamat'],
+                'alamat_ktp' => $row['alamat_ktp'],
+                'status_pernikahan' => $row['status_pernikahan'],
+                'tanggungan' => $row['tanggungan'],
+                'pendidikan_trakhir' => $row['pendidikan_trakhir'],
+                'jurusan' => $row['jurusan'],
+                'unit_bisnis' => $unit_bisnis,
+                'sertifikasi' => $row['sertifikasi'],
+                'expired_sertifikasi' => $row['expired_sertifikasi'],
             ]);            
         }
     }

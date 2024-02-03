@@ -35,7 +35,7 @@
                             <a class="dropdown-item d-flex align-items-center me-2" href="{{ route('employee.create') }}"><i data-feather="plus" class="icon-sm me-2"></i> Tambah Karyawan</a>
                             <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"><i data-feather="upload" class="icon-sm me-2"></i> Import</a>
                             <a class="dropdown-item d-flex align-items-center me-2"  href="{{ route('export.employee') }}"><i data-feather="download" class="icon-sm me-2"></i> Export</a>
-                            <a class="dropdown-item d-flex align-items-center me-2"  href="https://truest.co.id/wp-content/uploads/2024/02/Tamplate-Karyawan.xlsx"><i data-feather="file-text" class="icon-sm me-2"></i> Download Template</a>
+                            <a class="dropdown-item d-flex align-items-center me-2"  href="https://truest.co.id/wp-content/uploads/2024/02/Tamplate-Karyawan-1.xlsx"><i data-feather="file-text" class="icon-sm me-2"></i> Download Template</a>
                         </div>
                     </div>
                 </div>

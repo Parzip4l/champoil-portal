@@ -112,6 +112,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group mb-3">
+                                                <label for="" class="form-label">Gaji Sebulan</label>
+                                                <input type="number" name="tp_bulanan" class="form-control rate_bulan" id="rate_bulan" required>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="add-button-wrap mb-2">

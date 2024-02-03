@@ -192,6 +192,7 @@ class ProjectDetailsController extends Controller
                 'p_membership' => $request->input('p_membership'),
                 'r_deduction' => $request->input('r_deduction'),
                 'p_deduction' => $request->input('p_deduction'),
+                'tp_bulanan' => $request->input('tp_bulanan'),
             ]);
 
             return redirect()->route('project.index')->with('success', 'Data updated successfully');

@@ -12,9 +12,9 @@ class Employee extends Model
     use HasFactory;
     protected $table = 'karyawan';
     protected $fillable = [
+        'nama',
         'ktp',
         'nik',
-        'nama',
         'referal_code',
         'alamat_ktp',
         'alamat',

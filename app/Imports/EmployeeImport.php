@@ -58,7 +58,7 @@ class EmployeeImport implements ToCollection, WithHeadingRow
                 'name' => $row['nik'],
                 'email' => $row['email'],
                 'password' => $hashedPassword,
-                'permission' => $useraccess,
+                'permission' => json_encode($useraccess),
                 'employee_code' => $row['nik'],
                 'company' => $unit_bisnis,
             ]);        

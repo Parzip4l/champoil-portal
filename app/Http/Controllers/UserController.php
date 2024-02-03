@@ -59,6 +59,8 @@ class UserController extends Controller
             'password' => 'required',
             'permissions' => 'required|array',
         ]);
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
 
         $user = new User();
         $user->name = $request->name;
@@ -66,6 +68,7 @@ class UserController extends Controller
         $user->employee_code = $request->name;
         $user->password = Hash::make($request->password);
         $user->permission = json_encode($request->permissions);
+        $user->company = $company->unit_bisnis;
         $user->save();
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');

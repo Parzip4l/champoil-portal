@@ -35,7 +35,7 @@
                             <a class="dropdown-item d-flex align-items-center me-2" href="{{ route('employee.create') }}"><i data-feather="plus" class="icon-sm me-2"></i> Tambah Karyawan</a>
                             <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"><i data-feather="upload" class="icon-sm me-2"></i> Import</a>
                             <a class="dropdown-item d-flex align-items-center me-2"  href="{{ route('export.employee') }}"><i data-feather="download" class="icon-sm me-2"></i> Export</a>
-                            <a class="dropdown-item d-flex align-items-center me-2"  href="https://gdurl.com/dG_E/download"><i data-feather="file-text" class="icon-sm me-2"></i> Download Template</a>
+                            <a class="dropdown-item d-flex align-items-center me-2"  href="https://gdurl.com/lKIA/download"><i data-feather="file-text" class="icon-sm me-2"></i> Download Template</a>
                         </div>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
             <div class="modal-body">
                 <form action="{{ route('import.employee') }}" method="post" enctype="multipart/form-data">
                     @csrf
-                    <input type="file" class="form-control mb-2" name="csv_file" required accept=".xlsx">
+                    <input type="file" class="form-control mb-2" name="csv_file" required>
                     <button type="submit" class="btn btn-primary w-100">Import Excel</button>
                 </form>
             </div>

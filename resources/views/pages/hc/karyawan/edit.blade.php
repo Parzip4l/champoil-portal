@@ -37,13 +37,6 @@
             @method('PUT')
             <div class="row">
                 <div class="col mb-3">
-                    <label for="name" class="form-label">Referal Code</label>
-                    <input id="name" class="form-control" readonly="readonly" name="referal_code" type="text" placeholder="John Doe" value="{{$unix}}">
-                </div>
-            </div>
-            <div class="row">
-                
-                <div class="col mb-3">
                     <label for="name" class="form-label">Nama lengkap</label>
                     <input id="name" class="form-control" name="nama" type="text" placeholder="John Doe" value="{{$employee->nama}}">
                 </div>
@@ -357,6 +350,12 @@
                                 <option value="8" {{$employee->tanggungan == '8' ? 'selected' : ''}}>8</option>
                                 <option value="9" {{$employee->tanggungan == '9' ? 'selected' : ''}}>9</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="name" class="form-label">Referal Code</label>
+                            <input id="name" class="form-control" readonly="readonly" name="referal_code" type="text" placeholder="John Doe" value="{{$unix}}">
                         </div>
                     </div>
                     <div class="card-header mb-3">

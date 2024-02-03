@@ -106,7 +106,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col">
+                    <div class="col mb-2">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('company') }}" class="text-center link-settings">
@@ -120,7 +120,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col mb-2">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('organisasi') }}" class="text-center link-settings">
@@ -134,7 +134,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col mb-2">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('divisi') }}" class="text-center link-settings">
@@ -148,7 +148,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-2">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ route('jabatan.index') }}" class="text-center link-settings">
@@ -157,6 +159,20 @@
                                     </div>
                                     <div class="title-menu">
                                         <h6>Position Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ route('pajak.index') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>PPH Settings</h6>
                                     </div>
                                 </a>
                             </div>

@@ -143,6 +143,12 @@
                     </select>
                 </div>
             </div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label for="name" class="form-label">Referal Code</label>
+                    <input id="name" class="form-control" readonly="readonly" name="referal_code" type="text" placeholder="John Doe" value="{{$unix}}">
+                </div>
+            </div>
             <div class="card-header mb-3">
                 <h5>Payroll Info</h5>
             </div>

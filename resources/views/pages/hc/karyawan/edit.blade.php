@@ -18,7 +18,7 @@
 </nav>
 @php 
     $dataLogin = json_decode(Auth::user()->permission);
-    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+    $karyawanlogin = \App\Employee::where('nik', Auth::user()->name)->first();
 @endphp 
 @if(session('success'))
     <div class="alert alert-success">
@@ -147,7 +147,7 @@
                     </select>
                 </div>
             </div>
-            @if($employee->unit_bisnis === 'Kas')
+            @if($karyawanlogin->unit_bisnis === 'Kas')
             <div class="row">
                 <div class="col mb-3">
                     <label for="name" class="form-label">Referal Code</label>
@@ -364,7 +364,7 @@
                             </select>
                         </div>
                     </div>
-                    @if($employee->unit_bisnis === 'Kas')
+                    @if($karyawanlogin->unit_bisnis === 'Kas')
                     <div class="row">
                         <div class="col mb-3">
                             <label for="name" class="form-label">Referal Code</label>

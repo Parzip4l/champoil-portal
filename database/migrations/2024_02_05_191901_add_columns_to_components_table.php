@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('pajak', function (Blueprint $table) {
-            $table->decimal('min_bruto', 10, 0);
-            $table->decimal('max_bruto', 10, 0);
-            $table->integer('persentase');
+        Schema::table('components', function (Blueprint $table) {
+            $table->string('company');
         });
     }
 
@@ -27,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('pajak', function (Blueprint $table) {
+        Schema::table('components', function (Blueprint $table) {
             //
         });
     }

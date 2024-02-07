@@ -19,7 +19,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col">
+                    <div class="col mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="" class="text-center link-settings" data-bs-target="#usersModal" data-bs-toggle="modal">
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('users') }}" class="text-center link-settings">
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('request-type') }}" class="text-center link-settings">
@@ -61,7 +61,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ route('project.index') }}" class="text-center link-settings">
@@ -75,7 +75,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ url('additional-component') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="dollar-sign"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Payroll Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('garda-pratama') }}" class="text-center link-settings">
@@ -89,7 +106,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

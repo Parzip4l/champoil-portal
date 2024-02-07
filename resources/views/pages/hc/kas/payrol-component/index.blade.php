@@ -8,9 +8,9 @@
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Component</h5>
+                <h5 class="mb-0 align-self-center">Component Master</h5>
                 <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ComponentModal">Tambah Component</a>
             </div>
             <div class="card-body">

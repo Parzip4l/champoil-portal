@@ -57,7 +57,7 @@
                     <label class="form-label">Tunjangan Kinerja</label>
                     <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3 mt-3">
                     <label for="kode_karyawan" class="form-label">Tunjangan Makan</label>
                     <input type="number" id="t_makan" class="form-control allowance" name="allowances[t_makan][]" placeholder="Rp. " required>
                 </div>

@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Payrol;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Payrol\Component;
+use App\Employee;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ComponentController extends Controller
 {
@@ -15,8 +20,11 @@ class ComponentController extends Controller
      */
     public function index()
     {
-        $data = Component::all();
-        $data2 = Component::all();
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $data = Component::where('company', $company->unit_bisnis)->get();
+        $data2 = Component::where('company', $company->unit_bisnis)->get();
         return view('pages.hc.kas.payrol-component.index',compact('data','data2'));
     }
 
@@ -39,6 +47,9 @@ class ComponentController extends Controller
     public function store(Request $request)
     {
         try {
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+
             $request->validate([
                 'name' => 'required',
                 'type' => 'required',
@@ -49,6 +60,7 @@ class ComponentController extends Controller
             $ComponentData->name = $request->name;
             $ComponentData->type = $request->type;
             $ComponentData->is_taxable = $request->is_taxable;
+            $ComponentData->company = $company->unit_bisnis;
             $ComponentData->save();
 
             return redirect()->route('component-data.index')->with('success', 'Component Successfully Added');

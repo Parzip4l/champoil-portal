@@ -200,6 +200,13 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('pajak', App\Http\Controllers\Pajak\PajakController::class);
         Route::get('/pajak-data/{pajakid}', [App\Http\Controllers\Pajak\PajakController::class, 'pajakdetails'])->name('pajak.details');
 
+        // Additional Component
+        Route::resource('additional-component', App\Http\Controllers\Component\ComponentController::class);
+            // Get Employee
+            Route::get('/get-employees-component', [App\Http\Controllers\Component\ComponentController::class, 'getEmployeesComponent'])->name('employee.datacomponent');
+            Route::get('/get-component', [App\Http\Controllers\Component\ComponentController::class, 'getComponent'])->name('component.additional');
+            Route::get('/additional-component/show/{code_master}', [App\Http\Controllers\Component\ComponentController::class, 'showDetails'])->name('additional-component.showDetails');
+
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);

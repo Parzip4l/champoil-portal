@@ -54,6 +54,7 @@
                                     <th>Employee Name</th>
                                     <th>Component</th>
                                     <th>Nominal</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -182,7 +182,7 @@ class PayrolNS extends Controller
                     // Tentukan Rate Harian
                     $schedulesManBackup = Schedule::where('employee', $manBackup)
                         ->whereBetween('tanggal', [$startDate, $endDate])
-                        ->where('shift', '!=', 'Off')
+                        ->where('shift', '!=', 'OFF')
                         ->get();
                 
                     $totalScheduleManBackup = $schedulesManBackup->count();
@@ -270,7 +270,7 @@ class PayrolNS extends Controller
                 // cek jumlah schedule
                 $schedules = Schedule::where('employee', $nik)
                     ->whereBetween('tanggal', [$startDate, $endDate])
-                    ->where('shift', '!=', 'Off')
+                    ->where('shift', '!=', 'OFF')
                     ->get();
 
                 $totalDaysInSchedules = $schedules->count();

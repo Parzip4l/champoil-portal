@@ -10,6 +10,7 @@ class Schedule extends Model
     use HasFactory;
     protected $table = 'schedules';
     protected $fillable = ['schedule_code','project', 'employee','tanggal','shift','periode']; 
+    protected $dateFormat = 'Y-m-d';
 
     public function project()
     {

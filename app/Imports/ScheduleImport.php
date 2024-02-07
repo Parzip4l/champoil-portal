@@ -18,7 +18,6 @@ class ScheduleImport implements ToCollection, WithHeadingRow
     {
         
         foreach ($rows as $row) {
-            dd($row['tanggal']);
             Schedule::create([
                 'schedule_code' => $row['schedule_code'],
                 'project' => $row['project'],

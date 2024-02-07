@@ -19,7 +19,7 @@ class ScheduleImport implements ToCollection, WithHeadingRow
                 'schedule_code' => $row['schedule_code'],
                 'project' => $row['project'],
                 'employee' => $row['employee'],
-                'tanggal' => $row['tanggal'],
+                'tanggal' => \Carbon\Carbon::parse($row['tanggal'])->toDateString(),
                 'shift' => $row['shift'],
                 'periode' => $row['periode'],
             ]);

@@ -10,6 +10,8 @@ use App\ModelCG\Jabatan;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Employee;
 
 class ProjectControllers extends Controller
 {
@@ -31,7 +33,11 @@ class ProjectControllers extends Controller
      */
     public function create()
     {
-        $jabatan = Jabatan::all();
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $jabatan = Jabatan::where('parent_category',$company->unit_bisnis)->get();
+        
         return view('pages.hc.kas.project.create', compact('jabatan'));
     }
 

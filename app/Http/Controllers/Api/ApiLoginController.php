@@ -640,7 +640,7 @@ class ApiLoginController extends Controller
                         ->first();
                 
                     if ($scheduleKas === null) {
-                        $alreadyClockIn = false;
+                        $alreadyClockIn = true;
                         $alreadyClockOut = true;
                         $isSameDay = true;
                         $logs = 'No Logs';

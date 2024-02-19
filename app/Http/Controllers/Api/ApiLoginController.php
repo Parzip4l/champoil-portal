@@ -638,14 +638,8 @@ class ApiLoginController extends Controller
                     $scheduleKas = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
-                    if ($scheduleKas === null) {
-                        $alreadyClockIn = true;
-                        $alreadyClockOut = true;
-                        $isSameDay = true;
-                        $logs = 'No Logs';
-                    }
-
                 }
+                dd($scheduleKas);
 
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda

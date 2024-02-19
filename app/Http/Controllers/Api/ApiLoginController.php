@@ -146,7 +146,7 @@ class ApiLoginController extends Controller
             }
         } catch (\Exception $e) {
             // Log the error or handle it appropriately
-            return response()->json(['message' => 'An error occurred while processing the request.']);
+            return response()->json(['message' => 'An error occurred while processing the request1.']);
         }
     }
 

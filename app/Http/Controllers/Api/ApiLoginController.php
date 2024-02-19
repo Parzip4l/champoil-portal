@@ -584,6 +584,19 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik',$nik)->first();
+
+            if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
+                $scheduleKas = Schedule::where('employee', $nik)
+                    ->whereDate('tanggal', $today)
+                    ->first();
+                if (!$scheduleKas) {
+                    $alreadyClockIn = true;
+                    $alreadyClockOut = true;
+                    $isSameDay = true;
+                    $logs = 'No Logs';
+                }
+
+            }
             
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
@@ -632,19 +645,6 @@ class ApiLoginController extends Controller
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
                     }
-                }
-
-                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
-                    $scheduleKas = Schedule::where('employee', $nik)
-                        ->whereDate('tanggal', $today)
-                        ->first();
-                    if (!$scheduleKas) {
-                        $alreadyClockIn = true;
-                        $alreadyClockOut = true;
-                        $isSameDay = true;
-                        $logs = 'No Logs';
-                    }
-
                 }
 
                 // Greating

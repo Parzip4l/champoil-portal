@@ -631,15 +631,15 @@ class ApiLoginController extends Controller
                     }
                 }
 
-                // if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
-                //     $scheduleKas = Schedule::where('employee', $nik)
-                //         ->whereDate('tanggal', $today)
-                //         ->first();
+                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
+                    $scheduleKas = Schedule::where('employee', $nik)
+                        ->whereDate('tanggal', $today)
+                        ->first();
             
-                //     if ($scheduleKas) {
-                        
-                //     }
-                // }
+                    if ($scheduleKas === null) {
+                        return response()->json(['message' => 'Schedule not found for the specified conditions.']);
+                    }
+                }
 
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda

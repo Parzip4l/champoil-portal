@@ -622,25 +622,6 @@ class ApiLoginController extends Controller
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
-                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
-                    $scheduleKas = Schedule::where('employee', $nik)
-                        ->whereDate('tanggal', $today)
-                        ->first();
-                    if ($scheduleKas) {
-                        
-                        $alreadyClockIn = false;
-                        $alreadyClockOut = false;
-                        $isSameDay = false;
-                        
-                    }else{
-                        $alreadyClockIn = true;
-                        $alreadyClockOut = true;
-                        $isSameDay = true;
-                        $logs = 'No Logs';
-                    }
-
-                }
-                
 
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
@@ -657,7 +638,7 @@ class ApiLoginController extends Controller
                     $scheduleKas = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
-                    if (!$scheduleKas) {
+                    if ($scheduleKas === null) {
                         $alreadyClockIn = true;
                         $alreadyClockOut = true;
                         $isSameDay = true;

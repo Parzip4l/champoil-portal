@@ -638,7 +638,7 @@ class ApiLoginController extends Controller
                     $scheduleKas = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
-                
+                    dd($scheduleKas);
                     if ($scheduleKas === null) {
                         $alreadyClockIn = true;
                         $alreadyClockOut = true;

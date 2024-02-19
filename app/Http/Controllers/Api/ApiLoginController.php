@@ -519,7 +519,7 @@ class ApiLoginController extends Controller
             }
 
             $employeeCode = $user->employee_code;
-            $historyData = RequestAbsen::where('employee', $employeeCode)->paggetinate(15);
+            $historyData = RequestAbsen::where('employee', $employeeCode)->paginate(15);
 
             return response()->json([
                 'employeeCode' => $employeeCode,

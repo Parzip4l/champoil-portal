@@ -101,6 +101,17 @@ class ApiLoginController extends Controller
                 $allowedRadius = $dataCompany->radius;
             }
 
+            if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
+                $scheduleKas = Schedule::where('employee', $nik)
+                    ->whereDate('tanggal', $today)
+                    ->first();
+        
+                if (!$scheduleKas) {
+                    return response()->json(['message' => 'An error occurred while processing the request.']);
+                }
+            }
+            
+
             $lat = $request->input('latitude');
             $long = $request->input('longitude');
             $status = $request->input('status');
@@ -635,17 +646,7 @@ class ApiLoginController extends Controller
                     }
                 }
 
-                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
-                    $scheduleKas = Schedule::where('employee', $nik)
-                        ->whereDate('tanggal', $today)
-                        ->first();
-            
-                    if ($scheduleKas) {
-                        $alreadyClockOut = false;
-                    } else {
-                        $alreadyClockIn = true;
-                    }
-                }
+                
 
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda

@@ -639,13 +639,9 @@ class ApiLoginController extends Controller
                         ->whereDate('tanggal', $today)
                         ->first();
                         if (!$scheduleKas) {
-                            // Eksekusi tindakan jika $scheduleKas memiliki data
-                            // Misalnya:
-                            // Do something with $scheduleKas
-                            // ...
-                    
-                            // Contoh:
-                            return response()->json(['message' => 'ScheduleKas found!', 'scheduleKas' => $scheduleKas], 200);
+                            $alreadyClockIn = false;
+                            $alreadyClockOut = true;
+                            $isSameDay = true;
                         }
                 }
                 

@@ -619,11 +619,15 @@ class ApiLoginController extends Controller
                 }
 
                 // Remove Absen Button
+                $alreadyClockIn = false;
+                $alreadyClockOut = false;
+                $isSameDay = false;
                 if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
                     $scheduleKas = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
                     if ($scheduleKas) {
+                        
                         $alreadyClockIn = false;
                         $alreadyClockOut = false;
                         $isSameDay = false;

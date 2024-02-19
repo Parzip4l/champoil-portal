@@ -582,6 +582,9 @@ class ApiLoginController extends Controller
     {
         if (Auth::guard('api')->check()) {
             $user = Auth::guard('api')->user();
+            $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
+            
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
                 $lastAbsensi = Absen::where('tanggal',$hariini)
@@ -631,7 +634,19 @@ class ApiLoginController extends Controller
                     }
                 }
 
+                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
+                    $scheduleKas = Schedule::where('employee', $nik)
+                        ->whereDate('tanggal', $today)
+                        ->first();
                 
+                    if ($scheduleKas === null) {
+                        $alreadyClockIn = false;
+                        $alreadyClockOut = true;
+                        $isSameDay = false;
+                        $logs = 'No Logs';
+                    }
+
+                }
 
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda

@@ -644,6 +644,7 @@ class ApiLoginController extends Controller
                         $alreadyClockOut = false;
                     } else {
                         $alreadyClockOut = true;
+                        $alreadyClockIn = true;
                     }
                 }
 

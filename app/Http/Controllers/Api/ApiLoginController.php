@@ -596,7 +596,7 @@ class ApiLoginController extends Controller
                 // Get Log Absensi
                 $logs = Absen::where('user_id', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
-                    ->firstOrFail();
+                    ->get();
                     
                 $today = now();
                 $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
@@ -642,7 +642,6 @@ class ApiLoginController extends Controller
                             $alreadyClockIn = false;
                             $alreadyClockOut = true;
                             $isSameDay = true;
-                            $logs;
                         }
                 }
                 

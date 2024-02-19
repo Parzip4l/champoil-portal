@@ -642,7 +642,6 @@ class ApiLoginController extends Controller
                             $alreadyClockIn = false;
                             $alreadyClockOut = true;
                             $isSameDay = true;
-                            $logs = 'Enjoy Your Rest';
                         }
                 }
                 

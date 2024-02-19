@@ -638,7 +638,7 @@ class ApiLoginController extends Controller
                     $scheduleKas = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
-                        if ($scheduleKas) {
+                        if (!$scheduleKas) {
                             // Eksekusi tindakan jika $scheduleKas memiliki data
                             // Misalnya:
                             // Do something with $scheduleKas
@@ -646,14 +646,6 @@ class ApiLoginController extends Controller
                     
                             // Contoh:
                             return response()->json(['message' => 'ScheduleKas found!', 'scheduleKas' => $scheduleKas], 200);
-                        } else {
-                            // Eksekusi tindakan jika $scheduleKas tidak memiliki data
-                            // Misalnya:
-                            // Do something else
-                            // ...
-                    
-                            // Contoh:
-                            return response()->json(['message' => 'ScheduleKas not found!'], 404);
                         }
                 }
                 

@@ -101,49 +101,6 @@ class ApiLoginController extends Controller
                 $allowedRadius = $dataCompany->radius;
             }
 
-            if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
-                $scheduleKas = Schedule::where('employee', $nik)
-                    ->whereDate('tanggal', $today)
-                    ->first();
-        
-                if ($scheduleKas) {
-                    $lat = $request->input('latitude');
-                    $long = $request->input('longitude');
-                    $status = $request->input('status');
-        
-                    $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
-        
-                    if ($distance <= $allowedRadius) {
-                        $filename = null;
-        
-                        if ($request->hasFile('photo')) {
-                            $image = $request->file('photo');
-                            $filename = time() . '.' . $image->getClientOriginalExtension();
-        
-                            // Use Laravel's store method to handle file uploads
-                            $path = $image->storeAs('images/absen', $filename, 'public');
-                        }
-        
-                        Absen::create([
-                            'user_id' => $nik,
-                            'nik' => $nik,
-                            'tanggal' => now()->toDateString(),
-                            'clock_in' => now()->format('H:i'),
-                            'latitude' => $lat,
-                            'longtitude' => $long,
-                            'status' => $status,
-                            'photo' => $filename,
-                        ]);
-        
-                        return response()->json(['message' => 'Clockin success, Happy Working Day!']);
-                    } else {
-                        return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
-                    }
-                } else {
-                    return response()->json(['message' => 'Clockin Rejected, No Schedule for Today!']);
-                }
-            }
-
             $lat = $request->input('latitude');
             $long = $request->input('longitude');
             $status = $request->input('status');
@@ -625,6 +582,10 @@ class ApiLoginController extends Controller
     {
         if (Auth::guard('api')->check()) {
             $user = Auth::guard('api')->user();
+            $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
+
+            
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
                 $lastAbsensi = Absen::where('tanggal',$hariini)
@@ -671,6 +632,18 @@ class ApiLoginController extends Controller
                         $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
+                    }
+                }
+
+                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'Frontline Officer') {
+                    $scheduleKas = Schedule::where('employee', $nik)
+                        ->whereDate('tanggal', $today)
+                        ->first();
+            
+                    if ($scheduleKas) {
+                        $alreadyClockOut = false;
+                    } else {
+                        $alreadyClockOut = true;
                     }
                 }
 

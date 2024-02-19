@@ -584,7 +584,6 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik',$nik)->first();
-            dd($unit_bisnis);
             
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');

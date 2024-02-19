@@ -101,6 +101,15 @@ class ApiLoginController extends Controller
                 $allowedRadius = $dataCompany->radius;
             }
 
+            if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'FRONTLINE OFFICER') {
+                $scheduleKas = Schedule::where('employee', $nik)
+                    ->whereDate('tanggal', $today)
+                    ->first();
+                    if (!$scheduleKas) {
+                        return response()->json(['message' => 'Clock In Rejected, Schedule not found!']);
+                    }
+            }
+
             $lat = $request->input('latitude');
             $long = $request->input('longitude');
             $status = $request->input('status');
@@ -632,17 +641,6 @@ class ApiLoginController extends Controller
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
                     }
-                }
-
-                if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'FRONTLINE OFFICER') {
-                    $scheduleKas = Schedule::where('employee', $nik)
-                        ->whereDate('tanggal', $today)
-                        ->first();
-                        if (!$scheduleKas) {
-                            $alreadyClockIn = false;
-                            $alreadyClockOut = true;
-                            $isSameDay = true;
-                        }
                 }
                 
 

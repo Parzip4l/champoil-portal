@@ -107,7 +107,7 @@ class ApiLoginController extends Controller
                     ->first();
         
                 if (!$scheduleKas) {
-                    return response()->json(['message' => 'An error occurred while processing the request.']);
+                    return response()->json(['message' => 'Kamu tidak memiliki schedule, Selamat Beristirahat.']);
                 }
             }
             

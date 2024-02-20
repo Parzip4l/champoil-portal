@@ -704,24 +704,24 @@ class ApiLoginController extends Controller
                         $logs = Absen::where('user_id', $user->employee_code)
                                 ->whereDate('tanggal', $yesterday)
                                 ->get();
+                    }
 
-                        $lastAbsensi = Absen::where('tanggal',$yesterday)
+                    $lastAbsensi = Absen::where('tanggal',$yesterday)
                                 ->where('nik', $user->employee_code)
                                 ->first();
                                 
-                        if($lastAbsensi) {
-                            if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
-                                $alreadyClockOut = true;
-                                $logs = Absen::where('user_id', $user->employee_code)
-                                        ->whereDate('tanggal', $yesterday)
-                                        ->get();
-                            }else {
-                                $alreadyClockIn = false;
-                                $alreadyClockOut = false;
-                                $logs = Absen::where('user_id', $user->employee_code)
-                                        ->whereDate('tanggal', $yesterday)
-                                        ->get();
-                            }
+                    if($lastAbsensi) {
+                        if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
+                            $alreadyClockOut = true;
+                            $logs = Absen::where('user_id', $user->employee_code)
+                                    ->whereDate('tanggal', $yesterday)
+                                    ->get();
+                        }else {
+                            $alreadyClockIn = false;
+                            $alreadyClockOut = false;
+                            $logs = Absen::where('user_id', $user->employee_code)
+                                    ->whereDate('tanggal', $yesterday)
+                                    ->get();
                         }
                     }
                 }

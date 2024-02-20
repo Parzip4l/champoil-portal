@@ -101,11 +101,14 @@ class ApiLoginController extends Controller
                 $allowedRadius = $dataCompany->radius;
             }
 
-            if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->organisasi == 'FRONTLINE OFFICER') {
+            if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
                 $scheduleKas = Schedule::where('employee', $nik)
                     ->whereDate('tanggal', $today)
                     ->first();
+
                     if (!$scheduleKas) {
+                        return response()->json(['message' => 'Clock In Rejected, Schedule not found!']);
+                    }elseif ($scheduleKas->shift === 'OFF'){
                         return response()->json(['message' => 'Clock In Rejected, Schedule not found!']);
                     }
             }
@@ -683,6 +686,14 @@ class ApiLoginController extends Controller
                     $scheduleKasToday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
+                    
+                    if($scheduleKasToday->shift === 'OFF'){
+                        $alreadyClockIn = false;
+                        $alreadyClockOut = true;
+                        $logs = Absen::where('user_id', $user->employee_code)
+                                ->whereDate('tanggal', $today)
+                                ->get();
+                    }
                 
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $yesterday)
@@ -701,6 +712,11 @@ class ApiLoginController extends Controller
                         
                     if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
                         $alreadyClockOut = true;
+                        $logs = Absen::where('user_id', $user->employee_code)
+                                ->whereDate('tanggal', $yesterday)
+                                ->get();
+                    }else {
+                        $alreadyClockOut = false;
                         $logs = Absen::where('user_id', $user->employee_code)
                                 ->whereDate('tanggal', $yesterday)
                                 ->get();

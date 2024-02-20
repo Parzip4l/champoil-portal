@@ -608,6 +608,7 @@ class ApiLoginController extends Controller
                     ->get();
                     
                 $today = now();
+                $yesterday = Carbon::yesterday();
                 $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
                 $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
@@ -640,6 +641,21 @@ class ApiLoginController extends Controller
                         $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
+                    }
+                }
+
+                // Cek Button
+                if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
+                    $scheduleKasToday = Schedule::where('employee', $nik)
+                        ->whereDate('tanggal', $today)
+                        ->first();
+                
+                    $scheduleKasYesterday = Schedule::where('employee', $nik)
+                        ->whereDate('tanggal', $yesterday)
+                        ->first();
+    
+                    if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
+                        $alreadyClockIn = true;
                     }
                 }
                 

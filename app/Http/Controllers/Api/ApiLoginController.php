@@ -710,16 +710,18 @@ class ApiLoginController extends Controller
                         ->where('nik', $user->employee_code)
                         ->first();
                         
-                    if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
-                        $alreadyClockOut = true;
-                        $logs = Absen::where('user_id', $user->employee_code)
-                                ->whereDate('tanggal', $yesterday)
-                                ->get();
-                    }else {
-                        $alreadyClockOut = false;
-                        $logs = Absen::where('user_id', $user->employee_code)
-                                ->whereDate('tanggal', $yesterday)
-                                ->get();
+                    if($lastAbsensi) {
+                        if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
+                            $alreadyClockOut = true;
+                            $logs = Absen::where('user_id', $user->employee_code)
+                                    ->whereDate('tanggal', $yesterday)
+                                    ->get();
+                        }else {
+                            $alreadyClockOut = false;
+                            $logs = Absen::where('user_id', $user->employee_code)
+                                    ->whereDate('tanggal', $yesterday)
+                                    ->get();
+                        }
                     }
                 }
                 

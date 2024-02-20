@@ -30,6 +30,7 @@ use App\User;
 use App\Absen\RequestAbsen;
 use App\Company\CompanyModel;
 use App\Absen\RequestType;
+use App\Slack;
 
 class ApiLoginController extends Controller
 {

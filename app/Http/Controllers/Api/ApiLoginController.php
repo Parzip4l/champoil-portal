@@ -686,14 +686,6 @@ class ApiLoginController extends Controller
                     $scheduleKasToday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $today)
                         ->first();
-                    
-                    if($scheduleKasToday->shift === 'OFF'){
-                        $alreadyClockIn = false;
-                        $alreadyClockOut = true;
-                        $logs = Absen::where('user_id', $user->employee_code)
-                                ->whereDate('tanggal', $today)
-                                ->get();
-                    }
                 
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $yesterday)

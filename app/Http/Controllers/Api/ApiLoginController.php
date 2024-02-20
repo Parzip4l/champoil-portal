@@ -613,6 +613,64 @@ class ApiLoginController extends Controller
 
             $pengajuan->save();
 
+            $slackChannel = Slack::where('channel', 'Request')->first();
+            $slackWebhookUrl = $slackChannel->url;
+            $today = now()->toDateString();
+            $data = [
+                'text' => "Attendence Request From {$employee}",
+                'attachments' => [
+                    [
+                        'fields' => [
+                            [
+                                'title' => 'Tanggal',
+                                'value' => $request->tanggal,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Alasan',
+                                'value' => $request->alasan,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Untuk Approval Silahkan Cek di Aplikasi Truest',
+                                'short' => true,
+                            ]
+                        ],
+                    ],
+                ],
+                
+            ];
+
+            $data_string = json_encode($data);
+
+            $ch = curl_init($slackWebhookUrl);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data_string),
+            ]);
+
+            $result = curl_exec($ch);
+
+            if ($result === false) {
+                // Penanganan kesalahan jika Curl gagal
+                $error = curl_error($ch);
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+            }
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($httpCode !== 200) {
+                // Penanganan kesalahan jika Slack merespons selain status 200 OK
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+            }
+
+            curl_close($ch);
+
             return response()->json(['message' => 'Pengajuan berhasil diajukan'], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Handle validation errors

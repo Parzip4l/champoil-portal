@@ -618,18 +618,18 @@ class ApiLoginController extends Controller
             $slackWebhookUrl = $slackChannel->url;
             $today = now()->toDateString();
             $data = [
-                'text' => "Attendence Request From {$employee}",
+                'text' => "Attendence Request From {$pengajuan->employee}",
                 'attachments' => [
                     [
                         'fields' => [
                             [
                                 'title' => 'Tanggal',
-                                'value' => $request->tanggal,
+                                'value' => $pengajuan->tanggal,
                                 'short' => true,
                             ],
                             [
                                 'title' => 'Alasan',
-                                'value' => $request->alasan,
+                                'value' => $pengajuan->alasan,
                                 'short' => true,
                             ],
                             [

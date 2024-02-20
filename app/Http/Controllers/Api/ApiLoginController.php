@@ -698,6 +698,9 @@ class ApiLoginController extends Controller
                         
                     if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
                         $alreadyClockOut = true;
+                        $logs = Absen::where('user_id', $user->employee_code)
+                                ->whereDate('tanggal', $yesterday)
+                                ->get();
                     }
                 }
                 

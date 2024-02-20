@@ -691,6 +691,14 @@ class ApiLoginController extends Controller
                     if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
                         $alreadyClockIn = true;
                     }
+
+                    $lastAbsensi = Absen::where('tanggal',$yesterday)
+                        ->where('nik', $user->employee_code)
+                        ->first();
+                        
+                    if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
+                        $alreadyClockOut = true;
+                    }
                 }
                 
 

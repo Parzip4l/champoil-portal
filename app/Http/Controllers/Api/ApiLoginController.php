@@ -617,8 +617,10 @@ class ApiLoginController extends Controller
             $slackChannel = Slack::where('channel', 'Request')->first();
             $slackWebhookUrl = $slackChannel->url;
             $today = now()->toDateString();
+
+            $employeeData = Employee::where('nik', $pengajuan->employee)->first();
             $data = [
-                'text' => "Attendence Request From {$pengajuan->employee}",
+                'text' => "Attendence Request From {$employeeData->nama}",
                 'attachments' => [
                     [
                         'fields' => [

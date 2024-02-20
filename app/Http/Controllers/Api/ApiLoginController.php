@@ -690,6 +690,9 @@ class ApiLoginController extends Controller
     
                     if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
                         $alreadyClockIn = true;
+                        $logs = Absen::where('user_id', $user->employee_code)
+                                ->whereDate('tanggal', $yesterday)
+                                ->get();
                     }
 
                     $lastAbsensi = Absen::where('tanggal',$yesterday)

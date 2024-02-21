@@ -888,7 +888,8 @@ class ApiLoginController extends Controller
                 $employeeCode = $user->employee_code;
                 $bulan = now()->format('F-Y');
                 
-                $mySchedule = ScheduleBackup::where('employee', $employeeCode)
+                $mySchedule = ScheduleBackup::with('project:id,name') // Eager loading
+                    ->where('employee', $employeeCode)
                     ->where('periode', $bulan)
                     ->select('project', 'tanggal', 'shift')
                     ->get();

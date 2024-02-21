@@ -180,39 +180,6 @@ class ApiLoginController extends Controller
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
 
-            $yesterday = Carbon::yesterday();
-            $currentDate = now()->format('Y-m-d');
-            if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
-            
-                $scheduleKasYesterday = Schedule::where('employee', $nik)
-                    ->whereDate('tanggal', $yesterday)
-                    ->first();
-
-                if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
-                    $absensi = Absen::where('nik', $nik)
-                                ->whereDate('tanggal', $yesterday)
-                                ->orderBy('clock_in', 'desc')
-                                ->first();
-
-                    if ($absensi) {
-                        $absensi->clock_out = now()->format('H:i');
-                        $absensi->latitude_out = $lat2;
-                        $absensi->longtitude_out = $long2;
-                        $absensi->save();
-        
-                        return response()->json([
-                            'status' => 'success',
-                            'message' => 'Clockout success! Selamat Beristirahat!',
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'No clock-in record found for Yesterday.',
-                        ], 404);
-                    }
-                }
-            }
-
             $absensi = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $currentDate)
                 ->orderBy('clock_in', 'desc')

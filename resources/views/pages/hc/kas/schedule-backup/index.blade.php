@@ -37,7 +37,7 @@
                                 </td>
                                 <td>
                                 @if($employee->nama)
-                                    {{ $employee->nama }}
+                                    {{ $employee->nama ?? 'Nama tidak ada' }}
                                 @else
                                     Nama tidak ada
                                 @endif

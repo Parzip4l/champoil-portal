@@ -712,35 +712,21 @@ class ApiLoginController extends Controller
                 }
 
                 // Cek Button
-                // if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
-                //     $scheduleKasToday = Schedule::where('employee', $nik)
-                //         ->whereDate('tanggal', $today)
-                //         ->first();
+                if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
                 
-                //     $scheduleKasYesterday = Schedule::where('employee', $nik)
-                //         ->whereDate('tanggal', $yesterday)
-                //         ->first();
+                    $scheduleKasYesterday = Schedule::where('employee', $nik)
+                        ->whereDate('tanggal', $yesterday)
+                        ->first();
     
-                //     if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
-                //         $alreadyClockIn = true;
-                //         $logs = Absen::where('user_id', $user->employee_code)
-                //                 ->whereDate('tanggal', $yesterday)
-                //                 ->get();
-                //     }
+                    if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
+                        $alreadyClockIn = true;
+                        $logs = Absen::where('user_id', $user->employee_code)
+                                ->whereDate('tanggal', $yesterday)
+                                ->get();
+                    }
 
-                //     $lastAbsensi = Absen::where('tanggal',$yesterday)
-                //                 ->where('nik', $user->employee_code)
-                //                 ->first();
-                                
-                //     if($lastAbsensi) {
-                //         if($lastAbsensi->clock_in && $lastAbsensi->clock_out){
-                //             $alreadyClockOut = true;
-                //             $logs = Absen::where('user_id', $user->employee_code)
-                //                     ->whereDate('tanggal', $yesterday)
-                //                     ->get();
-                //         }
-                //     }
-                // }
+                    
+                }
                 
 
                 // Greating

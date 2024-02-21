@@ -89,6 +89,8 @@ class ApiLoginController extends Controller
                 ->whereDate('tanggal', $today)
                 ->first();
 
+            $projectData = $schedulebackup->project;
+
             if ($schedulebackup) {
                 $dataProject = Project::find($schedulebackup->project);
                 $kantorLatitude = $dataProject->latitude;
@@ -134,7 +136,7 @@ class ApiLoginController extends Controller
                 Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
-                    'project' => $schedulebackup->project,
+                    'project' => $projectData,
                     'tanggal' => now()->toDateString(),
                     'clock_in' => now()->format('H:i'),
                     'latitude' => $lat,

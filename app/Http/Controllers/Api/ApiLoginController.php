@@ -181,6 +181,62 @@ class ApiLoginController extends Controller
             $long2 = $request->input('longitude_out');
             
             $currentDate = now()->format('Y-m-d');
+            $yesterday = Carbon::yesterday();
+
+            // Clockout Shift Malam
+            if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
+                
+                $scheduleKasYesterday = Schedule::where('employee', $nik)
+                    ->whereDate('tanggal', $yesterday)
+                    ->first();
+
+                if ($scheduleKasYesterday->shift === 'ML'){
+                    $absensiml = Absen::where('nik', $nik)
+                                ->whereDate('tanggal', $yesterday)
+                                ->orderBy('clock_in', 'desc')
+                                ->first();
+
+                    if ($absensiml) {
+                        $absensiml->clock_out = now()->format('H:i');
+                        $absensiml->latitude_out = $lat2;
+                        $absensiml->longtitude_out = $long2;
+                        $absensiml->save();
+        
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Clockout success! Selamat Beristirahat!',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'No clock-in record found for today.',
+                        ], 404);
+                    }
+                }else{
+                    $absensi = Absen::where('nik', $nik)
+                        ->whereDate('tanggal', $currentDate)
+                        ->orderBy('clock_in', 'desc')
+                        ->first();
+
+                    if ($absensi) {
+                        $absensi->clock_out = now()->format('H:i');
+                        $absensi->latitude_out = $lat2;
+                        $absensi->longtitude_out = $long2;
+                        $absensi->save();
+
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Clockout success! Selamat Beristirahat!',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'No clock-in record found for today.',
+                        ], 404);
+                    }
+                }
+                
+            }
 
             $absensi = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $currentDate)
@@ -724,7 +780,6 @@ class ApiLoginController extends Controller
                                 ->whereDate('tanggal', $yesterday)
                                 ->get();
                     }
-
                     
                 }
                 

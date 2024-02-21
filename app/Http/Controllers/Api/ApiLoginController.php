@@ -179,6 +179,8 @@ class ApiLoginController extends Controller
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
+            
+            $currentDate = now()->format('Y-m-d');
 
             $absensi = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $currentDate)

@@ -36,7 +36,7 @@
                                     {{ \Carbon\Carbon::parse($data->tanggal)->locale('id_ID')->isoFormat('dddd, D MMMM YYYY') }}
                                 </td>
                                 <td>
-                                @if($employee->nama)
+                                @if($employee)
                                     {{ $employee->nama ?? 'Nama tidak ada' }}
                                 @else
                                     Nama tidak ada

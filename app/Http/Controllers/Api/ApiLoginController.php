@@ -779,6 +779,16 @@ class ApiLoginController extends Controller
                         $logs = Absen::where('user_id', $user->employee_code)
                                 ->whereDate('tanggal', $yesterday)
                                 ->get();
+
+                        $absentoday = Absen::where('user_id',$user->employee_code)
+                                ->whereDate('tanggal', $today)
+                                ->get();
+
+                                if ($absentoday === null) {
+                                    $alreadyClockIn = false;
+                                    $alreadyClockOut = false;
+                                    $logs = $absentoday;
+                                }
                     }
                     
                 }

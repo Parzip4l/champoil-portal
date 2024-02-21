@@ -134,6 +134,7 @@ class ApiLoginController extends Controller
                 Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
+                    'project' => $schedulebackup->project,
                     'tanggal' => now()->toDateString(),
                     'clock_in' => now()->format('H:i'),
                     'latitude' => $lat,

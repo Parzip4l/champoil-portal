@@ -24,11 +24,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group mb-3">
                                                 <label class="form-label">Jabatan Anggota</label>
-                                                <select class="form-control" id="jabatan_select" name="jabatan">
-                                                    @foreach ($jabatan as $data)
-                                                        <option value="{{$data->name}}">{{$data->name}}</option>
-                                                    @endforeach
-                                                </select>
+                                                <input type="text" name="jabatan" value="{{$projectDetails->jabatan}}" class="form-control">
                                             </div>
                                         </div>
                                     </div>

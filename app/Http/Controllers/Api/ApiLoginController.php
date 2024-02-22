@@ -780,15 +780,55 @@ class ApiLoginController extends Controller
                                 ->whereDate('tanggal', $yesterday)
                                 ->get();
 
-                        $absentoday = Absen::where('user_id',$user->employee_code)
-                                ->whereDate('tanggal', $today)
-                                ->get();
-
-                                if ($absentoday === null) {
+                        if ($logs->isEmpty()) {
+                            // Jika belum ada log absen, set tombol ke clock in
+                            $alreadyClockIn = false;
+                            $alreadyClockOut = false;
+                        } else {
+                            // Jika sudah ada log absen, cek apakah yang terakhir adalah clock in atau clock out
+                            $lastLog = $logs->last();
+                    
+                            if ($lastLog->clock_out === null) {
+                                // Jika yang terakhir adalah clock in, set tombol ke clock out
+                                $alreadyClockIn = true;
+                                $alreadyClockOut = false;
+                            } else {
+                                // Jika yang terakhir adalah clock out, set tombol ke clock in
+                                $alreadyClockIn = false;
+                                $alreadyClockOut = false;
+                                
+                                $today = Carbon::today();
+                                $logs = Absen::where('user_id', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->get();
+                                
+                                
+                                $logsHarinini = Absen::where('user_id', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->first();
+                                
+                                if ($logsHarinini !== null) {
+                                    if ($logsHarinini->clock_in !== null) {
+                                        $alreadyClockIn = true;
+                                        $logs = Absen::where('user_id', $user->employee_code)
+                                            ->whereDate('tanggal', $today)
+                                            ->get();
+                                    } else {
+                                        $alreadyClockIn = false;
+                                        $alreadyClockOut = false;
+                                        $logs = Absen::where('user_id', $user->employee_code)
+                                            ->whereDate('tanggal', $today)
+                                            ->get();
+                                    }
+                                } else {
+                                    // Handle ketika $logsHarinini adalah null, misalnya memberikan pesan atau tindakan lainnya
                                     $alreadyClockIn = false;
                                     $alreadyClockOut = false;
-                                    $logs = $absentoday;
+                                    $logs = collect(); // Menggunakan koleksi kosong untuk menghindari error jika dibutuhkan
                                 }
+                                
+                            }
+                        }
                     }
                     
                 }

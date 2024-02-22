@@ -21,6 +21,7 @@
                                 <th>#</th>
                                 <th>Code</th>
                                 <th>Name</th>
+                                <th>Jam Kerja</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -33,13 +34,14 @@
                                 <td> {{$nomor++}} </td>
                                 <td> {{ $data->code }} </td>
                                 <td> {{ $data->name }} </td>
+                                <td> {{ $data->waktu }} - {{ $data->waktu_selesai }} </td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $data->id}}">
+                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ShiftModal{{ $data->id}}">
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
                                             </a>
@@ -83,6 +85,14 @@
                             <label for="" class="form-label">Shift Name</label>
                             <input type="text" class="form-control" name="name" required>    
                         </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Jam Masuk</label>
+                            <input type="time" class="form-control" name="waktu" required>    
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Jam Keluar</label>
+                            <input type="time" class="form-control" name="waktu_selesai" required>    
+                        </div>
                         <div class="col-md-12 mt-2">
                             <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
                         </div>
@@ -92,6 +102,47 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Data -->
+@foreach ($shifts as $data)
+<div class="modal fade" id="ShiftModal{{$data->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Data Shift</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('shift.update', $data->id )}}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Shift Code</label>
+                            <input type="text" class="form-control" name="code" value="{{$data->code}}" required>    
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Shift Name</label>
+                            <input type="text" class="form-control" name="name" value="{{$data->name}}" required>    
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Jam Masuk</label>
+                            <input type="time" class="form-control" name="waktu" value="{{$data->waktu}}" required>    
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Jam Keluar</label>
+                            <input type="time" class="form-control" name="waktu_selesai" value="{{$data->waktu_selesai}}" required>    
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Update Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 
 <!-- End -->
 @endsection

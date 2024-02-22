@@ -46,6 +46,8 @@ class ShiftControllers extends Controller
             $data = new Shift();
             $data->code = $request->code;
             $data->name = $request->name;
+            $data->waktu = $request->waktu;
+            $data->waktu_selesai = $request->waktu_selesai;
             $data->save();
 
             return redirect()->route('shift.index')->with(['success' => 'Shift has been Succesfully Created!']);
@@ -86,7 +88,26 @@ class ShiftControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate the form data
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+            ]);
+    
+            // Update the data
+            $shiftdata = Shift::findOrFail($id);
+            $shiftdata->code = $request->input('code');
+            $shiftdata->name = $request->input('name');
+            $shiftdata->waktu = $request->input('waktu');
+            $shiftdata->waktu_selesai = $request->input('waktu_selesai');
+            $shiftdata->update($validatedData);
+    
+            // Redirect back with a success message
+            return redirect()->route('shift.index')->with('success', 'Data updated successfully');
+        } catch (\Exception $e) {
+            // Handle exceptions, you can log or return an error message
+            return redirect()->back()->with('error', 'Error updating data: ' . $e->getMessage())->withErrors($e->getMessage());
+        }
     }
 
     /**

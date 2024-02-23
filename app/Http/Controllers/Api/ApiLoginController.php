@@ -1119,6 +1119,20 @@ class ApiLoginController extends Controller
                 ], 200);
             }
 
+            if ($backupLogHariIni === null) {
+                return response()->json([
+                    'message' => 'Anda tidak memiliki jadwal absen hari ini.',
+                    'LogAbsenBackupPeriode' => $BackupPeriodeLog
+                ], 200);
+            } else {
+                // Backup log for today is not null
+                $alreadyClockIn = $backupLogHariIni->clock_in !== null;
+                $alreadyClockOut = $backupLogHariIni->clock_out !== null;
+                $isSameDay = $alreadyClockOut ? Carbon::parse($backupLogHariIni->clock_out)->isSameDay(Carbon::today()) : false;
+            
+                // Your code here for handling the case when the backup log for today is not null
+            }
+
             // Absensi Backup Check
             $alreadyClockIn = $backupLogHariIni->clock_in !== null;
             $alreadyClockOut = $backupLogHariIni->clock_out !== null;

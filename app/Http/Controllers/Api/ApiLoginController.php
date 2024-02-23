@@ -1085,9 +1085,15 @@ class ApiLoginController extends Controller
             // Get User Information
             $user = Auth::guard('api')->user();
             $employeeCode = $user->name;
-
             // Define Today
             $today = now()->format('Y-m-d');
+            $employeeCode = $user->employee_code;
+            $bulan = now()->format('F-Y');
+            
+            $mySchedule = ScheduleBackup::where('employee', $employeeCode)
+                ->where('tanggal', $today)
+                ->select('project', 'tanggal', 'shift')
+                ->get();
 
             // Get Absen Backup Hari Ini
             $backupLogHariIni = Absen::where('nik', $employeeCode)
@@ -1105,7 +1111,7 @@ class ApiLoginController extends Controller
                 ->get();
 
             // Check if there are logs for today
-            if (!$backupLogHariIni) {
+            if (!$mySchedule) {
                 // Return logs for the whole month and a message
                 return response()->json([
                     'message' => 'Anda tidak memiliki jadwal absen hari ini.',
@@ -1120,7 +1126,7 @@ class ApiLoginController extends Controller
 
             // Response
             return response()->json([
-                'backupHariIni' => $backupLogHariIni,
+                'backupHariIni' => $mySchedule,
                 'alreadyClockIn' => $alreadyClockIn,
                 'alreadyClockOut' => $alreadyClockOut,
                 'isSameDay' => $isSameDay,

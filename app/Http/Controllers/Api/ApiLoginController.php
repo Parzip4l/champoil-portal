@@ -31,6 +31,7 @@ use App\Absen\RequestAbsen;
 use App\Company\CompanyModel;
 use App\Absen\RequestType;
 use App\Slack;
+use App\ModelCG\Shift;
 
 class ApiLoginController extends Controller
 {
@@ -112,6 +113,7 @@ class ApiLoginController extends Controller
                     }elseif ($scheduleKas->shift === 'OFF'){
                         return response()->json(['message' => 'Clock In Rejected, Schedule not found!']);
                     }
+
             }
 
             $lat = $request->input('latitude');
@@ -182,6 +184,7 @@ class ApiLoginController extends Controller
             
             $currentDate = now()->format('Y-m-d');
             $yesterday = Carbon::yesterday();
+            $today = now()->toDateString();
 
             // Clockout Shift Malam
             if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
@@ -189,6 +192,43 @@ class ApiLoginController extends Controller
                 $scheduleKasYesterday = Schedule::where('employee', $nik)
                     ->whereDate('tanggal', $yesterday)
                     ->first();
+
+                $scheduleToday = Schedule::where('employee', $nik)
+                    ->whereDate('tanggal', $today)
+                    ->first();
+                    
+                $jamshift = $scheduleToday->shift;
+                $getJam = Shift::where('code', $jamshift)->select('waktu_selesai')->first();
+                
+                $currentHour = date('H');
+                $jamshift = $scheduleKas->shift;
+                $getJam = Shift::where('code', $jamshift)->select('waktu_selesai')->first();
+                
+                if($currentHour <= $getJam->waktu_selesai){
+                    return response()->json(['message' => 'Clock In Rejected, Waktu Shift Belum Dimulai!']);
+                }else{
+                    $absensi = Absen::where('nik', $nik)
+                        ->whereDate('tanggal', $currentDate)
+                        ->orderBy('clock_in', 'desc')
+                        ->first();
+
+                    if ($absensi) {
+                        $absensi->clock_out = now()->format('H:i');
+                        $absensi->latitude_out = $lat2;
+                        $absensi->longtitude_out = $long2;
+                        $absensi->save();
+
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Clockout success! Selamat Beristirahat!',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'No clock-in record found for today.',
+                        ], 404);
+                    }
+                }
 
                 if ($scheduleKasYesterday->shift === 'ML'){
                     $absensiml = Absen::where('nik', $nik)
@@ -925,8 +965,7 @@ class ApiLoginController extends Controller
                 $employeeCode = $user->employee_code;
                 $bulan = now()->format('F-Y');
                 
-                $mySchedule = ScheduleBackup::with('project:id,name') // Eager loading
-                    ->where('employee', $employeeCode)
+                $mySchedule = ScheduleBackup::where('employee', $employeeCode)
                     ->where('periode', $bulan)
                     ->select('project', 'tanggal', 'shift')
                     ->get();

@@ -540,11 +540,20 @@ class EmployeeController extends Controller
     {
         // Lakukan pemrosesan untuk mengedit data berdasarkan tanggal ($date) dan nik ($nik)
         $attendance = Absen::where('tanggal', $date)->where('nik', $nik)->first();
+        $schedule = Schedule::where('employee', $request->input('user'))
+                                ->where('tanggal', $request->input('tanggal'))
+                                ->pluck('project')
+                                ->first();
+            
+        if ($schedule === null) {
+            return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');
+        }
 
         if ($attendance) {
             $attendance->clock_in = $request->input('clock_in');
             $attendance->clock_out = $request->input('clock_out');
             $attendance->status = $request->input('status');
+            $attendance->project = $schedule;
             $attendance->save();
 
             return redirect()->back()->with('success', 'Data Berhasil di ubah');

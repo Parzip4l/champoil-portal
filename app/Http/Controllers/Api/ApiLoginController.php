@@ -32,6 +32,7 @@ use App\Company\CompanyModel;
 use App\Absen\RequestType;
 use App\Slack;
 use App\ModelCG\Shift;
+use App\Backup\AbsenBackup;
 
 class ApiLoginController extends Controller
 {
@@ -351,7 +352,7 @@ class ApiLoginController extends Controller
 
             if ($distance <= $allowedRadius) {
                 $filename = null;
-                $absensi = new absen();
+                $absensi = new AbsenBackup();
                 $absensi->user_id = $nik;
                 $absensi->nik = $nik;
                 $absensi->tanggal = now()->toDateString();
@@ -367,7 +368,7 @@ class ApiLoginController extends Controller
                     $path = $image->storeAs('images/absen', $filename, 'public');
                 }
                 $absensi->photo = $filename;
-                $absensi->project_backup = $project_id;
+                $absensi->project = $project_id;
                 $absensi->save();
                 return response()->json(['message' => 'Clockin success, Happy Working Day!']);
             } else {
@@ -379,6 +380,107 @@ class ApiLoginController extends Controller
                 'status' => 'error',
                 'message' => 'An error occurred while processing the request.',
                 'error_details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function clockout_backup(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+            $user = Auth::guard('api')->user();
+            $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
+
+            $lat2 = $request->input('latitude_out');
+            $long2 = $request->input('longitude_out');
+            
+            $currentDate = now()->format('Y-m-d');
+            $yesterday = Carbon::yesterday();
+            $today = now()->toDateString();
+
+            // Clockout Shift Malam
+            if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
+                
+                $scheduleKasYesterday = Schedule::where('employee', $nik)
+                    ->whereDate('tanggal', $yesterday)
+                    ->first();
+
+                if ($scheduleKasYesterday->shift === 'ML'){
+                    $absensiml = Absen::where('nik', $nik)
+                                ->whereDate('tanggal', $yesterday)
+                                ->orderBy('clock_in', 'desc')
+                                ->first();
+
+                    if ($absensiml) {
+                        $absensiml->clock_out = now()->format('H:i');
+                        $absensiml->latitude_out = $lat2;
+                        $absensiml->longtitude_out = $long2;
+                        $absensiml->save();
+        
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Clockout success! Selamat Beristirahat!',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'No clock-in record found for today.',
+                        ], 404);
+                    }
+                }else{
+                    $absensi = AbsenBackup::where('nik', $nik)
+                        ->whereDate('tanggal', $currentDate)
+                        ->orderBy('clock_in', 'desc')
+                        ->first();
+
+                    if ($absensi) {
+                        $absensi->clock_out = now()->format('H:i');
+                        $absensi->latitude_out = $lat2;
+                        $absensi->longtitude_out = $long2;
+                        $absensi->save();
+
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Clockout success! Selamat Beristirahat!',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'No clock-in record found for today.',
+                        ], 404);
+                    }
+                }
+                
+            }
+
+            $absensi = AbsenBackup::where('nik', $nik)
+                ->whereDate('tanggal', $currentDate)
+                ->orderBy('clock_in', 'desc')
+                ->first();
+
+            if ($absensi) {
+                $absensi->clock_out = now()->format('H:i');
+                $absensi->latitude_out = $lat2;
+                $absensi->longtitude_out = $long2;
+                $absensi->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Clockout success! Selamat Beristirahat!',
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No clock-in record found for today.',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            // You may want to customize this based on your logging setup
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while processing the request.',
             ], 500);
         }
     }

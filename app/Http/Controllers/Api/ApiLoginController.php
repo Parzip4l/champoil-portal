@@ -932,7 +932,9 @@ class ApiLoginController extends Controller
                 return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
             } else {
                 $employeeCode = $user->employee_code;
-                $bulan = now()->format('F-Y');
+                $currentDate = Carbon::now();
+                $nextMonth = $currentDate->addMonth();
+                $bulan = $nextMonth->format('F-Y');
                 
                 $mySchedule = Schedule::with('project:id,name') // Eager loading
                     ->where('employee', $employeeCode)

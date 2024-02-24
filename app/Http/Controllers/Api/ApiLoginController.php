@@ -1198,13 +1198,16 @@ class ApiLoginController extends Controller
                 ->first();
                 // Get Data Karyawan
                 $userId = $user->id;
-
+                $today = now();
                 // Get Log Absensi
                 $logs = AbsenBackup::where('nik', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
                     ->get();
-                    
-                $today = now();
+                
+                $project_backup = ScheduleBackup::where('employee', $nik)
+                ->whereDate('tanggal', $today)
+                ->pluck('project');
+
                 $yesterday = Carbon::yesterday();
                 $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
                 $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
@@ -1325,7 +1328,12 @@ class ApiLoginController extends Controller
                     }
                     $currentDate->addDay();
                 }
-                
+                $startDate = now()->day >= 21 ? now()->copy()->day(20) : now()->copy()->subMonth()->day(21);
+                $endDate = now()->day >= 21 ? now()->copy()->addMonth()->day(20) : now()->copy()->day(20);
+
+                $BackupPeriodeLog = Absen::where('nik', $employeeCode)
+                            ->whereBetween('tanggal', [$startDate, $endDate])
+                            ->get();
                 // Calculate the total weekdays in the current month (excluding weekends)
                 $weekdaysInMonth = $totalDaysInMonth - $weekendDays;
                 
@@ -1341,9 +1349,11 @@ class ApiLoginController extends Controller
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
                     'logs' => $logs,
+                    'project_backup' => $project_backup,
                     'logsmonths' => $logsmonths,
                     'daysWithNoLogs' => $daysWithNoLogs,
                     'bulanSelected' => $bulanSelected,
+                    'LogAbsenBackupPeriode' => $BackupPeriodeLog
                 ], 200);
             } else {
                 return response()->json(['error' => 'Unauthorized'], 401);

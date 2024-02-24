@@ -193,42 +193,42 @@ class ApiLoginController extends Controller
                     ->whereDate('tanggal', $yesterday)
                     ->first();
 
-                $scheduleToday = Schedule::where('employee', $nik)
-                    ->whereDate('tanggal', $today)
-                    ->first();
+                // $scheduleToday = Schedule::where('employee', $nik)
+                //     ->whereDate('tanggal', $today)
+                //     ->first();
                     
-                $jamshift = $scheduleToday->shift;
-                $getJam = Shift::where('code', $jamshift)->select('waktu_selesai')->first();
+                // $jamshift = $scheduleToday->shift;
+                // $getJam = Shift::where('code', $jamshift)->select('waktu_selesai')->first();
                 
-                $currentHour = date('H');
-                $jamshift = $scheduleKas->shift;
-                $getJam = Shift::where('code', $jamshift)->select('waktu_selesai')->first();
+                // $currentHour = date('H');
+                // $jamshift = $scheduleKas->shift;
+                // $getJam = Shift::where('code', $jamshift)->select('waktu_selesai')->first();
                 
-                if($currentHour <= $getJam->waktu_selesai){
-                    return response()->json(['message' => 'Clock In Rejected, Waktu Shift Belum Dimulai!']);
-                }else{
-                    $absensi = Absen::where('nik', $nik)
-                        ->whereDate('tanggal', $currentDate)
-                        ->orderBy('clock_in', 'desc')
-                        ->first();
+                // if($currentHour <= $getJam->waktu_selesai){
+                //     return response()->json(['message' => 'Clock In Rejected, Waktu Shift Belum Dimulai!']);
+                // }else{
+                //     $absensi = Absen::where('nik', $nik)
+                //         ->whereDate('tanggal', $currentDate)
+                //         ->orderBy('clock_in', 'desc')
+                //         ->first();
 
-                    if ($absensi) {
-                        $absensi->clock_out = now()->format('H:i');
-                        $absensi->latitude_out = $lat2;
-                        $absensi->longtitude_out = $long2;
-                        $absensi->save();
+                //     if ($absensi) {
+                //         $absensi->clock_out = now()->format('H:i');
+                //         $absensi->latitude_out = $lat2;
+                //         $absensi->longtitude_out = $long2;
+                //         $absensi->save();
 
-                        return response()->json([
-                            'status' => 'success',
-                            'message' => 'Clockout success! Selamat Beristirahat!',
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'No clock-in record found for today.',
-                        ], 404);
-                    }
-                }
+                //         return response()->json([
+                //             'status' => 'success',
+                //             'message' => 'Clockout success! Selamat Beristirahat!',
+                //         ], 200);
+                //     } else {
+                //         return response()->json([
+                //             'status' => 'error',
+                //             'message' => 'No clock-in record found for today.',
+                //         ], 404);
+                //     }
+                // }
 
                 if ($scheduleKasYesterday->shift === 'ML'){
                     $absensiml = Absen::where('nik', $nik)

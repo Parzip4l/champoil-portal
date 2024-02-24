@@ -1212,14 +1212,14 @@ class ApiLoginController extends Controller
                 $bulan = $request->input('bulan');
                 // Get logs for the month
                 if($bulan) {
-                    $logsmonths = Absen::where('nik', $user->employee_code)
+                    $logsmonths = AbsenBackup::where('nik', $user->employee_code)
                         ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
                         ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
                         ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                         ->orderBy('tanggal')
                         ->get();
                 } else {
-                    $logsmonths = Absen::where('nik', $user->employee_code)
+                    $logsmonths = AbsenBackup::where('nik', $user->employee_code)
                         ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                         ->orderBy('tanggal')
                         ->get();

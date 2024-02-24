@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
 
     // Backup
     Route::post('/clockin-backup', [ApiLoginController::class, 'clockinbackup']);
-    Route::post('/clockout-backup', [ApiLoginController::class, 'clockout']);
+    Route::post('/clockout-backup', [ApiLoginController::class, 'clockout_backup']);
     Route::get('/backup-log', [ApiLoginController::class, 'LogBackup']);
 
     // Request Type

@@ -272,7 +272,7 @@
 @endif
 
 <!-- Announcement -->
-<div class="row mb-3">
+<div class="row mb-3 mobile">
     <h5 class="mb-2">Announcement</h5>
     <div class="col-md-12">
         <div class="card custom-card2">
@@ -287,7 +287,7 @@
 
 @if(in_array('hr_access', $dataLogin))
 <!-- Request -->
-<div class="row mb-3">
+<div class="row mb-3 mobile">
     <h5 class="mb-2">Need My Approval</h5>
     <div class="col-md-12">
         <div class="card custom-card2">
@@ -369,8 +369,22 @@
 @endif
 <!-- End -->
 
+<!-- Chart Section -->
+<div class="chart-wrap mb-4">
+    
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card custom-card2">
+                    <div class="card-body">
+                        <div id="apexBar"></div>    
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+<!-- End Chart Section -->
 <!-- Task -->
-<div class="row mb-6">
+<div class="row mb-6 mobile">
     <h5 class="mb-2">Task</h5>
     <div class="col-md-12">
         <div class="card custom-card2">
@@ -567,12 +581,14 @@
   <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
 <script src="{{ asset('assets/js/dashboard.js') }}"></script>
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
 <script src="{{ asset('assets/js/carousel.js') }}"></script>
+<script src="{{ asset('assets/js/apexcharts.js') }}"></script>
 <script>
     @if(session('success'))
         Swal.fire({

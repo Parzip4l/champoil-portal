@@ -118,14 +118,14 @@
                                 $attendanceDataByDate[$absendata->tanggal] = $absendata;
                             }
                             @endphp
-
+                            
                             @while ($currentDate->lte($end_date))
                             <tr>
                             <td class="{{ $currentDate->isWeekend() ? 'text-danger' : '' }}">{{ $currentDate->translatedFormat('D, j M Y') }}</td>
                             <td>
                                 @if (isset($attendanceDataByDate[$currentDate->format('Y-m-d')]))
                                     @php
-                                        $projectCode = $attendanceDataByDate[$currentDate->format('Y-m-d')]->project_backup;
+                                        $projectCode = $attendanceDataByDate[$currentDate->format('Y-m-d')]->project;
                                         $projectName = \App\ModelCG\Project::where('id', $projectCode)->value('name');
                                     @endphp
                                     {{ $projectName ?? '-' }}

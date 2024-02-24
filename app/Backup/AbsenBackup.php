@@ -1,15 +1,15 @@
 <?php
 
-namespace App;
+namespace App\Backup;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Absen extends Model
+class AbsenBackup extends Model
 {
     use HasFactory;
-    protected $table = 'absens';
-    protected $fillable = ['user_id', 'nik', 'tanggal', 'clock_in', 'latitude', 'longtitude', 'status','project'];
+    protected $table = 'absen_backup';
+    protected $fillable = ['user_id', 'nik', 'tanggal', 'clock_in', 'latitude', 'longtitude', 'status'];
 
     public function user()
     {

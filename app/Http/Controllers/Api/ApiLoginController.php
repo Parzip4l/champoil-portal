@@ -120,7 +120,6 @@ class ApiLoginController extends Controller
             $lat = $request->input('latitude');
             $long = $request->input('longitude');
             $status = $request->input('status');
-            $project = $request->input('project');
 
             $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
 
@@ -138,7 +137,7 @@ class ApiLoginController extends Controller
                 Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
-                    'project' => $dataProject,
+                    'project' => $dataProject->id,
                     'tanggal' => now()->toDateString(),
                     'clock_in' => now()->format('H:i'),
                     'latitude' => $lat,

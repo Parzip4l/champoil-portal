@@ -1331,7 +1331,7 @@ class ApiLoginController extends Controller
                 $startDate = now()->day >= 21 ? now()->copy()->day(20) : now()->copy()->subMonth()->day(21);
                 $endDate = now()->day >= 21 ? now()->copy()->addMonth()->day(20) : now()->copy()->day(20);
 
-                $BackupPeriodeLog = Absen::where('nik', $employeeCode)
+                $BackupPeriodeLog = Absen::where('nik', $user->employee_code)
                             ->whereBetween('tanggal', [$startDate, $endDate])
                             ->get();
                 // Calculate the total weekdays in the current month (excluding weekends)

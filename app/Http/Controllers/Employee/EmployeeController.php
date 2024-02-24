@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redis;
 use App\Employee;
 use App\EmployeeResign;
 use App\Absen;
+use App\Backup\AbsenBackup;
 use App\User;
 use App\Payrolinfo\Payrolinfo;
 use App\UserActivities;
@@ -567,16 +568,15 @@ class EmployeeController extends Controller
                 return redirect()->back()->with('error', 'Tidak ada jadwal untuk anggota ini pada tanggal tersebut');
             }
 
-            $attendance = new Absen;
-            $attendance->user_id = $request->input('user');
+            $attendance = new AbsenBackup;
             $attendance->nik = $request->input('user');
             $attendance->tanggal = $request->input('tanggal');
+            $attendance->project = $schedule;
             $attendance->clock_in = $request->input('clock_in');
             $attendance->clock_out = $request->input('clock_out');
             $attendance->latitude = $request->input('latitude');
             $attendance->longtitude = $request->input('longtitude');
             $attendance->status = $request->input('status');
-            $attendance->project = $schedule;
             $attendance->save();
     
             return redirect()->back()->with('success', 'Absensi berhasil ditambahkan');
@@ -589,7 +589,7 @@ class EmployeeController extends Controller
     public function UpdateAbsenBackup(Request $request, $date, $nik)
     {
         // Lakukan pemrosesan untuk mengedit data berdasarkan tanggal ($date) dan nik ($nik)
-        $attendance = Absen::where('tanggal', $date)->where('nik', $nik)->first();
+        $attendance = AbsenBackup::where('tanggal', $date)->where('nik', $nik)->first();
 
         if ($attendance) {
             $attendance->clock_in = $request->input('clock_in');

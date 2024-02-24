@@ -10,6 +10,7 @@ use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
 use App\Absen\RequestAbsen;
+use App\Backup\AbsenBackup;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -74,15 +75,15 @@ class AbsenController extends Controller
         // Query untuk data absensi
         $query = DB::table('users')
             ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
-            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
-                $join->on('absens.nik', '=', 'users.employee_code')
-                    ->whereBetween('absens.tanggal', [$startDate, $endDate])
-                    ->whereNotNull('absens.project_backup');
+            ->leftJoin('absen_backup', function ($join) use ($startDate, $endDate) {
+                $join->on('absen_backup.nik', '=', 'users.employee_code')
+                    ->whereBetween('absen_backup.tanggal', [$startDate, $endDate])
+                    ->whereNotNull('absen_backup.project');
             })
             ->where('karyawan.unit_bisnis', $company->unit_bisnis);
 
         // Mengambil data absensi dari database
-        $data1 = $query->select('users.*', 'absens.*')
+        $data1 = $query->select('users.*', 'absen_backup.*')
             ->orderBy('users.name')
             ->get();
 
@@ -434,9 +435,9 @@ class AbsenController extends Controller
             // Hitung Total Hari Kerja
             $totalWorkingDays = $startDate->diffInWeekdays($endDate);
 
-            $absensi = Absen::where('nik', $nik)
+            $absensi = AbsenBackup::where('nik', $nik)
                 ->whereBetween('tanggal', [$startDate, $endDate])
-                ->whereNotNull('project_backup')
+                ->whereNotNull('project')
                 ->get();
 
             $ontime = count($absensi);
@@ -531,7 +532,7 @@ class AbsenController extends Controller
 
     public function deleteAttendanceBackup($date, $nik)
     {
-        $dataAbsen = Absen::where('tanggal', $date)
+        $dataAbsen = AbsenBackup::where('tanggal', $date)
         ->where('nik', $nik)
         ->delete();
         return redirect()->back()->with('success', 'Attendance successfully deleted');

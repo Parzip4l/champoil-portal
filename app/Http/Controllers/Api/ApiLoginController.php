@@ -1186,73 +1186,170 @@ class ApiLoginController extends Controller
     // Log Absen Backup
     public function LogBackup(Request $request)
     {
-        try {
-            // Get User Information
+        if (Auth::guard('api')->check()) {
             $user = Auth::guard('api')->user();
-            $employeeCode = $user->name;
-            // Define Today
-            $today = now()->format('Y-m-d');
-            $employeeCode = $user->employee_code;
-            $bulan = now()->format('F-Y');
+            $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
             
-            $mySchedule = ScheduleBackup::where('employee', $employeeCode)
-                ->where('tanggal', $today)
-                ->select('project', 'tanggal', 'shift')
-                ->get();
-
-            // Get Absen Backup Hari Ini
-            $backupLogHariIni = Absen::where('nik', $employeeCode)
-                ->where('tanggal', $today)
-                ->whereNotNull('project_backup')
+            if ($user->id) {
+                $hariini = now()->format('Y-m-d');
+                $lastAbsensi = AbsenBackup::where('tanggal',$hariini)
+                ->where('nik', $user->employee_code)
                 ->first();
+                // Get Data Karyawan
+                $userId = $user->id;
 
-            // Get Absen Backup Periode Bulan Sekarang
-            $startDate = now()->day >= 21 ? now()->copy()->day(21) : now()->copy()->subMonth()->day(21);
-            $endDate = now()->day >= 21 ? now()->copy()->addMonth()->day(20) : now()->copy()->day(20);
+                // Get Log Absensi
+                $logs = AbsenBackup::where('nik', $user->employee_code)
+                    ->whereDate('tanggal', $hariini)
+                    ->get();
+                    
+                $today = now();
+                $yesterday = Carbon::yesterday();
+                $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+                $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
-            $BackupPeriodeLog = Absen::where('nik', $employeeCode)
-                ->whereNotNull('project_backup')
-                ->whereBetween('tanggal', [$startDate, $endDate])
-                ->get();
+                $bulan = $request->input('bulan');
+                // Get logs for the month
+                if($bulan) {
+                    $logsmonths = Absen::where('nik', $user->employee_code)
+                        ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
+                        ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
+                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                        ->orderBy('tanggal')
+                        ->get();
+                } else {
+                    $logsmonths = Absen::where('nik', $user->employee_code)
+                        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+                        ->orderBy('tanggal')
+                        ->get();
+                }
 
-            // Check if there are logs for today
-            if (!$mySchedule) {
-                // Return logs for the whole month and a message
+                // Remove Absen Button
+                $alreadyClockIn = false;
+                $alreadyClockOut = false;
+                $isSameDay = false;
+
+                if ($lastAbsensi) {
+                    if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
+                        $alreadyClockIn = true;
+                    } elseif ($lastAbsensi->clock_in && $lastAbsensi->clock_out) {
+                        $alreadyClockOut = true;
+                        $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
+                        $today = Carbon::today();
+                        $isSameDay = $lastClockOut->isSameDay($today);
+                    }
+                }
+
+                // Cek Button
+                if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
+                
+                    $scheduleKasYesterday = ScheduleBackup::where('employee', $nik)
+                        ->whereDate('tanggal', $yesterday)
+                        ->first();
+    
+                    if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
+                        $alreadyClockIn = true;
+                        $logs = AbsenBackup::where('nik', $user->employee_code)
+                                ->whereDate('tanggal', $yesterday)
+                                ->get();
+
+                        if ($logs->isEmpty()) {
+                            // Jika belum ada log absen, set tombol ke clock in
+                            $alreadyClockIn = false;
+                            $alreadyClockOut = false;
+                        } else {
+                            // Jika sudah ada log absen, cek apakah yang terakhir adalah clock in atau clock out
+                            $lastLog = $logs->last();
+                    
+                            if ($lastLog->clock_out === null) {
+                                // Jika yang terakhir adalah clock in, set tombol ke clock out
+                                $alreadyClockIn = true;
+                                $alreadyClockOut = false;
+                            } else {
+                                // Jika yang terakhir adalah clock out, set tombol ke clock in
+                                $alreadyClockIn = false;
+                                $alreadyClockOut = false;
+                                
+                                $today = Carbon::today();
+                                $logs = AbsenBackup::where('nik', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->get();
+                                
+                                
+                                $logsHarinini = AbsenBackup::where('nik', $user->employee_code)
+                                        ->whereDate('tanggal', $today)
+                                        ->first();
+                                
+                                if ($logsHarinini !== null) {
+                                    if ($logsHarinini->clock_in !== null) {
+                                        $alreadyClockIn = true;
+                                        $logs = AbsenBackup::where('nik', $user->employee_code)
+                                            ->whereDate('tanggal', $today)
+                                            ->get();
+                                    } else {
+                                        $alreadyClockIn = false;
+                                        $alreadyClockOut = false;
+                                        $logs = AbsenBackup::where('nik', $user->employee_code)
+                                            ->whereDate('tanggal', $today)
+                                            ->get();
+                                    }
+                                } else {
+                                    // Handle ketika $logsHarinini adalah null, misalnya memberikan pesan atau tindakan lainnya
+                                    $alreadyClockIn = false;
+                                    $alreadyClockOut = false;
+                                    $logs = collect(); // Menggunakan koleksi kosong untuk menghindari error jika dibutuhkan
+                                }
+                                
+                            }
+                        }
+                    }
+                    
+                }
+                
+
+                // Greating
+                date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda
+                $hour = date('H'); // Ambil jam saat ini
+
+                $totalDaysInMonth = $startOfMonth->diffInDays($endOfMonth);
+                
+                // Calculate the number of weekend days in the current month
+                $weekendDays = 0;
+                $currentDate = Carbon::now()->startOfMonth();
+                $endOfMonth = Carbon::now()->endOfMonth();
+
+                while ($currentDate <= $endOfMonth) {
+                    if ($currentDate->isWeekend()) {
+                        $weekendDays++;
+                    }
+                    $currentDate->addDay();
+                }
+                
+                // Calculate the total weekdays in the current month (excluding weekends)
+                $weekdaysInMonth = $totalDaysInMonth - $weekendDays;
+                
+                // Calculate the number of logs in the current month
+                $logsCount = $logsmonths->count();
+                
+                // Calculate the number of weekdays with no logs
+                $daysWithNoLogs = $weekdaysInMonth - $logsCount;
+
+                $bulanSelected = $bulan ? date('F', strtotime($bulan)) : date('F');
                 return response()->json([
-                    'message' => 'Anda tidak memiliki jadwal absen hari ini.',
-                    'LogAbsenBackupPeriode' => $BackupPeriodeLog
-                ], 200);
-            }
-
-            if ($backupLogHariIni === null) {
-                return response()->json([
-                    'message' => 'Anda tidak memiliki jadwal absen hari ini.',
-                    'LogAbsenBackupPeriode' => $BackupPeriodeLog
+                    'alreadyClockIn' => $alreadyClockIn,
+                    'alreadyClockOut' => $alreadyClockOut,
+                    'isSameDay' => $isSameDay,
+                    'logs' => $logs,
+                    'logsmonths' => $logsmonths,
+                    'daysWithNoLogs' => $daysWithNoLogs,
+                    'bulanSelected' => $bulanSelected,
                 ], 200);
             } else {
-                // Backup log for today is not null
-                $alreadyClockIn = $backupLogHariIni->clock_in !== null;
-                $alreadyClockOut = $backupLogHariIni->clock_out !== null;
-                $isSameDay = $alreadyClockOut ? Carbon::parse($backupLogHariIni->clock_out)->isSameDay(Carbon::today()) : false;
-            
-                // Your code here for handling the case when the backup log for today is not null
+                return response()->json(['error' => 'Unauthorized'], 401);
             }
-
-            // Absensi Backup Check
-            $alreadyClockIn = $backupLogHariIni->clock_in !== null;
-            $alreadyClockOut = $backupLogHariIni->clock_out !== null;
-            $isSameDay = $alreadyClockOut ? Carbon::parse($backupLogHariIni->clock_out)->isSameDay(Carbon::today()) : false;
-
-            // Response
-            return response()->json([
-                'backupHariIni' => $mySchedule,
-                'alreadyClockIn' => $alreadyClockIn,
-                'alreadyClockOut' => $alreadyClockOut,
-                'isSameDay' => $isSameDay,
-                'LogAbsenBackupPeriode' => $BackupPeriodeLog
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
 

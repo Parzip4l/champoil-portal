@@ -93,12 +93,13 @@ class ApiLoginController extends Controller
 
             if ($schedulebackup) {
                 $dataProject = Project::find($schedulebackup->project);
+                $projectData = $dataProject->id;
                 $kantorLatitude = $dataProject->latitude;
                 $kantorLongitude = $dataProject->longtitude;
                 $allowedRadius = 5;
             } else {
                 $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-           
+                $projectData = 123;
                 $kantorLatitude = $dataCompany->latitude;
                 $kantorLongitude = $dataCompany->longitude;
                 $allowedRadius = $dataCompany->radius;
@@ -137,7 +138,7 @@ class ApiLoginController extends Controller
                 Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
-                    'project' => $dataProject->id,
+                    'project' => $projectData,
                     'tanggal' => now()->toDateString(),
                     'clock_in' => now()->format('H:i'),
                     'latitude' => $lat,

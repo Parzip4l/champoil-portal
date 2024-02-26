@@ -19,6 +19,7 @@ use App\Mail\PayslipEmail;
 use Illuminate\Support\Facades\Mail;
 use App\PengajuanSchedule\PengajuanSchedule;
 use PDF;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -118,6 +119,8 @@ class DashboardController extends Controller
 
         $DataFrontline = $dataChartKaryawan->where('organisasi','Frontline Officer')->count();
         $DataManagement = $dataChartKaryawan->where('organisasi','Management Leaders')->count();
+        $DataFrontline = Str::upper($DataFrontline);
+        $DataManagement = Str::upper($DataManagement);      
         $DataAllKaryawan = $dataChartKaryawan->count();
 
         $ChartKaryawan = [

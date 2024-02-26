@@ -19,6 +19,7 @@ use App\Mail\PayslipEmail;
 use Illuminate\Support\Facades\Mail;
 use App\PengajuanSchedule\PengajuanSchedule;
 use PDF;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {

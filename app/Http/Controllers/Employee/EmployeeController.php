@@ -507,14 +507,17 @@ class EmployeeController extends Controller
     {
         // Lakukan pemrosesan untuk menambahkan data baru
         try{
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
             // Cek Project
             $schedule = Schedule::where('employee', $request->input('user'))
                                 ->where('tanggal', $request->input('tanggal'))
                                 ->pluck('project')
                                 ->first();
-            
-            if ($schedule === null) {
-                return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');
+            if ($company->unit_bisnis === 'Kas'){
+                if ($schedule === null) {
+                    return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');
+                }
             }
 
             $attendance = new Absen;
@@ -538,15 +541,20 @@ class EmployeeController extends Controller
     // Update Absen
     public function UpdateAbsen(Request $request, $date, $nik)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
         // Lakukan pemrosesan untuk mengedit data berdasarkan tanggal ($date) dan nik ($nik)
         $attendance = Absen::where('tanggal', $date)->where('nik', $nik)->first();
         $schedule = Schedule::where('employee', $request->input('user'))
                                 ->where('tanggal', $request->input('tanggal'))
                                 ->pluck('project')
                                 ->first();
-            
-        if ($schedule === null) {
-            return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');
+
+        if ($company->unit_bisnis === 'Kas'){
+            if ($schedule === null) {
+                return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');
+            }
         }
 
         if ($attendance) {

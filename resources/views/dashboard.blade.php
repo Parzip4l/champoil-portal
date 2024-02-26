@@ -370,7 +370,7 @@
 <!-- End -->
 
 <!-- Chart Section -->
-<div class="chart-wrap mb-4">
+<div class="chart-wrap mb-4 desktop">
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card custom-card2">

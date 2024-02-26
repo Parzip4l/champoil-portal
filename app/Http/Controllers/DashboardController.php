@@ -134,8 +134,8 @@ class DashboardController extends Controller
             'datasets' => [
                 [
                     'label' => '',
-                    'backgroundColor' => ['#277BC0', '#FFB200', '#FFCB42'],
-                    'data' => [$DataAllKaryawan, $DataFrontline, $DataManagement],
+                    'backgroundColor' => ['#277BC0', '#FFB200', '#66d1d1'],
+                    'data' => [$DataAllKaryawan, $DataManagement, $DataFrontline],
                 ]
             ]
         ];

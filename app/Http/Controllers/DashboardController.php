@@ -44,7 +44,13 @@ class DashboardController extends Controller
                     ->whereBetween('tanggal', [$startDate, $endDate])
                     ->select('absens.*', 'karyawan.*')
                     ->get();
-        
+
+        $DataHadir = Absen::join('karyawan', 'absens.nik', '=', 'karyawan.nik')
+                    ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->where('status', 'H')
+                    ->select('absens.*', 'karyawan.*')
+                    ->get();
 
         // Data Absensi 
         $labels = [];
@@ -66,7 +72,7 @@ class DashboardController extends Controller
         ];
 
         foreach ($labels as $label) {
-            $absencesCount = $dataAbsen->where('tanggal', $label)->count();
+            $absencesCount = $DataHadir->where('tanggal', $label)->count();
             $dataAbsenByDay['datasets'][0]['data'][] = $absencesCount;
         }
 
@@ -75,21 +81,29 @@ class DashboardController extends Controller
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
 
-        $dataSakit = $dataAbsen->where('status', 'Sakit')
+        $dataSakit = $dataAbsen->where('status', 'S')
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
 
-        $dataIzin = $dataAbsen->where('status', 'F')
+        $dataIzin = $dataAbsen->where('status', 'I')
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->count();
+        
+        $wfe = $dataAbsen->where('status', 'A')
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->count();
+        
+        $vc = $dataAbsen->where('status', 'VC')
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
         
         $DataTotalKehadiran = [
-            'labels' => ['Hadir', 'Sakit', 'Izin'],
+            'labels' => ['Hadir', 'Sakit', 'Izin', 'Wfe','Visit Customer'],
             'datasets' => [
                 [
                     'label' => 'Total Data',
-                    'backgroundColor' => ['#277BC0', '#FFB200', '#FFCB42'],
-                    'data' => [$dataKehadirantotal, $dataSakit, $dataIzin],
+                    'backgroundColor' => ['#277BC0', '#FFB200', '#FFCB42', '#66d1d1', '#f36'],
+                    'data' => [$dataKehadirantotal, $dataSakit, $dataIzin,$wfe,$vc],
                 ]
             ]
         ];

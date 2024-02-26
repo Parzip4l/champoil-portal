@@ -371,16 +371,22 @@
 
 <!-- Chart Section -->
 <div class="chart-wrap mb-4">
-    
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card custom-card2">
-                    <div class="card-body">
-                        <div id="apexBar"></div>    
-                    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <canvas id="ChartAbsen"></canvas>    
                 </div>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <div id=""></div>    
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- End Chart Section -->
 <!-- Task -->
@@ -582,6 +588,7 @@
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/chartjs/chart.umd.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
@@ -589,6 +596,7 @@
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
 <script src="{{ asset('assets/js/carousel.js') }}"></script>
 <script src="{{ asset('assets/js/apexcharts.js') }}"></script>
+<script src="{{ asset('assets/js/chartjs.js') }}"></script>
 <script>
     @if(session('success'))
         Swal.fire({
@@ -781,4 +789,15 @@ $(function() {
         }
     });
 </script>
+<script>
+    var data = {!! json_encode($dataAbsenByDay) !!};
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('ChartAbsen').getContext('2d');
+        var ChartAbsen = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+        });
+    });
+  </script>
 @endpush

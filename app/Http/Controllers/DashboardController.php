@@ -27,6 +27,9 @@ class DashboardController extends Controller
         // Request Approval
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
         $dataRequest = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
             ->where('karyawan.unit_bisnis', $company->unit_bisnis)
@@ -35,6 +38,37 @@ class DashboardController extends Controller
             ->get();
         
         $pengajuanSchedule = PengajuanSchedule::where('status', 'Ditinjau')->get();
+
+        $dataAbsen = Absen::join('karyawan', 'absens.nik', '=', 'karyawan.nik')
+        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+        ->whereBetween('tanggal', [$startDate, $endDate])
+        ->select('absens.*', 'karyawan.*')
+        ->get();
+        
+
+        // Data Absensi 
+        $labels = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate->lte($endDate)) {
+            $labels[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
+        // Calculate the total absences for each day
+        $dataAbsenByDay = [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Total Absences',
+                    'backgroundColor' => '#36a2eb',
+                    'data' => [],
+                ]
+            ]
+        ];
+
+        foreach ($labels as $label) {
+            $absencesCount = $dataAbsen->where('tanggal', $label)->count();
+            $dataAbsenByDay['datasets'][0]['data'][] = $absencesCount;
+        }
 
 
         // Absen Data
@@ -86,7 +120,10 @@ class DashboardController extends Controller
         $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
 
-        return view('dashboard', compact('karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule'
+        return view('dashboard', 
+        compact(
+            'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
+            'dataAbsenByDay'
         ));
     }
 

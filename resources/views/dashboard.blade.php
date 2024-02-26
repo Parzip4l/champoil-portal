@@ -1,11 +1,13 @@
 @extends('layout.master')
 
 @push('plugin-styles')
-  <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.carousel.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.theme.default.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/animate-css/animate.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.carousel.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.theme.default.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/animate-css/animate.min.css') }}" rel="stylesheet" />
+  
 @endpush
 
 @section('content')
@@ -373,22 +375,47 @@
 <div class="chart-wrap mb-4 desktop">
     <div class="row mb-4">
         <div class="col-md-6">
+            <h6 class="mb-2">Daftar karyawan tanpa keterangan hari ini.</h6>
             <div class="card custom-card2">
+                <div class="card-body">
+                    <table class="table" id="dataTableExample">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Organisasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($karyawanTidakAbsenHariIni as $alpha)
+                            <tr>
+                                <td>{{$alpha->nama}}</td>
+                                <td>{{$alpha->organisasi}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table> 
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-6">
+            <h6 class="mb-2">Total Absensi Day to Day.</h6>
+            <div class="card custom-card2 mb-4">
                 <div class="card-body">
                     <canvas id="ChartAbsen"></canvas>    
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
+            <h6 class="mb-2">Total Absensi Periode.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
-                <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
+                    <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
+        <h6 class="mb-2">Total Karyawan.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
                     <canvas id="ChartKaryawan"></canvas>    
@@ -396,9 +423,9 @@
             </div>
         </div>
         <div class="col-md-6">
+            <h6 class="mb-2">Daftar karyawan yang akan segera berakhir kontrak.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
-                    <h6>Daftar karyawan yang akan segera berakhir kontrak.</h6>
                     <table class="table table-responsive">
                         <thead>
                             <tr>
@@ -617,6 +644,8 @@
 @endsection
 
 @push('plugin-scripts')
+<script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/flatpickr/flatpickr.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
@@ -626,6 +655,7 @@
 @endpush
 
 @push('custom-scripts')
+<script src="{{ asset('assets/js/data-table.js') }}"></script>
 <script src="{{ asset('assets/js/dashboard.js') }}"></script>
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
 <script src="{{ asset('assets/js/carousel.js') }}"></script>

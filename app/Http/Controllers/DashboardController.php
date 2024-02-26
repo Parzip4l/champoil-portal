@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use App\PengajuanSchedule\PengajuanSchedule;
 use PDF;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -152,6 +153,17 @@ class DashboardController extends Controller
                 $contractEndDate = $employee->berakhirkontrak;
                 $remainingDays = now()->diffInDays($contractEndDate, false);
             }
+
+        $karyawanTidakAbsenHariIni = DB::table('karyawan')
+            ->leftJoin('absens', function ($join) use ($today) {
+                $join->on('karyawan.nik', '=', 'absens.nik')
+                    ->whereDate('absens.tanggal', $today);
+            })
+            ->where('unit_bisnis',$company->unit_bisnis)
+            ->where('resign_status',0)
+            ->whereNull('absens.nik')
+            ->select('karyawan.nama','karyawan.organisasi')
+            ->get();
         // End Employee Statistik
 
 
@@ -208,7 +220,7 @@ class DashboardController extends Controller
         return view('dashboard', 
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
-            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan'
+            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni'
         ));
     }
 

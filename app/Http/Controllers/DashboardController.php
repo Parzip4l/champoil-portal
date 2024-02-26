@@ -39,6 +39,7 @@ class DashboardController extends Controller
         
         $pengajuanSchedule = PengajuanSchedule::where('status', 'Ditinjau')->get();
 
+        // Absensi Statistik
         $dataAbsen = Absen::join('karyawan', 'absens.nik', '=', 'karyawan.nik')
                     ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                     ->whereBetween('tanggal', [$startDate, $endDate])
@@ -107,6 +108,45 @@ class DashboardController extends Controller
                 ]
             ]
         ];
+        //End Absensi Statistik
+
+
+        // Employee Statistik
+        $dataChartKaryawan = Employee::where('unit_bisnis',$company->unit_bisnis)
+        ->where('resign_status',0)
+        ->get();
+
+        $DataFrontline = $dataChartKaryawan->where('organisasi','Frontline Officer')->count();
+        $DataManagement = $dataChartKaryawan->where('organisasi','Management Leaders')->count();
+        $DataAllKaryawan = $dataChartKaryawan->count();
+
+        $ChartKaryawan = [
+            'labels' => ['All', 'Management Leaders', 'Frontline Officer'],
+            'datasets' => [
+                [
+                    'label' => '',
+                    'backgroundColor' => ['#277BC0', '#FFB200', '#FFCB42'],
+                    'data' => [$DataAllKaryawan, $DataFrontline, $DataManagement],
+                ]
+            ]
+        ];
+
+        $today = now()->format('Y-m-d');  // Tanggal hari ini
+
+        $kontrakKaryawan = Employee::where('unit_bisnis',$company->unit_bisnis)
+            ->where('berakhirkontrak', '>', $today)
+            ->where('berakhirkontrak', '<=', now()->addMonth()->format('Y-m-d'))
+            ->select('nama','berakhirkontrak')
+            ->get();
+
+        foreach ($kontrakKaryawan as $employee) {
+                $contractEndDate = $employee->berakhirkontrak;
+                $remainingDays = now()->diffInDays($contractEndDate, false);
+            }
+        // End Employee Statistik
+
+
+
         // Absen Data
         if (Auth::check()) {
             // Get the authenticated user
@@ -159,7 +199,7 @@ class DashboardController extends Controller
         return view('dashboard', 
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
-            'dataAbsenByDay','DataTotalKehadiran'
+            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan'
         ));
     }
 

@@ -371,7 +371,7 @@
 
 <!-- Chart Section -->
 <div class="chart-wrap mb-4">
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-md-6">
             <div class="card custom-card2">
                 <div class="card-body">
@@ -383,6 +383,40 @@
             <div class="card custom-card2">
                 <div class="card-body">
                 <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <canvas id="ChartKaryawan"></canvas>    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <h6>Daftar karyawan yang akan segera berakhir kontrak.</h6>
+                    <table class="table table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Tanggal Berakhir</th>
+                                <th>Sisa Kontrak</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($kontrakKaryawan as $dataKontrak)
+                            <tr>
+                                <td>{{$dataKontrak->nama}}</td>
+                                <td>{{$dataKontrak->berakhirkontrak}}</td>
+                                <td>{{ now()->diffInDays($dataKontrak->berakhirkontrak, false) }} Hari</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>    
                 </div>
             </div>
         </div>
@@ -807,6 +841,16 @@ $(function() {
         var PersentaseHadir = new Chart(ctx, {
             type: 'doughnut',
             data: dataKehadiran,
+        });
+    });
+    
+    var dataKaryawan = {!! json_encode($ChartKaryawan) !!};
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('ChartKaryawan').getContext('2d');
+        var ChartKaryawan = new Chart(ctx, {
+            type: 'bar',
+            data: dataKaryawan,
         });
     });
   </script>

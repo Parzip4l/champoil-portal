@@ -124,7 +124,7 @@ class DashboardController extends Controller
             $DataAllKaryawan = $dataChartKaryawan->count();
         }else{
             $DataFrontline = $dataChartKaryawan->where('organisasi','FRONTLINE OFFICER')->count();
-            $DataManagement = $dataChartKaryawan->where('organisasi','MANAGEMENT LEADERS')->count();
+            $DataManagement = $dataChartKaryawan->where('organisasi','Management Leaders')->count();
             $DataAllKaryawan = $dataChartKaryawan->count(); 
         }
         

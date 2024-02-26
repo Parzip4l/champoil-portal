@@ -382,7 +382,7 @@
         <div class="col-md-6">
             <div class="card custom-card2">
                 <div class="card-body">
-                    <div id=""></div>    
+                <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
                 </div>
             </div>
         </div>
@@ -797,6 +797,16 @@ $(function() {
         var ChartAbsen = new Chart(ctx, {
             type: 'bar',
             data: data,
+        });
+    });
+
+    var dataKehadiran = {!! json_encode($DataTotalKehadiran) !!};
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('PersentaseHadir').getContext('2d');
+        var PersentaseHadir = new Chart(ctx, {
+            type: 'doughnut',
+            data: dataKehadiran,
         });
     });
   </script>

@@ -40,10 +40,10 @@ class DashboardController extends Controller
         $pengajuanSchedule = PengajuanSchedule::where('status', 'Ditinjau')->get();
 
         $dataAbsen = Absen::join('karyawan', 'absens.nik', '=', 'karyawan.nik')
-        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-        ->whereBetween('tanggal', [$startDate, $endDate])
-        ->select('absens.*', 'karyawan.*')
-        ->get();
+                    ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->select('absens.*', 'karyawan.*')
+                    ->get();
         
 
         // Data Absensi 
@@ -58,8 +58,8 @@ class DashboardController extends Controller
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => 'Total Absences',
-                    'backgroundColor' => '#36a2eb',
+                    'label' => 'Total Absensi',
+                    'backgroundColor' => '#424874',
                     'data' => [],
                 ]
             ]
@@ -70,7 +70,29 @@ class DashboardController extends Controller
             $dataAbsenByDay['datasets'][0]['data'][] = $absencesCount;
         }
 
+        // Persantase Hadir, Sakit, Izin, WFE
+        $dataKehadirantotal = $dataAbsen->where('status', 'H')
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->count();
 
+        $dataSakit = $dataAbsen->where('status', 'S')
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->count();
+
+        $dataIzin = $dataAbsen->where('status', 'I')
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->count();
+        
+        $DataTotalKehadiran = [
+            'labels' => ['Hadir', 'Sakit', 'Izin'],
+            'datasets' => [
+                [
+                    'label' => 'Total Data',
+                    'backgroundColor' => ['#277BC0', '#FFB200', '#FFCB42'],
+                    'data' => [$dataKehadirantotal, $dataSakit, $dataIzin],
+                ]
+            ]
+        ];
         // Absen Data
         if (Auth::check()) {
             // Get the authenticated user
@@ -123,7 +145,7 @@ class DashboardController extends Controller
         return view('dashboard', 
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
-            'dataAbsenByDay'
+            'dataAbsenByDay','DataTotalKehadiran'
         ));
     }
 

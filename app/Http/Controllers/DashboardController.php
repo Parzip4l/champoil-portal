@@ -117,11 +117,17 @@ class DashboardController extends Controller
         ->where('resign_status',0)
         ->get();
 
-        $DataFrontline = $dataChartKaryawan->where('organisasi','Frontline Officer')->count();
-        $DataManagement = $dataChartKaryawan->where('organisasi','Management Leaders')->count();
-        $DataFrontline = Str::upper($DataFrontline);
-        $DataManagement = Str::upper($DataManagement);      
-        $DataAllKaryawan = $dataChartKaryawan->count();
+        if($company->unit_bisnis === 'CHAMPOIL')
+        {
+            $DataFrontline = $dataChartKaryawan->where('organisasi','Frontline Officer')->count();
+            $DataManagement = $dataChartKaryawan->where('organisasi','Management Leaders')->count();
+            $DataAllKaryawan = $dataChartKaryawan->count();
+        }else{
+            $DataFrontline = $dataChartKaryawan->where('organisasi','FRONTLINE OFFICER')->count();
+            $DataManagement = $dataChartKaryawan->where('organisasi','MANAGEMENT LEADERS')->count();
+            $DataAllKaryawan = $dataChartKaryawan->count(); 
+        }
+        
 
         $ChartKaryawan = [
             'labels' => ['All', 'Management Leaders', 'Frontline Officer'],

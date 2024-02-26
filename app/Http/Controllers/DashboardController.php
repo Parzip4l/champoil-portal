@@ -42,6 +42,7 @@ class DashboardController extends Controller
         $dataAbsen = Absen::join('karyawan', 'absens.nik', '=', 'karyawan.nik')
                     ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                     ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->where('status', 'H')
                     ->select('absens.*', 'karyawan.*')
                     ->get();
         

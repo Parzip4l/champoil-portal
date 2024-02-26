@@ -116,8 +116,14 @@ class DashboardController extends Controller
         ->where('resign_status',0)
         ->get();
 
-        $DataFrontline = $dataChartKaryawan->where('organisasi','Frontline Officer')->count();
-        $DataManagement = $dataChartKaryawan->where('organisasi','Management Leaders')->count();
+        $DataFrontline = Str::casecmp(
+            $dataChartKaryawan->where('organisasi', 'Frontline Officer')->count(),
+            0
+        );
+        $DataManagement = Str::casecmp(
+            $dataChartKaryawan->where('organisasi', 'Management Leaders')->count(),
+            0
+        );
         $DataAllKaryawan = $dataChartKaryawan->count();
 
         $ChartKaryawan = [

@@ -84,7 +84,7 @@ class DashboardController extends Controller
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
 
-        $dataSakit = $dataAbsen->where('status', 'S')
+        $dataSakit = $dataAbsen->where('status', 'Sakit')
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
 
@@ -92,7 +92,7 @@ class DashboardController extends Controller
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
         
-        $wfe = $dataAbsen->where('status', 'A')
+        $wfe = $dataAbsen->where('status', 'WFE')
             ->whereBetween('tanggal', [$startDate, $endDate])
             ->count();
         

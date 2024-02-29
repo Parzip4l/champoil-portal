@@ -181,6 +181,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Company Settings
     Route::resource('company', App\Http\Controllers\Company\CompanyController::class);
 
+    // Menu Settings
+    Route::resource('menu', App\Http\Controllers\MenuController::class);
+    Route::post('/menu-create', [App\Http\Controllers\MenuController::class, 'store'])->name('menu-create');
+
     // Payroll
     // Component Master
     Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);

@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/absence-request', [ApiLoginController::class, 'submitAbsenceRequest']);
     Route::get('/history-absence-request', [ApiLoginController::class, 'HistoryDataRequest']);
     Route::get('/employee-resign', [App\Http\Controllers\Api\EmployeeController::class, 'resign'])->name('employee-resign');
+    Route::get('/parentMenu/{id}', [App\Http\Controllers\MenuController::class, 'parentChild'])->name('parentMenu');
 
     /**
      * Referal

@@ -279,8 +279,10 @@ class EmployeeController extends Controller
             $unix = $this->generateCodeVisitor("karyawan","id", 4, "CITY");
         }
 
+        $divisi = Divisi::where('company', $employee->unit_bisnis)->get();
+        $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();
         // dd($unix);
-        return view('pages.hc.karyawan.edit', compact('employee','unix'));
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan'));
         
     }
 
@@ -357,10 +359,16 @@ class EmployeeController extends Controller
             $employee->ktp = $request->input('ktp');
             $employee->nik = $request->input('nik');
             $employee->jabatan = $request->input('jabatan');
+            $employee->divisi = $request->input('divisi');
+            $employee->pendidikan_trakhir = $request->input('pendidikan_trakhir');
+            $employee->jurusan = $request->input('jurusan');
+            $employee->sertifikasi = $request->input('sertifikasi');
+            $employee->expired_sertifikasi = $request->input('expired_sertifikasi');
             $employee->agama = $request->input('agama');
             $employee->jenis_kelamin = $request->input('jenis_kelamin');
             $employee->email = $request->input('email');
             $employee->telepon = $request->input('telepon');
+            $employee->telepon_darurat = $request->input('telepon_darurat');
             $employee->status_kontrak = $request->input('status_kontrak');
             $employee->organisasi = $request->input('organisasi');
             $employee->joindate = $request->input('joindate');
@@ -368,6 +376,7 @@ class EmployeeController extends Controller
             $employee->tempat_lahir = $request->input('tempat_lahir');
             $employee->tanggal_lahir = $request->input('tanggal_lahir');
             $employee->alamat = $request->input('alamat');
+            $employee->alamat_ktp = $request->input('alamat_ktp');
             $employee->status_pernikahan = $request->input('status_pernikahan');
             $employee->tanggungan = $request->input('tanggungan');
             $employee->referal_code = $request->input('referal_code');

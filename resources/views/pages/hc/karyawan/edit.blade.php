@@ -54,9 +54,21 @@
                     <label for="kode_karyawan" class="form-label">Kode Karyawan</label>
                     <input id="kode_karyawan" class="form-control" name="nik" type="number" placeholder="xxx-xxx-xxx" value="{{$employee->nik}}" readonly>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Divisi</label>
+                    <select name="divisi" class="form-control" id="">
+                        @foreach($divisi as $dataDivisi)
+                            <option value="{{$dataDivisi->name}}" @if($dataDivisi->name == $employee->divisi) selected @endif>{{$dataDivisi->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Jabatan</label>
-                    <input type="text" name="jabatan" class="form-control" value="{{$employee->jabatan}}">
+                    <select name="jabatan" class="form-control" id="">
+                        @foreach($jabatan as $dataJabatan)
+                            <option value="{{$dataJabatan->name}}" @if($dataJabatan->name == $employee->jabatan) selected @endif>{{$dataJabatan->name}}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="row">
@@ -77,9 +89,13 @@
                     <label for="kode_karyawan" class="form-label">Email</label>
                     <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id" value="{{$employee->email}}">
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
                     <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx" value="{{$employee->telepon}}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="kode_karyawan" class="form-label">Nomor Telepon Darurat</label>
+                    <input id="telepon" class="form-control" name="telepon_darurat" type="number" placeholder="08xxxxxx" value="{{$employee->telepon_darurat}}">
                 </div>
             </div>
             <div class="row">
@@ -93,7 +109,6 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Organisasi</label>
                     <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
-                        <option value="Professional Frontline" {{$employee->organisasi == 'Professional Frontline' ? 'selected' : ''}}>Professional Frontline</option>
                         <option value="Management Leaders" {{$employee->organisasi == 'Management Leaders' ? 'selected' : ''}}>Management Leaders</option>
                         <option value="Frontline Officer" {{$employee->organisasi == 'Frontline Officer' ? 'selected' : ''}}>Frontline Officer</option>
                     </select>
@@ -119,9 +134,48 @@
                     <input type="date" class="form-control" name="tanggal_lahir" value="{{$employee->tanggal_lahir}}">
                 </div>
             </div>
-            <div class="mb-3 mb-3">
-                <label class="form-label">alamat</label>
-                <textarea name="alamat" id="" cols="30" rows="10" class=form-control>{{$employee->alamat}}</textarea>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Full Address Domisili</label>
+                    <textarea name="alamat" id="" cols="30" rows="10" class=form-control>{{$employee->alamat}}</textarea>
+                </div>
+                <div class="col">
+                    <label class="form-label">Full Address KTP</label>
+                    <textarea name="alamat_ktp" id="" cols="30" rows="10" class=form-control>{{$employee->alamat_ktp}}</textarea>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Pendidikan Terakhir</label>
+                    <select class="js-example-basic-single form-select" data-width="100%" name="pendidikan_trakhir">
+                        <option value="SD" {{$employee->pendidikan_trakhir == 'SD' ? 'selected' : ''}}>SD</option>
+                        <option value="SMP" {{$employee->pendidikan_trakhir == 'SMP' ? 'selected' : ''}}>SMP</option>
+                        <option value="SMA" {{$employee->pendidikan_trakhir == 'SMA' ? 'selected' : ''}}>SMA</option>
+                        <option value="DIPLOMA" {{$employee->pendidikan_trakhir == 'DIPLOMA' ? 'selected' : ''}}>DIPLOMA</option>
+                        <option value="MAGISTER" {{$employee->pendidikan_trakhir == 'MAGISTER' ? 'selected' : ''}}>MAGISTER</option>
+                        <option value="DOCTOR" {{$employee->pendidikan_trakhir == 'DOCTOR' ? 'selected' : ''}}>DOCTOR</option>
+                        <option value="OTHERS" {{$employee->pendidikan_trakhir == 'OTHERS' ? 'selected' : ''}}>OTHERS</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label class="form-label">Jurusan</label>
+                    <input type="text" name="jurusan" class="form-control" value="{{$employee->jurusan}}">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Sertifikasi</label>
+                    <select class="js-example-basic-single form-select" data-width="100%" name="sertifikasi">
+                        <option value="GADA PRATAMA" {{$employee->sertifikasi == 'GADA PRATAMA' ? 'selected' : ''}}>GADA PRATAMA</option>
+                        <option value="GADA MADYA" {{$employee->sertifikasi == 'GADA MADYA' ? 'selected' : ''}}>GADA MADYA</option>
+                        <option value="GADA UTAMA" {{$employee->sertifikasi == 'GADA UTAMA' ? 'selected' : ''}}>GADA UTAMA</option>
+                        <option value="LAINNYA" {{$employee->sertifikasi == 'LAINNYA' ? 'selected' : ''}}>LAINNYA</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label class="form-label">Expired Date</label>
+                    <input type="date" class="form-control" name="expired_sertifikasi" value="{{$employee->expired_sertifikasi}}">
+                </div>
             </div>
             <div class="row">
                 <div class="col mb-3">

@@ -24,7 +24,13 @@
                                         <div class="col-md-6">
                                             <div class="form-group mb-3">
                                                 <label class="form-label">Jabatan Anggota</label>
-                                                <input type="text" name="jabatan" value="{{$projectDetails->jabatan}}" class="form-control">
+                                                <select name="jabatan" class="form-control" id="">
+                                                    @foreach($jabatan as $jabatanData)
+                                                        <option value="{{$jabatanData->name}}" @if($jabatanData->name == $projectDetails->jabatan) selected @endif>
+                                                            {{$jabatanData->name}}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                     </div>

@@ -161,6 +161,7 @@ class ProjectDetailsController extends Controller
     {
         $projectDetails = ProjectDetails::where('id', $id)->first();
         $jabatan = Jabatan::where('parent_category', 'KAS')->get();
+        
         if (!$projectDetails) {
             return abort(404); // Handle jika proyek tidak ditemukan
         }
@@ -195,7 +196,7 @@ class ProjectDetailsController extends Controller
                 'tp_bulanan' => $request->input('tp_bulanan'),
             ]);
 
-            return redirect()->route('project.index')->with('success', 'Data updated successfully');
+            return redirect()->route('project.show',['project' => $projectDetails->project_code])->with('success', 'Data updated successfully');
         } catch (\Exception $e) {
             // Handle the error, you can log it or return an error response
             return back()->withInput()->withErrors(['error' => 'Failed to update data.']);

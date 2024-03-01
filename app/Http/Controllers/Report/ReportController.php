@@ -21,32 +21,26 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         //
-
-        $periode = 'MARCH-2024';
-        $year = date('Y',strtotime($periode));
-        $month = date('m',strtotime($periode));
-
-        if($request->has('periode')){
-            $periode = strtoupper($request->input('periode'));
-            $year = date('Y',strtotime($periode));
-            $month = date('m',strtotime($periode));
+        $start = date('Y-m-d');
+        $end = date('Y-m-d');
+        if(!empty($request->input('periode'))){
+            $explode=explode('to',$request->input('periode'));
+            $start = date('Y-m-d',strtotime($explode[0]));
+            $end = date('Y-m-d',strtotime($explode[1]));
         }
-
-        $start = date('Y').'-0'.($month-1).'-21';
-        $end = date('Y').'-'.$month.'-20';
+        
 
 
-        // dd($end);
         $project = Project::all();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
                 $row->schedule = Schedule::where('project',$row->id)
-                                           ->where('periode',$periode)
+                                           ->whereBetween('tanggal', [$start, $end])
                                            ->where('shift','!=','OFF')
                                            ->count();
-                $row->schedule_backup = ScheduleBackup::where('project',$row->id)->where('periode',$periode)->count();
+                $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
                 $row->absen = Absen::where('project', $row->id)
                                     ->whereBetween('tanggal', [$start, $end])
                                     ->count();

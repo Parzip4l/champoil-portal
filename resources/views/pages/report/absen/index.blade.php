@@ -26,10 +26,10 @@
                 <div class="header-title align-self-center">
                     <h6 class="card-title align-self-center mb-0">Report Absensi</h6>
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                        <span class="input-group-text" id="basic-addon2">
-                            <span data-feather="search"></span>
-                        </span>
+                        <input type="text" id="date_range" class="form-control" placeholder="Select Date" aria-label="Select Date" aria-describedby="basic-addon2">
+                            <button class="input-group-text btn-primary" id="search">
+                                <span  data-feather="search" ></span>
+                            </button>
                     </div>
                 
             </div>
@@ -94,6 +94,13 @@
     flatpickr('#date_range', {
         mode: 'range',
         dateFormat: 'Y-m-d',
+        conjunction: "/"
+    });
+    // Button click event
+    document.getElementById('search').addEventListener('click', function () {
+        // Add your button click logic here
+        var range_date = $('#date_range').val();
+        window.location.href = '?periode=' + range_date;
     });
     function filter_absen(select) {
         // Get the selected value from the dropdown

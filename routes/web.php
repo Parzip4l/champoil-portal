@@ -266,6 +266,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         
         /** Report */
         Route::resource('report', App\Http\Controllers\Report\ReportController::class);
+        Route::get('report-detail/{id}/{periode}',[App\Http\Controllers\Report\ReportController::class,'show'])->name('report-detail');
 
 
 

@@ -44,6 +44,8 @@ class ReportController extends Controller
                                            ->where('shift','!=','OFF')
                                            ->count();
                 $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
+              
+
                 $row->absen = Absen::where('project', $row->id)
                                     ->whereBetween('tanggal', [$start, $end])
                                     ->count();
@@ -58,8 +60,6 @@ class ReportController extends Controller
                 if($row->absen_backup > 0){
                     $row->persentase_backup = round(($row->absen_backup / $row->schedule_backup) * 100,2);
                 }
-
-               
                 
             }
         }
@@ -98,9 +98,27 @@ class ReportController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id,$periode)
     {
         //
+        $start = date('Y-m-d');
+        $end = date('Y-m-d');
+        if(!empty($periode)){
+            $explode=explode('to',$periode);
+            if(!empty($explode[0])){
+                $start = date('Y-m-d',strtotime($explode[0]));
+            }elseif(!empty($explode[1])){
+                $end = date('Y-m-d',strtotime($explode[1]));
+            }
+        }
+
+        $data['records']=Schedule::select('schedules.*','karyawan.nama','schedules.tanggal','absens.clock_in','absens.clock_out')
+                            ->where('schedules.project',$id)
+                            ->join('karyawan','karyawan.nik','=','schedules.employee')
+                            ->leftjoin('absens','absens.nik','=','schedules.employee')
+                            ->whereBetween('schedules.tanggal', [$start, $end])
+                            ->get();
+        return view('pages.report.absen.detail',$data);
     }
 
     /**

@@ -109,8 +109,8 @@
         var dateRangeArray = dateRangeParam.split('to');
     
         // Now dateRangeArray contains the start and end date values
-        startDate = dateRangeArray[0].trim(); // Assuming dates are separated by 'to'
-        endDate = dateRangeArray[1].trim();
+        startDate = dateRangeArray[0]; // Assuming dates are separated by 'to'
+        endDate = dateRangeArray[1];
     }
     
 

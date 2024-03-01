@@ -25,8 +25,11 @@ class ReportController extends Controller
         $end = date('Y-m-d');
         if(!empty($request->input('periode'))){
             $explode=explode('to',$request->input('periode'));
-            $start = date('Y-m-d',strtotime($explode[0]));
-            $end = date('Y-m-d',strtotime($explode[1]));
+            if(!empty($explode[0])){
+                $start = date('Y-m-d',strtotime($explode[0]));
+            }elseif(!empty($explode[1])){
+                $end = date('Y-m-d',strtotime($explode[1]));
+            }
         }
         
 

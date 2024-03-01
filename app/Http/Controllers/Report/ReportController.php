@@ -58,6 +58,8 @@ class ReportController extends Controller
                 if($row->absen_backup > 0){
                     $row->persentase_backup = round(($row->absen_backup / $row->schedule_backup) * 100,2);
                 }
+
+               
                 
             }
         }

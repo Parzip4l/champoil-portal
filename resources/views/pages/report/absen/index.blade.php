@@ -53,6 +53,12 @@
                     @if($project)
                         @php 
                             $no=1;
+                            $total_schedule=0;
+                            $total_absen=0;
+                            $schedule_backup=0;
+                            $absen_backup=0;
+                            $percent_absen=0;
+                            $percent_backup=0;
                         @endphp
                         @foreach($project as $row)
                             <tr>
@@ -65,11 +71,34 @@
                                 <td>{{ $row->absen_backup }}</td>
                                 <td>{{ $row->persentase_backup }} %</td>
                             </tr>
-                        @php 
+                            @php
+                                $total_schedule +=$row->schedule;
+                                $total_absen +=$row->absen;
+                                $schedule_backup +=$row->schedule_backup;
+                                $absen_backup +=$row->absen_backup;
+                                
                             $no++;
                         @endphp
 
                         @endforeach
+                        @php 
+                            if($total_absen > 0 && $total_schedule> 0){
+                                $percent_absen = round(($total_absen / $total_schedule) * 100,2);
+                            }
+                            if($absen_backup > 0 && $schedule_backup> 0){
+                                $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
+                            }
+                        @endphp
+                        <tr>
+                            <td colspan=2>Total</td>
+                            <td>{{ $total_schedule }}</td>
+                            <td>{{ $total_absen }}</td>
+                            <td>{{ $percent_absen }} %</td>
+                            <td>{{ $schedule_backup }}</td>
+                            <td>{{ $absen_backup }}</td>
+                            <td>{{ $percent_backup }} %</td>
+                        </tr>
+
                     @endif
                     
                 </tbody>

@@ -15,6 +15,11 @@ class MenuController extends Controller
     public function index()
     {
         $records = Menu::where('parent_id',0)->get();
+        if($records){
+            foreach($records as $row){
+                $row->parent = Menu::where('parent_id',$row->id)->get();
+            }
+        }
         
 
         $data['result']=$records;

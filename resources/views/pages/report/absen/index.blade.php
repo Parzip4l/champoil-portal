@@ -25,21 +25,12 @@
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
                     <h6 class="card-title align-self-center mb-0">Report Absensi</h6>
-                    <select name="periode" onchange="filter_absen(this)" class="form-control mt-3 select2">
-                        <option value="January-2024" <?php echo ($_GET['periode'] == 'January-2024') ? 'selected' : ''; ?>>January - 2024</option>
-                        <option value="February-2024" <?php echo ($_GET['periode'] == 'February-2024') ? 'selected' : ''; ?>>February - 2024</option>
-                        <option value="MARCH-2024" <?php echo ($_GET['periode'] == 'MARCH-2024') ? 'selected' : ''; ?>>March - 2024</option>
-                        <option value="April-2024" <?php echo ($_GET['periode'] == 'April-2024') ? 'selected' : ''; ?>>April - 2024</option>
-                        <option value="May-2024" <?php echo ($_GET['periode'] == 'May-2024') ? 'selected' : ''; ?>>May - 2024</option>
-                        <option value="June-2024" <?php echo ($_GET['periode'] == 'June-2024') ? 'selected' : ''; ?>>June - 2024</option>
-                        <option value="July-2024" <?php echo ($_GET['periode'] == 'July-2024') ? 'selected' : ''; ?>>July - 2024</option>
-                        <option value="August-2024" <?php echo ($_GET['periode'] == 'August-2024') ? 'selected' : ''; ?>>August - 2024</option>
-                        <option value="September-2024" <?php echo ($_GET['periode'] == 'September-2024') ? 'selected' : ''; ?>>September - 2024</option>
-                        <option value="October-2024" <?php echo ($_GET['periode'] == 'October-2024') ? 'selected' : ''; ?>>October - 2024</option>
-                        <option value="November-2024" <?php echo ($_GET['periode'] == 'November-2024') ? 'selected' : ''; ?>>November - 2024</option>
-                        <option value="December-2024" <?php echo ($_GET['periode'] == 'December-2024') ? 'selected' : ''; ?>>December - 2024</option>
-                    </select>
-                </div>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        <span class="input-group-text" id="basic-addon2">
+                            <span data-feather="search"></span>
+                        </span>
+                    </div>
                 
             </div>
         </div>
@@ -98,8 +89,12 @@
 @endpush
 
 @push('custom-scripts')
-  
+    
   <script>
+    flatpickr('#date_range', {
+        mode: 'range',
+        dateFormat: 'Y-m-d',
+    });
     function filter_absen(select) {
         // Get the selected value from the dropdown
         var selectedMonth = select.value;

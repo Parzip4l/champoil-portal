@@ -40,74 +40,59 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="accordion" id="accordionExample">
-                @if($result)
-                    @php 
-                        $no=1;
-                    @endphp
-                    @foreach($result as $row)
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne{{$row->id}}" aria-expanded="true" aria-controls="collapseOne">
-                                {{ $row->title }}
-                            </button>
-                            </h2>
-                            <div id="collapseOne{{$row->id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div class="table-responsive">
-                                    <a class="dropdown-item d-flex align-items-center" 
-                                        href="javasvript:void(0)"
-                                        style="float:right"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#sub-{{ $row->id }}">
-                                        <span class="btn btn-xs btn-success">Tambah Sub Menu</span>
-                                    </a>
-                                    <table id="example" class="display table">
-                                        <thead>
-                                            <tr role="row">
-                                                <td width="30px"></td>
-                                                <th width="30px">No</th>
-                                                <th class="ord" data-name="title">Nama Menu</th>
-                                                <th class="ord" data-name="url">Link</th>
-                                                <th class="ord" data-name="description">Keterangan</th>
-                                                <th class="ord" data-name="icon" width="30px">Icon</th>
-                                                <th class="ord" data-name="menu_order" width="50px">Urutan</th>
-                                                <th width="110px" class="text-center">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        @if(!empty($row->parent))
-                                            @php 
-                                                $parent_no=1;
-                                            @endphp
-                                            @foreach($row->parent as $row_parent)
-                                                <tr>
-                                                    <td></td>
-                                                    <td>{{ $parent_no }}</td>
-                                                    <td>{{ $row_parent->title }}</td>
-                                                    <td>{{ $row_parent->url }}</td>
-                                                    <td>{{ $row_parent->description }}</td>
-                                                    <td>{{ $row_parent->is_icon }}</td>
-                                                    <td>{{ $row_parent->menu_order }}</td>
-                                                    <td></td>
-                                                </tr>
-
-
-                                            @php 
-                                                $parent_no++;
-                                            @endphp
-                                            @endforeach
-                                        @else
-                                            
-
-                                        @endif
-
-                                        </tbody>
-                                    </table>
+            
+            <div class="table-responsive">
+            <table id="example" class="display table">
+                <thead>
+                    <tr role="row">
+                        <td width="30px"></td>
+                        <th width="30px">No</th>
+                        <th class="ord" data-name="title">Nama Menu</th>
+                        <th class="ord" data-name="url">Link</th>
+                        <th class="ord" data-name="description">Keterangan</th>
+                        <th class="ord" data-name="icon" width="30px">Icon</th>
+                        <th class="ord" data-name="menu_order" width="50px">Urutan</th>
+                        <th width="110px" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if($result)
+                        @php 
+                            $no=1;
+                        @endphp
+                        @foreach($result as $row)
+                        <tr class="child-row">
+                            <td>
+                                <a href="javascript:void(0)" 
+                                   class="toggle-child"
+                                   onclick="toggleChildRow({{$row->id}});">
+                                    <i class="link-icon" data-feather="plus"></i>
+                                </a>
+                            </td>
+                            <td>{{ $no }}</td>
+                            <td>{{ $row->title }}</td>
+                            <td>{{ $row->url }}</td>
+                            <td>{{ $row->description }}</td>
+                            <td>{{ $row->is_icon }}</td>
+                            <td>{{ $row->menu_order  }}</td>
+                            <td>
+                                <div class="dropdown"> 
+                                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item d-flex align-items-center" 
+                                           href="javasvript:void(0)"
+                                           data-bs-toggle="modal" 
+                                           data-bs-target="#sub-{{ $row->id }}">
+                                            <i data-feather="git-branch" class="icon-sm me-2"></i> 
+                                            <span class="">Tambah Sub Menu</span>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                            </div>
-                        </div>
+                            </td>
+                            
+                        </tr>
                         <div class="modal fade" id="sub-{{ $row->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -154,11 +139,14 @@
                         @php 
                             $no++;
                         @endphp
-                    @endforeach
-                @endif
-               
-                </div>
-           
+                        @endforeach
+                    @endif
+                    
+    <!-- Add more parent and child rows as needed -->
+                </tbody>
+            </table>
+            
+            </div>
         </div>
     </div>
   </div>
@@ -206,6 +194,7 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @push('plugin-scripts')
@@ -219,6 +208,90 @@
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
      
+    $(document).ready(function() {
+        var table = $('#example').DataTable();
+
+        function toggleChildRow(link) {
+            
+            var tr = link.closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                link.find('i.link-icon').attr('data-feather', 'plus');
+                // If child row is already shown, hide it
+                row.child.hide();
+                tr.removeClass('shown');
+
+            } else {
+                // If child row is not shown, show it
+                row.child(formatChildRow(tr)).show();
+                tr.addClass('shown');
+                link.find('i.link-icon').attr('data-feather', 'minus');
+            }
+
+            // Refresh Feather Icons after changing data-feather attribute
+            feather.replace();
+        }
+
+        $('#example tbody').on('click', 'a.toggle-child', function () {
+            toggleChildRow(this);
+        });
+
+
+        
+
+        
+
+        // Function to format content for the child row
+        function formatChildRow(tr,id) {
+            var apiEndpoint = '/api/v1/parentMenu/'+id;
+
+            // Make a GET request using $.ajax()
+            $.ajax({
+                url: apiEndpoint,
+                type: 'GET',
+                dataType: 'json', // Specify the expected data type
+                success: function(data) {
+                // Handle the successful response
+                console.log('Data received:', data);
+                },
+                error: function(xhr, status, error) {
+                // Handle errors
+                console.error('Error:', error);
+                }
+            });
+            var childTable ='';
+            childTable += '<table class="child-table table table-bordered table-responsive">';
+    
+            // Assuming there are three columns in your child table
+            childTable += '<tr>' +
+                            '<th width="30px">No</th>'+
+                            '<th>Nama Menu</th>'+
+                            '<th>Link</th>'+
+                            '<th>Keterangan</th>'+
+                            '<th>Icon</th>'+
+                            '<th>Urutan</th>'+
+                            '<th>Actions</th>'+
+                        '</tr>';
+
+            // Add more rows as needed
+            childTable += '<tr>' +
+                            '<td>Value 1</td>' +
+                            '<td>Value 2</td>' +
+                            '<td>Value 3</td>' +
+                            '<td>Value 1</td>' +
+                            '<td>Value 2</td>' +
+                            '<td>Value 3</td>' +
+                            '<td>Value 3</td>' +
+                        '</tr>';
+
+            // End the child table
+            childTable += '</table>';
+            
+
+            return childTable;
+        }
+    });
     
     function showDeleteDataDialog(id) {
         Swal.fire({

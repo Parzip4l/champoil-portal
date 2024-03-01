@@ -91,10 +91,37 @@
 @push('custom-scripts')
     
   <script>
+
+    function formatDateToYMD(date) {
+        var year = date.getFullYear();
+        var month = String(date.getMonth() + 1).padStart(2, '0');
+        var day = String(date.getDate()).padStart(2, '0');
+
+        return year + '-' + month + '-' + day;
+    }
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var dateRangeParam = urlParams.get('periode');
+    let startDate=new Date();
+    let endDate=new Date();
+
+    if(dateRangeParam){
+        var dateRangeArray = dateRangeParam.split('to');
+    
+        // Now dateRangeArray contains the start and end date values
+        startDate = dateRangeArray[0].trim(); // Assuming dates are separated by 'to'
+        endDate = dateRangeArray[1].trim();
+    }
+    
+
+    // You can use startDate and endDate as needed
+    console.log('Start Date:', startDate);
+    console.log('End Date:', dateRangeParam);
     flatpickr('#date_range', {
         mode: 'range',
         dateFormat: 'Y-m-d',
-        conjunction: "/"
+        defaultDate: [startDate,endDate]
+        
     });
     // Button click event
     document.getElementById('search').addEventListener('click', function () {

@@ -24,14 +24,7 @@
         <div class="card-header">
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-0">Report Absensi</h6>
-                    <div class="input-group mb-3">
-                        <input type="text" id="date_range" class="form-control" placeholder="Select Date" aria-label="Select Date" aria-describedby="basic-addon2">
-                            <button class="input-group-text btn-primary" id="search">
-                                <span  data-feather="search" ></span>
-                            </button>
-                    </div>
-                
+                    <h6 class="card-title align-self-center mb-0">Report Absensi Detail</h6>
             </div>
         </div>
         <div class="card-body">
@@ -40,70 +33,32 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Project Name</th>
-                    <th>Total Schedule</th>
-                    <th>Total Absensi</th>
-                    <th>Persentase</th>
-                    <th>Total Schedule Backup</th>
-                    <th>Total Absensi</th>
-                    <th>Persentase</th>
+                    <th>Name</th>
+                    <th>Tanggal</th>
+                    <th>Schedule</th>
+                    <th>Clock In</th>
+                    <th>Clock Out</th>
                 </tr>
                 </thead>
                 <tbody>
-                    @if($project)
+                    @if($records)
                         @php 
                             $no=1;
-                            $total_schedule=0;
-                            $total_absen=0;
-                            $schedule_backup=0;
-                            $absen_backup=0;
-                            $percent_absen=0;
-                            $percent_backup=0;
                         @endphp
-                        @foreach($project as $row)
+                        @foreach($records as $row)
                             <tr>
                                 <td>{{ $no }}</td>
-                                <td>
-                                    <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}">
-                                        {{ $row->name }}
-                                    </a>
-                                </td>
-                                <td>{{ $row->schedule }}</td>
-                                <td>{{ $row->absen }}</td>
-                                <td>{{ $row->persentase_absen }} %</td>
-                                <td>{{ $row->schedule_backup }}</td>
-                                <td>{{ $row->absen_backup }}</td>
-                                <td>{{ $row->persentase_backup }} %</td>
+                                <td>{{ $row->nama }}</td>
+                                <td>{{ $row->tanggal }}</td>
+                                <td>{{ $row->shift }}</td>
+                                <td>{{ isset($row->clock_in)?$row->clock_in:'-' }}</td>
+                                <td>{{ isset($row->clock_out)?$row->clock_out:'-' }}</td>
                             </tr>
-                            @php
-                                $total_schedule +=$row->schedule;
-                                $total_absen +=$row->absen;
-                                $schedule_backup +=$row->schedule_backup;
-                                $absen_backup +=$row->absen_backup;
-                                
-                            $no++;
-                        @endphp
-                        
-
-                        @endforeach
                         @php 
-                            if($total_absen > 0 && $total_schedule> 0){
-                                $percent_absen = round(($total_absen / $total_schedule) * 100,2);
-                            }
-                            if($absen_backup > 0 && $schedule_backup> 0){
-                                $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
-                            }
+                            $no++   ;
                         @endphp
-                        <tr>
-                            <td colspan=2>Total</td>
-                            <td>{{ $total_schedule }}</td>
-                            <td>{{ $total_absen }}</td>
-                            <td>{{ $percent_absen }} %</td>
-                            <td>{{ $schedule_backup }}</td>
-                            <td>{{ $absen_backup }}</td>
-                            <td>{{ $percent_backup }} %</td>
-                        </tr>
-
+                        @endforeach
+                        
                     @endif
                     
                 </tbody>

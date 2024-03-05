@@ -14,7 +14,8 @@
                     <h5 class="mb-0 align-self-center">Data Schedule</h5>
                 </div>
                 <div class="button-actions">
-                    <a href="{{route('export.schedule')}}" class="btn btn-sm btn-primary">Download Template</a>
+                    <a href="{{route('schedule.create')}}" class="btn btn-sm btn-primary">Create</a>
+                    <a href="{{route('export.schedule')}}" class="btn btn-sm btn-warning">Download Template</a>
                     <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         Import Schedule
                     </button>

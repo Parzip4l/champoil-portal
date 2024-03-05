@@ -22,7 +22,7 @@ class ReferalController extends Controller
         $result=[
             "msg"=>$msg,
             "error"=>$error,
-            "records"=>$records->nama
+            "records"=>@$records->nama
         ];
 
         return response()->json($result, 200);

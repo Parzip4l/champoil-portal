@@ -21,32 +21,31 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         //
-
-        $periode = 'MARCH-2024';
-        $year = date('Y',strtotime($periode));
-        $month = date('m',strtotime($periode));
-
-        if($request->has('periode')){
-            $periode = strtoupper($request->input('periode'));
-            $year = date('Y',strtotime($periode));
-            $month = date('m',strtotime($periode));
+        $start = date('Y-m-d');
+        $end = date('Y-m-d');
+        if(!empty($request->input('periode'))){
+            $explode=explode('to',$request->input('periode'));
+            if(!empty($explode[0])){
+                $start = date('Y-m-d',strtotime($explode[0]));
+            }elseif(!empty($explode[1])){
+                $end = date('Y-m-d',strtotime($explode[1]));
+            }
         }
-
-        $start = date('Y').'-0'.($month-1).'-21';
-        $end = date('Y').'-'.$month.'-20';
+        
 
 
-        // dd($end);
         $project = Project::all();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
                 $row->schedule = Schedule::where('project',$row->id)
-                                           ->where('periode',$periode)
+                                           ->whereBetween('tanggal', [$start, $end])
                                            ->where('shift','!=','OFF')
                                            ->count();
-                $row->schedule_backup = ScheduleBackup::where('project',$row->id)->where('periode',$periode)->count();
+                $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
+              
+
                 $row->absen = Absen::where('project', $row->id)
                                     ->whereBetween('tanggal', [$start, $end])
                                     ->count();
@@ -99,9 +98,27 @@ class ReportController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id,$periode)
     {
         //
+        $start = date('Y-m-d');
+        $end = date('Y-m-d');
+        if(!empty($periode)){
+            $explode=explode('to',$periode);
+            if(!empty($explode[0])){
+                $start = date('Y-m-d',strtotime($explode[0]));
+            }elseif(!empty($explode[1])){
+                $end = date('Y-m-d',strtotime($explode[1]));
+            }
+        }
+
+        $data['records']=Schedule::select('schedules.*','karyawan.nama','schedules.tanggal','absens.clock_in','absens.clock_out')
+                            ->where('schedules.project',$id)
+                            ->join('karyawan','karyawan.nik','=','schedules.employee')
+                            ->leftjoin('absens','absens.nik','=','schedules.employee')
+                            ->whereBetween('schedules.tanggal', [$start, $end])
+                            ->get();
+        return view('pages.report.absen.detail',$data);
     }
 
     /**

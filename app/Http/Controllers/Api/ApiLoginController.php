@@ -111,9 +111,9 @@ class ApiLoginController extends Controller
                     ->first();
 
                     if (!$scheduleKas) {
-                        return response()->json(['message' => 'Clock In Rejected, Schedule not found!']);
+                        return response()->json(['message' => 'Clock In Rejected, Schedule not found! Please contact the Team Leader for the schedule.']);
                     }elseif ($scheduleKas->shift === 'OFF'){
-                        return response()->json(['message' => 'Clock In Rejected, Schedule not found!']);
+                        return response()->json(['message' => 'Clock In Rejected, Schedule OFF. Please contact Team Leader for schedule changes!']);
                     }
 
             }

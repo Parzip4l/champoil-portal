@@ -162,6 +162,7 @@
                     <input type="text" name="jurusan" class="form-control" value="{{$employee->jurusan}}">
                 </div>
             </div>
+            @if($karyawanlogin->unit_bisnis === 'Kas')
             <div class="row mb-3">
                 <div class="col">
                     <label class="form-label">Sertifikasi</label>
@@ -177,6 +178,7 @@
                     <input type="date" class="form-control" name="expired_sertifikasi" value="{{$employee->expired_sertifikasi}}">
                 </div>
             </div>
+            @endif
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label">Status Pernikahan</label>

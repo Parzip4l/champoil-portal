@@ -9,6 +9,7 @@ use App\ModelCG\Project;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use App\Absen;
+use App\Employee;
 
 
 class ReportController extends Controller
@@ -103,21 +104,42 @@ class ReportController extends Controller
         //
         $start = date('Y-m-d');
         $end = date('Y-m-d');
-        if(!empty($periode)){
-            $explode=explode('to',$periode);
-            if(!empty($explode[0])){
-                $start = date('Y-m-d',strtotime($explode[0]));
-            }elseif(!empty($explode[1])){
-                $end = date('Y-m-d',strtotime($explode[1]));
-            }
+
+        if (!empty($periode)) {
+        $explode = explode('to', $periode);
+
+        if (!empty($explode[0])) {
+            $start = date('Y-m-d', strtotime($explode[0]));
         }
 
-        $data['records']=Schedule::select('schedules.*','karyawan.nama','schedules.tanggal','absens.clock_in','absens.clock_out')
-                            ->where('schedules.project',$id)
-                            ->join('karyawan','karyawan.nik','=','schedules.employee')
-                            ->leftjoin('absens','absens.nik','=','schedules.employee')
-                            ->whereBetween('schedules.tanggal', [$start, $end])
-                            ->get();
+        if (!empty($explode[1])) {
+            $end = date('Y-m-d', strtotime($explode[1]));
+        }
+        }
+
+        $records = Schedule::where('schedules.project', $id)
+        ->whereBetween('schedules.tanggal', [$start, $end])
+        ->get();
+
+        if ($records) {
+        foreach ($records as $row) {
+            $currentDate = Carbon::parse($start); // Use Carbon library for date manipulation
+
+            while ($currentDate->lte($end)) {
+                // Cari data absen untuk tanggal saat ini
+                $attendanceData = Absen::whereDate('tanggal', $currentDate->format('Y-m-d'))->first();
+
+                // Buat array data untuk tanggal ini
+                $row->tanggal = $currentDate->format('Y-m-d');
+                $row->clock_in = $attendanceData ? $attendanceData->clock_in : '-';
+                $row->clock_out = $attendanceData ? $attendanceData->clock_out : '-';
+                $row->status = $attendanceData ? $attendanceData->status : '-';
+
+                $currentDate->addDay(); // Increment the current date
+            }
+        }
+        }
+
         return view('pages.report.absen.detail',$data);
     }
 

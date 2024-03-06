@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiLoginController;
 use App\Http\Controllers\Api\LmsController;
+use App\Http\Controllers\Api\Patroli\PatroliController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReferalController;
@@ -67,5 +68,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/knowledge_test/{id}', [LmsController::class, 'KnowledgeTest']);
     Route::get('/lms-nilai', [LmsController::class, 'hasilNilai']);
     Route::post('/post_test', [LmsController::class, 'SubmitTest']);
+
+    //PATROLI
+    Route::get('/patroli_task/{id}', [PatroliController::class, 'checklist_task']);
     
 });

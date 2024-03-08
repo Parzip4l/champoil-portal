@@ -91,11 +91,11 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
-                    <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx" value="{{$employee->telepon}}" required>
+                    <input id="telepon" class="form-control" name="telepon" type="text" placeholder="08xxxxxx" value="{{$employee->telepon}}" required>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Nomor Telepon Darurat</label>
-                    <input id="telepon" class="form-control" name="telepon_darurat" type="number" placeholder="08xxxxxx" value="{{$employee->telepon_darurat}}">
+                    <input id="telepon" class="form-control" name="telepon_darurat" type="text" placeholder="08xxxxxx" value="{{$employee->telepon_darurat}}">
                 </div>
             </div>
             <div class="row">
@@ -110,7 +110,7 @@
                     <label class="form-label">Organisasi</label>
                     <select class="js-example-basic-single form-select" data-width="100%" name="organisasi" required>
                         <option value="Management Leaders" {{$employee->organisasi == 'Management Leaders' ? 'selected' : ''}}>Management Leaders</option>
-                        <option value="Frontline Officer" {{$employee->organisasi == 'Frontline Officer' ? 'selected' : ''}}>Frontline Officer</option>
+                        <option value="FRONTLINE OFFICER" {{$employee->organisasi == 'FRONTLINE OFFICER' ? 'selected' : ''}}>Frontline Officer</option>
                     </select>
                 </div>
             </div>
@@ -366,9 +366,8 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Organisasi</label>
                             <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
-                                <option value="Professional Frontline" {{$employee->organisasi == 'Professional Frontline' ? 'selected' : ''}}>Professional Frontline</option>
                                 <option value="Management Leaders" {{$employee->organisasi == 'Management Leaders' ? 'selected' : ''}}>Management Leaders</option>
-                                <option value="Frontline Officer" {{$employee->organisasi == 'Frontline Officer' ? 'selected' : ''}}>Frontline Officer</option>
+                                <option value="FRONTLINE OFFICER" {{$employee->organisasi == 'FRONTLINE OFFICER' ? 'selected' : ''}}>Frontline Officer</option>
                             </select>
                         </div>
                     </div>

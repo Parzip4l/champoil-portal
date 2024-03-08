@@ -9,6 +9,7 @@ use App\ModelCG\List_task;
 use App\ModelCG\Patroli;
 use App\ModelCG\Absen;
 use App\ModelCG\Temuan;
+use App\Employee;
 use Illuminate\Support\Facades\Auth;
 
 class PatroliController extends Controller
@@ -40,6 +41,22 @@ class PatroliController extends Controller
         }
 
         return view('pages.operational.patroli.checklist',$data);
+    }
+    
+    public function report(Request $request){
+        $segments = $request->segments();
+        $data['task']=Task::where('unix_code',$segments[1])->first();
+        $data['list']=List_task::where('id_master',$data['task']->id)->get();
+        if($data['list']){
+            foreach($data['list'] as $row){
+                $row->detail = Patroli::where('id_task',$row->id)->where('unix_code',$segments[1])->first();
+                $row->petugas=[];
+                if($row->detail){
+                    $row->petugas = Employee::where('nik',$row->detail->employee_code)->first();
+                }
+            }
+        }
+        return view('pages.operational.patroli.report',$data);
     }
     
 

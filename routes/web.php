@@ -106,6 +106,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     
     //patroli
     Route::get('/patroli', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'index'])->name('patroli');
+    Route::get('/report-patrol/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'report'])->name('report-patrol');
     Route::get('/scan_qr', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'scan_qr'])->name('scan_qr');
     Route::get('/checklist/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'checklist_task'])->name('checklist');
     Route::post('/checklist/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'post_code'])->name('checklist.post');

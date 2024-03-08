@@ -41,7 +41,7 @@
 
         // Send a POST request to the server
         $.get({
-            url: "/api/v1/patroli_task/"+decodedText,
+            url: "checklist/"+decodedText,
             dataType: "json",
             headers: {
                 "X-CSRF-Token": '{{ csrf_token() }}'
@@ -49,7 +49,7 @@
             success: function(response) {
                 // Success callback function
                 if (!response.error) {
-                    window.location.href = response.msg;
+                    console.log(response.msg);
                 }
             }
         });

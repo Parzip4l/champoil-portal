@@ -41,6 +41,7 @@ class PatroliController extends Controller
 
         return view('pages.operational.patroli.checklist',$data);
     }
+    
 
     public function post_code(Request $request){
         $result=[];

@@ -41,16 +41,15 @@
 
         // Send a POST request to the server
         $.get({
-            url: "checklist/"+decodedText,
+            url: "/api/v1/patroli_task/"+decodedText,
             dataType: "json",
             headers: {
                 "X-CSRF-Token": '{{ csrf_token() }}'
             },
             success: function(response) {
-                // Success callback function
-                if (!response.error) {
-                    console.log(response.msg);
-                }
+                
+                    window.location.href = "https://hris.truest.co.id/checklist/"+decodedText;
+                
             }
         });
         

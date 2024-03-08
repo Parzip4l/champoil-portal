@@ -105,18 +105,21 @@ class PatroliController extends Controller
         // insert looping to table temuan
 
         $no2=0;
-        foreach($data['temuan'] as $temuan){
-            $ins2=[
-                "temuan"=>$data['temuan'][$no2],
-                "tindakan"=>$data['tindakan'][$no2],
-                "shift"=>"",
-                "unix_code"=>$data['unix_code'],
-                "employee_code"=>Auth::user()->employee_code,
-            ];
-            Temuan::insert($ins2);
-
-            $no2++;
+        if($data['temuan']){
+            foreach($data['temuan'] as $temuan){
+                $ins2=[
+                    "temuan"=>$data['temuan'][$no2],
+                    "tindakan"=>$data['tindakan'][$no2],
+                    "shift"=>"",
+                    "unix_code"=>$data['unix_code'],
+                    "employee_code"=>Auth::user()->employee_code,
+                ];
+                Temuan::insert($ins2);
+    
+                $no2++;
+            }
         }
+        
         return redirect()->route('patroli')->with('success', 'Successfully');
         
     }

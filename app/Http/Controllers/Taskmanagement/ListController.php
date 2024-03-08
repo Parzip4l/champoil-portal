@@ -21,7 +21,7 @@ class ListController extends Controller
 
     public function list_task($id)
     {
-        $data['records']=List_task::all();
+        $data['records']=List_task::where('id_master',$id)->get();
         $data['id_master']=$id;
         return view('pages.operational.list_task.index',$data);
     }

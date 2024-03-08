@@ -105,7 +105,7 @@ class PatroliController extends Controller
         // insert looping to table temuan
 
         $no2=0;
-        if($data['temuan']){
+        if(!empty($data['temuan'])){
             foreach($data['temuan'] as $temuan){
                 $ins2=[
                     "temuan"=>$data['temuan'][$no2],

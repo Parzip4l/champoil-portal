@@ -75,6 +75,7 @@ class PatroliController extends Controller
                 "id_task"=>$explode[1],
                 "employee_code"=>Auth::user()->employee_code,
                 "status"=>$explode[0],
+                "unix_code"=>$data['unix_code'],
                 "description"=>isset($data['keterangan'][$no])?$data['keterangan'][$no]:"-",
                 "created_at"=>date('Y-m-d H:i:s')
             ];

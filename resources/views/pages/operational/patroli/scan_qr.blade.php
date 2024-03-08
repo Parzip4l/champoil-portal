@@ -47,9 +47,7 @@
                 "X-CSRF-Token": '{{ csrf_token() }}'
             },
             success: function(response) {
-                
-                    window.location.href = "https://hris.truest.co.id/checklist/"+decodedText;
-                
+                window.location.href = "https://hris.truest.co.id/checklist/"+decodedText;
             }
         });
         

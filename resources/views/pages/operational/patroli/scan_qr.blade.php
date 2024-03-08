@@ -32,17 +32,19 @@
         // Handle on success condition with the decoded text or result.
         // console.log(`Scan result: ${decodedText}`, decodedResult);
         // Define the data to be sent in the POST request
-        var csrfToken = "{{ csrf_token() }}";  // Replace with the actual CSRF token value
+        
+        var postData = {
+            qr_code: decodedText
+        };
 
+        
 
         // Send a POST request to the server
-        $.ajax({
-            url: "/api/checklist.post",
-            type: "POST",
-            data: postData,
+        $.get({
+            url: "/api/v1/patroli_task/"+decodedText,
             dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRF-Token", csrfToken);
+            headers: {
+                "X-CSRF-Token": '{{ csrf_token() }}'
             },
             success: function(response) {
                 // Success callback function

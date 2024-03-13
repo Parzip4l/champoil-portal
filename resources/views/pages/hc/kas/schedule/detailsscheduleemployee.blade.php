@@ -14,8 +14,6 @@
                 <h5 class="mb-0 align-self-center">Details Schedule {{$employeeName}}</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('schedule-store') }}" method="POST">
-                    @csrf
                     <div class="wrap-schedule">
                         <div class="row">
                             <div class="col-md-12">
@@ -38,6 +36,7 @@
                                                     <th>Shift</th>
                                                     <th>Project</th>
                                                     <th>Periode</th>
+                                                    <th>Update Schedule</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -45,6 +44,9 @@
                                                     $nomor = 1;
                                                 @endphp
                                                 @foreach($schedules as $schedules)
+                                            <form action="{{ route('schedule.update', $schedules->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
                                                 <tr>
                                                     @php
                                                         $projectname = \App\ModelCG\Project::find($schedules->project)->name;
@@ -70,7 +72,11 @@
                                                     <td>
                                                         <input type="text" class="form-control" value="{{$schedules->periode}}" name="periode" readonly>
                                                     </td>
+                                                    <td>
+                                                        <button class="btn btn-primary">Update Schedule</button>
+                                                    </td>
                                                 </tr>
+                                            </form>
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -79,10 +85,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Add other input fields as needed -->
-
-                    <button type="submit" class="btn btn-primary w-100">Update Schedule</button>
-                </form>
             </div>
         </div>
     </div>

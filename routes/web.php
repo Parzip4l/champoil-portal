@@ -233,6 +233,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/schedule/details/{project}/{periode}/{employee}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetailsEmployee'])->name('schedule.employee');
         Route::post('/schedule-store', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'store'])->name('schedule-store');
 
+        // Update Manual Schedule
+        Route::post('/schedules/edit/{schedule_code}/{tanggal}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'editScheduleForm'])->name('schedules.edit');
+
         // Day Off
         Route::get('/getEmployeesWithDayOff', [App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getEmployeesWithDayOff'])->name('getEmployeesWithDayOff.backup');
         Route::get('/getEmployeesReplaceSchedule', [App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getManPower'])->name('getManPower.backup');

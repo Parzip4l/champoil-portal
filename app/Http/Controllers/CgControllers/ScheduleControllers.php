@@ -185,15 +185,49 @@ class ScheduleControllers extends Controller
                                 ->where('employee', $employee)
                                 ->get();
 
+        $schedule_code = Schedule::where('project', $project)
+                                ->where('periode', $periode)
+                                ->where('employee', $employee)
+                                ->pluck('schedule_code')
+                                ->first();
+
         $employeeName = Employee::where('nik', $employee)->value('nama');
         $shift = Shift::all();
-
         return view('pages.hc.kas.schedule.detailsscheduleemployee', [
             'employeeName' => $employeeName,
             'schedules' => $schedulesWithDetails,
             'shift' => $shift,
+            'schedule_code' => $schedule_code,
+        ]);
+    }
+
+    // Edit Manual Schedule
+
+    public function updateMultiple(Request $request)
+    {
+        // Validasi jika diperlukan
+        $request->validate([
+            'schedules.*.tanggal' => 'required|date',
+            'schedules.*.shift' => 'required',
+            // Tambahkan aturan validasi sesuai kebutuhan
         ]);
 
+        // Loop melalui data yang dikirimkan melalui formulir
+        foreach ($request->schedules as $scheduleId => $data) {
+            // Temukan entitas jadwal berdasarkan ID
+            $schedule = Schedule::findOrFail($scheduleId);
+
+            // Update atribut jadwal dengan data yang diterima dari formulir
+            $schedule->tanggal = $data['tanggal'];
+            $schedule->shift = $data['shift'];
+            // Lanjutkan dengan atribut lain yang perlu diperbarui
+
+            // Simpan perubahan
+            $schedule->save();
+        }
+
+        // Redirect ke halaman terkait atau tampilkan pesan sukses
+        return redirect()->back()->with('success', 'Jadwal berhasil diperbarui');
     }
 
     /**
@@ -216,7 +250,31 @@ class ScheduleControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            // Atur aturan validasi sesuai kebutuhan Anda
+        ]);
+
+        // Temukan entitas jadwal berdasarkan ID
+        $schedule = Schedule::findOrFail($id);
+
+        // Update atribut jadwal dengan data yang diterima dari formulir
+        $schedule->tanggal = $request->tanggal;
+        $schedule->shift = $request->shift;
+        // Lanjutkan dengan atribut lain yang perlu diperbarui
+
+        // Simpan perubahan
+        $schedule->save();
+
+        $project = $schedule->project; 
+        $periode = $schedule->periode; 
+        $employee = $schedule->employee; 
+
+        // Redirect ke halaman terkait atau tampilkan pesan sukses
+        return redirect()->route('schedule.employee', [
+            'project' => $project,
+            'periode' => $periode,
+            'employee' => $employee,
+        ])->with('success', 'Jadwal berhasil diperbarui');
     }
 
     /**

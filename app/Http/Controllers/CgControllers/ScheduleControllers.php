@@ -146,8 +146,8 @@ class ScheduleControllers extends Controller
             $schedule->periode = $periodes;
             $schedule->save();
         }
-        dd('s');
-        // return redirect()->route('schedule.index')->with('success', 'Schedules created successfully.');
+
+        return redirect()->route('schedule.index')->with('success', 'Schedules created successfully.');
     }
 
     /**

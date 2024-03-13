@@ -147,7 +147,7 @@ class ScheduleControllers extends Controller
             $schedule->save();
         }
 
-        return redirect()->route('schedule.index')->with('success', 'Schedules created successfully.');
+        // return redirect()->route('schedule.index')->with('success', 'Schedules created successfully.');
     }
 
     /**

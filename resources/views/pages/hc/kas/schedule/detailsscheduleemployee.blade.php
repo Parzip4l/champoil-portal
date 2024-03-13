@@ -14,7 +14,7 @@
                 <h5 class="mb-0 align-self-center">Details Schedule {{$employeeName}}</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('schedule.store') }}" method="POST">
+                <form action="{{ route('schedule-store') }}" method="POST">
                     @csrf
                     <div class="wrap-schedule">
                         <div class="row">

@@ -105,6 +105,14 @@ class ApiLoginController extends Controller
                 $allowedRadius = $dataCompany->radius;
             }
 
+            $existingAbsen = Absen::where('nik', $nik)
+            ->whereDate('tanggal', $today)
+            ->first();
+
+            if ($existingAbsen) {
+                return response()->json(['message' => 'Clockin Rejected, Already Clocked In for Today!']);
+            }
+
             if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
                 $scheduleKas = Schedule::where('employee', $nik)
                     ->whereDate('tanggal', $today)

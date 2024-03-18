@@ -165,7 +165,7 @@
                 </a>
             </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ route('knowledge_base.index') }}" class="nav-link">
                     <i class="link-icon" data-feather="book-open"></i>
@@ -187,7 +187,7 @@
                 </div>
             </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin)  || in_array('am_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ route('setting.index') }}" class="nav-link {{ active_class(['setting']) }}">
                     <i class="link-icon" data-feather="settings"></i>

@@ -290,12 +290,34 @@
                                     <label class="form-check-label">Project PIC</label>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input type="checkbox" id="client" class="form-check-input" name="permissions[]" value="client_access">
+                                    <label class="form-check-label">Client</label>
+                                </div>
+                            </div>
+                            
                             @endif
                             <div class="col-md-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">
                                     <label class="form-check-label">Super Admin</label>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <div class="col-md-4" id="project_id" style="display:none">
+                            <div class="form-check">
+                                <label class="form-check-label">Project</label>
+                                <select name="project_id" class="form-control select2">
+                                    <option varlue="">-- Select Project -- </option>
+                                    @if($project)
+                                        @foreach($project as $pr)
+                                            <option value="{{ $pr->id }}">{{ $pr->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -338,6 +360,19 @@
     const passwordInput = document.getElementById('passwordInput');
     const passwordConfirmationInput = document.getElementById('passwordConfirmationInput');
 
+    $(document).ready(function(){
+        $("#client").change(function(){
+            if(this.checked) {
+                // Checkbox is checked
+                $('#project_id').show();
+            } else {
+                // Checkbox is unchecked
+                $('#project_id').hide();
+            }
+        });
+        
+        $('#client').select2();
+    });
     authCheck.addEventListener('change', function() {
         if (authCheck.checked) {
             passwordInput.type = 'text';

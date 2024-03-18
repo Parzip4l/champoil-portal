@@ -189,6 +189,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Payroll
     // Component Master
     Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
+    
+    // logbook
+    Route::resource('logbook', App\Http\Controllers\Logbook\LogbookController::class);
+    Route::get('logbook-tamu', [App\Http\Controllers\Logbook\LogbookController::class, 'tamu'])->name('logbook-tamu');
+    Route::get('logbook-barang', [App\Http\Controllers\Logbook\LogbookController::class, 'barang'])->name('logbook-barang');
 
     // Request Type
     Route::resource('request-type', App\Http\Controllers\Absen\RequestTypeController::class);
@@ -245,6 +250,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // Get Employee
         Route::get('/get-employees', [App\Http\Controllers\CgControllers\PayrolNS::class, 'getEmployees'])->name('employee.unit');
+        
         Route::post('/import-employees', [App\Http\Controllers\Employee\EmployeeController::class, 'importEmployee'])->name('import.employee');
 
         // Backup Log
@@ -261,6 +267,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Route::get('/read_test/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'read_test'])->name('read_test');
         Route::get('/pdf.preview/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');
         Route::post('/knowledge.save_asign_users', [App\Http\Controllers\knowledge\KnowledgeController::class, 'save_asign_users'])->name('knowledge.save_asign_users');
+
+        
+
 
         // Pengajuan Schedule
         Route::resource('pengajuan-schedule', App\Http\Controllers\PengajuanSchedule\PengajuanController::class);

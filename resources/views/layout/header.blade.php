@@ -29,6 +29,7 @@
                     // Ambil nama produk berdasarkan product_id
                     $employeeDetails = \App\Employee::where('nik', Auth::user()->employee_code)->first();
                     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+                    $user = Auth::user();
                 @endphp
                 <img class="wd-30 ht-30 rounded-circle" src="{{ asset('images/' . $employeeDetails->gambar) }}" alt="{{$employee->nama}}">
                 </a>
@@ -83,7 +84,7 @@
           </a>
         </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin))
            
             <li class="nav-item">
                 <a href="{{ url('#') }}" class="nav-link">
@@ -99,7 +100,7 @@
                 </div>
             </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('dashboard_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('dashboard_access', $dataLogin) || in_array('client_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ url('#') }}" class="nav-link">
                     <i class="link-icon" data-feather="clock"></i>
@@ -109,21 +110,26 @@
                 <div class="submenu">
                     <ul class="submenu-item">
                         <li class="nav-item"><a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a></li>
-                        @if($employee && $employee->unit_bisnis == 'Kas')
+                        @if($employee && $employee->unit_bisnis == 'Kas' && $user->project_id == NULL)
                         <li class="nav-item"><a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a></li>
                         @endif
                         @if($employee && $employee->unit_bisnis == 'Kas')
                         <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
+                        @if($user->project_id == NULL)
                         <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
                         @endif
+                        @endif
+                        @if($user->project_id == NULL)
                         <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['kas/shift']) }}">Shift</a></li>
-                        @if($employee && $employee->unit_bisnis == 'Kas' )
+                        @endif
+                        @if($employee && $employee->unit_bisnis == 'Kas'  && $user->project_id == NULL)
                         <li class="nav-item"><a href="{{ url(route('report.index') . '?periode='.date('M-Y')) }}" class="nav-link {{ active_class(['kas/report']) }}">Report</a></li>
                         @endif
                     </ul>
                 </div>
             </li>
         @endif
+
         @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ url('#') }}" class="nav-link">
@@ -157,7 +163,7 @@
                 </a>
             </li>
         @endif
-        @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
+        @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">
                     <i class="link-icon" data-feather="calendar"></i>
@@ -165,7 +171,7 @@
                 </a>
             </li>
         @endif
-        @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
+        @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{ route('knowledge_base.index') }}" class="nav-link">
                     <i class="link-icon" data-feather="book-open"></i>
@@ -183,6 +189,21 @@
                         <li class="nav-item"><a href="{{ url('task') }}" class="nav-link {{ active_class(['task']) }}">Patroli</a></li>
                         <li class="nav-item"><a href="#" class="nav-link {{ active_class(['kas/schedule']) }}">Audit</a></li>
                         <li class="nav-item"><a href="{{ route('taskg.index') }}" class="nav-link {{ active_class(['tasg']) }}">Task</a></li>
+                    </ul>
+                </div>
+            </li>
+        @endif
+        @if(in_array('client_access', $dataLogin))
+        <li class="nav-item">
+                <a href="{{ url('#') }}" class="nav-link">
+                    <i class="link-icon" data-feather="book"></i>
+                        <span class="menu-title">Logbook</span>
+                    <i class="link-arrow"></i>
+                </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item"><a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook']) }}">Tamu</a></li>
+                        <li class="nav-item"><a href="{{ route('logbook-barang') }}" class="nav-link {{ active_class(['component-data']) }}">Barang</a></li>
                     </ul>
                 </div>
             </li>

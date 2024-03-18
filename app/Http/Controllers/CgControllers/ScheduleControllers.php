@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ScheduleImport;
 use App\Exports\ScheduleExport;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ScheduleControllers extends Controller
 {
@@ -23,10 +25,15 @@ class ScheduleControllers extends Controller
      */
     public function index()
     {
-        $schedulesByProject = Schedule::with('project')
+        $get_data = Schedule::with('project')
             ->select('project', 'periode', DB::raw('count(*) as schedule_count'))
-            ->groupBy('project', 'periode')
-            ->get();
+            ->groupBy('project', 'periode');
+        
+        if(Auth::user()->project_id == NULL){
+            $schedulesByProject = $get_data->get();
+        }else{
+            $schedulesByProject = $get_data->where('project',Auth::user()->project_id)->get();
+        }
 
         return view('pages.hc.kas.schedule.index', compact('schedulesByProject'));
     }

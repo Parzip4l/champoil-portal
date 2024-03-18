@@ -15,13 +15,16 @@
     $employee = \App\Employee::where('nik', Auth::user()->name)->first();
     $feedback = \App\Feedback::where('name', Auth::user()->name)->first();
     $dataLogin = json_decode(Auth::user()->permission);
+    $user = Auth::user();
 @endphp
 <div class="absen-wrap mb-2">
     <div class="row">
         <div class="col-md-12 mb-2">
             <!-- Employee Login Details -->
+            @if($user->project_id == NULL)
             <div class="card custom-card mb-3">
                 <div class="card-body">
+                    
                     <div class="row">
                         <div class="content-wrap-employee-card d-flex justify-content-between mb-5">
                             <div class="content-left align-self-center">
@@ -57,8 +60,10 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
+            @endif
             <!-- End  -->
             <div class="card custom-card2 mobile">
                 <div class="card-body">
@@ -373,6 +378,7 @@
 
 <!-- Chart Section -->
 <div class="chart-wrap mb-4 desktop">
+    @if($user->project_id==NULL)
     <div class="row mb-4">
         <div class="col-md-6">
             <h6 class="mb-2">Daftar karyawan tanpa keterangan hari ini.</h6>
@@ -413,6 +419,7 @@
             </div>
         </div>
     </div>
+    
     <div class="row">
         <div class="col-md-6">
         <h6 class="mb-2">Total Karyawan.</h6>
@@ -422,6 +429,7 @@
                 </div>
             </div>
         </div>
+        @if($user->project_id ==NULL)
         <div class="col-md-6">
             <h6 class="mb-2">Daftar karyawan yang akan segera berakhir kontrak.</h6>
             <div class="card custom-card2">
@@ -447,7 +455,9 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
+    @endif
 </div>
 <!-- End Chart Section -->
 <!-- Task -->

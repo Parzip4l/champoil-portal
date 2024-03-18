@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Task;
 use App\ModelCG\Project;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class TaskController extends Controller
 {
@@ -16,9 +19,16 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $data['records']=Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
-                            ->select('master_tasks.*', 'projects.name as project_name')
-                            ->get();
+        if(Auth::user()->project_id == NULL){
+            $task = Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
+            ->select('master_tasks.*', 'projects.name as project_name');
+        }else{
+            $task= Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
+            ->select('master_tasks.*', 'projects.name as project_name')
+            ->where('projects.id',Auth::user()->project_id);
+        }
+        
+        $data['records']=$task->get();
         $data['project']=Project::all();
         return view('pages.operational.task.index',$data);
     }

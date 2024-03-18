@@ -18,6 +18,7 @@ use App\Divisi\Divisi;
 Use App\Organisasi\Organisasi;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
+use App\ModelCG\Project;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
@@ -39,10 +40,30 @@ class EmployeeController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
         
-        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
-        ->where('resign_status',0)
-        ->get();
+        if(Auth::user()->project_id == NULL){
+            $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
+            ->where('resign_status',0)
+            ->get();
+        }else{
+            $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
+                            ->join('schedules', function($join) {
+                                $join->on('karyawan.nik', '=', 'schedules.employee')
+                                    ->where('schedules.project', Auth::user()->project_id)
+                                    ->where('schedules.id', '=', function($query) {
+                                        $query->select('id')
+                                            ->from('schedules')
+                                            ->whereColumn('employee', 'karyawan.nik')
+                                            ->where('schedules.project', Auth::user()->project_id)
+                                            ->limit(1);
+                                    });
+                            })
+                            ->where('resign_status', 0)
+                            ->get();
 
+        }
+        
+        
+        
         return view('pages.hc.karyawan.index', compact('karyawan'));
     }
 
@@ -103,11 +124,12 @@ class EmployeeController extends Controller
     {   
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-
+        
         $jabatan = Jabatan::where('parent_category', $company->unit_bisnis)->get();
         $divisi = Divisi::where('company', $company->unit_bisnis)->get();
         $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
-        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi'));
+        $project = Project::all();
+        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project'));
     }
 
     /**
@@ -180,6 +202,7 @@ class EmployeeController extends Controller
             $userinfo = new User();
             $userinfo->name = $request->nik;
             $userinfo->email = $request->email;
+            $userinfo->project_id = $request->project_id;
             $userinfo->password = Hash::make($request->password);
             $userinfo->permission = json_encode($request->permissions);
             $userinfo->employee_code = $request->nik;

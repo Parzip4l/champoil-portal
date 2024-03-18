@@ -54,9 +54,26 @@ class AbsenController extends Controller
         }
 
         // Mengambil data absensi dari database
-        $data1 = $query->select('users.*', 'absens.*')
-            ->orderBy('users.name')
-            ->get();
+        if(Auth::user()->project_id == NULL){
+            $data1 = $query->select('users.*', 'absens.*')
+                ->orderBy('users.name')
+                ->get();
+        }else{
+            $data1 = $query->select('users.*', 'absens.*')
+                        ->join('schedules', function($join) {
+                            $join->on('karyawan.nik', '=', 'schedules.employee')
+                                ->where('schedules.project', Auth::user()->project_id)
+                                ->where('schedules.id', '=', function($query) {
+                                    $query->select('id')
+                                        ->from('schedules')
+                                        ->whereColumn('employee', 'karyawan.nik')
+                                        ->where('schedules.project', Auth::user()->project_id)
+                                        ->limit(1);
+                                });
+                        })
+                ->orderBy('users.name')
+                ->get();
+        }
 
         // Mengirim data ke tampilan
         return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization'));

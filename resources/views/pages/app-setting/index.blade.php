@@ -106,6 +106,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ url('thr-component') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="sun"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>THR Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

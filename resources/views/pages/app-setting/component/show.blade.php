@@ -67,6 +67,7 @@
                                     <td> {{ $data->employee_name }} </td>
                                     <td> {{ $data->component_name }}</td>
                                     <td>Rp {{ number_format($data->nominal, 0, ',', '.') }}</td>
+                                    <td> <a href="" class="btn btn-sm btn-warning">Edit</a></td>
                                 </tr>
                                 @endforeach
                             </tbody>

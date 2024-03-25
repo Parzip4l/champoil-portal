@@ -187,7 +187,7 @@
                         <option value="Single" {{$employee->status_pernikahan == 'Single' ? 'selected' : ''}}>Single</option>
                     </select>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Jumlah Tanggungan</label>
                     <select class="js-example-basic-single form-select" data-width="100%" name="tanggungan" required>
                         <option value="0" {{$employee->tanggungan == '0' ? 'selected' : ''}}>0</option>
@@ -200,6 +200,14 @@
                         <option value="7" {{$employee->tanggungan == '7' ? 'selected' : ''}}>7</option>
                         <option value="8" {{$employee->tanggungan == '8' ? 'selected' : ''}}>8</option>
                         <option value="9" {{$employee->tanggungan == '9' ? 'selected' : ''}}>9</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Status Pajak</label>
+                    <select name="tax_code" class="form-control" id="">
+                        <option value="45363" {{$employee->tax_code == '45363' ? 'selected' : ''}}>TER A</option>
+                        <option value="45464" {{$employee->tax_code == '45464' ? 'selected' : ''}}>TER B</option>
+                        <option value="45565" {{$employee->tax_code == '45565' ? 'selected' : ''}}>TER C</option>
                     </select>
                 </div>
             </div>

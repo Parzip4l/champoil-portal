@@ -176,6 +176,7 @@ class EmployeeController extends Controller
             $data->tempat_lahir = $request->tempat_lahir;
             $data->jenis_kelamin = $request->jenis_kelamin;
             $data->tanggungan = $request->tanggungan;
+            $data->tax_code = $request->tax_code;
             $data->unit_bisnis = $company->unit_bisnis;
             $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
@@ -402,6 +403,7 @@ class EmployeeController extends Controller
             $employee->alamat_ktp = $request->input('alamat_ktp');
             $employee->status_pernikahan = $request->input('status_pernikahan');
             $employee->tanggungan = $request->input('tanggungan');
+            $data->tax_code = $request->input('tax_code');
             $employee->referal_code = $request->input('referal_code');
 
             // Update the employee's photo if a new one is provided

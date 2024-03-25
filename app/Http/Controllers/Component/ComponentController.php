@@ -131,6 +131,7 @@ class ComponentController extends Controller
                     'component_code' => $request->component_code[$i],
                     'component_name' => $componentData->name,
                     'nominal' => $request->nominal[$i],
+                    'type' => $request->input('type'),
                 ]);
         
                 $componentDetails->save();

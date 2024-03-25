@@ -194,7 +194,7 @@
                                 <option value="Single">Single</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Jumlah Tanggungan</label>
                             <select name="tanggungan" class="form-control" id="">
                                 <option value="0">0</option>
@@ -207,6 +207,14 @@
                                 <option value="7">7</option>
                                 <option value="8">8</option>
                                 <option value="9">9</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status Pajak</label>
+                            <select name="tax_code" class="form-control" id="">
+                                <option value="45363">TER A</option>
+                                <option value="45464">TER B</option>
+                                <option value="45565">TER C</option>
                             </select>
                         </div>
                         <div class="col-md-12">

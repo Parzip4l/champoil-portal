@@ -217,7 +217,12 @@
             <div class="row mb-3">
                 <div class="col">
                     <label class="form-label">BPJS Kesehatan</label>
-                    <input type="number" class="form-control" name="bpjs_kes" placeholder="0902xxx" required value="{{$employee->payrolinfo ? $employee->payrolinfo->bpjs_kes : '' }}">
+                    <input type="number" 
+                           class="form-control" 
+                           name="bpjs_kes" 
+                           placeholder="0902xxx" 
+                           required 
+                           value="{{$employee->payrolinfo ? $employee->payrolinfo->bpjs_kes : '' }}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">BPJS Ketenagakerjaan</label>

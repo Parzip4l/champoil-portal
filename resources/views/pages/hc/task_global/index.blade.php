@@ -104,6 +104,7 @@
                         <div class="col-md-12 mb-2" id="div_project">
                             <label for="" class="form-label">Project</label>
                             <select name="project" class="form-control">
+                                <option value="0">All Project</option>
                                 @foreach($project as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach

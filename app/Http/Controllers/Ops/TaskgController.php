@@ -38,9 +38,9 @@ class TaskgController extends Controller
 
                 if($row->project){
                     $project = Project::where('id',$row->project)->first();
-                    $row->project = "asas";
+                    $row->project = $project->name;
                 }else{
-                    $row->project = "";
+                    $row->project = "All Project";
                 }
             }
         }

@@ -319,7 +319,7 @@
                             <div class="form-check">
                                 <label class="form-check-label">Project</label>
                                 <select name="project_id" class="form-control select2">
-                                    <option varlue="">-- Select Project -- </option>
+                                    <option value="">-- Select Project -- </option>
                                     @if($project)
                                         @foreach($project as $pr)
                                             <option value="{{ $pr->id }}">{{ $pr->name }}</option>

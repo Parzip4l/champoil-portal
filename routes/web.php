@@ -128,6 +128,8 @@ Route::middleware(['auth', 'permission:hc_access'])->group(function () {
 
     //task management global
     Route::resource('taskg', App\Http\Controllers\Ops\TaskgController::class);
+    Route::get('/task_edit/{id}', [App\Http\Controllers\ops\TaskgController::class, 'edit'])->name('task_edit');
+    Route::post('/save-task-item', [App\Http\Controllers\ops\TaskgController::class, 'save_item'])->name('save-task-item');
 });
 
 // Superadmin Access

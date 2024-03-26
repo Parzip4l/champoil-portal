@@ -27,7 +27,7 @@
                                 <th>Project</th>
                                 <th>User</th>
                                 <th>Mengulang</th>
-                                <th>Upload Photo</th>
+                                <!-- <th>Upload Photo</th> -->
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -42,14 +42,15 @@
                                 <td>{{ $record->project }}</td>
                                 <td>{{ $record->assign }}</td>
                                 <td>{{ $record->repeat_task }}</td>
-                                <td>{{ $record->upload_file }}</td>
+                                <!-- <td>{{ $record->upload_file }}</td> -->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#EditContact{{ $record->id}}">
+                                            <a class="dropdown-item d-flex align-items-center" 
+                                               href="{{ route('task_edit',['id'=>$record->id]) }}">
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Details</span>
                                             </a>
@@ -70,6 +71,9 @@
                                     </div>
                                 </td>
                             </tr>
+                            @php 
+                                $nomor++;
+                            @endphp
                             @endforeach
                         </tbody>
                     </table>
@@ -114,7 +118,7 @@
                             <label for="" class="form-label">Nama Task</label>
                             <input type="text" class="form-control" name="task_name" required="required"></div>
                             <div class="col-md-12 mb-2">
-                                <label for="" class="form-label">Upload Photo</label>
+                                <!-- <label for="" class="form-label">Upload Photo</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="upload_file" value="1" id="flexCheckDefault">
                                     <label class="form-check-label" for="flexCheckDefault">
@@ -126,7 +130,7 @@
                                     <label class="form-check-label" for="flexCheckChecked">
                                         NO
                                     </label>
-                                </div>
+                                </div> -->
                                 
                                 Employee
                                 <select class="form-control employeeSelect" id="employeeSelect" name="assign[]" multiple>

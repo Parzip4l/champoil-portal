@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Project; 
 use App\ModelCG\TaskGlobal; 
+use App\ModelCG\TaskParent; 
 
 
 class TaskgController extends Controller
@@ -110,7 +111,11 @@ class TaskgController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data=[];
+        $data['master']=TaskGlobal::find($id);
+        $data['records']=TaskParent::where('id_task',$id)->get();
+        $data['project']=Project::all();
+        return view('pages.hc.task_global.edit',$data);
     }
 
     /**
@@ -124,6 +129,32 @@ class TaskgController extends Controller
     {
         //
     }
+
+    public function save_item(Request $request){
+        $item = $request->all();
+
+        if($item['task_name']){
+            $no=0;
+            foreach($item['task_name'] as $row){
+                $ins=[
+                    "task_name"=>$item['task_name'][$no],
+                    "upload_file"=>$item['file_upload'][$no],
+                    "id_task"=>$item['id_master']
+                ];
+
+                if($item['id'][$no]==0){
+                    TaskParent::insert($ins);
+                }else{
+                    TaskParent::where('id',$item['id'][$no])->update($ins);
+                }
+                
+
+                $no++;
+            }
+        }
+
+        return redirect()->route('task_edit',['id'=>$item['id_master']])->with('success', 'Task Successfully Added');
+    }   
 
     /**
      * Remove the specified resource from storage.

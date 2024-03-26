@@ -115,6 +115,14 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // Feedback
     Route::post('/users/feedback', 'DashboardController@StoreFeedback')->name('feedback.store');
     Route::get('/unix-code', [App\Http\Controllers\Employee\EmployeeController::class,'unix_code'])->name('unix-code');
+
+    //task management global
+    Route::resource('taskg', App\Http\Controllers\Ops\TaskgController::class);
+    Route::get('/task_edit/{id}', [App\Http\Controllers\ops\TaskgController::class, 'edit'])->name('task_edit');
+    Route::post('/save-task-item', [App\Http\Controllers\ops\TaskgController::class, 'save_item'])->name('save-task-item');
+    Route::post('/save_data', [App\Http\Controllers\ops\TaskgController::class, 'store'])->name('save_data');
+
+    
 });
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
@@ -126,11 +134,7 @@ Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
 
-    //task management global
-    Route::resource('taskg', App\Http\Controllers\Ops\TaskgController::class);
-    Route::get('/task_edit/{id}', [App\Http\Controllers\ops\TaskgController::class, 'edit'])->name('task_edit');
-    Route::post('/save-task-item', [App\Http\Controllers\ops\TaskgController::class, 'save_item'])->name('save-task-item');
-    Route::post('/save_data', [App\Http\Controllers\ops\TaskgController::class, 'store'])->name('save_data');
+    
 });
 
 // Superadmin Access

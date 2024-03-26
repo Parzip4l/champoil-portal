@@ -93,7 +93,7 @@
             </div>
             <div class="modal-body">
             <form
-                    action="{{route('taskg.store')}}"
+                    action="{{route('save_data')}}"
                     method="POST"
                     enctype="multipart/form-data">
                     @csrf

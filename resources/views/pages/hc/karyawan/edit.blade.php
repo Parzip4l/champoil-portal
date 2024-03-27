@@ -12,7 +12,7 @@
 @section('content')
 <nav class="page-breadcrumb desktop">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="#">Karyawan</a></li>
+    <li class="breadcrumb-item"><a href="{{url('employee')}}">Karyawan</a></li>
     <li class="breadcrumb-item active" aria-current="page">Edit Karyawan</li>
   </ol>
 </nav>

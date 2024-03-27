@@ -305,8 +305,9 @@ class EmployeeController extends Controller
 
         $divisi = Divisi::where('company', $employee->unit_bisnis)->get();
         $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();
+        $organisasi = Organisasi::where('company',$employee->unit_bisnis)->get();
         // dd($unix);
-        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan'));
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi'));
         
     }
 

@@ -210,6 +210,33 @@ class EmployeeController extends Controller
             $userinfo->company = $company->unit_bisnis;
             $userinfo->save();
 
+            if($company->unit_bisnis=="Kas"){
+                $unit="CITY SERVICE";
+            }else if($company->unit_bisnis=="CHAMPOIL"){
+                $unit="CHAMPOIL";
+            }else{
+                $unit="";
+            }
+
+            $html ="Hello ".strtoupper($request->nama)."
+
+Welcome to ".$unit."! 🎉
+
+Please install the TRUEST application for your digital attendance needs.
+
+Here are the download links:
+
+Play Store: https://play.google.com/store/apps/details?id=co.id.truest.truest
+
+App Store: https://apps.apple.com/idn/app/truest/id6476389232?platform=iphone
+
+And here is your login account information:
+    
+Email: ".$request->email."
+Password: ".$request->password;
+
+            push_notif_wa($html,'','',$request->telepon,'');
+
             DB::commit();
             return redirect()->route('employee.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }catch (ValidationException $exception) {

@@ -12,7 +12,7 @@
 @section('content')
 <nav class="page-breadcrumb desktop">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="#">Karyawan</a></li>
+    <li class="breadcrumb-item"><a href="{{url('employee')}}">Karyawan</a></li>
     <li class="breadcrumb-item active" aria-current="page">Edit Karyawan</li>
   </ol>
 </nav>
@@ -109,8 +109,9 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Organisasi</label>
                     <select class="js-example-basic-single form-select" data-width="100%" name="organisasi" required>
-                        <option value="Management Leaders" {{$employee->organisasi == 'Management Leaders' ? 'selected' : ''}}>Management Leaders</option>
-                        <option value="FRONTLINE OFFICER" {{$employee->organisasi == 'FRONTLINE OFFICER' ? 'selected' : ''}}>Frontline Officer</option>
+                        @foreach($organisasi as $dataOrganisasi)
+                            <option value="{{$dataOrganisasi->name}}" @if($dataOrganisasi->name == $employee->organisasi) selected @endif>{{$dataOrganisasi->name}}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>

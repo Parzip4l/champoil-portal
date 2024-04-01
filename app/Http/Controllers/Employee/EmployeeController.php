@@ -332,8 +332,9 @@ Password: ".$request->password;
 
         $divisi = Divisi::where('company', $employee->unit_bisnis)->get();
         $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();
+        $organisasi = Organisasi::where('company',$employee->unit_bisnis)->get();
         // dd($unix);
-        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan'));
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi'));
         
     }
 
@@ -430,7 +431,7 @@ Password: ".$request->password;
             $employee->alamat_ktp = $request->input('alamat_ktp');
             $employee->status_pernikahan = $request->input('status_pernikahan');
             $employee->tanggungan = $request->input('tanggungan');
-            $data->tax_code = $request->input('tax_code');
+            $employee->tax_code = $request->input('tax_code');
             $employee->referal_code = $request->input('referal_code');
 
             // Update the employee's photo if a new one is provided

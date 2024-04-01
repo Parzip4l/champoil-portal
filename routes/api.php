@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiLoginController;
 use App\Http\Controllers\Api\LmsController;
 use App\Http\Controllers\Api\Patroli\PatroliController;
-use App\Http\Controllers\Api\task\TaskController;
+use App\Http\Controllers\Api\Task\TaskController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReferalController;

@@ -78,5 +78,6 @@ Route::prefix('v1')->group(function () {
      * Task Management
      */
     Route::get('/task_list/{id}', [TaskController::class, 'task']);
+    Route::get('/project', [TaskController::class, 'project']);
     
 });

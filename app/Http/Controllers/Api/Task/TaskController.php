@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 // Load Model
 use App\ModelCG\TaskGlobal; 
+use App\ModelCG\Project; 
 
 class TaskController extends Controller
 {
@@ -26,6 +27,17 @@ class TaskController extends Controller
             "records"=>$result,
             "error"=>$error,
             "message"=>$msg
+        ];
+
+        return response()->json($records);
+    }
+
+    public function project(){
+        $records = Project::all();
+        $records=[
+            "records"=>$records,
+            "error"=>false,
+            "message"=>"Data"
         ];
 
         return response()->json($records);

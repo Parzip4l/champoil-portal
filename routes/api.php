@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Task\TaskController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReferalController;
+use App\Http\Controllers\Api\Project\ProjectController;
 
 Route::prefix('v1')->group(function () {
 
@@ -79,5 +80,10 @@ Route::prefix('v1')->group(function () {
      */
     Route::get('/task_list/{id}', [TaskController::class, 'task']);
     Route::get('/project', [TaskController::class, 'project']);
+
+    /**
+     * Project
+     */
+    Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
     
 });

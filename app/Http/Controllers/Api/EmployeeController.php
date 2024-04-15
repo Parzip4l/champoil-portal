@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\EmployeeResign;
 use App\Absen;
 use App\ModelCG\Project;
+use App\Employee;
 
 
 class EmployeeController extends Controller
@@ -49,5 +50,37 @@ class EmployeeController extends Controller
             'error'=>false,
             'result'=>$result    
         ]);
+    }
+
+    public function all_employee(){
+        $records = Employee::where('resign_status',0)->get();
+        $html='*Important Update for Truest App!*
+
+Hello esteemed Truest users,
+        
+We would like to inform you that a critical update for the Truest app is now available. Please follow these steps promptly:
+        
+Google Play Store (Android):
+https://play.google.com/store/apps/details?id=co.id.truest.truest
+        
+App Store (iOS):
+https://apps.apple.com/idn/app/truest/id6476389232?platform=iphone
+        
+Thank you for your attention and cooperation. If you have any questions or issues, please feel free to contact our support team.';
+        foreach($records as $row){
+            push_notif_wa($html,'','',$row->telepon,'');
+        }
+        
+        
+
+
+        $result=[
+            "records"=>$records,
+            "message"=>"success",
+            "error"=>false
+        ];
+
+        return response()->json($result);
+
     }
 }

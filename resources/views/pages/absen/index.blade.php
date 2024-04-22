@@ -29,7 +29,7 @@
             <div class="card-body">
                 <div class="head-card d-flex justify-content-between mb-3">
                     <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
-                    <a href="{{route('export.attendence')}}" class="btn btn-sm btn-primary">Export Absen</a>
+                    <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalExport">Export Absen</a>
                 </div>
                 <div class="row">
                     <div class="col-md-5">
@@ -89,6 +89,32 @@
                         @endforeach
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Export Absen -->
+<div class="modal fade bd-example-modal-sm" id="ModalExport" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Export Attendence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('export.attendence') }}" method="GET">
+                    <div class="form-group mb-3">
+                        <label for="selected_month" class="form-label">Pilih Bulan :</label>
+                        <select class="form-control" id="selected_month" name="selected_month">
+                            <option value="">-- Pilih Bulan --</option>
+                            @foreach ($months as $key => $month)
+                                <option value="{{ $key }}">{{ $month }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Export Absen</button>
+                </form>
             </div>
         </div>
     </div>

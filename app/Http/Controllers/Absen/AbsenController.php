@@ -75,8 +75,24 @@ class AbsenController extends Controller
                 ->get();
         }
 
+        $months = [
+            '01' => 'Januari',
+            '02' => 'Februari',
+            '03' => 'Maret',
+            '04' => 'April',
+            '05' => 'Mei',
+            '06' => 'Juni',
+            '07' => 'Juli',
+            '08' => 'Agustus',
+            '09' => 'September',
+            '10' => 'Oktober',
+            '11' => 'November',
+            '12' => 'Desember',
+        ];
+        
+
         // Mengirim data ke tampilan
-        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization'));
+        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization','months'));
     }
 
     public function indexbackup()
@@ -115,25 +131,43 @@ class AbsenController extends Controller
     }
 
 
-    public function exportAttendence()
+    public function exportAttendence(Request $request)
     {
-        // Get Bulan
-        $loggedInUserNik = auth()->user()->employee_code;
-        $company = Employee::where('nik', $loggedInUserNik)->first();
+        $selectedMonth = $request->input('selected_month');
 
-        // Dapatkan nilai unit bisnis dari request
-        $unitBisnis = $company->unit_bisnis;
+        // Validasi input bulan
+        $validatedData = $request->validate([
+            'selected_month' => 'required|string', // Validasi jenis data
+        ]);
 
-        // Dapatkan tanggal awal dan akhir periode
-        $today = now();
-        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
-        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+        // Tambahkan tahun ke nilai bulan
+        $selectedMonthWithYear = date('Y') . '-' . $selectedMonth;
 
-        // Buat instance dari kelas AttendenceExport dengan rentang waktu
-        $export = new AttendenceExport($unitBisnis, $loggedInUserNik, $startDate, $endDate);
+        // Konversi input bulan menjadi objek Carbon
+        $selectedDate = Carbon::createFromFormat('Y-m', $selectedMonthWithYear);
 
-        // Ekspor data ke Excel
-        return Excel::download($export, 'attendence_export_' . strtolower($startDate->format('F')) . '.xlsx');
+        // Dapatkan tahun dan bulan dari input
+        $year = $selectedDate->year;
+        $month = $selectedDate->month;
+
+        // Dapatkan tanggal awal dan akhir periode berdasarkan bulan yang dipilih
+        $startDate = Carbon::create($year, $month, 21)->startOfMonth();
+        $endDate = $startDate->copy()->addMonth()->subDay();
+
+        try {
+            // Lakukan proses eksportasi seperti sebelumnya
+            $loggedInUserNik = auth()->user()->employee_code;
+            $company = Employee::where('nik', $loggedInUserNik)->first();
+            $unitBisnis = $company->unit_bisnis;
+
+            $export = new AttendenceExport($unitBisnis, $loggedInUserNik, $startDate, $endDate);
+
+            return Excel::download($export, 'attendence_export_' . strtolower($startDate->format('F')) . '.xlsx');
+        } catch (\Exception $e) {
+            // Tampilkan pesan kesalahan kepada pengguna
+            return back()->with('error', 'Terjadi kesalahan saat mengunduh file Excel. Silakan coba lagi.');
+        }
+        
     }
 
     /**

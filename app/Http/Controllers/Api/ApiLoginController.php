@@ -1148,8 +1148,11 @@ class ApiLoginController extends Controller
             $requestAbsen = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
                 ->where('requests_attendence.aprrove_status', 'Pending')
                 ->where('karyawan.unit_bisnis', $unitBisnis)
+                ->orderBy('requests_attendence.created_at', 'desc') // Mengurutkan berdasarkan tanggal dibuat secara descending
+                ->limit(5) // Mengambil hanya 5 data terbaru
                 ->select('requests_attendence.*', 'karyawan.nama', 'karyawan.unit_bisnis')
                 ->get();
+
 
             return response()->json(['dataRequest' => $requestAbsen], 200);
         } catch (\Exception $e) {

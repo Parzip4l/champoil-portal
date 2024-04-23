@@ -741,10 +741,7 @@ class ApiLoginController extends Controller
 
             return response()->json([
                 'employeeCode' => $employeeCode,
-                'historyData' => $historyData->items(),
-                'current_page' => $historyData->currentPage(),
-                'per_page' => $historyData->perPage(),
-                'total' => $historyData->total(),
+                'historyData' => $historyData,
             ], 200);
 
         } catch (\Exception $e) {

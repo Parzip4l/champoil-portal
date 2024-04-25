@@ -96,11 +96,11 @@
                         </div>
                         <div class="col">
                             <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
-                            <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx">
+                            <input id="telepon" class="form-control" name="telepon" type="number" placeholder="+62862612">
                         </div>
                         <div class="col">
                             <label for="kode_karyawan" class="form-label">Nomor Telepon Darurat</label>
-                            <input id="telepon" class="form-control" name="telepon_darurat" type="number" placeholder="08xxxxxx">
+                            <input id="telepon" class="form-control" name="telepon_darurat" type="number" placeholder="+62862612">
                         </div>
                     </div>
                     <div class="row mb-3">

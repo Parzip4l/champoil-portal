@@ -22,8 +22,11 @@ class ProjectControllers extends Controller
      */
     public function index()
     {
-        $project = Project::all();
-        return view('pages.hc.kas.project.index', compact('project'));
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $project = Project::where('company',$company);
+        return view('pages.hc.kas.phproject.index', compact('project'));
     }
 
     /**
@@ -62,6 +65,9 @@ class ProjectControllers extends Controller
     public function store(Request $request)
     {
         try {
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+
             $name = $request->input('name');
             $badan = $request->input('badan');
             $latitude = $request->input('latitude');
@@ -79,6 +85,7 @@ class ProjectControllers extends Controller
             $project->longtitude = $longtitude;
             $project->contract_start = $contract_start;
             $project->end_contract = $end_contract;
+            $project->company = $company;
             $project->save();
 
             return redirect()->route('project.index')->with(['success' => 'Data Berhasil Disimpan!']);

@@ -26,7 +26,7 @@ class ProjectControllers extends Controller
         $company = Employee::where('nik', $code)->first();
 
         $project = Project::where('company',$company);
-        return view('pages.hc.kas.phproject.index', compact('project'));
+        return view('pages.hc.kas.project.index', compact('project'));
     }
 
     /**

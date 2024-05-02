@@ -25,7 +25,7 @@ class ProjectControllers extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        $project = Project::where('company',$company);
+        $project = Project::where('company',$company->unit_bisnis);
         return view('pages.hc.kas.project.index', compact('project'));
     }
 

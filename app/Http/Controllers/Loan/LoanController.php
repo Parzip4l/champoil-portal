@@ -136,6 +136,18 @@ class LoanController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $data = LoanModel::findOrFail($id);
+
+            // Delete the project
+            $data->delete();
+
+            return redirect()->route('employee-loan.index')->with('success', 'Loan Data Successfully Deleted');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('employee-loan.index')->with('error', 'Loan not found');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->route('employee-loan.index')->with('error', 'An error occurred while deleting the loan data');
+        }
     }
 }

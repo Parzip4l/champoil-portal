@@ -199,7 +199,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "#".replace(':id', id);
+                const deleteUrl = "{{ route('employee-loan.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {
@@ -209,7 +209,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Contact Successfully Deleted',
+                            title: 'Data Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert
@@ -217,7 +217,7 @@
                     } else {
                         // Handle error response if needed
                         Swal.fire({
-                            title: 'Contact Failed to Delete',
+                            title: 'Data Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });
@@ -225,7 +225,7 @@
                 }).catch((error) => {
                     // Handle fetch error if needed
                     Swal.fire({
-                        title: 'Contact Failed to Delete',
+                        title: 'Data Failed to Delete',
                         text: 'An error occurred while deleting data.',
                         icon: 'error',
                     });

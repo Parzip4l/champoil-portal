@@ -36,9 +36,7 @@ function getLocation() {
 function showPosition(position) {
     var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
-
-    // Now you can send latitude and longitude to your Laravel backend using AJAX
-    sendDataToBackend(latitude, longitude);
+    alert('lat:'+latitude+' long:'+longitude);
 }
 
 function sendDataToBackend(latitude, longitude) {

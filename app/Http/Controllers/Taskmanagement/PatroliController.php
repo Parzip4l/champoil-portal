@@ -36,6 +36,8 @@ class PatroliController extends Controller
         $data['message']="";
 
         $data['master']=Task::where('unix_code',$params)->first();
+        
+        dd($data);
 
         $lat = $request->input('lat');
         $long = $request->input('long');

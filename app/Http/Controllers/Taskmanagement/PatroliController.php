@@ -39,23 +39,23 @@ class PatroliController extends Controller
         
         dd($data);
 
-        $lat = $request->input('lat');
-        $long = $request->input('long');
-        $kantorLatitude = $data['master']->latitude;
-        $kantorLongtitude = $data['master']->longitude;
+        // $lat = $request->input('lat');
+        // $long = $request->input('long');
+        // $kantorLatitude = $data['master']->latitude;
+        // $kantorLongtitude = $data['master']->longitude;
 
         
 
-        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+        // $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
         
-        $allowedRadius = 10000;
-        if ($distance <= $allowedRadius) {
-            if($data['master']){
-                $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
-            }
-        }else{
-            $data['message']="Scan Rejected, Outside Radius!";
-        }
+        // $allowedRadius = 10000;
+        // if ($distance <= $allowedRadius) {
+        //     if($data['master']){
+        //         $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
+        //     }
+        // }else{
+        //     $data['message']="Scan Rejected, Outside Radius!";
+        // }
 
         return view('pages.operational.patroli.checklist',$data);
     }

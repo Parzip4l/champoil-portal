@@ -37,10 +37,12 @@ class PatroliController extends Controller
 
         $data['master']=Task::where('unix_code',$params)->first();
 
-        $lat = $data['master']->latitude;
-        $long = $data['master']->longitude;
+        $lat = $request->input('latitude');
+        $long = $request->input('longitude');
+        $kantorLatitude = $latitudeProject;
+        $kantorLongtitude = $longtitudeProject;
 
-        $distance = $this->calculateDistance('', '', $lat, $long);
+        $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
 
         if ($distance <= $allowedRadius) {
             if($data['master']){

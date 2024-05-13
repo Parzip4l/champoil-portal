@@ -42,6 +42,8 @@ class PatroliController extends Controller
         $kantorLatitude = $data['master']->latitude;
         $kantorLongtitude = $data['master']->longitude;
 
+        dd($lat);
+
         $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
         
         $allowedRadius = 30;
@@ -52,7 +54,7 @@ class PatroliController extends Controller
         }else{
             $data['message']="Scan Rejected, Outside Radius!";
         }
-        
+
         return view('pages.operational.patroli.checklist',$data);
     }
     

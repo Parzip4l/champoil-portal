@@ -26,7 +26,7 @@ class KoperasiController extends Controller
         // Redirect View 
         $koperasi = Koperasi::where('company', $company->unit_bisnis)->get();
         $anggotaPending = Anggota::where('company', $company->unit_bisnis)
-                        ->where('member_status', 'review')
+                        ->whereNotIn('member_status', ['active'])
                         ->get();
 
         $anggota = Anggota::where('company', $company->unit_bisnis)

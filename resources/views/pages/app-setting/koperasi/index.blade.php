@@ -76,14 +76,15 @@
                                 <td>{{$pendingdata->nama}}</td>
                                 <td>
                                     <div class="dropdown">
+                                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                        </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Approve</span>
+                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('ApproveAnggota', ['employee_code' => $pendingdata->employee_code]) }}">
+                                                <i data-feather="check" class="icon-sm me-2"></i> <span class="">Approve</span>
                                             </a>
-                                            <a class="dropdown-item d-flex align-items-center" data-bs-target="" data-bs-toggle="modal">
-                                                <i data-feather="edit-2" class="icon-sm me-2"></i>
-                                                <span class="">Reject</span>
+                                            <a href="{{ route('RejectAnggota', ['employee_code' => $pendingdata->employee_code]) }}" class="dropdown-item d-flex align-items-center">
+                                                <i data-feather="x" class="icon-sm me-2"></i> <span class="">Reject</span>
                                             </a>
                                         </div>
                                     </div>

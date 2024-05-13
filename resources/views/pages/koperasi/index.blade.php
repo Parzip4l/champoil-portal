@@ -115,6 +115,9 @@
             @elseif($datasaya->member_status == 'review')
                 <button class="btn btn-primary w-100" disabled>On Reviewed</button>
                 <p class="mt-2 color-custom-secondary">*The review process takes a maximum of 2 working days</p>
+            @elseif($datasaya->member_status == 'reject')
+                <a href="{{ route('ReapplyAnggota', ['employee_code' => $employee->nik]) }}"  class="btn btn-primary w-100">Reapply for member</a>
+                <p class="mt-2 text-danger">*Your application is rejected</p>
             @elseif($datasaya->member_status == 'active')
                 <div class="logo-koperasi mb-4">
                     <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="" style="max-width : 40%; width : 100%;">

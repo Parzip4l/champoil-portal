@@ -236,6 +236,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // Koperasi
         Route::resource('koperasi', App\Http\Controllers\Koperasi\KoperasiController::class);
+            //member
+            Route::get('/approve-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'ApproveAnggota'])->name('ApproveAnggota'); 
+            Route::get('/reject-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'RejectAnggota'])->name('RejectAnggota'); 
+            Route::get('/reapply-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'ReapplyAnggota'])->name('ReapplyAnggota'); 
 
     // CG Component
     Route::group(['prefix' => 'kas'], function(){

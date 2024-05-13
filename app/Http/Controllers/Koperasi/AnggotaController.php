@@ -9,6 +9,7 @@ use App\Koperasi\Anggota;
 use App\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
 
 class AnggotaController extends Controller
 {
@@ -102,6 +103,49 @@ class AnggotaController extends Controller
     {
         //
     }
+
+    public function ApproveAnggota($employee_code)
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
+        $now = Carbon::now();
+
+        Anggota::where('employee_code', $employee_code)
+                    ->where('company', $companyData)
+                    ->update(['member_status' => 'active', 'join_date' => $now]);
+
+        return redirect()->back()->with('success', 'Data has been update');
+    }
+
+    public function RejectAnggota($employee_code)
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
+        $now = Carbon::now();
+
+        Anggota::where('employee_code', $employee_code)
+                    ->where('company', $companyData)
+                    ->update(['member_status' => 'reject', 'join_date' => '-']);
+
+        return redirect()->back()->with('success', 'Data has been update');
+    }
+
+    public function ReapplyAnggota($employee_code)
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $companyData = $employee->unit_bisnis;
+        $now = Carbon::now();
+
+        Anggota::where('employee_code', $employee_code)
+                    ->where('company', $companyData)
+                    ->update(['member_status' => 'review', 'join_date' => '-']);
+
+        return redirect()->back()->with('success', 'Data has been update');
+    }
+
 
     /**
      * Update the specified resource in storage.

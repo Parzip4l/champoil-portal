@@ -7,6 +7,7 @@
 
 @section('content')
 <div  id="reader"></div>
+<button id="getLocationBtn">Get Location</button>
 <!-- End -->
 @endsection
 
@@ -22,6 +23,36 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
+    document.getElementById('getLocationBtn').addEventListener('click', getLocation);
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        alert('Geolocation is not supported by this browser.');
+    }
+}
+
+function showPosition(position) {
+    var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
+
+    // Now you can send latitude and longitude to your Laravel backend using AJAX
+    sendDataToBackend(latitude, longitude);
+}
+
+function sendDataToBackend(latitude, longitude) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/process-coordinates', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            console.log('Coordinates sent successfully');
+        }
+    };
+    var data = JSON.stringify({ latitude: latitude, longitude: longitude });
+    xhr.send(data);
+}
     $(document).ready(function() {
         // Your code here
         $('#html5-qrcode-anchor-scan-type-change').hide();

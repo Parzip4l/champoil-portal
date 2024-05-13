@@ -74,7 +74,7 @@
 <!-- End -->
 
 <!-- Koperasi Page -->
-<div class="row">
+<div class="row mb-4">
     <div class="col-md-12">
         <div class="card custom-card2 mb-3">
             <div class="card-body">

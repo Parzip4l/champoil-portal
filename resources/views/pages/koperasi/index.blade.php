@@ -157,7 +157,7 @@
                 </div>
                 @else 
                 <div class="persyaratan-pinjaman-wrap mt-4">
-                    <h5 class="mb-3">Persyaratan Pinjaman :</h5>
+                    <h5 class="mb-3">Loan Terms :</h5>
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>
                         <div class="icon-syarat align-self-center">
@@ -177,7 +177,7 @@
                         </div>
                     </div>
                     <div class="button-pinjaman mt-2">
-                        <button class="btn btn-primary w-100" disabled>Ajukan Pinjaman</button>
+                        <button class="btn btn-primary w-100" disabled>Apply for a Loan</button>
                     </div>
                 </div>
                 @endif

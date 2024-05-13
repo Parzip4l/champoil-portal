@@ -123,15 +123,15 @@
                     <div class="title mb-2">
                         <h5>My Saving</h5>
                     </div>
-                    <div class="saldo-saya mb-4">
+                    <div class="saldo-saya mb-2">
                         <h3 class="color-custom-secondary">Rp. 500.000</h3>
+                        <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">Saving will be deducted automatically in payroll</p>
                     </div>
-                    <div class="bottom-data d-flex">
-                        <div class="saving-data align-self-center" style="width : 50%;">
-                            <h5>Last Saving <span class="text-danger">Rp 50.000</span></h5>
-                            <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">Saving will be deducted automatically in payroll</p>
+                    <div class="bottom-data">
+                        <div class="saving-data align-self-center">
+                            
                         </div>
-                       <div class="history-saving" style="width : 50%;">
+                       <div class="history-saving">
                             <a href="" class="btn btn-primary w-100">Saving History</a>
                        </div>
                     </div>
@@ -142,15 +142,12 @@
                     <div class="title mb-2">
                         <h5>Remaining Debt</h5>
                     </div>
-                    <div class="saldo-saya mb-4">
+                    <div class="saldo-saya mb-2">
                         <h3 class="color-custom-secondary">Rp. 2.500.000</h3>
+                        <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">The bill will be deducted automatically in payroll</p>
                     </div>
-                    <div class="bottom-data d-flex">
-                        <div class="saving-data align-self-center" style="width : 50%;">
-                            <h5>Next Bill <span class="text-danger">Rp 500.000</span></h5>
-                            <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">The bill will be deducted automatically in payroll</p>
-                        </div>
-                       <div class="history-saving" style="width : 50%;">
+                    <div class="bottom-data">
+                       <div class="history-saving">
                             <a href="" class="btn btn-primary w-100">Billing History</a>
                        </div>
                     </div>

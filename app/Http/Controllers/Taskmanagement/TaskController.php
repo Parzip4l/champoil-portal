@@ -105,9 +105,15 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $data=$request->all();
+        $ins=[
+            "longitude"=>$data['longitude'],
+            "latitude"=>$data['latitude']
+        ];
+        Task::where('unix_code',$data['unix_code'])->update($ins);
+        return redirect()->route('task.index')->with('success', 'List Task Successfully Updated');
     }
 
     /**

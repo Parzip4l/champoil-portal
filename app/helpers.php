@@ -24,7 +24,7 @@ function push_notif_wa($data,$token,$instance,$nomor,$url){
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_ENCODING => "",
       CURLOPT_MAXREDIRS => 10,
-      CURLOPT_TIMEOUT => 30,
+      CURLOPT_TIMEOUT => 1000,
       CURLOPT_SSL_VERIFYHOST => 0,
       CURLOPT_SSL_VERIFYPEER => 0,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,

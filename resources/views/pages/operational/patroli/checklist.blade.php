@@ -8,6 +8,8 @@
 @endpush
 
 @section('content') 
+
+@if(empty($message))
 <form action = "{{ route('save_patroli') }}" method = "POST" enctype = "multipart/form-data" > 
     @csrf 
     <input type = "hidden" id = "unix_code" name = "unix_code" value = "{{ $master->unix_code }}" > <div class="row">
@@ -166,3 +168,6 @@
                 @endif
             </script>
             @endpush
+@else
+    <strong class="text-danger">{{$message}}</strong> 
+@endif

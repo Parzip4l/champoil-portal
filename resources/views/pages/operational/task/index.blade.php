@@ -42,9 +42,18 @@
                                         $class = "badge rounded-pill bg-success";
                                     }
                                 ?>
+                                @php
+                                if($record->latitude && $record->longitude){
+                                    $longlat ='Longlat : '. $record->longitude.' - '.$record->latitude;
+                                }else{
+                                    $longlat="Longlat : -   ";
+                                }
+                                @endphp
                             <tr>
                                 <td> {{$nomor++}} </td>
-                                <td> {{ $record->judul }} <br/> {{ $record->project_name }}</td>
+                                <td> 
+                                    {{ $record->judul }} <br/> {{ $record->project_name }}<br/>{{$longlat}}
+                                </td>
                                 <td>{{ $record->jam_mulai_shift_1 }} s/d {{ $record->jam_akhir_shift_1 }}</td>
                                 <td>{{ $record->jam_mulai_shift_2 }} s/d {{ $record->jam_akhir_shift_2 }}</td>
                                 <td>{{ $record->jam_mulai_shift_3 }} s/d {{ $record->jam_akhir_shift_3 }}</td>
@@ -69,6 +78,10 @@
                                                 <i data-feather="grid" class="icon-sm me-2"></i>
                                                 <span class="">Show QR</span>
                                             </a>
+                                            <a class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#longlat{{$record->unix_code}}">
+                                                <i data-feather="map" class="icon-sm me-2"></i>
+                                                <span class="">Add Longlat</span>
+                                            </a>
                                           
                                             <form action="{{ route('task.destroy', $record->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 
@@ -81,6 +94,36 @@
                                     </div>
                                 </td>
                             </tr>
+                            <div class="modal fade" id="longlat{{$record->unix_code}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{ $record->project_name }} - {{ $record->judul }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('task-update')}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="unix_code" value="{{$record->unix_code}}">
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Longitude</label>
+                            <input type="text" name="longitude" id="longitude" class="form-control">    
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Latitude</label>
+                            <input type="text" name="latitude" id="latitude" class="form-control">    
+                        </div>
+                        
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
                             @endforeach
                         </tbody>
                     </table>

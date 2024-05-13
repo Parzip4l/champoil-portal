@@ -33,12 +33,25 @@ class PatroliController extends Controller
 
     public function checklist_task($params){
         $data=[];
+        $data['message']="";
 
         $data['master']=Task::where('unix_code',$params)->first();
 
-        if($data['master']){
-            $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
+        $lat = $data['master']->latitude;
+        $long = $data['master']->longitude;
+
+        $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
+
+        if ($distance <= $allowedRadius) {
+            if($data['master']){
+                $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
+            }
+
+        }else{
+            $data['message']="Scan Rejected, Outside Radius!";
         }
+
+        
 
         return view('pages.operational.patroli.checklist',$data);
     }
@@ -122,6 +135,21 @@ class PatroliController extends Controller
         
         return redirect()->route('patroli')->with('success', 'Successfully');
         
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; 
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c; 
+
+        return $distance;
     }
 }
 

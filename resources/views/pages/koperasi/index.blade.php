@@ -156,19 +156,6 @@
                     </div>
                 </div>
                 @else 
-                    
-                @endif
-            @endif
-        </div>
-    </div>
-</div>
-</div>
-<!-- Data Pinjaman -->
-@if($datasaya->loan_status == 'noloan')
-<div class="row mb-5">
-    <div class="col-md-12">
-        <div class="card custom-card2 mb-3">
-            <div class="card-body">
                 <div class="persyaratan-pinjaman-wrap">
                     <h5 class="mb-3">Persyaratan Pinjaman :</h5>
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
@@ -193,12 +180,12 @@
                         <button class="btn btn-primary w-100" disabled>Ajukan Pinjaman</button>
                     </div>
                 </div>
-            </div>
+                @endif
+            @endif
         </div>
     </div>
 </div>
-@else
-@endif
+
 
 @endsection
 

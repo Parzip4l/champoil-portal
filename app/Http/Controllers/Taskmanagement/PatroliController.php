@@ -50,9 +50,9 @@ class PatroliController extends Controller
         
         // $allowedRadius = 10000;
         // if ($distance <= $allowedRadius) {
-        //     if($data['master']){
-        //         $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
-        //     }
+            if($data['master']){
+                $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
+            }
         // }else{
         //     $data['message']="Scan Rejected, Outside Radius!";
         // }

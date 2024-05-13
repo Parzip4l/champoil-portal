@@ -68,6 +68,8 @@ class AnggotaController extends Controller
             $anggotaDaftar->join_date = '-';
             $anggotaDaftar->member_status = 'review';
             $anggotaDaftar->loan_limit = 0;
+            $anggotaDaftar->loan_status = 'noloan';
+            $anggotaDaftar->saldo_simpanan = 0;
             // Simpan data ke database
             $anggotaDaftar->save();
 

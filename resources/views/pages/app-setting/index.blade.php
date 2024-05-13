@@ -123,7 +123,7 @@
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
-                                <a href="{{ url('#') }}" class="text-center link-settings">
+                                <a href="{{ url('koperasi') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
                                         <i data-feather="package"></i> 
                                     </div>

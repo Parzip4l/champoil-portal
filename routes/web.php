@@ -16,7 +16,11 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
     // Employee Loan
     Route::resource('employee-loan', App\Http\Controllers\Loan\LoanController::class);
-    
+
+    // Anggota Koperasi
+    Route::resource('koperasi-page', App\Http\Controllers\Koperasi\AnggotaController::class);
+
+
     // Garda Pratama
     Route::resource('garda-pratama', App\Http\Controllers\GardaPratama\GpController::class);
 
@@ -229,6 +233,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
             Route::get('/get-employees-component', [App\Http\Controllers\Component\ComponentController::class, 'getEmployeesComponent'])->name('employee.datacomponent');
             Route::get('/get-component', [App\Http\Controllers\Component\ComponentController::class, 'getComponent'])->name('component.additional');
             Route::get('/additional-component/show/{code_master}', [App\Http\Controllers\Component\ComponentController::class, 'showDetails'])->name('additional-component.showDetails');
+
+        // Koperasi
+        Route::resource('koperasi', App\Http\Controllers\Koperasi\KoperasiController::class);
 
     // CG Component
     Route::group(['prefix' => 'kas'], function(){

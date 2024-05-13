@@ -176,6 +176,16 @@
     <div class="menu-absen-wrap">
         <div class="owl-carousel owl-theme owl-basic">
             <div class="item">
+                <a href="{{url('koperasi-page')}}">
+                    <div class="icon text-center">
+                        <i class="icon-lg text-white" data-feather="dollar-sign"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Koperasi</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
                 <a href="{{route('mylogs')}}">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="git-branch"></i>

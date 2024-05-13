@@ -153,7 +153,7 @@
                     </div>
                 </div>
                 @else 
-                <div class="persyaratan-pinjaman-wrap">
+                <div class="persyaratan-pinjaman-wrap mt-4">
                     <h5 class="mb-3">Persyaratan Pinjaman :</h5>
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>

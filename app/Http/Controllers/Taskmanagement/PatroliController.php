@@ -31,7 +31,7 @@ class PatroliController extends Controller
         return view('pages.operational.patroli.scan_qr',$data);
     }
 
-    public function checklist_task($params){
+    public function checklist_task($params,Request $request){
         $data=[];
         $data['message']="";
 

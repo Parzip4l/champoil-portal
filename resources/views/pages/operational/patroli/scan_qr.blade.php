@@ -7,7 +7,6 @@
 
 @section('content')
 <div  id="reader"></div>
-<button id="getLocationBtn">Get Location</button>
 <!-- End -->
 @endsection
 
@@ -23,34 +22,6 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
-    document.getElementById('getLocationBtn').addEventListener('click', getLocation);
-
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else {
-        alert('Geolocation is not supported by this browser.');
-    }
-}
-
-function showPosition(position) {
-    var latitude = position.coords.latitude;
-    var longitude = position.coords.longitude;
-    alert('lat:'+latitude+' long:'+longitude);
-}
-
-function sendDataToBackend(latitude, longitude) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/process-coordinates', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            console.log('Coordinates sent successfully');
-        }
-    };
-    var data = JSON.stringify({ latitude: latitude, longitude: longitude });
-    xhr.send(data);
-}
     $(document).ready(function() {
         // Your code here
         $('#html5-qrcode-anchor-scan-type-change').hide();
@@ -61,25 +32,33 @@ function sendDataToBackend(latitude, longitude) {
         // Handle on success condition with the decoded text or result.
         // console.log(`Scan result: ${decodedText}`, decodedResult);
         // Define the data to be sent in the POST request
-        
         var postData = {
             qr_code: decodedText
         };
 
-        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
 
-        // Send a POST request to the server
-        $.get({
-            url: "/api/v1/patroli_task/"+decodedText,
-            dataType: "json",
-            headers: {
-                "X-CSRF-Token": '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                window.location.href = "https://staging.truest.co.id/checklist/"+decodedText;
-            }
-        });
-        
+                // Send a POST request to the server
+                $.ajax({
+                    url: "/api/v1/patroli_task/" + decodedText,
+                    method: "GET",
+                    data: {
+                        long: longitude,
+                        lat: latitude
+                    },
+                    dataType: "json",
+                    headers: {
+                        "X-CSRF-Token": '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        window.location.href = "https://staging.truest.co.id/checklist/" + decodedText;
+                    }
+                });
+            });
+        }
     }
 
     var html5QrcodeScanner = new Html5QrcodeScanner(

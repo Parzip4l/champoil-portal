@@ -54,7 +54,7 @@
                         "X-CSRF-Token": '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        window.location.href = "https://truest.co.id/checklist/" + decodedText+"?long="+longitude+"&lat="+latitude;
+                        window.location.href = "https://truest.co.id/checklist/" + decodedText;
                     }
                 });
             });

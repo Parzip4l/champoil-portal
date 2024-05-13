@@ -43,7 +43,7 @@ class PatroliController extends Controller
         $kantorLongtitude = $data['master']->longitude;
 
         $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-        dd($distance);
+        dd($lat);
         $allowedRadius = 30;
         if ($distance <= $allowedRadius) {
             if($data['master']){

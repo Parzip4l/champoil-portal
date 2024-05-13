@@ -43,7 +43,7 @@ class PatroliController extends Controller
         $kantorLongtitude = $data['master']->longitude;
 
         $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
+        $allowedRadius = 3;
         if ($distance <= $allowedRadius) {
             if($data['master']){
                 $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();

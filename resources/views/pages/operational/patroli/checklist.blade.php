@@ -12,7 +12,7 @@
 @if(empty($message))
 <form action = "{{ route('save_patroli') }}" method = "POST" enctype = "multipart/form-data" > 
     @csrf 
-    <input type = "hidden" id = "unix_code" name = "unix_code" value = "{{ $master->unix_code }}" > <div class="row">
+    <input type = "hidden" id = "unix_code" name = "unix_code" value = "{{ @$master->unix_code }}" > <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">

@@ -37,8 +37,8 @@ class PatroliController extends Controller
 
         $data['master']=Task::where('unix_code',$params)->first();
 
-        $lat = $request->input('latitude');
-        $long = $request->input('longitude');
+        $lat = $request->input('lat');
+        $long = $request->input('long');
         $kantorLatitude = $data['master']->latitude;
         $kantorLongtitude = $data['master']->longitude;
 

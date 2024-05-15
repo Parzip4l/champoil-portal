@@ -127,7 +127,11 @@
                         <h5>My Saving</h5>
                     </div>
                     <div class="saldo-saya mb-2">
-                        <h3 class="color-custom-secondary">Rp {{ number_format($saving->totalsimpanan, 0, ',', '.') }}</h3>
+                        @if ($saving)
+                            <h3 class="color-custom-secondary">Rp {{ number_format($saving->totalsimpanan, 0, ',', '.') }}</h3>
+                        @else
+                            <h3 class="color-custom-secondary">Rp 0</h3>
+                        @endif
                         <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">Saving will be deducted automatically in payroll</p>
                     </div>
                     <div class="bottom-data">

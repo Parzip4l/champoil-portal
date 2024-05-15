@@ -50,7 +50,8 @@ class PengajuanPinjamanController extends Controller
 
         $minsaving = 0;
         $maxsaving = 0;
-        $maxlimit = 0;        
+        $maxlimit = 0;   
+        $limitpinjaman = 0;     
 
         foreach ($loansettings as $datapinjaman) {
             if ($saldosimpanan >= $datapinjaman->min_saving && $saldosimpanan <= $datapinjaman->max_saving) {

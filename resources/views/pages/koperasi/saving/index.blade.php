@@ -78,110 +78,42 @@
     <div class="col-md-12">
         <div class="card custom-card2 mb-3">
             <div class="card-body">
-            @if(is_null($datasaya))
-                <div class="persayratan-wrap">
-                    <div class="title mb-4">
-                        <h4>Terms & Conditions</h4>
+                <div class="title-saving">
+                    <h4>Saving History</h4>
+                </div>
+                <hr>
+                <div class="history-wrap d-flex justify-content-between mb-4">
+                    <div class="item-saving">
+                        <h4 class="mb-1">April</h4>
+                        <p class="text-muted" style="font-size: 8px;">Has been deducted automatically on the date</p>
+                        <h6>28 April 2024</h6>
                     </div>
-                    <div class="terms-container" style="max-height: 300px; overflow-y: auto;">
-                        <div class="body-terms">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.<br>
-
-                                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem<br>
-
-                                Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?<br>
-
-                                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.<br>
-                            </p>
-                        </div>
+                    <div class="nominal-data align-self-center">
+                        <h3 class="text-primary">Rp 50.000</h3>
                     </div>
-                    <div class="form-check mt-3">
-                        <input class="form-check-input" type="checkbox" id="agreeCheckbox">
-                        <label class="form-check-label" for="agreeCheckbox">
-                            i agree with term & conditions
-                        </label>
+                </div>
+                <div class="history-wrap d-flex justify-content-between mb-4">
+                    <div class="item-saving">
+                        <h4 class="mb-1">Mar</h4>
+                        <p class="text-muted" style="font-size: 8px;">Has been deducted automatically on the date</p>
+                        <h6>28 Maret 2024</h6>
                     </div>
-                    <!-- Tombol pendaftaran -->
-                    <form action="{{route('koperasi-page.store')}}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="text" class="d-none" name="nama" value="{{$employee->nama}}">
-                        <input type="text" class="d-none" name="employee_code" value="{{$employee->nik}}">
-                        <input type="text" class="d-none" name="company" value="{{$employee->unit_bisnis}}">
-
-                        <button type="submit" id="registrationBtn" class="btn btn-primary mt-3 w-100" disabled>Register of Member </button>
-                    </form>
+                    <div class="nominal-data align-self-center">
+                        <h3 class="text-primary">Rp 50.000</h3>
+                    </div>
                 </div>
             </div>
-            @elseif($datasaya->member_status == 'review')
-                <button class="btn btn-primary w-100" disabled>On Reviewed</button>
-                <p class="mt-2 color-custom-secondary">*The review process takes a maximum of 2 working days</p>
-            @elseif($datasaya->member_status == 'reject')
-                <a href="{{ route('ReapplyAnggota', ['employee_code' => $employee->nik]) }}"  class="btn btn-primary w-100">Reapply for member</a>
-                <p class="mt-2 text-danger">*Your application is rejected</p>
-            @elseif($datasaya->member_status == 'active')
-                <div class="logo-koperasi mb-4">
-                    <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="" style="max-width : 40%; width : 100%;">
-                </div>
-                <div class="wallet-body">
-                    <div class="title mb-2">
+            <div class="footer-saving p-4">
+                <div class="content-footer-saving d-flex justify-content-between">
+                    <div class="left-item">
                         <h5>My Saving</h5>
+                        <p style="font-size: 8px;">Your bill is paid, you can reapply for the loan</p>
                     </div>
-                    <div class="saldo-saya mb-2">
-                        <h3 class="color-custom-secondary">Rp. 500.000</h3>
-                        <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">Saving will be deducted automatically in payroll</p>
-                    </div>
-                    <div class="bottom-data">
-                        <div class="saving-data align-self-center">
-                            
-                        </div>
-                       <div class="history-saving">
-                            <a href="{{url('saving-history')}}" class="btn btn-primary w-100">Saving History</a>
-                       </div>
+                    <div class="rignt-item">
+                        <h4>Rp 100.000</h4>
                     </div>
                 </div>
-                @if($datasaya->loan_status == 'onloan')
-                <hr>
-                <div class="wallet-body">
-                    <div class="title mb-2">
-                        <h5>Remaining Debt</h5>
-                    </div>
-                    <div class="saldo-saya mb-2">
-                        <h3 class="color-custom-secondary">Rp. 2.500.000</h3>
-                        <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">The bill will be deducted automatically in payroll</p>
-                    </div>
-                    <div class="bottom-data">
-                       <div class="history-saving">
-                            <a href="" class="btn btn-primary w-100">Billing History</a>
-                       </div>
-                    </div>
-                </div>
-                @else 
-                <div class="persyaratan-pinjaman-wrap mt-4">
-                    <h5 class="mb-3">Loan Terms :</h5>
-                    <div class="item-pesyratan d-flex justify-content-between mb-2">
-                        <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>
-                        <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
-                        </div>
-                    </div>
-                    <div class="item-pesyratan d-flex justify-content-between mb-2">
-                        <p style="width: 70%">Tidak Dalam Masa Cicilan Pinjaman Sebelumnya.</p>
-                        <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
-                        </div>
-                    </div>
-                    <div class="item-pesyratan d-flex justify-content-between mb-2">
-                        <p style="width: 70%">Absensi Periode Sebelumnya 100% Kehadiran.</p>
-                        <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/cakra.png') }}" alt="" style="max-width : 100%; width : 100%;">
-                        </div>
-                    </div>
-                    <div class="button-pinjaman mt-2">
-                        <button class="btn btn-primary w-100" disabled>Apply for a Loan</button>
-                    </div>
-                </div>
-                @endif
-            @endif
+            </div>
         </div>
     </div>
 </div>
@@ -287,5 +219,4 @@
             });
     });
 </script>
-
 @endpush

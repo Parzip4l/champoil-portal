@@ -36,8 +36,18 @@
                     </div>
 
                     <div class="details-data d-flex mb-2">
-                        <h5 class="me-2">Potongan Pinjaman</h5>
-                        <p>{{$data->potongan}} %</p>
+                        <h5 class="me-2">Membership</h5>
+                        <p>{{$data->membership}}%</p>
+                    </div>
+
+                    <div class="details-data d-flex mb-2">
+                        <h5 class="me-2">Merchendise</h5>
+                        <p>{{$data->merchendise}}%</p>
+                    </div>
+
+                    <div class="details-data d-flex mb-2">
+                        <h5 class="me-2">Tenor Pinjaman</h5>
+                        <p>{{$data->tenor}} Bulan</p>
                     </div>
 
                     <div class="details-data d-flex mb-2">
@@ -47,6 +57,59 @@
                     @endforeach
                 </div>
                 
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6 align-self-center">
+                        <h6 class="card-title mb-0">Loan Settings</h6>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <!-- Add Setting -->
+                        <a href="#" class="btn btn-primary" data-bs-target="#SettingsLoan" data-bs-toggle="modal">Add Settings</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+            <div class="table-responsive">
+                    <table id="dataTableExample2" class="table">
+                        <thead>
+                            <tr>
+                                <th>Min Saving</th>
+                                <th>Max Saving</th>
+                                <th>Max Limit</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($loansettings as $data)
+                            <tr>
+                                <td>Rp {{ number_format($data->min_saving, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($data->max_saving, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($data->max_limit, 0, ',', '.') }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item d-flex align-items-center" href="">
+                                                <i data-feather="edit" class="icon-sm me-2"></i> <span class="">Edit</span>
+                                            </a>
+                                            <a href="" class="dropdown-item d-flex align-items-center">
+                                                <i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -98,7 +161,7 @@
         </div>
     </div>
     <!-- Table Data Anggota -->
-    <div class="col-md-12 grid-margin stretch-card">
+    <div class="col-md-6 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header">
                 <div class="row">
@@ -176,6 +239,18 @@
                             <input type="number" name="iuran" class="form-control" placholder="" required>
                         </div>
                         <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Membership</label>
+                            <input type="number" name="membership" class="form-control" placholder="" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Merchendise</label>
+                            <input type="number" name="merchendise" class="form-control" placholder="" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Tenor Pinjaman</label>
+                            <input type="number" name="tenor" class="form-control" placholder="" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Pesyaratan</label>
                             <input type="text" name="persayaratan" class="form-control" placholder="" required>
                         </div>
@@ -188,6 +263,41 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Loan Settings -->
+<div class="modal fade" id="SettingsLoan" tabindex="-1" aria-labelledby="SettingsLoan" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SettingsLoan">Add Loan Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('loan-settings.store')}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Min Saving</label>
+                            <input type="number" name="min_saving" class="form-control" placholder="" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Max Saving</label>
+                            <input type="number" name="max_saving" class="form-control" placholder="" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Max Loan</label>
+                            <input type="number" name="max_limit" class="form-control" placholder="" required>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Add Settings</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal -->
 
 <!-- Update Setting -->
 @foreach($koperasi as $item)
@@ -210,6 +320,18 @@
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Iuran Wajib</label>
                             <input type="number" name="iuran" class="form-control" placholder="" value="{{$item->iuran}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Membership</label>
+                            <input type="number" name="membership" class="form-control" placholder="" value="{{$item->membership}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Merchendise</label>
+                            <input type="number" name="merchendise" class="form-control" placholder="" value="{{$item->merchendise}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Tenor Pinjaman</label>
+                            <input type="number" name="tenor" class="form-control" placholder="" value="{{$item->tenor}}" required>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Pesyaratan</label>
@@ -310,4 +432,11 @@
         $('#dataTableAnggota').DataTable();
     });
 </script>
+<script>
+    // Inisialisasi DataTable
+    $(document).ready(function() {
+        $('#dataTableExample2').DataTable();
+    });
+</script>
+
 @endpush

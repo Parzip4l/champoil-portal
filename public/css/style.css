@@ -161,6 +161,12 @@ a.text-muted.nav-link.active {
     font-weight: 400;
     line-height: 1.2rem;
 }
+.footer-saving {
+    background: #424874;
+    border-radius: 0px 0px 15px 15px;
+    color: #fff;
+}
+
 
 .feedback-button-wrap {
     position: fixed;

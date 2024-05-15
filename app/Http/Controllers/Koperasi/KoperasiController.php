@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
+use App\Koperasi\SettingLoan;
 use App\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +24,9 @@ class KoperasiController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
+        // Loan Settings
+        $loansettings = SettingLoan::where('company',$company->unit_bisnis)->get();
+
         // Redirect View 
         $koperasi = Koperasi::where('company', $company->unit_bisnis)->get();
         $anggotaPending = Anggota::where('company', $company->unit_bisnis)
@@ -33,7 +37,7 @@ class KoperasiController extends Controller
                         ->where('member_status', 'active')
                         ->get();
 
-        return view('pages.app-setting.koperasi.index', compact('koperasi','anggotaPending','anggota'));
+        return view('pages.app-setting.koperasi.index', compact('koperasi','anggotaPending','anggota','loansettings'));
     }
 
     /**
@@ -70,6 +74,9 @@ class KoperasiController extends Controller
                 'company' => $company->unit_bisnis,
                 'potongan' => $request->potongan,
                 'iuran' => $request->iuran,
+                'membership' => $request->membership,
+                'merchendise' => $request->merchendise,
+                'tenor' => $request->tenor,
                 'persayaratan' => $request->persayaratan,
             ]);
 
@@ -127,6 +134,9 @@ class KoperasiController extends Controller
             $koperasi->potongan = $request->potongan;
             $koperasi->iuran = $request->iuran;
             $koperasi->persayaratan = $request->persayaratan;
+            $koperasi->merchendise = $request->merchendise;
+            $koperasi->membership = $request->membership;
+            $koperasi->tenor = $request->tenor;
             
             // Simpan perubahan
             $koperasi->save();

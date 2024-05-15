@@ -236,6 +236,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // Koperasi
         Route::resource('koperasi', App\Http\Controllers\Koperasi\KoperasiController::class);
+
             //member
             Route::get('/approve-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'ApproveAnggota'])->name('ApproveAnggota'); 
             Route::get('/reject-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'RejectAnggota'])->name('RejectAnggota'); 
@@ -246,6 +247,12 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
             // Loan Settings
             Route::resource('loan-settings', App\Http\Controllers\Koperasi\LoanSettingController::class);
+
+            // Pengajuan Pinjaman
+            Route::resource('pengajuan-pinjaman', App\Http\Controllers\Koperasi\PengajuanPinjamanController::class);
+                // Set Status 
+                Route::get('/approve-pinjaman/{employee_code}', [App\Http\Controllers\Koperasi\PengajuanPinjamanController::class, 'ApprovePinjaman'])->name('ApprovePinjaman'); 
+                Route::get('/reject-pinjaman/{employee_code}', [App\Http\Controllers\Koperasi\PengajuanPinjamanController::class, 'RejectPinjaman'])->name('RejectPinjaman'); 
             
 
     // CG Component

@@ -127,36 +127,20 @@
                         <h5>My Saving</h5>
                     </div>
                     <div class="saldo-saya mb-2">
-                        <h3 class="color-custom-secondary">Rp. 500.000</h3>
+                        <h3 class="color-custom-secondary">Rp {{ number_format($saving->totalsimpanan, 0, ',', '.') }}</h3>
                         <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">Saving will be deducted automatically in payroll</p>
                     </div>
                     <div class="bottom-data">
                         <div class="saving-data align-self-center">
                             
                         </div>
-                       <div class="history-saving">
+                       <div class="history-saving mb-4">
                             <a href="{{url('saving-history')}}" class="btn btn-primary w-100">Saving History</a>
                        </div>
                     </div>
                 </div>
-                @if($datasaya->loan_status == 'onloan')
-                <hr>
-                <div class="wallet-body">
-                    <div class="title mb-2">
-                        <h5>Remaining Debt</h5>
-                    </div>
-                    <div class="saldo-saya mb-2">
-                        <h3 class="color-custom-secondary">Rp. 2.500.000</h3>
-                        <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">The bill will be deducted automatically in payroll</p>
-                    </div>
-                    <div class="bottom-data">
-                       <div class="history-saving">
-                            <a href="" class="btn btn-primary w-100">Billing History</a>
-                       </div>
-                    </div>
-                </div>
-                @else 
-                <div class="persyaratan-pinjaman-wrap mt-4">
+                @if (empty($loan))
+                <div class="persyaratan-pinjaman-wrap mt-4 mb-4">
                     <h5 class="mb-3">Loan Terms :</h5>
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>
@@ -177,7 +161,59 @@
                         </div>
                     </div>
                     <div class="button-pinjaman mt-2">
-                        <button class="btn btn-primary w-100" disabled>Apply for a Loan</button>
+                        <a href="{{url('pengajuan-pinjaman')}}" class="btn btn-primary w-100" >Apply for a Loan</a>
+                    </div>
+                </div>
+                @elseif($loan->status == 'waiting')
+                <hr>
+                <div class="wallet-body">
+                    <div class="title mb-2">
+                        <h5>Loan Status</h5>
+                    </div>
+                    <div class="bottom-data">
+                       <div class="history-saving">
+                            <button class="btn btn-primary w-100" disabled>Waiting For Approve</button>
+                       </div>
+                    </div>
+                </div>
+                @elseif($loan->status == 'approve')
+                <div class="wallet-body">
+                    <div class="title mb-2">
+                        <h5>Remaining Debt</h5>
+                    </div>
+                    <div class="saldo-saya mb-2">
+                        <h3 class="color-custom-secondary">Rp {{ number_format($pinjaman->sisahutang, 0, ',', '.') }}</h3>
+                        <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">The bill will be deducted automatically in payroll</p>
+                    </div>
+                    <div class="bottom-data">
+                       <div class="history-saving">
+                            <a href="" class="btn btn-primary w-100">Billing History</a>
+                       </div>
+                    </div>
+                </div>
+                @elseif($loan->status == 'rejected')
+                <div class="persyaratan-pinjaman-wrap mt-4 mb-4">
+                    <h5 class="mb-3">Loan Terms :</h5>
+                    <div class="item-pesyratan d-flex justify-content-between mb-2">
+                        <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>
+                        <div class="icon-syarat align-self-center">
+                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                        </div>
+                    </div>
+                    <div class="item-pesyratan d-flex justify-content-between mb-2">
+                        <p style="width: 70%">Tidak Dalam Masa Cicilan Pinjaman Sebelumnya.</p>
+                        <div class="icon-syarat align-self-center">
+                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                        </div>
+                    </div>
+                    <div class="item-pesyratan d-flex justify-content-between mb-2">
+                        <p style="width: 70%">Absensi Periode Sebelumnya 100% Kehadiran.</p>
+                        <div class="icon-syarat align-self-center">
+                            <img src="{{ url('assets/images/logo/cakra.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                        </div>
+                    </div>
+                    <div class="button-pinjaman mt-2">
+                        <a href="{{url('pengajuan-pinjaman')}}" class="btn btn-primary w-100" >Re Apply Loan</a>
                     </div>
                 </div>
                 @endif

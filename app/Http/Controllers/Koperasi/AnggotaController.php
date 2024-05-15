@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
+use App\Koperasi\Loan;
+use App\Koperasi\Saving;
+use App\Koperasi\LoanPayment;
 use App\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class AnggotaController extends Controller
 {
@@ -27,9 +32,19 @@ class AnggotaController extends Controller
         $employee = Employee::where('nik', $code)->with('payrolinfo')->first();
         $koperasi = Koperasi::where('company', $company->unit_bisnis)->first();
 
+        // Pinjaman Cek
+        $loan = Loan::where('employee_code',$code)->first();
+        $saving = Saving::where('employee_id',$code)->first();
+        $pinjaman = null;
+        // Data Pinjaman Sata
+        if ($loan) {
+            // Data Pinjaman Sata
+            $pinjaman = LoanPayment::where('loan_id', $loan->id)->first();
+        }
+
         // Cek Member 
         $datasaya = Anggota::where('employee_code',$company->nik)->first();
-        return view ('pages.koperasi.index', compact('datasaya','employee','koperasi'));
+        return view ('pages.koperasi.index', compact('datasaya','employee','koperasi','loan','pinjaman','saving'));
     }
 
     /**
@@ -106,16 +121,38 @@ class AnggotaController extends Controller
 
     public function ApproveAnggota($employee_code)
     {
-        $code = Auth::user()->employee_code;
-        $employee = Employee::where('nik', $code)->first();
-        $companyData = $employee->unit_bisnis;
-        $now = Carbon::now();
-
-        Anggota::where('employee_code', $employee_code)
-                    ->where('company', $companyData)
-                    ->update(['member_status' => 'active', 'join_date' => $now]);
-
-        return redirect()->back()->with('success', 'Data has been update');
+        try {
+            // Mulai transaksi
+            DB::beginTransaction();
+        
+            $code = Auth::user()->employee_code;
+            $employee = Employee::where('nik', $code)->first();
+            $companyData = $employee->unit_bisnis;
+            $now = Carbon::now();
+        
+            Anggota::where('employee_code', $employee_code)
+                ->where('company', $companyData)
+                ->update(['member_status' => 'active', 'join_date' => $now]);
+        
+            $today = Carbon::now()->toDateString(); // Tanggal hari ini
+            Saving::create([
+                'employee_id' => $employee_code,
+                'tanggal_simpan' => $today,
+                'jumlah_simpanan' => 0,
+                'keterangan' => '-',
+                'totalsimpanan' => 0,
+            ]);
+        
+            // Commit transaksi jika semua operasi berhasil
+            DB::commit();
+        
+            return redirect()->back()->with('success', 'Data has been updated');
+        } catch (\Exception $e) {
+            // Tangani kesalahan jika ada
+            DB::rollBack();
+        
+            return redirect()->back()->with('error', 'Failed to update data. ' . $e->getMessage());
+        }
     }
 
     public function RejectAnggota($employee_code)

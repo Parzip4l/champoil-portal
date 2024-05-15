@@ -6,14 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Saving extends Model
+class LoanPayment extends Model
 {
-    use HasFactory;
-    protected $table = 'savings';
+    protected $table = 'loan_payments';
     protected $primaryKey = 'id'; 
     public $incrementing = false; 
     protected $keyType = 'string'; 
-    protected $fillable = ['id', 'employee_id', 'tanggal_simpan', 'jumlah_simpanan', 'keterangan', 'totalsimpanan'];
+    protected $fillable = ['id', 'loan_id', 'tanggal_pembayaran', 'jumlah_pembayaran','sisahutang'];
 
     protected static function boot()
     {

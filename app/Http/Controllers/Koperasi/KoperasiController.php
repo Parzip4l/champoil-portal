@@ -10,6 +10,7 @@ use App\Koperasi\SettingLoan;
 use App\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Koperasi\Loan;
 
 class KoperasiController extends Controller
 {
@@ -37,7 +38,12 @@ class KoperasiController extends Controller
                         ->where('member_status', 'active')
                         ->get();
 
-        return view('pages.app-setting.koperasi.index', compact('koperasi','anggotaPending','anggota','loansettings'));
+        //Daftar Pengajuan
+        $pinjamanData = Loan::where('company', $company->unit_bisnis)
+                        ->where('status','waiting')        
+                        ->get(); 
+
+        return view('pages.app-setting.koperasi.index', compact('koperasi','anggotaPending','anggota','loansettings','pinjamanData'));
     }
 
     /**

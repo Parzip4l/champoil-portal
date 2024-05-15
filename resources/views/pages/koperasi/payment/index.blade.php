@@ -79,7 +79,7 @@
         <div class="card custom-card2 mb-3">
             <div class="card-body">
                 <div class="title-saving">
-                    <h4>Saving History</h4>
+                    <h4>Bill History</h4>
                 </div>
                 <hr>
                 @foreach ($datasaya as $data)
@@ -95,21 +95,47 @@
                 </div>
                 @endforeach
             </div>
+            @if(isset($saldosaya) && $saldosaya->sisahutang == 0)
             <div class="footer-saving p-4">
                 <div class="content-footer-saving d-flex justify-content-between">
                     <div class="left-item">
-                        <h5>My Saving</h5>
-                        <p style="font-size: 8px;">The saving will be deducted automatically in payroll</p>
+                        <h5>Remaining Bill</h5>
+                        @if(isset($saldosaya) && $saldosaya->sisahutang == 0)
+                        <p style="font-size: 8px;">Your bill is paid, you can reapply for the loan</p>
+                        @else 
+                        <p style="font-size: 8px;">The bill will be deducted automatically in payroll</p>
+                        @endif
                     </div>
                     <div class="rignt-item">
                         @if(isset($saldosaya))
-                        <h4>Rp {{ number_format($saldosaya->totalsimpanan, 0, ',', '.') }}</h4>
+                        <h4>Rp {{ number_format($saldosaya->sisahutang, 0, ',', '.') }}</h4>
                         @else
                         <h4>Rp 0</h4>
                         @endif
                     </div>
                 </div>
             </div>
+            @else 
+            <div class="footer-saving bg-danger p-4">
+                <div class="content-footer-saving d-flex justify-content-between">
+                    <div class="left-item">
+                        <h5>Remaining Bill</h5>
+                        @if(isset($saldosaya) && $saldosaya->sisahutang == 0)
+                        <p style="font-size: 8px;">Your bill is paid, you can reapply for the loan</p>
+                        @else 
+                        <p style="font-size: 8px;">The bill will be deducted automatically in payroll</p>
+                        @endif
+                    </div>
+                    <div class="rignt-item">
+                        @if(isset($saldosaya))
+                        <h4>Rp {{ number_format($saldosaya->sisahutang, 0, ',', '.') }}</h4>
+                        @else
+                        <h4>Rp 0</h4>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>

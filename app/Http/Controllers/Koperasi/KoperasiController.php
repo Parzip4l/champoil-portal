@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
 use App\Koperasi\SettingLoan;
+use App\Koperasi\LoanPayment;
 use App\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -164,5 +165,19 @@ class KoperasiController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function historypayment()
+    {
+        // Cek User Login 
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        $pinjamansaya = Loan::where('status','approve')->first();
+        
+        $datasaya = LoanPayment::where('loan_id',$pinjamansaya->id)->get();
+        $saldosaya = LoanPayment::where('loan_id',$pinjamansaya->id)->select('sisahutang')->first();
+
+        return view ('pages.koperasi.payment.index', compact('datasaya','employee','saldosaya'));
     }
 }

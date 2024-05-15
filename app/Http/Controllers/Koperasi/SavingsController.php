@@ -24,9 +24,10 @@ class SavingsController extends Controller
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
 
-        $datasaya = Saving::where('employee_id',$code)->first();
+        $datasaya = Saving::where('employee_id',$code)->get();
+        $saldosaya = Saving::where('employee_id',$code)->select('totalsimpanan')->first();
 
-        return view ('pages.koperasi.saving.index', compact('datasaya','employee'));
+        return view ('pages.koperasi.saving.index', compact('datasaya','employee','saldosaya'));
     }
 
     /**

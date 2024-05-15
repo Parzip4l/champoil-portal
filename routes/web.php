@@ -253,7 +253,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
                 // Set Status 
                 Route::get('/approve-pinjaman/{employee_code}', [App\Http\Controllers\Koperasi\PengajuanPinjamanController::class, 'ApprovePinjaman'])->name('ApprovePinjaman'); 
                 Route::get('/reject-pinjaman/{employee_code}', [App\Http\Controllers\Koperasi\PengajuanPinjamanController::class, 'RejectPinjaman'])->name('RejectPinjaman'); 
-            
+
+                // history Pembayaran
+                Route::get('/history-pembayaran', [App\Http\Controllers\Koperasi\KoperasiController::class, 'historypayment'])->name('historypayment'); 
 
     // CG Component
     Route::group(['prefix' => 'kas'], function(){

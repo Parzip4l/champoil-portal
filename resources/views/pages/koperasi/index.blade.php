@@ -191,7 +191,7 @@
                     </div>
                     <div class="bottom-data">
                        <div class="history-saving">
-                            <a href="" class="btn btn-primary w-100">Billing History</a>
+                            <a href="{{url('history-pembayaran')}}" class="btn btn-primary w-100">Billing History</a>
                        </div>
                     </div>
                 </div>

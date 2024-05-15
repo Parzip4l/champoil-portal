@@ -54,12 +54,12 @@ class PengajuanPinjamanController extends Controller
 
         foreach ($loansettings as $datapinjaman) {
             if ($saldosimpanan >= $datapinjaman->min_saving && $saldosimpanan <= $datapinjaman->max_saving) {
-                $limitPinjaman = $datapinjaman->max_limit;
+                $limitpinjaman = $datapinjaman->max_limit;
                 break;
             }
         }
 
-        return view('pages.koperasi.pengajuan.index', compact('limitPinjaman','saldosimpanan','employee','koperasi'));
+        return view('pages.koperasi.pengajuan.index', compact('limitpinjaman','saldosimpanan','employee','koperasi'));
 
     }
 

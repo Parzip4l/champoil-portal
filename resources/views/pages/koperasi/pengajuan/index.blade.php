@@ -80,7 +80,7 @@
             <div class="card-body">
                 <div class="title-saving d-flex justify-content-between mb-2">
                     <p class="text-muted mb-1">Max Limit Pinjaman</p>
-                    <h3 id="maxLimit">Rp {{ number_format($limitPinjaman, 0, ',', '.') }}</h3>
+                    <h3 id="maxLimit">Rp {{ number_format($limitpinjaman, 0, ',', '.') }}</h3>
                 </div>
                 <div class="form-pengajuan">
                     <form action="{{route('pengajuan-pinjaman.store')}}" method="post">

@@ -14,7 +14,7 @@ class Koperasi extends Model
     protected $primaryKey = 'id'; 
     public $incrementing = false; 
     protected $keyType = 'string'; 
-    protected $fillable = ['id', 'company', 'potongan', 'iuran','persayaratan'];
+    protected $fillable = ['id', 'company', 'potongan', 'iuran','persayaratan','membership','merchendise','tenor'];
 
     protected static function boot()
     {

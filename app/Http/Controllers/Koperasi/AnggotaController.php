@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Slack;
 
 
 class AnggotaController extends Controller
@@ -87,6 +88,65 @@ class AnggotaController extends Controller
             $anggotaDaftar->loan_status = 'noloan';
             $anggotaDaftar->saldosimpanan = 0;
             // Simpan data ke database
+            $slackChannel = Slack::where('channel', 'Testing Channel')->first();
+            $slackWebhookUrl = $slackChannel->url;
+            $today = now()->toDateString();
+
+            $employeeData = Employee::where('nik', $request->employee_code)->first();
+            $data = [
+                'text' => "Pengajuan Anggota Koperasi TRUEST",
+                'attachments' => [
+                    [
+                        'fields' => [
+                            [
+                                'title' => 'Nama Lengkap',
+                                'value' => $employeeData->nama,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'NIK',
+                                'value' => $employeeData->ktp,
+                                'short' => true,
+                            ],
+                            [
+                                'title' => 'Untuk Approval Silahkan Buka Aplikasi',
+                                'short' => true,
+                            ]
+                        ],
+                    ],
+                ],
+                
+            ];
+
+            $data_string = json_encode($data);
+
+            $ch = curl_init($slackWebhookUrl);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data_string),
+            ]);
+
+            $result = curl_exec($ch);
+
+            if ($result === false) {
+                // Penanganan kesalahan jika Curl gagal
+                $error = curl_error($ch);
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+            }
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($httpCode !== 200) {
+                // Penanganan kesalahan jika Slack merespons selain status 200 OK
+                // Handle the error here
+                return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+            }
+
+            curl_close($ch);
             $anggotaDaftar->save();
 
             // Redirect ke halaman yang sesuai setelah penyimpanan berhasil
@@ -142,6 +202,32 @@ class AnggotaController extends Controller
                 'keterangan' => '-',
                 'totalsimpanan' => 0,
             ]);
+
+            $records = Employee::where('nik', $employee_code)->get();
+            $html = '```Halo ```' .strtoupper( $employee->nama ). '``` yang terhormat,
+
+Kami ingin menginformasikan bahwa pengajuan Anda sebagai anggota koperasi di TRUEST telah disetujui. Selamat! Anda sekarang resmi terdaftar sebagai anggota koperasi kami.
+
+Berikut adalah langkah-langkah yang perlu Anda ikuti untuk memanfaatkan layanan dan fasilitas yang tersedia:
+
+Unduh aplikasi TRUEST versi terbaru:
+
+Google Play Store (Android):
+https://play.google.com/store/apps/details?id=co.id.truest.truest
+App Store (iOS):
+https://apps.apple.com/idn/app/truest/id6476389232?platform=iphone
+
+Login menggunakan akun Anda untuk mengakses semua fitur dan layanan koperasi.
+
+Terima kasih atas perhatian dan kerjasama Anda. Jika Anda memiliki pertanyaan atau mengalami masalah, jangan ragu untuk menghubungi tim dukungan kami.
+
+Salam hormat,
+TRUEST Team```';
+
+            foreach($records as $row){
+                push_notif_wa($html,'','',$row->telepon,'');
+            }
+            
         
             // Commit transaksi jika semua operasi berhasil
             DB::commit();
@@ -165,6 +251,23 @@ class AnggotaController extends Controller
         Anggota::where('employee_code', $employee_code)
                     ->where('company', $companyData)
                     ->update(['member_status' => 'reject', 'join_date' => '-']);
+        
+                    $records = Employee::where('nik', $employee_code)->get();
+                    $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
+
+Kami ingin menginformasikan bahwa pengajuan Anda sebagai anggota koperasi di TRUEST tidak dapat disetujui pada saat ini. Kami mohon maaf atas ketidaknyamanannya.
+
+Jika Anda memiliki pertanyaan lebih lanjut atau ingin mengetahui alasan penolakan, silakan menghubungi tim dukungan kami. Kami akan dengan senang hati membantu Anda.
+
+Terima kasih atas perhatian dan pengertian Anda.
+
+Salam hormat,
+
+TRUEST Team```';
+        
+                    foreach($records as $row){
+                        push_notif_wa($html,'','',$row->telepon,'');
+                    }
 
         return redirect()->back()->with('success', 'Data has been update');
     }

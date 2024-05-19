@@ -150,6 +150,29 @@ class PengajuanPinjamanController extends Controller
                     ->where('company',$companyData)
                     ->update(['status' => 'approve', 'approve_by' => $code]);
 
+        $records = Employee::where('nik', $employee_code)->get();
+        $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
+
+Kami dengan senang hati menginformasikan bahwa pengajuan pinjaman Anda di TRUEST telah disetujui. Selamat! Anda sekarang dapat menggunakan dana pinjaman sesuai dengan ketentuan yang telah disepakati.
+
+Berikut adalah beberapa langkah yang perlu Anda ikuti untuk mengakses dana pinjaman Anda:
+
+1. Login ke akun TRUEST Anda.
+2. Periksa saldo pinjaman Anda yang telah ditambahkan.
+3. Ikuti instruksi lebih lanjut yang tersedia di aplikasi untuk penggunaan dana.
+
+Jika Anda memiliki pertanyaan atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi tim dukungan kami.
+
+Terima kasih atas kepercayaan Anda kepada TRUEST.
+
+Salam hormat,
+
+TRUEST Team```';
+
+        foreach($records as $row){
+            push_notif_wa($html,'','',$row->telepon,'');
+        }
+
         return redirect()->back()->with('success', 'Data has been update');
     }
 
@@ -163,6 +186,24 @@ class PengajuanPinjamanController extends Controller
         Loan::where('employee_code', $employee_code)
                     ->where('company',$companyData)
                     ->update(['status' => 'rejected', 'approve_by' => $code]);
+        
+        $records = Employee::where('nik', $employee_code)->get();
+        $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
+
+Kami ingin menginformasikan bahwa pengajuan pinjaman Anda di TRUEST tidak dapat disetujui pada saat ini. Kami mohon maaf atas ketidaknyamanannya.
+
+Jika Anda memiliki pertanyaan lebih lanjut atau ingin mengetahui alasan penolakan, silakan menghubungi tim dukungan kami. Kami akan dengan senang hati membantu Anda.
+
+Terima kasih atas perhatian dan pengertian Anda.
+
+Salam hormat,
+
+TRUEST Team```';
+
+
+        foreach($records as $row){
+            push_notif_wa($html,'','',$row->telepon,'');
+        }
 
         return redirect()->back()->with('success', 'Data has been update');
     }

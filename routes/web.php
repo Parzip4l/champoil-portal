@@ -241,7 +241,14 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
             //member
             Route::get('/approve-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'ApproveAnggota'])->name('ApproveAnggota'); 
             Route::get('/reject-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'RejectAnggota'])->name('RejectAnggota'); 
-            Route::get('/reapply-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'ReapplyAnggota'])->name('ReapplyAnggota'); 
+            Route::get('/reapply-anggota/{employee_code}', [App\Http\Controllers\Koperasi\AnggotaController::class, 'ReapplyAnggota'])->name('ReapplyAnggota');
+
+            Route::get('/daftar-anggota', [App\Http\Controllers\Koperasi\KoperasiController::class, 'anggotapage'])->name('anggota.page'); 
+            Route::get('/daftar-pengajuan-anggota', [App\Http\Controllers\Koperasi\KoperasiController::class, 'pendinganggota'])->name('pendinganggota.page'); 
+            Route::get('/daftar-pengajuan-pinjaman', [App\Http\Controllers\Koperasi\KoperasiController::class, 'pinjamananggota'])->name('pinjamananggota.page'); 
+
+            // Dashboard Koperasi
+            Route::get('/koperasi-dashboard', [App\Http\Controllers\Koperasi\KoperasiController::class, 'dashboard'])->name('dashboard.koperasi');
 
             // Saving History
             Route::resource('saving-history', App\Http\Controllers\Koperasi\SavingsController::class);

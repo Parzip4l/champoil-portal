@@ -11,9 +11,37 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Data Patrol</h5>
-                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#taskModel">Tambah Patrol</a>
+                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
+                <a href="{{route('task-report')}}" class="btn btn-warning text-white">Report</a>
             </div>
+            
             <div class="card-body">
+            <form class="row g-3">
+                <div class="col-auto">
+                    <label for="staticEmail2" class="visually-hidden">Project</label>
+                    <select name="project_id" class="form-control select2">
+                        <option value="">-- Select Project -- </option>
+                        @if($project)
+                            
+                            @foreach($project as $pr)
+                                @php
+                                    if($project_id==$pr->id){
+                                        $selected="selected";
+                                    }else{
+                                        $selected="";
+                                    }
+                                @endphp
+                                <option value="{{ $pr->id }}" {{$selected}}>{{ $pr->name }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3">Filter</button>
+                </div>
+            </form>
+                
                 <div class="table-responsive">
                     <table id="dataTableExample" class="table">
                         <thead>
@@ -155,7 +183,14 @@
                                 <option value="">PILIH PROJECT</option>
                                 
                                 @foreach($project as $row)
-                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @php
+                                    if($project_id==$row->id){
+                                        $selected="selected";
+                                    }else{
+                                        $selected="";
+                                    }
+                                @endphp
+                                <option value="{{ $row->id }}" {{$selected}}>{{ $row->name }}</option>
                                 @endforeach
                             </select>
                         </div>

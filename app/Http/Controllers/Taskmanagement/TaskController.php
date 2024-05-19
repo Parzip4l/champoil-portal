@@ -17,11 +17,14 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         if(Auth::user()->project_id == NULL){
             $task = Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
             ->select('master_tasks.*', 'projects.name as project_name');
+            if($request->input('project_id')){
+                $task->where('projects.id',$request->input('project_id'));
+            }
         }else{
             $task= Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
             ->select('master_tasks.*', 'projects.name as project_name')
@@ -30,6 +33,7 @@ class TaskController extends Controller
         
         $data['records']=$task->get();
         $data['project']=Project::all();
+        $data['project_id']=$request->input('project_id');
         return view('pages.operational.task.index',$data);
     }
 
@@ -73,7 +77,7 @@ class TaskController extends Controller
        
         $task->save();
 
-        return redirect()->route('task.index')->with('success', 'Data Patrol Successfully Added');
+        return redirect()->route('task.index',['project_id'=>$request->project_id])->with('success', 'Data Patrol Successfully Added');
     }
 
     /**
@@ -151,6 +155,12 @@ class TaskController extends Controller
         $data['unix_code']=$id;
         return view('pages.operational.task.qrcode',$data);
        
+    }
+
+    public function report(Request $request){
+        $data['project']=Project::all();
+        $data['project_id']=$request->input('project_id');
+        return view('pages.operational.task.report',$data);
     }
 
 }

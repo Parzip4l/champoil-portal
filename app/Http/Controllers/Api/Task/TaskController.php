@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Api\Task;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 // Load Model
 use App\ModelCG\TaskGlobal; 
-use App\ModelCG\Project; 
+use App\ModelCG\Project;
+use App\ModelCG\Patroli; 
+use App\ModelCG\Task; 
 
 class TaskController extends Controller
 {
@@ -36,6 +40,53 @@ class TaskController extends Controller
         $records = Project::all();
         $records=[
             "records"=>$records,
+            "error"=>false,
+            "message"=>"Data"
+        ];
+
+        return response()->json($records);
+    }
+
+    public function report_patroli(Request $request){
+        $records = Project::all();
+        $report = Task::where('project_id',$request->input('project_id'))->get();
+        $data=[];
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $daysInMonth = Carbon::now()->daysInMonth;
+
+        $dates = [];
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dates[] = Carbon::create($currentYear, $currentMonth, $day)->toDateString();
+        }
+
+        if(!empty($dates)){
+            foreach($dates as $key=>$val){
+                $specifiedDate = $val;
+                $tanggal=date('d',strtotime($val));
+                $count = Patroli::join('master_tasks','master_tasks.id','=','patrolis.id_task')
+                                ->where('master_tasks.project_id',$request->input('project_id'))
+                                ->where(DB::raw('DATE_FORMAT(patrolis.created_at, "%Y-%m-%d")'),'=',$specifiedDate)
+                                ->count();  
+                if($count==0){
+                    $label="Patrol Empty";
+                }else{
+                    $label="Check Detail";
+                }
+                $button=$label;
+
+                $data[]=[
+                    "tanggal"=>$tanggal,
+                    "jumlah"=>$count,
+                    "label"=>$label
+                ];
+            }
+        }
+
+        $records=[
+            "records"=>$data,
+            "project_id"=>$request->input('project_id'),
             "error"=>false,
             "message"=>"Data"
         ];

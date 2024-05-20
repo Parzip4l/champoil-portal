@@ -158,9 +158,9 @@
         @endif
         @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
-                <a href="{{ route('employee-loan.index') }}" class="nav-link {{ active_class(['employee-loan']) }}">
+                <a href="{{ route('koperasi.index') }}" class="nav-link {{ active_class(['koperasi']) }}">
                     <i class="link-icon" data-feather="credit-card"></i>
-                    <span class="menu-title">Employee Loan</span>
+                    <span class="menu-title">Koperasi</span>
                 </a>
             </li>
         @endif

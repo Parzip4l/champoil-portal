@@ -8,20 +8,36 @@
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
-                <div class="judul">
-                    <h5 class="mb-0 align-self-center">Data Schedule</h5>
+                <div class="judul align-self-center">
+                    <h5 class="align-self-center">Data Schedule</h5>
                 </div>
                 <div class="button-actions">
                     <a href="{{route('schedule.create')}}" class="btn btn-sm btn-primary">Create</a>
-                    <a href="{{route('export.schedule')}}" class="btn btn-sm btn-warning">Download Template</a>
+                    <a href="{{route('export.schedule')}}" class="btn btn-sm btn-warning text-white">Download Template</a>
                     <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         Import Schedule
                     </button>
                 </div>
             </div>
             <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <form action="{{ route('schedule.index') }}" method="get" id="filterForm">
+                            @csrf
+                            <label for="periode" class="form-label">Filter Periode:</label>
+                            <select name="periode" class="form-control mb-2" id="periodeSelect" onchange="document.getElementById('filterForm').submit();">
+                                <option value="">Semua Periode</option>
+                                @foreach (range(1, 12) as $month)
+                                    <option value="{{ strtoupper(date('F', mktime(0, 0, 0, $month, 10))) }}-{{ $currentYear }}" {{ request('periode') == strtoupper(date('F', mktime(0, 0, 0, $month, 10))) . '-' . $currentYear ? 'selected' : '' }}>
+                                        {{ strtoupper(date('F', mktime(0, 0, 0, $month, 10))) }}-{{ $currentYear }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table id="dataTableExample" class="table">
                         <thead>
@@ -38,8 +54,8 @@
                                     $project = \App\ModelCG\Project::find($scheduleByProject->project);
                                     $projectname = isset($project->name) ? $project->name : 'Project not found';
                                 @endphp
-                                <td> {{ $projectname }} </td>
-                                <td> {{ $scheduleByProject->periode }} </td>
+                                <td>{{ $projectname }}</td>
+                                <td>{{ $scheduleByProject->periode }}</td>
                                 <td>
                                     <a href="{{ route('schedule.details', ['project' => $scheduleByProject->project, 'periode' => $scheduleByProject->periode]) }}" class="btn btn-primary btn-sm">Details</a>
                                 </td>
@@ -144,5 +160,14 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Menangkap perubahan pada elemen select
+        document.getElementById('organizationSelect').addEventListener('change', function () {
+            // Mengirim formulir saat terjadi perubahan
+            document.getElementById('filterForm').submit();
+        });
+    });
 </script>
 @endpush

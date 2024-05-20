@@ -18,23 +18,25 @@
     </div>
 </div>
 <!-- End -->
+@php
+    $employee = \App\Employee::where('nik', $data[0]['employee_code'])->first();
+    $dataArray = json_decode( $data[0]['allowances'], true);
+    $datadeduction = json_decode( $data[0]['deductions'], true);
+    $user = Auth::user();
+    $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
+        ->select('unit_bisnis','organisasi')
+        ->first();
+    $company = \App\Company\CompanyModel::where('company_name',$karyawanLogin->unit_bisnis)->first();
+@endphp
 <div class="row desktop">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-body">
                 <div class="container-fluid d-flex justify-content-between">
                     <div class="col-lg-6 ps-0">
-                        <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="" style="max-width:20%;">           
+                        <img src="{{ asset('assets/images/company/' . $company->logo) }}" alt="" class="mb-2" style="max-width:20%;">
+                        <p class="text-muted">{{$company->company_address}}</p>        
                         <h5 class="mt-5 mb-2 text-muted">Payslip Details</h5>
-                        @php
-                            $employee = \App\Employee::where('nik', $dataPayslip[0]['employee_code'])->first();
-                            $dataEarnings = json_decode($dataPayslip[0]['allowances'], true);
-                            $datadeductions = json_decode($dataPayslip[0]['deductions'], true);
-                            $user = Auth::user();
-                            $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
-                                ->select('unit_bisnis','organisasi')
-                                ->first();
-                        @endphp
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="payslip-details">
@@ -59,7 +61,7 @@
                         </div>
                     </div>
                     <div class="col-lg-4 pe-0">
-                        <h4 class="fw-bold text-uppercase text-end mt-4 mb-2">Payslip {{$dataPayslip[0]['month']}} - {{$dataPayslip[0]['year']}}</h4>
+                        <h4 class="fw-bold text-uppercase text-end mt-4 mb-2">Payslip {{$data[0]['month']}} - {{$data[0]['year']}}</h4>
                         <h6 class="text-end text-danger mb-5 pb-4">*CONFIDENTIAL</h6>
                     </div>
                 </div>
@@ -75,114 +77,28 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                    @if($karyawanLogin->unit_bisnis === 'Kas')
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Jabatan</span>
+                                        @foreach($dataArray['data'] as $id => $value)
+                                            <div class="row mb-2">
+                                                <div class="col-md-6">
+                                                    <span>{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}</span> 
+                                                </div>
+                                                <div class="col-md-6 text-right">
+                                                    <span class="text-right">Rp {{ number_format($value[0], 0, ',', '.') }}</span>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_jabatan'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Struktural</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_struktural'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                    @endif
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Kinerja</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_kinerja'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        @if($karyawanLogin->unit_bisnis === 'Kas')
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Fasilitas</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_fasilitas'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        @endif
-                                        @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Alat Kerja</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        @endif
-                                        @if($karyawanLogin->unit_bisnis === 'Kas')
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Makan</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_makan'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Transportasi</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['t_transportasi'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Gaji Rapel</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($dataEarnings['g_rapel'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        @endif
+                                        @endforeach
                                     </td>
                                     <td>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>BPJS Kesehatan</span>
+                                        @foreach($datadeduction['data'] as $id => $value)
+                                            <div class="row mb-2">
+                                                <div class="col-md-6">
+                                                    <span>{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}</span> 
+                                                </div>
+                                                <div class="col-md-6 text-right">
+                                                    <span class="text-right">Rp {{ number_format($value[0], 0, ',', '.') }}</span>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($datadeductions['bpjs_ks'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>BPJS Ketenagakerjaan</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($datadeductions['bpsj_tk'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>Potongan Hutang</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($datadeductions['p_hutang'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-6">
-                                                <span>PPH 21</span> 
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp {{ number_format($datadeductions['pph21'][0], 0, ',', '.') }}</span>
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </td>
                                 </tr>
                             </tbody>
@@ -197,19 +113,19 @@
                                     <tbody>
                                         <tr>
                                             <td class="text-bold-800">Basic Salary</td>
-                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($dataPayslip[0]['basic_salary'], 0, ',', '.') }}</td>
+                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($data[0]['basic_salary'], 0, ',', '.') }}</td>
                                         </tr>
                                         <tr>
                                             <td class="text-bold-800">Total Allowences</td>
-                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($dataEarnings['t_allowance'][0], 0, ',', '.') }}</td>
+                                            <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($dataArray['total_allowance'], 0, ',', '.') }}</td>
                                         </tr>
                                         <tr>
                                             <td class="text-bold-800">Total Deductions</td>
-                                            <td class="text-bold-800 text-end text-danger"> Rp. {{ number_format($datadeductions['t_deduction'][0], 0, ',', '.') }}</td>
+                                            <td class="text-bold-800 text-end text-danger"> Rp. {{ number_format($datadeduction['total_deduction'], 0, ',', '.') }}</td>
                                         </tr>
                                         <tr style="font-size: 18px; font-weight: 800;">
                                             <td class="text-bold-800">Take Home Pay</td>
-                                            <td class="text-bold-800 text-end"> Rp. {{ number_format($dataPayslip[0]['net_salary'], 0, ',', '.') }}</td>
+                                            <td class="text-bold-800 text-end"> Rp. {{ number_format($data[0]['net_salary'], 0, ',', '.') }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -233,7 +149,7 @@
                 <div class="card-header text-center">
                     <div class="row">
                         <div class="col-md-6">
-                            <h5>Payroll Periode {{$dataPayslip[0]['month']}} {{$dataPayslip[0]['year']}}</h5>
+                            <h5>Payroll Periode {{$data[0]['month']}} {{$data[0]['year']}}</h5>
                         </div>
                     </div>
                 </div>
@@ -264,7 +180,7 @@
                             Basic Salary
                         </span>
                         <span>
-                            Rp. {{ number_format($dataPayslip[0]['basic_salary'], 0, ',', '.') }}
+                            Rp. {{ number_format($data[0]['basic_salary'], 0, ',', '.') }}
                         </span>
                     </div>
                 </div>
@@ -275,85 +191,19 @@
                     <h4>Earnings</h4>
                 </div>
                 <div class="card-body">
-                    @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Struktural
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_struktural'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    @endif
-                    @if($karyawanLogin->unit_bisnis === 'Kas')
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Jabatan
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_jabatan'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    @endif
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Kinerja
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_kinerja'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Alat Kerja
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_alatkerja'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    @endif
-                    @if($karyawanLogin->unit_bisnis === 'Kas')
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Fasilitas
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_fasilitas'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Gaji Rapel
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['g_rapel'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    @endif
-                    @if($karyawanLogin->unit_bisnis === 'Kas')
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Makan
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_makan'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Tunjangan Transportasi
-                        </span>
-                        <span>
-                            Rp {{ number_format($dataEarnings['t_transportasi'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    @endif
+                    @foreach($dataArray['data'] as $id => $value)
+                        <div class="details-earning d-flex justify-content-between mb-2">
+                            <span>
+                                {{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}
+                            </span>
+                            <span>Rp {{ number_format($value[0], 0, ',', '.') }}</span>
+                        </div>
+                    @endforeach
                 </div>
                 <div class="card-header text-center">
                     <div class="details-earning d-flex justify-content-between mb-2">
-                        <h4>Total Earnings</h4>
-                        <h4 id="totalAmount">Rp. {{ number_format($dataEarnings['t_allowance'][0], 0, ',', '.') }}</h4>
+                        <h4>Total Allowances</h4>
+                        <h4 id="totalAmount">Rp. {{ number_format($dataArray['total_allowance'], 0, ',', '.') }}</h4>
                     </div>
                 </div>
             </div>
@@ -364,43 +214,19 @@
                     <h4>Deductions</h4>
                 </div>
                 <div class="card-body">
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            BPJS Kesehatan
-                        </span>
-                        <span>
-                            Rp {{ number_format($datadeductions['bpjs_ks'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            BPJS Ketenagakerjaan
-                        </span>
-                        <span>
-                            Rp {{ number_format($datadeductions['bpsj_tk'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Potongan Hutang
-                        </span>
-                        <span>
-                            Rp {{ number_format($datadeductions['p_hutang'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            PPH21
-                        </span>
-                        <span>
-                            Rp {{ number_format($datadeductions['pph21'][0], 0, ',', '.') }}
-                        </span>
-                    </div>
+                    @foreach($datadeduction['data'] as $id => $value)
+                        <div class="details-earning d-flex justify-content-between mb-2">
+                            <span>
+                                {{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}
+                            </span>
+                            <span>Rp {{ number_format($value[0], 0, ',', '.') }}</span>
+                        </div>
+                    @endforeach
                 </div>
                 <div class="card-header text-center">
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <h4>Total Deductions</h4>
-                        <h4>Rp. {{ number_format($datadeductions['t_deduction'][0], 0, ',', '.') }}</h4>
+                        <h4>Rp. {{ number_format($datadeduction['total_deduction'], 0, ',', '.') }}</h4>
                     </div>
                 </div>
             </div>
@@ -408,7 +234,7 @@
             <!-- THP -->
             <div class="thp-wrap text-center mb-2">
                 <h5 class="text-danger mb-2">TAKE HOME PAY</h5>
-                <h2> Rp. {{ number_format($dataPayslip[0]['net_salary'], 0, ',', '.') }}</h2>
+                <h2> Rp. {{ number_format($data[0]['net_salary'], 0, ',', '.') }}</h2>
             </div>
             <div class="button-download-slip mb-2">
                 <a href="#" class="btn btn-primary button-biru w-100">Download Payslip </a>

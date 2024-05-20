@@ -139,14 +139,23 @@
     } );
 } );
   </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Menangkap perubahan pada elemen select
-        document.getElementById('organizationSelect').addEventListener('change', function () {
-            // Mengirim formulir saat terjadi perubahan
-            document.getElementById('filterForm').submit();
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Menangkap perubahan pada elemen select
+            document.getElementById('organizationSelect').addEventListener('change', function () {
+                // Mengirim formulir saat terjadi perubahan
+                document.getElementById('filterForm').submit();
+            });
         });
-    });
-</script>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Menangkap perubahan pada elemen select
+            document.getElementById('organizationSelect').addEventListener('change', function () {
+                // Mengirim formulir saat terjadi perubahan
+                document.getElementById('filterForm').submit();
+            });
+        });
+    </script>
 
 @endpush

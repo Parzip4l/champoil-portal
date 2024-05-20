@@ -24,119 +24,41 @@
       <div class="card-body">
         <form method="POST" action="{{ route('payrol-component.store') }}" enctype="multipart/form-data">
             @csrf
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Pilih Karyawan</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="employee_code">
-                        @foreach($employee as $data)
-                            <option value="{{$data->nik}}">{{$data->nama}}</option>
+            <div class="row">
+                <div class="col-md-12 mb-2">
+                    <label for="" class="form-label">Karyawan</label>
+                    <select class="js-example-basic-single form-select" data-width="100%" name="employee_code" required>
+                        @foreach($employee as $karyawan)
+                            <option value="{{$karyawan->nik}}">{{$karyawan->nama}}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label for="Ktp" class="form-label">Basic Sallary</label>
-                    <input type="number" class="form-control" id="basic_salary" name="basic_salary" placeholder="Rp.">
+                <div class="title mt-2 mb-2">
+                    <h5>Allowence</h5>
+                    <hr>
                 </div>
+                <div class="col-md-6 mb-2">
+                    <label for="" class="form-label">Gaji Pokok</label>
+                    <input type="number" name="basic_salary" class="form-control allowance" required>   
+                </div>
+                @foreach($allowence as $dataallowence)
+                <div class="col-md-6 mb-2">
+                    <label for="" class="form-label">{{$dataallowence->name}}</label>
+                    <input type="number" name="allowances[{{$dataallowence->id}}][]" class="form-control allowance" required>   
+                </div>
+                @endforeach
+                <div class="title mt-2 mb-2">
+                    <h5>Deduction</h5>
+                    <hr>
+                </div>
+                @foreach($deduction as $datadeduction)
+                <div class="col-md-6 mb-2">
+                    <label for="" class="form-label">{{$datadeduction->name}}</label>
+                    <input type="number" name="deductions[{{$datadeduction->id}}][]" class="form-control deduction" id="t_deduction" required>   
+                </div>
+                @endforeach
             </div>
-            <h5>Allowance</h5>
-            <hr>
-            <div class="row mb-3 allowance-group">
-                @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Struktural</label>
-                    <input type="number" class="form-control allowance" name="allowances[Tunjangan Strukturan][]" placeholder="Rp." required>
-                </div>
-                @endif
-                @if($karyawanLogin->unit_bisnis === 'RUN')
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Fasilitas</label>
-                    <input type="number" class="form-control allowance" name="allowances[Tunjangan Fasilitas][]" placeholder="Rp." required>
-                </div>
-                @endif
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Kinerja</label>
-                    <input type="number" class="form-control allowance" name="allowances[Tunjangan Kinerja][]" placeholder="Rp." required>
-                </div>
-                <div class="col-md-6 mb-3 mt-3">
-                    <label for="kode_karyawan" class="form-label">Tunjangan Makan</label>
-                    <input type="number" id="t_makan" class="form-control allowance" name="allowances[Tunjangan Makan][]" placeholder="Rp. " required>
-                </div>
-            </div>
-            @if($karyawanLogin->unit_bisnis === 'Kas')
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Tunjangan Transportasi</label>
-                    <input type="number" id="t_transportasi" class="form-control allowance" name="allowances[Tunjangan Transportasi][]" placeholder="Rp. " required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Fasilitas</label>
-                    <input type="number" class="form-control allowance" name="allowances[Tunjangan Fasilitas][]" placeholder="Rp." required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Jabatan</label>
-                    <input type="number" class="form-control allowance" name="allowances[Tunjangan Jabatan][]" placeholder="Rp." required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Gaji Rapel</label>
-                    <input type="number" id="t_makan" class="form-control allowance" name="allowances[Gaji Rapel][]" placeholder="Rp. " required>
-                </div>
-            </div>
-            @endif
-            <div class="row mb-3">
-                @if($karyawanLogin->unit_bisnis === 'CHAMPOIL')
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>
-                    <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[Tunjangan Alat Kerja][]" placeholder="Rp. " required>
-                </div>
-                @endif
-                @if($karyawanLogin->unit_bisnis === 'RUN')
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Tunjangan Makan</label>
-                    <input type="number" id="t_makan" class="form-control allowance" name="allowances[Tunjangan Makan][]" placeholder="Rp. " required>
-                </div>
-                @endif
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Total Allowance</label>
-                    <input type="number" id="t_allowance" class="form-control" name="allowances[t_allowance][]" placeholder="Rp. " required readonly>
-                </div>
-            </div>
-            <h5>Deductions</h5>
-            <hr>
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">BPJS Kesehatan</label>
-                    <input type="number" id="bpjs_ks" class="form-control deduction" name="deductions[BPJS Kesehatan][]" placeholder="Rp. " required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">BPJS Ketenagakerjaan</label>
-                    <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[BPJS Ketenagakerjaan][]" placeholder="Rp. " required>
-                </div>
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">Jaminan Pensiun</label>
-                    <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[j_pensiun][]" placeholder="Rp. " required disabled>
-                </div>
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">PPH 21</label>
-                    <input type="number" id="pph21" class="form-control deduction" name="deductions[PPH 21][]" placeholder="Rp. " required>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">Potongan Hutang</label>
-                    <input type="number" id="p_hutang" class="form-control deduction" name="deductions[Potongan Hutang][]" placeholder="Rp. " required>
-                </div>
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">Total Deductions</label>
-                    <input type="number" id="t_deduction" class="form-control" name="deductions[t_deduction][]" placeholder="Rp. " required readonly>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-12 mb-3">
-                    <label for="kode_karyawan" class="form-label">THP</label>
-                    <input type="number" id="thp" class="form-control" name="thp" placeholder="Rp. " required readonly>
-                </div>
-            </div>
-          <button class="btn btn-primary" type="submit">Submit</button>
+          <button class="btn btn-primary mt-4" type="submit">Submit</button>
         </form>
       </div>
     </div>

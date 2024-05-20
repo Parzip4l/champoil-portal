@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Payrol;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Employee;
+use App\Payrol\Component;
 use App\Payrol;
 use App\PayrolCM;
 use App\PayrolComponent_NS;
@@ -56,10 +57,24 @@ class PayrolComponent extends Controller
         $code = Auth::user()->employee_code;
         $DataCode = Employee::where('nik', $code)->first();
 
+        // Get data components
+        $allowence = Component::where('type','Allowences')
+                        ->where('company',$DataCode->unit_bisnis)
+                        ->get();
+
+        $deduction = Component::where('type','Deductions')
+                        ->where('company',$DataCode->unit_bisnis)
+                        ->get();
+
         $employee = Employee::where('organisasi', 'Management Leaders')
-        ->where('unit_bisnis', $DataCode->unit_bisnis)
-        ->get();
-        return view('pages.hc.payrol.create',compact('employee'));
+                        ->where('unit_bisnis', $DataCode->unit_bisnis)
+                        ->where('resign_status', 0)
+                        ->whereNotIn('nik', function($query) {
+                            $query->select('employee_code')->from('payrol_components');
+                        })
+                        ->get();
+    
+        return view('pages.hc.payrol.create',compact('employee','allowence','deduction'));
     }
 
     public function createns()
@@ -87,17 +102,58 @@ class PayrolComponent extends Controller
             'allowances' => 'required|array',
             'deductions' => 'required|array',
         ]);
+    
+        try {
 
-        $payrolComponent = new PayrolCM();
-        $payrolComponent->employee_code = $request->employee_code;
-        $payrolComponent->basic_salary = $request->basic_salary;
-        $payrolComponent->allowances = json_encode($request->allowances);
-        $payrolComponent->deductions = json_encode($request->deductions);
-        $payrolComponent->thp = $request->thp;
-        $payrolComponent->net_salary = $request->thp;
-        $payrolComponent->save();
+            $totalAllowances = array_sum($request->allowances);
+            $totalDeductions = array_sum($request->deductions);
 
-        return redirect()->route('payrol-component.index')->with(['success' => 'Data Berhasil Disimpan!']);
+            $total_allowance = 0;
+            foreach ($request->allowances as $allowanceData) {
+                foreach ($allowanceData as $allowance) {
+                    $total_allowance += (int) $allowance;
+                }
+            }
+
+            $total_deduction = 0;
+            foreach ($request->deductions as $deductionData) {
+                foreach ($deductionData as $deduction) {
+                    $total_deduction += (int) $deduction;
+                }
+            }
+
+            $allowance_data = [
+                'data' => $request->allowances,
+                'total_allowance' => $total_allowance,
+            ];
+        
+            $deduction_data = [
+                'data' => $request->deductions,
+                'total_deduction' => $total_deduction,
+            ];
+
+            // Calculate the take-home pay (thp)
+            $thp = $request->basic_salary + $total_allowance - $total_deduction;
+
+            // Create a new Payroll Component
+            $payrolComponent = new PayrolCM();
+            $payrolComponent->employee_code = $request->employee_code;
+            $payrolComponent->basic_salary = $request->basic_salary;
+            $payrolComponent->allowances = json_encode($allowance_data);
+            $payrolComponent->deductions = json_encode($deduction_data);
+            $payrolComponent->thp = $thp;
+            $payrolComponent->net_salary = $thp;
+            $payrolComponent->save();
+    
+            // Redirect with success message
+            return redirect()->route('payrol-component.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        } catch (\Exception $e) {
+            // Log the error message
+            \Log::error('Error saving payroll component: ' . $e->getMessage());
+    
+            // Redirect back with error message
+            return redirect()->back()->with(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
+        }
     }
 
     public function storens(Request $request)
@@ -128,13 +184,25 @@ class PayrolComponent extends Controller
      */
     public function show($id)
     {
-        $payrolComponent = PayrolCM::find($id);
+        // auth cek
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
 
-        if (!$payrolComponent) {
+        $data = PayrolCM::find($id);
+
+        // Get data components
+        $allowence = Component::where('type','Allowences')
+                        ->where('id',$id)
+                        ->get();
+
+        $deduction = Component::where('type','Deductions')
+                        ->where('id',$id)
+                        ->get();
+        if (!$data) {
             return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');
         }
 
-        return view('pages.hc.payrol.show', compact('payrolComponent'));
+        return view('pages.hc.payrol.show', compact('data'));
     }
 
     /**
@@ -145,13 +213,25 @@ class PayrolComponent extends Controller
      */
     public function edit($id)
     {
-        $payrolComponent = PayrolCM::find($id);
+        // auth cek
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
 
-        if (!$payrolComponent) {
+        $data = PayrolCM::find($id);
+
+        // Get data components
+        $allowence = Component::where('type','Allowences')
+                        ->where('id',$id)
+                        ->get();
+
+        $deduction = Component::where('type','Deductions')
+                        ->where('id',$id)
+                        ->get();
+        if (!$data) {
             return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');
         }
 
-        return view('pages.hc.payrol.editcomponent.edit', compact('payrolComponent'));
+        return view('pages.hc.payrol.editcomponent.edit', compact('data'));
     }
 
 
@@ -178,17 +258,10 @@ class PayrolComponent extends Controller
         try {
             // Validate the incoming request data
             $validatedData = $request->validate([
+                'employee_code' => 'required',
                 'basic_salary' => 'required|numeric',
-                'allowances.t_struktural.0' => 'required|numeric',
-                'allowances.t_kinerja.0' => 'required|numeric',
-                'allowances.t_alatkerja.0' => 'required|numeric',
-                'allowances.t_allowance.0' => 'required|numeric',
-                'deductions.bpjs_ks.0' => 'required|numeric',
-                'deductions.bpsj_tk.0' => 'required|numeric',
-                'deductions.pph21.0' => 'required|numeric',
-                'deductions.p_hutang.0' => 'required|numeric',
-                'deductions.t_deduction.0' => 'required|numeric',
-                'thp' => 'required|numeric', 
+                'allowances' => 'required|array',
+                'deductions' => 'required|array',
             ]);
 
             // Find the PayrollComponent by ID
@@ -198,30 +271,53 @@ class PayrolComponent extends Controller
                 return redirect()->back()->with('error', 'PayrollComponent not found.');
             }
 
+            // Calculate total allowances and deductions
+            $total_allowance = 0;
+            foreach ($validatedData['allowances'] as $allowanceData) {
+                foreach ($allowanceData as $allowance) {
+                    $total_allowance += (int) $allowance;
+                }
+            }
+
+            $total_deduction = 0;
+            foreach ($validatedData['deductions'] as $deductionData) {
+                foreach ($deductionData as $deduction) {
+                    $total_deduction += (int) $deduction;
+                }
+            }
+
+            $allowance_data = [
+                'data' => $validatedData['allowances'],
+                'total_allowance' => $total_allowance,
+            ];
+
+            $deduction_data = [
+                'data' => $validatedData['deductions'],
+                'total_deduction' => $total_deduction,
+            ];
+
+            // Calculate the take-home pay (thp)
+            $thp = $validatedData['basic_salary'] + $total_allowance - $total_deduction;
+
             // Update the PayrollComponent with the validated data
+            $payrollComponent->employee_code = $validatedData['employee_code'];
             $payrollComponent->basic_salary = $validatedData['basic_salary'];
-            $payrollComponent->allowances = json_encode([
-                't_struktural' => [$validatedData['allowances']['t_struktural'][0]],
-                't_kinerja' => [$validatedData['allowances']['t_kinerja'][0]],
-                't_alatkerja' => [$validatedData['allowances']['t_alatkerja'][0]],
-                't_allowance' => [$validatedData['allowances']['t_allowance'][0]],
-            ]);
-            $payrollComponent->deductions = json_encode([
-                'bpjs_ks' => [$validatedData['deductions']['bpjs_ks'][0]],
-                'bpsj_tk' => [$validatedData['deductions']['bpsj_tk'][0]],
-                'pph21' => [$validatedData['deductions']['pph21'][0]],
-                'p_hutang' => [$validatedData['deductions']['p_hutang'][0]],
-                't_deduction' => [$validatedData['deductions']['t_deduction'][0]],
-            ]);
-            $payrollComponent->net_salary = $validatedData['thp'];
-            
+            $payrollComponent->allowances = json_encode($allowance_data);
+            $payrollComponent->deductions = json_encode($deduction_data);
+            $payrollComponent->thp = $thp;
+            $payrollComponent->net_salary = $thp;
             $payrollComponent->save();
 
             return redirect()->route('payrol-component.index')->with('success', 'PayrollComponent updated successfully.');
         } catch (\Exception $e) {
+            // Log the error message
+            \Log::error('Error updating payroll component: ' . $e->getMessage());
+
+            // Redirect back with error message
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+
 
     public function updateNS(Request $request, $id)
     {

@@ -9,5 +9,5 @@ class Component extends Model
 {
     use HasFactory;
     protected $table = 'components';
-    protected $fillable = ['name','type'];
+    protected $fillable = ['name','type','company'];
 }

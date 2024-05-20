@@ -8,6 +8,7 @@ use App\Employee;
 use App\Payrol;
 use App\ModelCG\Payroll;
 use App\PayrolCM;
+use App\Payrol\Component;
 use App\Payrollns;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -324,10 +325,21 @@ class PayslipController extends Controller
      */
     public function show($id)
     {
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
+
         $payslip = Payrol::findOrFail($id);
 
-        $dataPayslip = Payrol::where('id', $id)->get();
-        return view('pages.hc.payrol.payslip-file', compact('dataPayslip'));
+        $allowence = Component::where('type','Allowences')
+                        ->where('id',$id)
+                        ->get();
+
+        $deduction = Component::where('type','Deductions')
+                        ->where('id',$id)
+                        ->get();
+
+        $data = Payrol::where('id', $id)->get();
+        return view('pages.hc.payrol.payslip-file', compact('data'));
     }
 
     public function showns($id)
@@ -350,11 +362,24 @@ class PayslipController extends Controller
      */
     public function edit($id)
     {
-        $payrolComponent = Payrol::findOrFail($id);
-        if (!$payrolComponent) {
+        // auth cek
+        $code = Auth::user()->employee_code;
+        $DataCode = Employee::where('nik', $code)->first();
+
+        $data = Payrol::findOrFail($id);
+
+        $allowence = Component::where('type','Allowences')
+                        ->where('id',$id)
+                        ->get();
+
+        $deduction = Component::where('type','Deductions')
+                        ->where('id',$id)
+                        ->get();
+
+        if (!$data) {
             return redirect()->back()->with('error', 'Payrol Component not found.');
         }
-        return view('pages.hc.payrol.editpayrol.edit', compact('payrolComponent'));
+        return view('pages.hc.payrol.editpayrol.edit', compact('data'));
     }
 
     public function editNS($id)
@@ -386,54 +411,75 @@ class PayslipController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $unit_bisnis = $employee->unit_bisnis;
+        $bulan = $request->input('month');
+        $tahun = $request->input('year');
+
         try {
-            // Validate the request data
-            $request->validate([
-                'basic_salary' => 'required|numeric',
-            ]);
-    
+            // Begin a database transaction
+            DB::beginTransaction();
+
             // Retrieve the payroll component by ID
             $payrolComponent = Payrol::findOrFail($id);
-    
+
             // Update the payroll component fields
             $payrolComponent->basic_salary = $request->input('basic_salary');
-            $payrolComponent->net_salary = $request->input('thp');
-    
+
             // Update allowances
-            $allowances = [
-                't_struktural' => [$request->input('allowances')['t_struktural'][0]],
-                't_kinerja' => [$request->input('allowances')['t_kinerja'][0]],
-                't_alatkerja' => [$request->input('allowances')['t_alatkerja'][0]],
-                't_allowance' => [$request->input('allowances')['t_allowance'][0]],
+            $allowancesData = $request->input('allowances');
+            $total_allowance = 0;
+
+            // Loop through each key-value pair in $allowancesData
+            foreach ($allowancesData as $key => $values) {
+                // Jumlahkan nilai-nilai dalam array untuk setiap jenis tunjangan
+                $total_allowance += array_sum($values);
+            }
+
+            // Buat array data tunjangan yang mencakup nilai dan total tunjangan
+            $allowance_data = [
+                'data' => $allowancesData,
+                'total_allowance' => $total_allowance,
             ];
-    
             // Update deductions
-            $deductions = [
-                'bpjs_ks' => [$request->input('deductions')['bpjs_ks'][0]],
-                'bpsj_tk' => [$request->input('deductions')['bpsj_tk'][0]],
-                'pph21' => [$request->input('deductions')['pph21'][0]],
-                'p_hutang' => [$request->input('deductions')['p_hutang'][0]],
-                't_deduction' => [$request->input('deductions')['t_deduction'][0]],
+            $deductionsData = $request->input('deductions');
+            $total_deduction = 0;
+
+            // Loop through each key-value pair in $allowancesData
+            foreach ($deductionsData as $key => $values) {
+                // Jumlahkan nilai-nilai dalam array untuk setiap jenis tunjangan
+                $total_deduction += array_sum($values);
+            }
+            $deduction_data = [
+                'data' => $deductionsData,
+                'total_deduction' => $total_deduction,
             ];
-    
-            $payrolComponent->allowances = json_encode($allowances);
-            $payrolComponent->deductions = json_encode($deductions);
-            $payrolComponent->net_salary = $request->input('thp');
-    
+
+            $netSalary = $payrolComponent->basic_salary + $total_allowance - $total_deduction;
+
+            // Update the Payroll Component
+            $payrolComponent->allowances = json_encode($allowance_data);
+            $payrolComponent->deductions = json_encode($deduction_data);
+            $payrolComponent->net_salary = $netSalary;
+
             // Save the updated payroll component
             $payrolComponent->save();
-    
-            $bulan = $request->input('month');
-            $tahun = $request->input('year');
-    
+
+            // Commit the database transaction
+            DB::commit();
+
             // Redirect back with a success message
             return redirect()->route('payslip.showByMonth', ['month' => $bulan, 'year' => $tahun])->with('success', 'Payroll component updated successfully');
-        } catch (QueryException $exception) {
-            // Handle database-related exceptions
-            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
         } catch (\Exception $exception) {
-            // Handle other exceptions
-            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
+            // Rollback the database transaction in case of any exception
+            DB::rollback();
+
+            // Log the error
+            \Log::error('Error updating payroll component: ' . $exception->getMessage());
+
+            // Handle exceptions
+            return redirect()->back()->with('error', 'Error updating payroll component. Please try again.'. $exception->getMessage());
         }
     }
 

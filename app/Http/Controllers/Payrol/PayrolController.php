@@ -4,14 +4,23 @@ namespace App\Http\Controllers\Payrol;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
+// Model
 use App\Employee;
 use App\Payrol;
 use App\PayrolCM;
 use App\PayrolComponent_NS;
-use Carbon\Carbon;
+use App\Component\ComponentDetails;
+use App\Component\ComponentMaster;
 use App\Absen;
 use App\Payrollns;
-use Illuminate\Support\Facades\Auth;
+use App\Pajak\Pajak;
+use App\Pajak\PajakDetails;
+use Illuminate\Support\Facades\DB;
+
+
 class PayrolController extends Controller
 {
     /**
@@ -30,6 +39,7 @@ class PayrolController extends Controller
             // Mengambil data Payroll berdasarkan unit bisnis dari tabel Employee
             $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
                 ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->where('karyawan.resign_status','0')
                 ->get();
         } else {
             $payrol = [];
@@ -109,36 +119,110 @@ class PayrolController extends Controller
         $bulan = $request->input('month');
         $tahun = $request->input('year');
 
-        // Loop melalui setiap employee code
-        foreach ($employeeCodes as $code) {
-            $payrollComponents = PayrolCM::where('employee_code', $code)->first();
+        try {
+            // Begin database transaction
+            DB::beginTransaction();
 
-            if ($payrollComponents) {
-                // Simpan detail payroll component
-                $basic_salary = $payrollComponents->basic_salary;
-                $allowancesData = $payrollComponents->allowances;
-                $deductionsData = $payrollComponents->deductions;
-                $NetSalary = $payrollComponents->net_salary;
-                
+            // Loop through each employee code
+            foreach ($employeeCodes as $code) {
+                $payrollComponents = PayrolCM::where('employee_code', $code)->first();
+                $additionalAllowances = ComponentDetails::where('employee_code', $code)
+                                        ->where('type', 'Allowances')
+                                        ->get();
 
-                // Simpan data payroll
-                $payroll = new Payrol();
-                $payroll->employee_code = $code;
-                $payroll->month = $bulan;
-                $payroll->year = $tahun;
-                $payroll->basic_salary = $basic_salary;
-                $payroll->allowances = $allowancesData;
-                $payroll->deductions = $deductionsData;
-                $payroll->net_salary = $NetSalary;
-                $payroll->payrol_status = 'Unlocked';
-                $payroll->payslip_status = 'Unpublish';
-                $payroll->unit_bisnis = $unit_bisnis;
-                $payroll->run_by = $employee->nama;
-                $payroll->save();
+                $additionalDeductions = ComponentDetails::where('employee_code', $code)
+                                        ->where('type', 'Deductions')
+                                        ->get();
+
+                // Initialize arrays to store additional data
+                $additionalDataArray = [];
+                $deductionDataArray = [];
+                $additionalAllowanceTotal = 0;
+                $additionalDeductionTotal = 0;
+
+                // Loop through additional allowances
+                foreach ($additionalAllowances as $additionalData) {
+                    $componentName = $additionalData->component_name;
+                    $nominal = $additionalData->nominal;
+                    // Add additional data to the array
+                    $additionalAllowanceTotal += $nominal;
+                    $additionalDataArray[$componentName] = $nominal;
+                }
+
+                // Loop through additional deductions
+                foreach ($additionalDeductions as $additionalDataDeductions) {
+                    $componentName = $additionalDataDeductions->component_name;
+                    $nominal = $additionalDataDeductions->nominal;
+                    // Add additional data to the array
+                    $additionalDeductionTotal += $nominal;
+                    $deductionDataArray[$componentName] = $nominal;
+                }
+
+                if ($payrollComponents) {
+                    // Get payroll component details
+                    $basic_salary = $payrollComponents->basic_salary;
+                    $allowancesData = $payrollComponents->allowances;
+                    $deductionsData = $payrollComponents->deductions;
+                    $NetSalary = $payrollComponents->net_salary;
+                    $allowancesArray = json_decode($allowancesData, true);
+                    $deductionArray = json_decode($deductionsData, true);
+
+                    // Ensure 'total_allowance' and 'total_deduction' are initialized as arrays
+                    if (!is_array($allowancesArray)) {
+                        $allowancesArray = ['total_allowance' => 0];
+                    } else if (!isset($allowancesArray['total_allowance'])) {
+                        $allowancesArray['total_allowance'] = 0;
+                    }
+
+                    if (!is_array($deductionArray)) {
+                        $deductionArray = ['total_deduction' => 0];
+                    } else if (!isset($deductionArray['total_deduction'])) {
+                        $deductionArray['total_deduction'] = 0;
+                    }
+
+                    // Add additional totals to existing totals
+                    $allowancesArray['total_allowance'] += $additionalAllowanceTotal;
+                    $deductionArray['total_deduction'] += $additionalDeductionTotal;
+
+                    // Merge additional data with existing arrays
+                    $allowancesArray = array_merge($allowancesArray, $additionalDataArray);
+                    $deductionArray = array_merge($deductionArray, $deductionDataArray);
+
+                    // Convert arrays back to JSON
+                    $newAllowancesData = json_encode($allowancesArray);
+                    $newDeductionsData = json_encode($deductionArray);
+
+                    $netSalary = $NetSalary + $additionalAllowanceTotal - $additionalDeductionTotal;
+
+                    // Save payroll data
+                    $payroll = new Payrol();
+                    $payroll->employee_code = $code;
+                    $payroll->month = $bulan;
+                    $payroll->year = $tahun;
+                    $payroll->basic_salary = $basic_salary;
+                    $payroll->allowances = $newAllowancesData;
+                    $payroll->deductions = $newDeductionsData;
+                    $payroll->net_salary = $netSalary;
+                    $payroll->payrol_status = 'Unlocked';
+                    $payroll->payslip_status = 'Unpublish';
+                    $payroll->unit_bisnis = $unit_bisnis;
+                    $payroll->run_by = $employee->nama;
+                    $payroll->save();
+                }
             }
-        }
 
-        return redirect()->route('payslip.showByMonth', ['month' => $bulan, 'year' => $tahun])->with('success', 'Payroll successfully created');
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->route('payslip.showByMonth', ['month' => $bulan, 'year' => $tahun])->with('success', 'Payroll successfully created');
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of any exception
+            DB::rollback();
+            // Log the error
+            \Log::error('Error creating payroll: ' . $e->getMessage());
+            // Redirect back with error message
+            return redirect()->back()->with(['error' => 'Error creating payroll. Please try again.']);
+        }
     }
 
     public function storens(Request $request)

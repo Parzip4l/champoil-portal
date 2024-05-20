@@ -20,78 +20,48 @@
             </div>
         @endif
         <h4 class="card-title">Payrol Component</h4>
-        <form method="POST" action="{{ route('payrol-component.update', $payrolComponent->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('payrol-component.update', $data->id) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             @php 
-                $employee = \App\Employee::where('nik', $payrolComponent->employee_code)->first();
-                $allowences = json_decode($payrolComponent->allowances);
-                $deductions = json_decode($payrolComponent->deductions);
+                $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                $allowences = json_decode($data->allowances);
+                $deductions = json_decode($data->deductions);
             @endphp
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Karyawan</label>
-                    <input type="hidden" name="employee_code" value="{{$payrolComponent->employee_code}}">
-                    <input type="text" class="form-control" value="{{$employee->nama}}" readonly>
+            <div class="row">
+                <div class="col-md-12 mb-2">
+                    <label for="" class="form-label">Karyawan</label>
+                    <input type="text" class="form-control" value="{{ \App\Employee::where('nik', $data->employee_code)->value('nama') ?? 'Nama tidak ditemukan' }}" readonly>
+                    <input type="hidden" class="form-control" name="employee_code" value="{{$data->employee_code}}">
                 </div>
-                <div class="col-md-6">
-                    <label for="Ktp" class="form-label">Basic Sallary</label>
-                    <input type="number" class="form-control" id="basic_salary" name="basic_salary" placeholder="Rp." value="{{$payrolComponent->basic_salary}}">
+                <div class="title mt-2 mb-2">
+                    <h5>Allowence</h5>
+                    <hr>
                 </div>
-            </div>
-            <h5>Allowance</h5>
-            <hr>
-            <div class="row mb-3 allowance-group">
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Struktural</label>
-                    <input type="number" class="form-control allowance" name="allowances[t_struktural][]" placeholder="Rp." required value="{{$allowences->t_struktural[0]}}">
+                <div class="col-md-6 mb-2">
+                    <label for="" class="form-label">Gaji Pokok</label>
+                    <input type="number" name="basic_salary" class="form-control allowance" value="{{$data->basic_salary}}" required>   
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Tunjangan Kinerja</label>
-                    <input type="number" class="form-control allowance" name="allowances[t_kinerja][]" placeholder="Rp." required value="{{$allowences->t_kinerja[0]}}">
+                @php
+                    $dataArray = json_decode($data->allowances, true);
+                    $datadeduction = json_decode($data->deductions, true);
+                @endphp
+                @foreach($dataArray['data'] as $id => $value)
+                    <div class="col-md-6 mb-2">
+                        <label for="" class="form-label">{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}</label>
+                        <input type="number" name="allowances[{{$id}}][]" class="form-control allowance" value="{{$value[0]}}" required>   
+                    </div>
+                @endforeach
+                <div class="title mt-2 mb-2">
+                    <h5>Deduction</h5>
+                    <hr>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Tunjangan Alat Kerja</label>
-                    <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[t_alatkerja][]" placeholder="Rp. " required value="{{$allowences->t_alatkerja[0]}}">
+                @foreach($datadeduction['data'] as $id => $value)
+                <div class="col-md-6 mb-2">
+                    <label for="" class="form-label">{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}</label>
+                    <input type="number" name="deductions[{{$id}}][]" class="form-control deduction" value="{{$value[0]}}" id="t_deduction" required>   
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Total Allowance</label>
-                    <input type="number" id="t_allowance" class="form-control" name="allowances[t_allowance][]" placeholder="Rp. " required readonly value="{{$allowences->t_allowance[0]}}">
-                </div>
-            </div>
-            <h5>Deductions</h5>
-            <hr>
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">BPJS Kesehatan</label>
-                    <input type="number" id="bpjs_ks" class="form-control deduction" name="deductions[bpjs_ks][]" placeholder="Rp. " required value="{{$deductions->bpjs_ks[0]}}">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">BPJS Ketenagakerjaan</label>
-                    <input type="number" id="bpsj_tk" class="form-control deduction" name="deductions[bpsj_tk][]" placeholder="Rp. " required value="{{$deductions->bpsj_tk[0]}}">
-                </div>
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">PPH 21</label>
-                    <input type="number" id="pph21" class="form-control deduction" name="deductions[pph21][]" placeholder="Rp. " required value="{{$deductions->pph21[0]}}">
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">Potongan Hutang</label>
-                    <input type="number" id="p_hutang" class="form-control deduction" name="deductions[p_hutang][]" placeholder="Rp. " required value="{{$deductions->p_hutang[0]}}">
-                </div>
-                <div class="col-md-6">
-                    <label for="kode_karyawan" class="form-label">Total Deductions</label>
-                    <input type="number" id="t_deduction" class="form-control" name="deductions[t_deduction][]" placeholder="Rp. " required readonly value="{{$deductions->t_deduction[0]}}">
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-12 mb-3">
-                    <label for="kode_karyawan" class="form-label">THP</label>
-                    <input type="number" id="thp" class="form-control" name="thp" placeholder="Rp. " required readonly value="{{$payrolComponent->net_salary}}">
-                </div>
+                @endforeach
             </div>
           <button class="btn btn-primary" type="submit">Submit</button>
         </form>

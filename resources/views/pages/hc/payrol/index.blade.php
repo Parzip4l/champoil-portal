@@ -47,7 +47,7 @@
                             @php
                                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                             @endphp
-                            <td><a href="{{route('payrol-component.show', $data->id)}}">{{ $employee->nama; }}</a></td>
+                            <td><a href="{{route('payrol-component.edit', $data->id)}}">{{ $employee->nama; }}</a></td>
                             <td>Rp {{ number_format($data->basic_salary, 0, ',', '.') }}</td>
                             <td>Rp {{ number_format($data->net_salary, 0, ',', '.') }}</td>
                             <td>

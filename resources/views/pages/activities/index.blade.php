@@ -35,7 +35,6 @@
                                     ->select('unit_bisnis','organisasi')
                                     ->first();
                                 $employee = \App\Employee::where('nik', $data->user_id)
-                                                ->where('unit_bisnis', $karyawanLogin->unit_bisnis)
                                                 ->first();
                             @endphp
                             <tr>

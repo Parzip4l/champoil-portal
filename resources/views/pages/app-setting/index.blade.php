@@ -78,7 +78,7 @@
                     
                 </div>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-3  mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('additional-component') }}" class="text-center link-settings">
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3  mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('garda-pratama') }}" class="text-center link-settings">
@@ -106,7 +106,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3  mb-4">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('thr-component') }}" class="text-center link-settings">
@@ -120,7 +120,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3  mb-4 mb">
                         <div class="card">
                             <div class="card-body">
                                 <a href="{{ url('koperasi') }}" class="text-center link-settings">
@@ -129,6 +129,20 @@
                                     </div>
                                     <div class="title-menu">
                                         <h6>Koperasi</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3  mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ url('activities') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="radio"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Activities</h6>
                                     </div>
                                 </a>
                             </div>

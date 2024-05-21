@@ -238,6 +238,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
             Route::get('/get-component', [App\Http\Controllers\Component\ComponentController::class, 'getComponent'])->name('component.additional');
             Route::get('/additional-component/show/{code_master}', [App\Http\Controllers\Component\ComponentController::class, 'showDetails'])->name('additional-component.showDetails');
 
+        //Log Activities
+        Route::resource('activities', App\Http\Controllers\UserActivitiesController::class); 
+
         // Koperasi
         Route::resource('koperasi', App\Http\Controllers\Koperasi\KoperasiController::class);
 

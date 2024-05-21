@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Payrol\Component;
 use App\Employee;
+Use App\Activities\Log;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -64,6 +65,8 @@ class ComponentController extends Controller
             $ComponentData->is_active = 'nonaktif';
             $ComponentData->save();
 
+            
+
             return redirect()->route('component-data.index')->with('success', 'Component Successfully Added');
         } catch (\Exception $e) {
             return redirect()->route('component-data.index')->with('error', 'Failed to add component: ' . $e->getMessage());
@@ -83,6 +86,8 @@ class ComponentController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         // Validasi input
         $request->validate([
             'is_active' => 'required|in:aktif,nonaktif',
@@ -122,6 +127,8 @@ class ComponentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         try {
             // Validate the incoming request data
             $validatedData = $request->validate([
@@ -143,6 +150,8 @@ class ComponentController extends Controller
             $payrollComponent->is_taxable = $validatedData['is_taxable'];
             
             $payrollComponent->save();
+            // Activities
+            
 
             return redirect()->route('component-data.index')->with('success', 'Payroll Component updated successfully.');
         } catch (\Exception $e) {
@@ -158,8 +167,10 @@ class ComponentController extends Controller
      */
     public function destroy($id)
     {
+
         $Component = Component::find($id);
         $Component->delete();
+
         return redirect()->route('component-data.index')->with('success', 'Component Successfully Deleted');
     }
 }

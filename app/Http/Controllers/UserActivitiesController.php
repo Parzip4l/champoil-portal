@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Employee;
+Use App\Activities\Log;
 
 class UserActivitiesController extends Controller
 {
@@ -13,7 +17,15 @@ class UserActivitiesController extends Controller
      */
     public function index()
     {
-        //
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $log = Log::where('description', $company->unit_bisnis)
+                ->latest()  // Urutkan log berdasarkan waktu pembuatan terbaru
+                ->take(1000) // Batasi jumlah data yang diambil menjadi 1000
+                ->get();
+
+        return view('pages.activities.index',compact('log'));
     }
 
     /**

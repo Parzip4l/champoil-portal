@@ -19,6 +19,7 @@ use App\Payrollns;
 use App\Pajak\Pajak;
 use App\Pajak\PajakDetails;
 use Illuminate\Support\Facades\DB;
+Use App\Activities\Log;
 
 
 class PayrolController extends Controller
@@ -44,12 +45,17 @@ class PayrolController extends Controller
         } else {
             $payrol = [];
         }
+
         return view('pages.hc.payrol.payrol', compact('payrol'));
     }
 
     public function indexns()
     {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
         $payrol = PayrolComponent_NS::all();
+
         return view('pages.hc.payrol.ns.payrol', compact('payrol'));
     }
 
@@ -114,6 +120,7 @@ class PayrolController extends Controller
     {
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
+
         $unit_bisnis = $employee->unit_bisnis;
         $employeeCodes = $request->input('employee_code');
         $bulan = $request->input('month');
@@ -210,7 +217,7 @@ class PayrolController extends Controller
                     $payroll->save();
                 }
             }
-
+           
             // Commit the transaction
             DB::commit();
 

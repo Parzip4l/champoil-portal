@@ -12,6 +12,11 @@ function show_class($path) {
   return call_user_func_array('Request::is', (array)$path) ? 'show' : '';
 }
 
+function karyawan_bynik($nik){
+  $karyawan = app('App\Employee');
+  return $karyawan->where('nik',$nik)->first();
+}
+
 function push_notif_wa($data,$token,$instance,$nomor,$url){
     $params=array(
       'token' => 'd2f0eeqxiklsbg4r',

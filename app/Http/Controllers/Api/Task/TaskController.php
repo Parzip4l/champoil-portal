@@ -12,6 +12,7 @@ use App\ModelCG\TaskGlobal;
 use App\ModelCG\Project;
 use App\ModelCG\Patroli; 
 use App\ModelCG\Task; 
+use App\ModelCG\List_task;
 
 class TaskController extends Controller
 {
@@ -92,5 +93,40 @@ class TaskController extends Controller
         ];
 
         return response()->json($records);
+    }
+
+    public function report_patroli_detail($id_project,$tanggal){
+        $report = Task::where('project_id',$id_project)->get();
+        
+        if(!empty($report)){
+            foreach($report as $row){
+                $row->patroli = List_task::where('id_master',$row->id)->get();
+                foreach($row->patroli as $det){
+                    $daily = Patroli::where('id_task',$det->id)
+                                            ->whereYear('created_at', date('Y',strtotime($tanggal)))
+                                            ->whereMonth('created_at', date('m',strtotime($tanggal)))
+                                            ->whereDay('created_at',  date('d',strtotime($tanggal)))
+                                            ->get();
+                    if($daily){
+                        foreach($daily as $day){
+                            $arr[]=[
+                                "petugas"=>karyawan_bynik($day->employee_code)->nama,
+                                "tanggal"=>date('d F Y H:i:s',strtotime($day->created_at)),
+                                "kondisi"=>$day->status,
+                                "deskripsi"=>$day->description
+                            ];
+                            $det->daily = $arr;
+                        }
+                    }
+                }
+            }
+        }
+
+        $data=[
+            "tanggal"=>$tanggal,
+            "report"=>$report
+        ];
+    
+        return response()->json($data);
     }
 }

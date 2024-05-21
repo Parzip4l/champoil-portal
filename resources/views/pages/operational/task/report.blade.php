@@ -3,11 +3,20 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <style>
+    .timeline{
+      max-width:100% !important;
+    }
+
+   
+
+    
+  </style>
 @endpush
 
 @section('content')
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-7">
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
@@ -42,7 +51,6 @@
                 </div>                
             </div>
         </div>
-        
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
@@ -67,10 +75,11 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-5">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title mb-4">Detail</h6>
+                <h6 class="card-title mb-4">Detail <span id="tanggal_report"></span></h6>
+                <div id="list"></div>
                 
             </div>
         </div>
@@ -79,21 +88,7 @@
 
 
 
-<div id="fullCalModal" class="modal fade">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 id="modalTitle1" class="modal-title"></h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"><span class="visually-hidden">close</span></button>
-      </div>
-      <div id="modalBody1" class="modal-body"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button class="btn btn-primary">Event Page</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <!-- End -->
 @endsection
@@ -144,23 +139,9 @@ var holidayEvents = {
   id: 3,
   backgroundColor: 'rgba(241,0,117,.25)',
   borderColor: '#f10075',
-  events: []
+  events: <?php echo json_encode($report, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>
 };
-// Fetch data from the API
-fetch('http://127.0.0.1:8000/api/v1/patroli-report?project_id=558661')
-    .then(response => response.json())
-    .then(data => {
-        data.records.forEach(record => {
-            var eventDate = `${curYear}-${curMonth}-${String(record.tanggal).padStart(2, '0')}`;
-            holidayEvents.events.push({
-                id: record.tanggal,
-                start: eventDate,
-                end: eventDate,
-                title: record.label
-            });
-        });
-    })
-    .catch(error => console.error('Error fetching data:', error));
+
 var discoveredEvents = {
   id: 4,
   backgroundColor: 'rgba(0,204,204,.25)',
@@ -227,15 +208,82 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
   },
   eventClick: function(info) {
     var eventObj = info.event;
-    console.log(info);
-    $('#modalTitle1').html(eventObj.title);
-    $('#modalBody1').html(eventObj._def.extendedProps.description);
-    $('#eventUrl').attr('href',eventObj.url);
-    $('#fullCalModal').modal("show");
-  },
-  dateClick: function(info) {
-    $("#createEventModal").modal("show");
-    console.log(info);
+    const date = new Date(eventObj.start);
+    const year = date.getFullYear();
+    let month = (date.getMonth() + 1).toString(); // Months are zero-indexed, so add 1
+    let day = date.getDate().toString();
+
+    // Pad month and day with leading zeros if necessary
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    if (day.length < 2) {
+      day = '0' + day;
+    }
+
+    // Combine into the desired format
+    const formattedDate = `${year}-${month}-${day}`;
+
+    
+    fetch('http://127.0.0.1:8000/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const reports = data.report;
+      $('#tanggal_report').text(formattedDate);
+      $('#list').empty();
+      // Loop through each report
+      reports.forEach(report => {
+        let reportHTML = 
+            '<ul class="timeline mb-3" style="background:#ffffff !important">'+
+              '<li class="event">'+
+                '<h3 class="title">'+report.judul+'</h3>';
+          
+          if (report.patroli.length > 0) {
+            reportHTML += '<ul class="timeline mt-10">';
+            report.patroli.forEach(patrol => {
+              reportHTML += 
+                '<li class="event mb-15">'+
+                  '<h3 class="title">'+patrol.task+'</h3>';
+                  reportHTML += '<ul class="timeline mt-10">';
+                      patrol.daily.forEach(daily => {
+                        let label_status="";
+                        if(daily.status==0){
+                          label_status="Kondisi Baik";
+                        }else{
+                          label_status="Kondisi Tidak Baik";
+                        }
+                        reportHTML += 
+                          '<li class="event mb-15">'+
+                            '<h3 class="title"> Petugas : '+daily.petugas+'</h3>'+
+                            '<p>Tanggal : '+daily.tanggal+'</p>'+
+                            '<p>Status : '+label_status+'</p>'+
+                            '<p>Keterangan : '+daily.deskripsi+'</p>';
+
+                            reportHTML +='</li>';
+
+                      });
+                  reportHTML += '</ul>';
+                  
+                  reportHTML +='</li>';
+            });
+            reportHTML += '</ul>';
+          }
+
+          reportHTML += 
+              '</li>'+
+            '</ul>';
+          
+          $('#list').append(reportHTML);
+      });
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
   },
 });
 

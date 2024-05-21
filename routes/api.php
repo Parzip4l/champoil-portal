@@ -83,11 +83,13 @@ Route::prefix('v1')->group(function () {
     Route::get('/task_list/{id}', [TaskController::class, 'task']);
     Route::get('/project', [TaskController::class, 'project']);
     Route::get('/patroli-report', [TaskController::class, 'report_patroli']);
+    Route::get('/patroli-report-detail/{id}/{tanggal}', [TaskController::class, 'report_patroli_detail']);
 
     /**
      * Project
      */
     Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
+    
 
     /**
      * version 

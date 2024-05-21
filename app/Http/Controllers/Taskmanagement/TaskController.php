@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Taskmanagement;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\ModelCG\Task;
 use App\ModelCG\Project;
+use App\ModelCG\Patroli; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -160,7 +162,51 @@ class TaskController extends Controller
     public function report(Request $request){
         $data['project']=Project::all();
         $data['project_id']=$request->input('project_id');
+        $records = Project::all();
+        $report = Task::where('project_id',$request->input('project_id'))->get();
+        $data['report']=[];
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $daysInMonth = Carbon::now()->daysInMonth;
+
+        $dates = [];
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dates[] = Carbon::create($currentYear, $currentMonth, $day)->toDateString();
+        }
+
+        if(!empty($dates)){
+            foreach($dates as $key=>$val){
+                $specifiedDate = $val;
+                $tanggal=date('d',strtotime($val));
+                $count = Patroli::join('master_tasks','master_tasks.id','=','patrolis.id_task')
+                                ->where('master_tasks.project_id',$request->input('project_id'))
+                                ->where(DB::raw('DATE_FORMAT(patrolis.created_at, "%Y-%m-%d")'),'=',$specifiedDate)
+                                ->count();  
+                if($count==0){
+                    $label="Patrol Empty";
+                    $backgroundColor='rgba(241,0,117,.25)';
+                    $borderColor='#f10075';
+                }else{
+                    $label="Check Detail";
+                    $backgroundColor='rgba(16,183,89, .25)';
+                    $borderColor='#10b759';
+                }
+                $button=$label;
+
+                $data['report'][]=[
+                    "id"=>$request->input('project_id'),
+                    "start"=>$val,
+                    "backgroundColor"=>$backgroundColor,
+                    "borderColor"=> $borderColor,
+                    "jumlah"=>$count,
+                    "title"=>$label
+                ];
+            }
+        }
         return view('pages.operational.task.report',$data);
     }
+
+    
 
 }

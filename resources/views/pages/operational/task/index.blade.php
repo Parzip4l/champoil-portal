@@ -9,10 +9,14 @@
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Patrol</h5>
-                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
-                <a href="{{route('task-report')}}" class="btn btn-warning text-white">Report</a>
+            <div class="card-header">
+                <h5 class="mb-0 align-self-center">
+                    Data Patrol
+                    <a href="{{route('task-report')}}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Report</a>
+                    <a href="#" class="btn btn-sm btn-primary ml-3" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
+                </h5>
+                
+                
             </div>
             
             <div class="card-body">

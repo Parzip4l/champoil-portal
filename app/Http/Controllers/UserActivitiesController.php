@@ -20,10 +20,7 @@ class UserActivitiesController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        $log = Log::where('description', $company->unit_bisnis)
-                ->latest()  // Urutkan log berdasarkan waktu pembuatan terbaru
-                ->take(1000) // Batasi jumlah data yang diambil menjadi 1000
-                ->get();
+        $log = Log::all();
 
         return view('pages.activities.index',compact('log'));
     }

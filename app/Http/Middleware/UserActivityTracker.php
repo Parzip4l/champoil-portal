@@ -42,7 +42,7 @@ class UserActivityTracker
                 $log = new ActivityLog();
                 $log->user_id = $code;
                 $log->action = 'URL: ' . $requestedUrl;
-                $log->controller = $this->getControllerName($response->original);
+                $log->controller = substr($this->getControllerName($response->original), 0, 255);
                 $log->ip_address = $ipAddress;
                 $log->description = $company->unit_bisnis;
                 $log->save();

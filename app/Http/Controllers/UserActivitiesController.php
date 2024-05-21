@@ -20,7 +20,7 @@ class UserActivitiesController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        $log = Log::all();
+        $log = Log::latest()->get();
 
         return view('pages.activities.index',compact('log'));
     }

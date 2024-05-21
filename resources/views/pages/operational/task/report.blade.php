@@ -225,7 +225,7 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
     const formattedDate = `${year}-${month}-${day}`;
 
     
-    fetch('http://127.0.0.1:8000/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
+    fetch('https://hris.truest.co.id/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');

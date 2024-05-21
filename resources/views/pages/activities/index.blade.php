@@ -23,6 +23,7 @@
                         <thead>
                             <tr>
                                 <th>User</th>
+                                <th>Ip</th>
                                 <th>Action</th>
                                 <th>Time</th>
                             </tr>
@@ -39,6 +40,7 @@
                             @endphp
                             <tr>
                                 <td>{{$employee->nama}}</td>
+                                <td>{{$data->ip_address}}</td>
                                 <td>{{$data->action}}</td>
                                 <td>{{$data->created_at}}</td>
                             </tr>

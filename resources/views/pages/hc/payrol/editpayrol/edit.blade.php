@@ -112,43 +112,6 @@
 function goBack() {
     window.history.back();
 }
-$(document).ready(function() {
-    // Fungsi untuk menghitung total allowances
-    function calculateTotalAllowance() {
-        let totalAllowance = 0;
-        $('.allowance').each(function() {
-            const allowanceValue = parseFloat($(this).val()) || 0;
-            totalAllowance += allowanceValue;
-        });
-        $('#t_allowance').val(totalAllowance);
-    }
-
-    // Fungsi untuk menghitung total deductions
-    function calculateTotalDeduction() {
-        let totalDeduction = 0;
-        $('.deduction').each(function() {
-            const deductionValue = parseFloat($(this).val()) || 0;
-            totalDeduction += deductionValue;
-        });
-        $('#t_deduction').val(totalDeduction);
-    }
-
-    function calculateTHP() {
-        // Menghitung THP
-        const totalAllowance = parseFloat($('#t_allowance').val()) || 0;
-        const totalDeduction = parseFloat($('#t_deduction').val()) || 0;
-        const BasicSalary = parseFloat($('#basic_salary').val()) || 0;
-        const thp = Math.round(BasicSalary + totalAllowance - totalDeduction);
-        $('#thp').val(thp);
-    }
-
-    // Menghitung total allowances, deductions, dan THP ketika ada perubahan nilai
-    $('.allowance, .deduction, .totalthp, #basic_salary').on('input', function() {
-        calculateTotalAllowance();
-        calculateTotalDeduction();
-        calculateTHP();
-    });
-});
 </script>
 <script>
     @if(session('success'))

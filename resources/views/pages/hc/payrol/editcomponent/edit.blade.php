@@ -84,41 +84,4 @@
   <script src="{{ asset('assets/js/bootstrap-maxlength.js') }}"></script>
   <script src="{{ asset('assets/js/inputmask.js') }}"></script>
   <script src="{{ asset('assets/js/select2.js') }}"></script>
-  <script>
-    $(document).ready(function() {
-        // Fungsi untuk menghitung total allowances
-        function calculateTotalAllowance() {
-            let totalAllowance = 0;
-            $('.allowance').each(function() {
-                const allowanceValue = parseFloat($(this).val()) || 0;
-                totalAllowance += allowanceValue;
-            });
-            $('#t_allowance').val(totalAllowance);
-        }
-
-        // Fungsi untuk menghitung total deductions
-        function calculateTotalDeduction() {
-            let totalDeduction = 0;
-            $('.deduction').each(function() {
-                const deductionValue = parseFloat($(this).val()) || 0;
-                totalDeduction += deductionValue;
-            });
-            $('#t_deduction').val(totalDeduction);
-        }
-
-        // Menghitung total allowances dan deductions ketika ada perubahan nilai
-        $('.allowance, .deduction').on('input', function() {
-            calculateTotalAllowance();
-            calculateTotalDeduction();
-
-            // Menghitung THP
-            const totalAllowance = parseFloat($('#t_allowance').val()) || 0;
-            const totalDeduction = parseFloat($('#t_deduction').val()) || 0;
-            const BasicSalary = parseFloat($('#basic_salary').val());
-            const thp = Math.round(BasicSalary + totalAllowance - totalDeduction);
-            $('#thp').val(thp);
-            console.log(thp);
-        });
-    });
-</script>
 @endpush

@@ -22,6 +22,7 @@
                                 <th>Component</th>
                                 <th>Tax</th>
                                 <th>Type</th>
+                                <th>Activ Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -40,6 +41,9 @@
                                         @endif 
                                 </td>
                                 <td class="@if ($data->type === 'Allowences') text-success @else text-danger @endif"> {{ $data->type }} </td>
+                                <td>
+                                    <input type="checkbox" class="status-switch" data-id="{{ $data->id }}" @if ($data->is_active == 'aktif') checked @endif>
+                                </td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -230,5 +234,43 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    document.querySelectorAll('.status-switch').forEach(function(switchElem) {
+        switchElem.addEventListener('change', function() {
+            var id = this.getAttribute('data-id');
+            var isActive = this.checked ? 'aktif' : 'nonaktif';
+
+            fetch(`/update-status/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ is_active: isActive })
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Status updated successfully',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update status',
+                    });
+                }
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred',
+                });
+            });
+        });
+    });
 </script>
 @endpush

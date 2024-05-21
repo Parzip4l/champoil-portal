@@ -55,12 +55,13 @@ class ComponentController extends Controller
                 'type' => 'required',
                 'is_taxable' => 'required',
             ]);
-
+            
             $ComponentData = new Component();
             $ComponentData->name = $request->name;
             $ComponentData->type = $request->type;
             $ComponentData->is_taxable = $request->is_taxable;
             $ComponentData->company = $company->unit_bisnis;
+            $ComponentData->is_active = 'nonaktif';
             $ComponentData->save();
 
             return redirect()->route('component-data.index')->with('success', 'Component Successfully Added');
@@ -78,6 +79,27 @@ class ComponentController extends Controller
     public function show($id)
     {
         //
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'is_active' => 'required|in:aktif,nonaktif',
+        ]);
+
+        // Temukan data berdasarkan ID
+        $data = Component::find($id);
+
+        if (!$data) {
+            return response()->json(['success' => false, 'message' => 'Data not found'], 404);
+        }
+
+        // Perbarui status aktif
+        $data->is_active = $request->input('is_active');
+        $data->save();
+
+        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
     }
 
     /**

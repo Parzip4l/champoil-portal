@@ -60,10 +60,12 @@ class PayrolComponent extends Controller
         // Get data components
         $allowence = Component::where('type','Allowences')
                         ->where('company',$DataCode->unit_bisnis)
+                        ->where('is_active','aktif')
                         ->get();
 
         $deduction = Component::where('type','Deductions')
                         ->where('company',$DataCode->unit_bisnis)
+                        ->where('is_active','aktif')
                         ->get();
 
         $employee = Employee::where('organisasi', 'Management Leaders')
@@ -193,10 +195,12 @@ class PayrolComponent extends Controller
         // Get data components
         $allowence = Component::where('type','Allowences')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
 
         $deduction = Component::where('type','Deductions')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
         if (!$data) {
             return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');
@@ -222,10 +226,12 @@ class PayrolComponent extends Controller
         // Get data components
         $allowence = Component::where('type','Allowences')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
 
         $deduction = Component::where('type','Deductions')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
         if (!$data) {
             return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');

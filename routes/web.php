@@ -205,8 +205,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::post('/menu-create', [App\Http\Controllers\MenuController::class, 'store'])->name('menu-create');
 
     // Payroll
+
     // Component Master
     Route::resource('component-data', App\Http\Controllers\Payrol\ComponentController::class);
+        // Update Active 
+        Route::post('/update-status/{id}', [App\Http\Controllers\Payrol\ComponentController::class, 'updateStatus'])->name('update-status');
     
     // logbook
     Route::resource('logbook', App\Http\Controllers\Logbook\LogbookController::class);

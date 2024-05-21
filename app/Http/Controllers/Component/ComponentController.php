@@ -47,7 +47,8 @@ class ComponentController extends Controller
                         ->get();
 
         $component = Component::where('company', $company->unit_bisnis)
-                     ->get();
+                        ->where('is_active','aktif')
+                        ->get();
 
         return view('pages.app-setting.component.create', compact('employees','component'));
     }

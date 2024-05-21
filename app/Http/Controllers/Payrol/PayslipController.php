@@ -332,10 +332,12 @@ class PayslipController extends Controller
 
         $allowence = Component::where('type','Allowences')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
 
         $deduction = Component::where('type','Deductions')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
 
         $data = Payrol::where('id', $id)->get();
@@ -370,10 +372,12 @@ class PayslipController extends Controller
 
         $allowence = Component::where('type','Allowences')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
 
         $deduction = Component::where('type','Deductions')
                         ->where('id',$id)
+                        ->where('is_active','aktif')
                         ->get();
 
         if (!$data) {

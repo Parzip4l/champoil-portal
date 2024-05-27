@@ -38,11 +38,14 @@ class UserActivityTracker
                 $company = Employee::where('nik', $code)->first();
                 // Simpan log aktivitas pengguna
 
+                $route = $request->route();
+                $controllerAction = $route->getActionName();
+            
                 $ipAddress = $request->ip();
                 $log = new ActivityLog();
                 $log->user_id = $code;
                 $log->action = 'URL: ' . $requestedUrl;
-                $log->controller = substr($this->getControllerName($response->original), 0, 255);
+                $log->controller = substr($controller . '@' . $method, 0, 255);
                 $log->ip_address = $ipAddress;
                 $log->description = $company->unit_bisnis;
                 $log->save();
@@ -64,16 +67,5 @@ class UserActivityTracker
         }
 
         return false;
-    }
-
-    protected function getControllerName($controller)
-    {
-        if (is_string($controller)) {
-            return $controller;
-        } elseif (is_object($controller)) {
-            return get_class($controller);
-        } else {
-            return 'Unknown';
-        }
     }
 }

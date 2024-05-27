@@ -25,6 +25,7 @@
                                 <th>User</th>
                                 <th>Ip</th>
                                 <th>Action</th>
+                                <th>Controller</th>
                                 <th>Time</th>
                             </tr>
                         </thead>
@@ -42,6 +43,7 @@
                                 <td>{{$employee->nama}}</td>
                                 <td>{{$data->ip_address}}</td>
                                 <td>{{$data->action}}</td>
+                                <td>{{$data->controller}}</td>
                                 <td>{{$data->created_at}}</td>
                             </tr>
                             @endforeach

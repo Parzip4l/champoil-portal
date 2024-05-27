@@ -73,8 +73,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/lms-nilai', [LmsController::class, 'hasilNilai']);
     Route::post('/post_test', [LmsController::class, 'SubmitTest']);
 
-    //PATROLI
-    Route::get('/patroli_task/{id}', [PatroliController::class, 'checklist_task']);
+    
 
 
     /**
@@ -82,6 +81,14 @@ Route::prefix('v1')->group(function () {
      */
     Route::get('/task_list/{id}', [TaskController::class, 'task']);
     Route::get('/project', [TaskController::class, 'project']);
+
+
+    /**
+     * patroli
+     */
+    Route::get('/patroli_task/{id}', [PatroliController::class, 'checklist_task']);
+
+
     Route::get('/patroli-report', [TaskController::class, 'report_patroli']);
     Route::get('/patroli-report-detail/{id}/{tanggal}', [TaskController::class, 'report_patroli_detail']);
 

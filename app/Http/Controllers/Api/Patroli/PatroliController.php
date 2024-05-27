@@ -17,15 +17,31 @@ class PatroliController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function checklist_task($params) {
+    public function checklist_task(Request $request,$params){
+        $data=[];
+        $data['message']="";
 
-        $data['master'] = Task::where('unix_code', $params)->first();
-    
-        if ($data['master']) {
-            $data['master']->list_task = List_task::where('id_master', $data['master']->id)->get();
+        $data['master']=Task::where('unix_code',$params)->first();
+        
+        $lat = $request->input('latitude');
+        $long = $request->input('longitude');
+        $kantorLatitude = $data['master']->latitude;
+        $kantorLongtitude = $data['master']->longitude;
+        $distance = calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+        
+        $allowedRadius = 5;
+        if ($distance <= $allowedRadius) {
+            if($data['master']){
+                $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
+                $data['distance']=$distance;
+            }
+        } else {
+            $data['message']="Scan Rejected, Outside Radius!";
+            $data['distance']=$distance; // Perbaikan penulisan variabel distance
+            $data['lat']=$lat;
+            $data['long']=$long;
         }
-    
-        // Return a JSON response
+
         return response()->json($data);
     }
 }

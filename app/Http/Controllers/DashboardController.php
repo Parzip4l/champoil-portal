@@ -223,11 +223,11 @@ class DashboardController extends Controller
 
         // Data Statistik Payroll
         if ($company->unit_bisnis === 'kas') {
-            $frontlineSalaries = Payrollns::all();
+            $frontlineSalaries = Payroll::all();
             $managementSalaries = Payrol::where('unit_bisnis', $company->unit_bisnis)->get();
         } else {
             $managementSalaries = Payrol::where('unit_bisnis', $company->unit_bisnis)->get();
-            $frontlineSalaries = Payroll::all();
+            $frontlineSalaries = Payrollns::all();
         }
 
         $managementData = $managementSalaries->groupBy(function ($salary) {

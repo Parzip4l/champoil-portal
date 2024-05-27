@@ -467,6 +467,24 @@
         </div>
         @endif
     </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+        <h6 class="mb-2">Payrol Statistik</h6>
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <canvas id="salaryChart"></canvas>    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+        <h6 class="mb-2">Payrol Statistik Years</h6>
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <canvas id="salaryChartYears"></canvas>    
+                </div>
+            </div>
+        </div>
+    </div>
     @endif
 </div>
 <!-- End Chart Section -->
@@ -904,4 +922,65 @@ $(function() {
         });
     });
   </script>
+  <script>
+        var ctx = document.getElementById('salaryChart').getContext('2d');
+        var salaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($managementData->keys()) !!},
+                datasets: [{
+                    label: 'Management Leaders',
+                    data: {!! json_encode($managementData->values()) !!},
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Frontline',
+                    data: {!! json_encode($frontlineData->values()) !!},
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        var ctx = document.getElementById('salaryChartYears').getContext('2d');
+        var salaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($managementData2->keys()) !!},
+                datasets: [{
+                    label: 'Management Leaders',
+                    data: {!! json_encode($managementData2->values()) !!},
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Frontline',
+                    data: {!! json_encode($frontlineData2->values()) !!},
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
 @endpush

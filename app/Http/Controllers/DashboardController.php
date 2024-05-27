@@ -11,6 +11,7 @@ use App\Absen;
 use App\Employee;
 use App\Feedback;
 use App\Payrol;
+use App\Payrollns;
 use App\Absen\RequestAbsen;
 use App\ModelCG\asign_test;
 use Illuminate\Support\Facades\Auth;
@@ -219,11 +220,31 @@ class DashboardController extends Controller
 
         $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
+        // Data Statistik Payroll
+        $managementSalaries = Payrol::where('unit_bisnis', $company->unit_bisnis)->get();
+        $frontlineSalaries = Payrollns::all();
+
+        $managementData = $managementSalaries->groupBy(function ($salary) {
+            return $salary->created_at->format('M Y');
+        })->map->sum('net_salary');
+
+        $frontlineData = $frontlineSalaries->groupBy(function ($salary) {
+            return $salary->created_at->format('M Y');
+        })->map->sum('thp');
+
+        $managementData2 = $managementSalaries->groupBy(function ($salary) {
+            return $salary->created_at->format('Y');
+        })->map->sum('net_salary');
+        
+        $frontlineData2 = $frontlineSalaries->groupBy(function ($salary) {
+            return $salary->created_at->format('Y');
+        })->map->sum('thp');
+
 
         return view('dashboard', 
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
-            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni'
+            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2'
         ));
     }
 

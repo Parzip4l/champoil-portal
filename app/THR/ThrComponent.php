@@ -4,10 +4,12 @@ namespace App\THR;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class ThrComponent extends Model
 {
     use HasFactory;
+    use LogsActivity;
     protected $table = 'thr_component';
 
     // Hapus kolom 'id' dari fillable karena UUID akan menjadi primary key

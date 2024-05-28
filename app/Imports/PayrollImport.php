@@ -32,6 +32,7 @@ class PayrollImport implements ToCollection, WithHeadingRow
             $employeeCode = $row['employee_code'];
             $lembur_jam = $row['jam_lembur'];
             $uang_makan = $row['uang_makan'];
+            $uang_kerajinan = $row['uang_ke$uang_kerajinan'];
             $potongan_hutang = $row['potongan_hutang'];
             $potongan_mess = $row['potongan_mess'];
             $potongan_lain = $row['potongan_lain'];

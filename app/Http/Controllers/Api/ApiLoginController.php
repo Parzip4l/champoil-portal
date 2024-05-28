@@ -33,6 +33,7 @@ use App\Absen\RequestType;
 use App\Slack;
 use App\ModelCG\Shift;
 use App\Backup\AbsenBackup;
+use App\Payrol\Component;
 
 class ApiLoginController extends Controller
 {
@@ -573,34 +574,80 @@ class ApiLoginController extends Controller
 
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
-        $organisasi = Employee::where('nik',$user->employee_code)
-                    ->select('organisasi','unit_bisnis')
-                    ->first();
+        $organisasi = Employee::where('nik', $user->employee_code)
+            ->select('organisasi', 'unit_bisnis')
+            ->first();
 
         try {
-            if ($organisasi->unit_bisnis === 'CHAMPOIL') {
-                if($organisasi->organisasi === 'Management Leaders') {
-                    $payslip = Payrol::findOrFail($id);
-                } else {
-                    $payslip = Payrollns::findOrFail($id);
-                }
-            }else{
-                if($organisasi->organisasi === 'Management Leaders') {
+            if ($organisasi->unit_bisnis === 'Kas') {
+                if ($organisasi->organisasi === 'Management Leaders') {
                     $payslip = Payrol::findOrFail($id);
                 } else {
                     $payslip = Payroll::findOrFail($id);
                 }
+            } else {
+                if ($organisasi->organisasi === 'Management Leaders') {
+                    $payslip = Payrol::findOrFail($id);
+                } else {
+                    $payslip = Payrollns::findOrFail($id);
+                }
             }
-            // Jika ditemukan, kembalikan data dalam format JSON
+
+            // Decode the JSON fields
+            $allowances = json_decode($payslip->allowances, true);
+            $deductions = json_decode($payslip->deductions, true);
+
+            // Replace IDs with component names
+            $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
+            $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
+
+            // Update the payslip object with the new data
+            $payslip->allowances = json_encode($allowances);
+            $payslip->deductions = json_encode($deductions);
+
+            // Return the payslip data as JSON
             return response()->json(['data' => $payslip], 200);
         } catch (ModelNotFoundException $e) {
-            // Tangani kasus ketika entitas tidak ditemukan
+            // Handle case when the entity is not found
             return response()->json(['error' => 'Data payslip tidak ditemukan.'], 404);
         } catch (\Exception $e) {
-            // Tangani kesalahan umum
+            // Handle general errors
             return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }
     }
+
+    private function replaceComponentIdsWithNames($components, $type)
+{
+    if (!isset($components['data'])) {
+        return $components;
+    }
+
+    $componentIds = array_keys($components['data']);
+    $componentDetails = Component::whereIn('id', $componentIds)->get();
+
+    $componentMap = [];
+    foreach ($componentDetails as $detail) {
+        $componentMap[$detail->id] = $detail->name;
+    }
+
+    $newComponents = ['data' => []];
+    if ($type === 'allowance' && isset($components['total_allowance'])) {
+        $newComponents['total_allowance'] = $components['total_allowance'];
+    }
+    if ($type === 'deduction' && isset($components['total_deduction'])) {
+        $newComponents['total_deduction'] = $components['total_deduction'];
+    }
+
+    foreach ($components['data'] as $id => $values) {
+        $componentName = $componentMap[$id] ?? 'komponen tidak ditemukan';
+        foreach ($values as $value) {
+            $newComponents['data'][$componentName][] = $value;
+        }
+    }
+
+    return $newComponents;
+}
+    
 
     // Get Employee Details
     public function getEmployeeByNik($nik)

@@ -176,7 +176,7 @@
     <div class="menu-absen-wrap">
         <div class="owl-carousel owl-theme owl-basic">
             <div class="item">
-                <a href="{{url('koperasi-page')}}">
+                <a href="#">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="dollar-sign"></i>
                     </div>

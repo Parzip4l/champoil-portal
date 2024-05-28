@@ -32,8 +32,10 @@ class PayrollImport implements ToCollection, WithHeadingRow
             $employeeCode = $row['employee_code'];
             $lembur_jam = $row['jam_lembur'];
             $uang_makan = $row['uang_makan'];
-            $uang_kerajinan = $row['uang_kerajinan'];
-
+            $potongan_hutang = $row['potongan_hutang'];
+            $potongan_mess = $row['potongan_mess'];
+            $potongan_lain = $row['potongan_lain'];
+            
             // Extract Week
             list($startDate, $endDate) = explode(' - ', $this->week);
 
@@ -55,9 +57,7 @@ class PayrollImport implements ToCollection, WithHeadingRow
 
                 // Calculate total deductions
                 $dataDeductions = json_decode($payrollComponents->deductions, true);
-                $totalPotongan = ($dataDeductions['hutang'][0] ?? 0) + 
-                                 ($dataDeductions['mess'][0] ?? 0) + 
-                                 ($dataDeductions['lain_lain'][0] ?? 0);
+                $totalPotongan = $potongan_hutang + $potongan_mess + $potongan_lain;
 
                 // Calculate THP (Take Home Pay)
                 $thpdetails = $totaldaily + $jamLemburdata + $uang_makan + $uang_kerajinan - $totalPotongan;
@@ -75,9 +75,9 @@ class PayrollImport implements ToCollection, WithHeadingRow
                     'total_lembur' => $jamLemburdata,
                     'uang_makan' => $uang_makan,
                     'uang_kerajinan' => $uang_kerajinan,
-                    'potongan_hutang' => $dataDeductions['hutang'][0] ?? 0,
-                    'potongan_mess' => $dataDeductions['mess'][0] ?? 0,
-                    'potongan_lain' => $dataDeductions['lain_lain'][0] ?? 0,
+                    'potongan_hutang' => $potongan_hutang,
+                    'potongan_mess' => $potongan_mess,
+                    'potongan_lain' => $potongan_lain,
                     'thp' => $thpdetails,
                     'total_daily' => $totaldaily,
                     'payrol_status' => 'Unlocked',

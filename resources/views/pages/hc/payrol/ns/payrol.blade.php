@@ -21,13 +21,14 @@
 @endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card custom-card2">
       <div class="card-body">
         <div class="head-card d-flex justify-content-between mb-3">
             <h6 class="card-title align-self-center mb-0">Payroll Frontline Officer</h6>
+            <a href="https://docs.google.com/spreadsheets/d/1EQAvYmzQCDbcPFgSyboi5NjUw9ogIx4S/edit?usp=sharing&ouid=111710735971754386652&rtpof=true&sd=true" target="blank" class="btn btn-success">Download Payrol Tamplate</a>
         </div>
         <hr>
-        <form action="{{route('payrollns.store')}}" method="POST">
+        <form action="{{route('payroll.import.post')}}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-4 mb-3">
@@ -63,7 +64,20 @@
                         <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-4 mb-3">
+                    <div class="form-group mb-3">
+                        <label for="" class="form-label">Import Data</label>
+                        <input type="file" name="file" required class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-group mb-3">
+                        <label for="" class="form-label mb-3"></label>
+                        <button type="submit" class="btn btn-primary w-100 mt-2">Run Payroll</button>
+                    </div>
+                </div>
+                
+                <!-- <div class="col-md-12">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Select Employee</label>
                     </div>
@@ -85,12 +99,38 @@
                 </div>
                 <div class="col-md-12">
                     <button type="submit" class="btn btn-primary">Run Payroll</button>
-                </div>
+                </div> -->
             </div>
         </form>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal Upload Excel -->
+<div class="modal fade" id="ImportModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Slack Webhooks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Import Data</label>
+                            <input type="file" class="form-control" name="file" required>    
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 

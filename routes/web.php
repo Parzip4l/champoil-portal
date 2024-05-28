@@ -89,6 +89,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
 
+        // Ns Import
+        Route::post('/payroll/import', [App\Http\Controllers\Payrol\PayrolController::class, 'importns'])->name('payroll.import.post');
+
     // Classroom
     Route::get('/read_test/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'read_test'])->name('read_test');
     Route::get('/pdf.preview/{id}', [App\Http\Controllers\knowledge\KnowledgeController::class, 'pdfPreview'])->name('pdf.preview');

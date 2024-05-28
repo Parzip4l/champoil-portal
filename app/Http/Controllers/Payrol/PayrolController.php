@@ -21,6 +21,9 @@ use App\Pajak\PajakDetails;
 use Illuminate\Support\Facades\DB;
 Use App\Activities\Log;
 
+use App\Imports\PayrollImport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class PayrolController extends Controller
 {
@@ -315,6 +318,21 @@ class PayrolController extends Controller
         return redirect()->route('payroll.ns')->with(['success' => 'Data Berhasil Disimpan!']);
     }
     
+    
+    public function importns(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+            'month' => 'required|string',
+            'week' => 'required|string',
+            'year' => 'required|integer',
+        ]);
+
+        // Passing the period data to the import class
+        Excel::import(new PayrollImport($request->month, $request->week, $request->year), $request->file('file'));
+
+        return redirect()->back()->with('success', 'Payroll data imported successfully.');
+    }
 
 
 

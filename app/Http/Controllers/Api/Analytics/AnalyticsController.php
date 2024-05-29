@@ -17,11 +17,14 @@ class AnalyticsController extends Controller
      */
     public function getUniqueVisitorsCount()
     {
-        $logs = Log::all(); // Mengambil semua data logs
-
+        // Ambil data logs hanya untuk bulan ini
+        $logs = Log::whereYear('created_at', Carbon::now()->year)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->get();
+    
         $visitorCount = $logs->unique('ip_address')->count(); // Menghitung jumlah visitor unik berdasarkan alamat IP
         $pageViewCount = $logs->count(); // Menghitung jumlah page view
-
+    
         // Mengembalikan data dalam format JSON
         return response()->json([
             'unique_visitor_count' => $visitorCount,

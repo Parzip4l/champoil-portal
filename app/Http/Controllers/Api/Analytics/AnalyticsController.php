@@ -17,8 +17,6 @@ class AnalyticsController extends Controller
      */
     public function getUniqueVisitorsCount()
     {
-        $user = Auth::guard('api')->user();
-        $nik = $user->employee_code;
         $logs = Log::all(); // Mengambil semua data logs
 
         $visitorCount = $logs->unique('ip_address')->count(); // Menghitung jumlah visitor unik berdasarkan alamat IP

@@ -16,22 +16,60 @@ class AnalyticsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getUniqueVisitorsCount()
+    private function getUniqueVisitorsCount()
     {
-        // Ambil data logs hanya untuk bulan ini
-        $logs = Log::whereYear('created_at', Carbon::now()->year)
-                    ->whereMonth('created_at', Carbon::now()->month)
-                    ->get();
+        try {
+            // Ambil data logs hanya untuk bulan ini
+            $currentLogs = Log::whereYear('created_at', Carbon::now()->year)
+                              ->whereMonth('created_at', Carbon::now()->month)
+                              ->get();
     
-        $visitorCount = $logs->unique('ip_address')->count(); // Menghitung jumlah visitor unik berdasarkan alamat IP
-        $pageViewCount = $logs->count(); // Menghitung jumlah page view
+            // Hitung jumlah pengunjung unik dan jumlah tampilan halaman untuk bulan ini
+            $currentVisitorCount = $currentLogs->unique('ip_address')->count();
+            $currentPageViewCount = $currentLogs->count();
     
-        // Mengembalikan data dalam format JSON
-        return response()->json([
-            'unique_visitor_count' => $visitorCount,
-            'page_view_count' => $pageViewCount,
-        ]);
+            // Ambil data logs untuk bulan sebelumnya
+            $previousLogs = Log::whereYear('created_at', Carbon::now()->subMonth()->year)
+                               ->whereMonth('created_at', Carbon::now()->subMonth()->month)
+                               ->get();
+    
+            // Hitung jumlah pengunjung unik dan jumlah tampilan halaman untuk bulan sebelumnya
+            $previousVisitorCount = $previousLogs->unique('ip_address')->count();
+            $previousPageViewCount = $previousLogs->count();
+    
+            // Hitung persentase perubahan untuk jumlah pengunjung unik dan jumlah tampilan halaman
+            $visitorCountChange = $currentVisitorCount - $previousVisitorCount;
+            $visitorCountChangePercentage = $previousVisitorCount != 0 ? ($visitorCountChange / $previousVisitorCount) * 100 : 0;
+    
+            $pageViewCountChange = $currentPageViewCount - $previousPageViewCount;
+            $pageViewCountChangePercentage = $previousPageViewCount != 0 ? ($pageViewCountChange / $previousPageViewCount) * 100 : 0;
+    
+            // Format data dalam format JSON
+            return response()->json([
+                'current_unique_visitor_count' => $currentVisitorCount,
+                'current_page_view_count' => $currentPageViewCount,
+                'previous_unique_visitor_count' => $previousVisitorCount,
+                'previous_page_view_count' => $previousPageViewCount,
+                'visitor_count_change' => $visitorCountChange,
+                'visitor_count_change_percentage' => round($visitorCountChangePercentage, 2),
+                'page_view_count_change' => $pageViewCountChange,
+                'page_view_count_change_percentage' => round($pageViewCountChangePercentage, 2),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return [
+                'current_unique_visitor_count' => 0,
+                'current_page_view_count' => 0,
+                'previous_unique_visitor_count' => 0,
+                'previous_page_view_count' => 0,
+                'visitor_count_change' => 0,
+                'visitor_count_change_percentage' => 0,
+                'page_view_count_change' => 0,
+                'page_view_count_change_percentage' => 0,
+            ]; // Return 0 if there's an error
+        }
     }
+    
 
     /**
      * Show the form for creating a new resource.

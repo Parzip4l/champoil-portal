@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 Use App\Activities\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class AnalyticsController extends Controller
 {

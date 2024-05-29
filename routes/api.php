@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ReferalController;
 use App\Http\Controllers\Api\Project\ProjectController;
 use App\Http\Controllers\Api\VersionController;
 use App\Http\Controllers\Api\Analytics\AnalyticsController;
+use App\Http\Controllers\Api\Analytics\EmployeeAnalytics;
 
 Route::prefix('v1')->group(function () {
 
@@ -106,5 +107,5 @@ Route::prefix('v1')->group(function () {
 
     // Analytics
     Route::get('unique-visitors', [AnalyticsController::class, 'getUniqueVisitorsCount']);
-    
+    Route::get('employee-count', [EmployeeAnalytics::class, 'getEmployeeCount']);
 });

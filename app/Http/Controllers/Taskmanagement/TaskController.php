@@ -35,7 +35,7 @@ class TaskController extends Controller
         
         $data['records']=$task->get();
         $data['project']=Project::all();
-        $data['project_id']=$request->input('project_id');
+        $data['project_id']=Auth::user()->project_id;
         return view('pages.operational.task.index',$data);
     }
 
@@ -160,10 +160,17 @@ class TaskController extends Controller
     }
 
     public function report(Request $request){
+        if(Auth::user()->project_id == NULL){
+            $id_project = $request->input('project_id');
+        }else{
+            $id_project = Auth::user()->project_id;
+        }
+        
         $data['project']=Project::all();
-        $data['project_id']=$request->input('project_id');
+        $data['project_id']=$id_project;
+        $data['client']=Auth::user()->project_id;
         $records = Project::all();
-        $report = Task::where('project_id',$request->input('project_id'))->get();
+        $report = Task::where('project_id',$id_project)->get();
         $data['report']=[];
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
@@ -180,7 +187,7 @@ class TaskController extends Controller
                 $specifiedDate = $val;
                 $tanggal=date('d',strtotime($val));
                 $count = Patroli::join('master_tasks','master_tasks.id','=','patrolis.id_task')
-                                ->where('master_tasks.project_id',$request->input('project_id'))
+                                ->where('master_tasks.project_id',$id_project)
                                 ->where(DB::raw('DATE_FORMAT(patrolis.created_at, "%Y-%m-%d")'),'=',$specifiedDate)
                                 ->count();  
                 if($count==0){
@@ -200,7 +207,8 @@ class TaskController extends Controller
                     "backgroundColor"=>$backgroundColor,
                     "borderColor"=> $borderColor,
                     "jumlah"=>$count,
-                    "title"=>$label
+                    "title"=>$label,
+                    "client"=>Auth::user()->project_id
                 ];
             }
         }

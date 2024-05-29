@@ -20,9 +20,10 @@
             </div>
             
             <div class="card-body">
+            @if($project_id==NULL)
             <form class="row g-3">
                 <div class="col-auto">
-                    <label for="staticEmail2" class="visually-hidden">Project</label>
+                    <label for="staticEmail2" class="visually-hidden">Project </label>
                     <select name="project_id" class="form-control select2">
                         <option value="">-- Select Project -- </option>
                         @if($project)
@@ -45,6 +46,7 @@
                     <button type="submit" class="btn btn-primary mb-3">Filter</button>
                 </div>
             </form>
+            @endif
                 
                 <div class="table-responsive">
                     <table id="dataTableExample" class="table">

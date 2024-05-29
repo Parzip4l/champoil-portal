@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReferalController;
 use App\Http\Controllers\Api\Project\ProjectController;
 use App\Http\Controllers\Api\VersionController;
+use App\Http\Controllers\Api\Analytics\AnalyticsController;
 
 Route::prefix('v1')->group(function () {
 
@@ -102,5 +103,8 @@ Route::prefix('v1')->group(function () {
      * version 
      */
     Route::get('/version', [VersionController::class, 'version']);
+
+    // Analytics
+    Route::get('unique-visitors', [AnalyticsController::class, 'getUniqueVisitorsCount']);
     
 });

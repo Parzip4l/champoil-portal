@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api\Analytics;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+Use App\Activities\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AnalyticsController extends Controller
 {
@@ -12,9 +15,20 @@ class AnalyticsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function getUniqueVisitorsCount()
     {
-        //
+        $user = Auth::guard('api')->user();
+        $nik = $user->employee_code;
+        $logs = Log::all(); // Mengambil semua data logs
+
+        $visitorCount = $logs->unique('ip_address')->count(); // Menghitung jumlah visitor unik berdasarkan alamat IP
+        $pageViewCount = $logs->count(); // Menghitung jumlah page view
+
+        // Mengembalikan data dalam format JSON
+        return response()->json([
+            'unique_visitor_count' => $visitorCount,
+            'page_view_count' => $pageViewCount,
+        ]);
     }
 
     /**

@@ -202,7 +202,7 @@ class TaskController extends Controller
                 $button=$label;
 
                 $data['report'][]=[
-                    "id"=>$request->input('project_id'),
+                    "id"=>$request->input('project_id')?$request->input('project_id'):Auth::user()->project_id,
                     "start"=>$val,
                     "backgroundColor"=>$backgroundColor,
                     "borderColor"=> $borderColor,

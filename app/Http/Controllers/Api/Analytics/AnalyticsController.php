@@ -16,7 +16,7 @@ class AnalyticsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    private function getUniqueVisitorsCount()
+    public function getUniqueVisitorsCount()
     {
         try {
             // Ambil data logs hanya untuk bulan ini

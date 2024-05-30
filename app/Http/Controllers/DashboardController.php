@@ -149,6 +149,7 @@ class DashboardController extends Controller
         $today = now()->format('Y-m-d');  // Tanggal hari ini
 
         $kontrakKaryawan = Employee::where('unit_bisnis',$company->unit_bisnis)
+            ->where('resign_status', 0)
             ->where('berakhirkontrak', '>', $today)
             ->where('berakhirkontrak', '<=', now()->addMonth()->format('Y-m-d'))
             ->select('nama','berakhirkontrak')

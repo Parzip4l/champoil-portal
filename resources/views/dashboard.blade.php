@@ -385,7 +385,17 @@
 @endforeach
 @endif
 <!-- End -->
-
+<div class="row mb-4">
+    <div class="title-analytic d-flex justify-content-between mb-2">
+        <div class="title-data align-self-center">
+            <h5>Analytic Data</h5>
+        </div>
+        <div class="button-detail-analytic">
+            <a href="https://analytic.truest.co.id/login" target="_blank" class="btn btn-primary">Lihat Details</a>
+        </div>
+    </div>
+    <hr>
+</div>
 <!-- Chart Section -->
 <div class="chart-wrap mb-4 desktop">
     @if($user->project_id==NULL)

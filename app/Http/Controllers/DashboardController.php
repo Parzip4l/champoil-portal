@@ -223,7 +223,7 @@ class DashboardController extends Controller
         $asign_test = asign_test::where('employee_code',Auth::user()->employee_code)->where('status',0)->get();
 
         // Data Statistik Payroll
-        if ($company->unit_bisnis === 'kas') {
+        if ($company->unit_bisnis === 'Kas') {
             $frontlineSalaries = Payroll::all();
             $managementSalaries = Payrol::where('unit_bisnis', $company->unit_bisnis)->get();
         } else {

@@ -340,7 +340,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('report-detail/{id}/{periode}',[App\Http\Controllers\Report\ReportController::class,'show'])->name('report-detail');
 
 
-
+        /** Recruitments */
+        Route::resource('job-aplicant', App\Http\Controllers\Recruitments\JobAplicantController::class);
+        Route::get('/job-aplicant', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'index'])->name('job-aplicant');
+        Route::get('/medis', [App\Http\Controllers\Recruitments\MedisController::class, 'index'])->name('medis');
+        Route::get('/test', [App\Http\Controllers\Recruitments\TestController::class, 'index'])->name('test');
 
     });
 });

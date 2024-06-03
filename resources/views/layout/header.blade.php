@@ -194,6 +194,44 @@
                 </div>
             </li>
         @endif
+        @if(in_array('superadmin_access', $dataLogin))
+        <li class="nav-item">
+                <a href="{{ url('#') }}" class="nav-link">
+                    <i class="link-icon" data-feather="users"></i>
+                        <span class="menu-title">Recruitments</span>
+                    <i class="link-arrow"></i>
+                </a>
+                <div class="submenu">
+                    <ul class="submenu-item">
+                        <li class="nav-item">
+                            <a href="{{ route('job-aplicant') }}" 
+                               class="nav-link {{ active_class(['job-aplicant']) }}">
+                                Job Aplicant
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('test') }}" 
+                               class="nav-link {{ active_class(['test']) }}">
+                                Test Result
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('medis') }}" 
+                               class="nav-link {{ active_class(['medis']) }}">
+                                Medis Result
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('logbook-tamu') }}" 
+                               class="nav-link {{ active_class(['logbook']) }}">
+                                Training
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </li>
+        @endif
         @if(in_array('client_access', $dataLogin))
         <li class="nav-item">
                 <a href="{{ url('#') }}" class="nav-link">

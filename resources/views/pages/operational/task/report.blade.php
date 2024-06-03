@@ -226,6 +226,7 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
     // Combine into the desired format
     const formattedDate = `${year}-${month}-${day}`;
 
+
     
     fetch('https://hris.truest.co.id/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
     .then(response => {
@@ -252,6 +253,7 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
                 '<li class="event mb-15">'+
                   '<h3 class="title">'+patrol.task+'</h3>';
                   reportHTML += '<ul class="timeline mt-10">';
+                      if(patrol.daily.length > 0){
                       patrol.daily.forEach(daily => {
                         let label_status="";
                         if(daily.status==0){
@@ -269,6 +271,7 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
                             reportHTML +='</li>';
 
                       });
+                    }
                   reportHTML += '</ul>';
                   
                   reportHTML +='</li>';

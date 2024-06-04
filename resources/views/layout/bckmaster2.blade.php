@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <!--
-Template Name: Champoil Portal - Admin Champoil Super Apps
+Template Name: TRUEST HRIS APPS
 Author: RinableCreative
 Website: https://www.rinablecreative.com
 Portfolio: https://behance.net/muhamadsobirin3
 -->
 <html>
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="description" content="TRUEST HRIS Apps">
@@ -26,17 +26,11 @@ Portfolio: https://behance.net/muhamadsobirin3
   <meta name="_token" content="{{ csrf_token() }}">
   
   <link rel="shortcut icon" href="{{ asset('/faviconbaru.png') }}">
+
   <!-- plugin css -->
   <link href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.css') }}" rel="stylesheet" />
   <link href="{{ asset('css/style.css') }}" rel="stylesheet" />
-  
-  <script>
-      var token = '{{ Session::get("token") }}';
-      if (token) {
-          localStorage.setItem('apiToken', token);
-      }
-  </script>
   <!-- end plugin css -->
 
   @stack('plugin-styles')
@@ -52,21 +46,14 @@ Portfolio: https://behance.net/muhamadsobirin3
   <script src="{{ asset('assets/js/spinner.js') }}"></script>
 
   <div class="main-wrapper" id="app">
-    @include('layout.sidebar')
-    <div class="page-wrapper">
-      @include('layout.header')
-      <div class="page-content">
-        @yield('content')
-      </div>
-      @include('layout.footer')
+    <div class="page-wrapper full-page">
+      @yield('content')
     </div>
   </div>
 
     <!-- base js -->
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('assets/plugins/feather-icons/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
-    <link href="{{ asset('css/responsive.css') }}" rel="stylesheet" />
     <!-- end base js -->
 
     <!-- plugin js -->

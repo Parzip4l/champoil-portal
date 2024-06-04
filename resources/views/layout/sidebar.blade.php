@@ -40,45 +40,45 @@
             @endif
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
             <li class="nav-item nav-category">Time Management</li>
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#timemanagement" role="button" aria-expanded="{{ is_active_route(['timemanagement']) }}" aria-controls="timemanagement">
-                    <i class="link-icon" data-feather="database"></i>
-                    <span class="link-title">Master</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['data']) }}" id="timemanagement">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a>
-                        </li>
-                        @if($employee && $employee->unit_bisnis == 'Kas' && $user->project_id == NULL)
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#timemanagement" role="button" aria-expanded="{{ is_active_route(['timemanagement']) }}" aria-controls="timemanagement">
+                        <i class="link-icon" data-feather="database"></i>
+                        <span class="link-title">Master</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['data']) }}" id="timemanagement">
+                        <ul class="nav sub-menu">
                             <li class="nav-item">
-                                <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>
+                                <a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a>
                             </li>
-                        @endif
-                        @if($employee && $employee->unit_bisnis == 'Kas')
-                            <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
-                            @if($user->project_id == NULL)
-                            <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
+                            @if($employee && $employee->unit_bisnis == 'Kas' && $user->project_id == NULL)
+                                <li class="nav-item">
+                                    <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>
+                                </li>
                             @endif
-                        @endif
-                        @if($user->project_id == NULL)
-                            <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['shift']) }}">Shift</a></li>
-                        @endif
-                        @if($employee && $employee->unit_bisnis == 'Kas'  && $user->project_id == NULL)
-                            <li class="nav-item"><a href="{{ url(route('report.index') . '?periode='.date('M-Y')) }}" class="nav-link {{ active_class(['kas/report']) }}">Report</a></li>
-                        @endif
-                    </ul>
-                </div>
-            </li>
-            @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
-            <li class="nav-item">
-                <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">
-                    <i class="link-icon" data-feather="calendar"></i>
-                    <span class="link-title">Pengajuan Schedule</span>
-                </a>
-            </li>
-            @endif
+                            @if($employee && $employee->unit_bisnis == 'Kas')
+                                <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
+                                @if($user->project_id == NULL)
+                                <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
+                                @endif
+                            @endif
+                            @if($user->project_id == NULL)
+                                <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['shift']) }}">Shift</a></li>
+                            @endif
+                            @if($employee && $employee->unit_bisnis == 'Kas'  && $user->project_id == NULL)
+                                <li class="nav-item"><a href="{{ url(route('report.index') . '?periode='.date('M-Y')) }}" class="nav-link {{ active_class(['kas/report']) }}">Report</a></li>
+                            @endif
+                        </ul>
+                    </div>
+                </li>
+                @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
+                <li class="nav-item">
+                    <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">
+                        <i class="link-icon" data-feather="calendar"></i>
+                        <span class="link-title">Pengajuan Schedule</span>
+                    </a>
+                </li>
+                @endif
             @endif
             @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item nav-category">Payrol</li>
@@ -204,7 +204,7 @@
                 </div>
             </li>
             @endif
-            @if(in_array('superadmin_access', $dataLogin)  || in_array('am_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item nav-category">Settings</li>
             <li class="nav-item">
                 <a href="{{route('setting.index')}}" class="nav-link {{ active_class(['setting']) }}">

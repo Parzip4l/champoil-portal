@@ -31,6 +31,7 @@ class AbsenController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
         $project = Project::all();
+        $client_id= Auth::user()->project_id;
 
         // Mendapatkan data organisasi terpilih (jika ada)
         $selectedOrganization = $request->input('organization');
@@ -113,7 +114,7 @@ class AbsenController extends Controller
         
 
         // Mengirim data ke tampilan
-        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization','months','project'));
+        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization','months','project','client_id'));
     }
 
     public function indexbackup()

@@ -31,6 +31,7 @@
                     <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
                     <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalExport">Export Absen</a>
                 </div>
+                @if($client_id==NULL)
                 <form action="{{ route('attendance.filter') }}" method="get" id="filterForm">
                 <div class="row">
                     
@@ -48,7 +49,7 @@
                                 <option value="">Project</option>
                                 @if($project)
                                     @foreach($project as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                        <option value="{{ $row->id }}" {{ request('project') == $row->id ? 'selected' : '' }}>{{ $row->name }}</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -61,6 +62,7 @@
                 </div>
                 </form>
                 <hr>
+                @endif
                 <div class="table-responsive">
                     <table id="dataTableExample1" class="table table-striped nowrap" width="100%">
                         <thead>

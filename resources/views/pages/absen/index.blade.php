@@ -31,19 +31,35 @@
                     <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
                     <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalExport">Export Absen</a>
                 </div>
+                <form action="{{ route('attendance.filter') }}" method="get" id="filterForm">
                 <div class="row">
-                    <div class="col-md-5">
-                        <form action="{{ route('attendance.filter') }}" method="get" id="filterForm">
-                            @csrf
-                            <label for="organization" class="form-label">Filter :</label>
+                    
+                        @csrf
+                        <label for="organization" class="form-label">Filter :</label>
+                        <div class="col-md-5">
                             <select name="organization" class="form-control mb-2" id="organizationSelect">
                                 <option value="">Semua Organisasi</option>
-                                <option value="Management Leaders">Management Leaders</option>
-                                <option value="Frontline Officer">Frontline Officer</option>
+                                <option value="Management Leaders" {{ request('organization') == 'Management Leaders' ? 'selected' : '' }}>Management Leaders</option>
+                                <option value="Frontline Officer" {{ request('organization') == 'Frontline Officer' ? 'selected' : '' }}>Frontline Officer</option>
                             </select>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="col-md-5">
+                            <select name="project" class="form-control mb-2 select2" id="project">
+                                <option value="">Project</option>
+                                @if($project)
+                                    @foreach($project as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                        
+                    
                 </div>
+                </form>
                 <hr>
                 <div class="table-responsive">
                     <table id="dataTableExample1" class="table table-striped nowrap" width="100%">
@@ -139,23 +155,4 @@
     } );
 } );
   </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Menangkap perubahan pada elemen select
-            document.getElementById('organizationSelect').addEventListener('change', function () {
-                // Mengirim formulir saat terjadi perubahan
-                document.getElementById('filterForm').submit();
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Menangkap perubahan pada elemen select
-            document.getElementById('organizationSelect').addEventListener('change', function () {
-                // Mengirim formulir saat terjadi perubahan
-                document.getElementById('filterForm').submit();
-            });
-        });
-    </script>
-
 @endpush

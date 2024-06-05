@@ -109,6 +109,7 @@
                     <span class="link-title">Payrol Frontline</span>
                 </a>
             </li>
+            @endif
             <li class="nav-item {{ active_class(['payrol-component']) }}">
                 <a href="{{ url('/payrol-component') }}" class="nav-link">
                     <i class="link-icon" data-feather="user-plus"></i>
@@ -121,7 +122,6 @@
                     <span class="link-title">Component Master</span>
                 </a>
             </li>
-            @endif
             @endif
             @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item nav-category">Koperasi</li>

@@ -1,3 +1,4 @@
+-- Active: 1717053366198@@127.0.0.1@3306
 <nav class="sidebar">
     <div class="sidebar-header">
         <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="TRUEST Logo" style="width:50%;">
@@ -71,7 +72,7 @@
                         </ul>
                     </div>
                 </li>
-                @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
+                @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('client_access', $dataLogin) || in_array('admin_access', $dataLogin))
                 <li class="nav-item">
                     <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">
                         <i class="link-icon" data-feather="calendar"></i>

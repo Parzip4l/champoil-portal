@@ -72,7 +72,7 @@
                         </ul>
                     </div>
                 </li>
-                @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('client_access', $dataLogin))
+                @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('client_access', $dataLogin))
                 <li class="nav-item">
                     <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">
                         <i class="link-icon" data-feather="calendar"></i>

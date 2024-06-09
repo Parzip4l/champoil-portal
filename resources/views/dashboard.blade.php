@@ -250,7 +250,7 @@
 </div>
 <!-- End Menu -->
 
-@if(in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || $employee === 'Kas' )
+@if(in_array('am_access', $dataLogin)  || $employee === 'Kas' )
 <!-- Pengajuan Schedule -->
 <div class="row mb-3">
     <h5 class="mb-2">Pengajuan Schedule</h5>

@@ -34,6 +34,8 @@ class TestController extends Controller
             $data['records']=[];
         }
 
+        // dd($data['records']['records']);
+
 
         return view('pages.recruitments.test.index',$data);
     }

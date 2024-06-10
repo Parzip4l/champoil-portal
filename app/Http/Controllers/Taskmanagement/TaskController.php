@@ -196,11 +196,11 @@ class TaskController extends Controller
                     ->count();
                 
                 if ($count == 0) {
-                    $label = "Patrol Empty";
+                    $label = "Empty";
                     $backgroundColor = 'rgba(241,0,117,.25)';
                     $borderColor = '#f10075';
                 } else {
-                    $label = "Check Detail";
+                    $label = "Detail";
                     $backgroundColor = 'rgba(16,183,89, .25)';
                     $borderColor = '#10b759';
                 }

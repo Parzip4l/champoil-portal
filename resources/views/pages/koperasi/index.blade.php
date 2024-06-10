@@ -83,18 +83,15 @@
                     <div class="title mb-4">
                         <h4>Terms & Conditions</h4>
                     </div>
-                    <div class="terms-container" style="max-height: 300px; overflow-y: auto;">
-                        <div class="body-terms">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.<br>
-
-                                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem<br>
-
-                                Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?<br>
-
-                                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.<br>
-                            </p>
+                    @if (!is_null($koperasi->persayaratan))
+                        <div class="terms-container" style="max-height: 300px; overflow-y: auto;">
+                            <div class="body-terms">
+                                {!! nl2br(e($koperasi->persayaratan)) !!}
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <p>Data persyaratan tidak tersedia.</p>
+                    @endif
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" id="agreeCheckbox">
                         <label class="form-check-label" for="agreeCheckbox">

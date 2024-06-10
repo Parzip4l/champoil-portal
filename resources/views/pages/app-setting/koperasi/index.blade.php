@@ -206,8 +206,8 @@
                             <input type="number" name="tenor" class="form-control" placholder="" required>
                         </div>
                         <div class="col-md-12 mb-3">
-                            <label for="" class="form-label">Pesyaratan</label>
-                            <input type="text" name="persayaratan" class="form-control" placholder="" required>
+                            <label for="" class="form-label">Terms & Condition</label>
+                            <textarea name="persayaratan" id="" class="form-control"></textarea>
                         </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Add Settings</button>

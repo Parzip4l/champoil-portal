@@ -16,7 +16,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         @if($client==NULL)
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">

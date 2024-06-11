@@ -81,6 +81,8 @@ class ProjectControllers extends Controller
         
             $randomCode = $this->generateRandomCode();
 
+            // dd($company->unit_bisnis);
+
             $project = new Project();
             $project->id = $randomCode;
             $project->name = $name;
@@ -89,7 +91,7 @@ class ProjectControllers extends Controller
             $project->longtitude = $longtitude;
             $project->contract_start = $contract_start;
             $project->end_contract = $end_contract;
-            $project->company = $company;
+            $project->company = $company->unit_bisnis;
             $project->save();
 
             return redirect()->route('project.index')->with(['success' => 'Data Berhasil Disimpan!']);

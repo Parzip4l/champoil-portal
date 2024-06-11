@@ -174,6 +174,7 @@
                         <div class="col">
                             <label class="form-label">Sertifikasi</label>
                             <select class=" form-select" data-width="100%" name="sertifikasi" required>
+                                <option value="TIDAK ADA">TIDAK ADA</option>
                                 <option value="GADA PRATAMA">GADA PRATAMA</option>
                                 <option value="GADA MADYA">GADA MADYA</option>
                                 <option value="GADA UTAMA">GADA UTAMA</option>

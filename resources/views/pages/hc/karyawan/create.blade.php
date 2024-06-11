@@ -54,7 +54,7 @@
                         </div>
                         <div class="col">
                             <label class="form-label">Divisi</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="divisi">
+                            <select class=" form-select" data-width="100%" name="divisi">
                                 @foreach($divisi as $divisi)
                                     <option value="{{$divisi->name}}">{{$divisi->name}}</option>
                                 @endforeach
@@ -62,7 +62,7 @@
                         </div>
                         <div class="col">
                             <label class="form-label">Jabatan</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="jabatan">
+                            <select class=" form-select" data-width="100%" name="jabatan">
                                 @foreach($jabatan as $jabatan)
                                     <option value="{{$jabatan->name}}">{{$jabatan->name}}</option>
                                 @endforeach
@@ -72,7 +72,7 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Agama</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="agama">
+                            <select class=" form-select" data-width="100%" name="agama">
                                 <option value="Islam">Islam</option>
                                 <option value="Kristen">Kristen</option>
                                 <option value="Katholik">Katholik</option>
@@ -83,7 +83,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Jenis Kelamin</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="jenis_kelamin">
+                            <select class=" form-select" data-width="100%" name="jenis_kelamin">
                                 <option value="Laki-Laki">Laki-Laki</option>
                                 <option value="Perempuan">Perempuan</option>
                             </select>
@@ -106,14 +106,14 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Status Kontrak</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="status_kontrak">
+                            <select class=" form-select" data-width="100%" name="status_kontrak">
                                 <option value="Contract">Kontrak</option>
                                 <option value="Permanent">Tetap</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Organisasi</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
+                            <select class=" form-select" data-width="100%" name="organisasi">
                                 @foreach($organisasi as $organisasi)
                                     <option value="{{$organisasi->name}}">{{$organisasi->name}}</option>
                                 @endforeach
@@ -153,7 +153,7 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Pendidikan Terakhir</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="pendidikan_terakhir" required>
+                            <select class=" form-select" data-width="100%" name="pendidikan_terakhir" required>
                                 <option value="SD">SD</option>
                                 <option value="SMP">SMP</option>
                                 <option value="SMA">SMA</option>
@@ -173,7 +173,7 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Sertifikasi</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="sertifikasi" required>
+                            <select class=" form-select" data-width="100%" name="sertifikasi" required>
                                 <option value="GADA PRATAMA">GADA PRATAMA</option>
                                 <option value="GADA MADYA">GADA MADYA</option>
                                 <option value="GADA UTAMA">GADA UTAMA</option>
@@ -189,7 +189,7 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Status Pernikahan</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="status_pernikahan">
+                            <select class=" form-select" data-width="100%" name="status_pernikahan">
                                 <option value="Married">Married</option>
                                 <option value="Single">Single</option>
                             </select>

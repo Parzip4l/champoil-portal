@@ -11,6 +11,11 @@
 |
 */
 
+/** DMAIC */
+Route::get('/dmaic-form', [App\Http\Controllers\DMAIC\DmaicController::class, 'create'])->name('dmic-form');
+Route::post('/submit-dmaic', [App\Http\Controllers\DMAIC\DmaicController::class, 'store'])->name('submit-dmaic');
+Route::get('/dmaic-success', [App\Http\Controllers\DMAIC\DmaicController::class, 'page_success'])->name('dmaic-success');
+
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 

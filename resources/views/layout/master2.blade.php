@@ -31,6 +31,7 @@ Portfolio: https://behance.net/muhamadsobirin3
   <link href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.css') }}" rel="stylesheet" />
   <link href="{{ asset('css/style.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
   <!-- end plugin css -->
 
   @stack('plugin-styles')
@@ -53,6 +54,7 @@ Portfolio: https://behance.net/muhamadsobirin3
 
     <!-- base js -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/feather-icons/feather.min.js') }}"></script>
     <!-- end base js -->
 
@@ -62,6 +64,12 @@ Portfolio: https://behance.net/muhamadsobirin3
 
     <!-- common js -->
     <script src="{{ asset('assets/js/template.js') }}"></script>
+    <script>
+    $(document).ready(function() {
+        
+        $('.select2').select2();
+    } );
+    </script>
     <!-- end common js -->
 
     @stack('custom-scripts')

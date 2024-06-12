@@ -205,6 +205,34 @@
                 </div>
             </li>
             @endif
+
+            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
+            <li class="nav-item nav-category">Repot DMAIC</li>
+            <li class="nav-item {{ active_class(['']) }}">
+                <a class="nav-link" data-bs-toggle="collapse" href="#dmaic" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">
+                    <i class="link-icon" data-feather="settings"></i>
+                    <span class="link-title">Master Data</span>
+                    <i class="link-arrow" data-feather="chevron-down"></i>
+                </a>
+                <div class="collapse {{ show_class(['category']) }}" id="dmaic">
+                    <ul class="nav sub-menu">
+                        <li class="nav-item">
+                            <a href="{{ route('job-aplicant') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Report Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('test') }}" class="nav-link {{ active_class(['test']) }}">Category</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">DMAIC List</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Analytic</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            @endif
+
             @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item nav-category">Settings</li>
             <li class="nav-item">

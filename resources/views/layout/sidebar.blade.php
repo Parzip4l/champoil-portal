@@ -236,14 +236,16 @@
             </li>
             @endif
 
-            @if(in_array('superadmin_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin))
             <li class="nav-item nav-category">Settings</li>
+            @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
                 <a href="{{route('setting.index')}}" class="nav-link {{ active_class(['setting']) }}">
                     <i class="link-icon" data-feather="hash"></i>
                     <span class="link-title">App Setting</span>
                 </a>
             </li>
+            @endif
             
             <li class="nav-item">
                 <a href="{{route('map')}}" class="nav-link {{ active_class(['map']) }}">

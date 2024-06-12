@@ -109,4 +109,6 @@ Route::prefix('v1')->group(function () {
     // Analytics
     Route::get('unique-visitors', [AnalyticsController::class, 'getUniqueVisitorsCount']);
     Route::get('employee-count', [EmployeeAnalytics::class, 'getEmployeeCount']);
+
+    Route::post('/map-domisili', [App\Http\Controllers\Map::class, 'update_domisili'])->name('map-domisili');
 });

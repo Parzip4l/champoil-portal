@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\ModelCG\Project;
+use App\User;
 class Map extends Controller
 {
     /**
@@ -68,6 +72,24 @@ class Map extends Controller
     public function edit($id)
     {
         //
+    }
+
+    public function update_domisili(Request $request){
+        $data = $request->all();
+        
+
+        DB::table('users') // Specify the table name
+            ->where('name', $data['user_id']) // Where clause to filter records
+            ->update([
+                "longitude" => $data['longitude'], // Update longitude
+                "latitude" => $data['latitude']    // Update latitude
+            ]);
+
+        $return = DB::table('users')
+        ->where('name', $data['user_id'])
+        ->first();
+
+        return response()->json($return);
     }
 
     /**

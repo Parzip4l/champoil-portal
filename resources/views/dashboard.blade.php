@@ -245,6 +245,16 @@
                     </div>
                 </a>
             </div>
+            <div class="item">
+                <a href="javascript:void(0)" id="maps-update">
+                    <div class="icon text-center">
+                        <i class="icon-lg text-white" data-feather="map"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Update Residence</p>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -725,6 +735,55 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    $('#maps-update').on('click', function() {
+        Swal.fire({
+            title: "Do you want to save the changes?",
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: "Yes",
+            denyButtonText: `No`
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var latitude = position.coords.latitude;
+                        var longitude = position.coords.longitude;
+                        // Data to be sent in the POST request
+                        var data_field = {
+                            longitude: longitude, // Replace with actual data
+                            latitude:latitude, // Replace with actual data
+                            user_id:<?php echo $user->employee_code ?>
+                        };
+
+                        $.ajax({
+                            url: "/api/v1/map-domisili", // URL of the API endpoint
+                            method: "POST", // Change the method to POST
+                            data: data_field,
+                            dataType: "json", // Expected data type of the response (JSON in this case)
+                            headers: {
+                                "X-CSRF-Token": '{{ csrf_token() }}' // CSRF token header
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    position: "middle",
+                                    icon: "success",
+                                    title: "Your work has been saved",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }
+                        });
+                    });
+                }
+            } else if (result.isDenied) {
+                Swal.fire("Changes are not saved", "", "info");
+            }
+        });
+    });
 </script>
 <script>
     $(document).ready(function () {

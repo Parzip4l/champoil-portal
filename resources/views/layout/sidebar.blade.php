@@ -244,7 +244,16 @@
                     <span class="link-title">App Setting</span>
                 </a>
             </li>
+            
+            <li class="nav-item">
+                <a href="{{route('map')}}" class="nav-link {{ active_class(['map']) }}">
+                    <i class="link-icon" data-feather="map"></i>
+                    <span class="link-title">Maps</span>
+                </a>
+            </li>
+        
             @endif
+            
         </ul>
     </div>
 </nav>

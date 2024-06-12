@@ -350,6 +350,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/job-aplicant', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'index'])->name('job-aplicant');
         Route::get('/medis', [App\Http\Controllers\Recruitments\MedisController::class, 'index'])->name('medis');
         Route::get('/test', [App\Http\Controllers\Recruitments\TestController::class, 'index'])->name('test');
+        Route::get('/penempatan', [App\Http\Controllers\Recruitments\PenempatanController::class, 'index'])->name('penempatan');
+        Route::get('/create-truest/{id}', [App\Http\Controllers\Recruitments\PenempatanController::class, 'create'])->name('create-truest');
 
     });
 });

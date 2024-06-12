@@ -739,7 +739,7 @@
 <script>
     $('#maps-update').on('click', function() {
         Swal.fire({
-            title: "Do you want to save the changes?",
+            title: "Apakah Anda Berada Di Lokasi Tempat Tinggal Anda ?",
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: "Yes",

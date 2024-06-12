@@ -756,7 +756,7 @@
                         var data_field = {
                             longitude: longitude, // Replace with actual data
                             latitude:latitude, // Replace with actual data
-                            user_id:<?php echo $user->employee_code ?>
+                            user_id:<?php echo $user->id ?>
                         };
 
                         $.ajax({

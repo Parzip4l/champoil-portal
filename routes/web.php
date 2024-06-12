@@ -354,6 +354,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/create-truest/{id}', [App\Http\Controllers\Recruitments\PenempatanController::class, 'create'])->name('create-truest');
         Route::get('/map', [App\Http\Controllers\Map::class, 'index'])->name('map');
         Route::post('/map-domisili', [App\Http\Controllers\Map::class, 'update_domisili'])->name('map-domisili');
+        Route::get('/map-frontline', [App\Http\Controllers\Map::class, 'map_frontline'])->name('map-frontline');
 
     });
 });

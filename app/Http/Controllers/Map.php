@@ -31,6 +31,96 @@ class Map extends Controller
         return view('pages.operational.map.index',$data);
     }
 
+    public function map_frontline(Request $request)
+    {
+        $data['project'] = Project::all();
+        $records = User::select('users.*', 'karyawan.*')
+                        ->join('karyawan', 'karyawan.nik', '=', 'users.name')
+                        ->whereNotNull('longitude')
+                        ->get();
+
+        $data['records'] = [];
+
+        if (!empty($request->input('project_id'))) {
+            $project = Project::find($request->input('project_id'));
+            if ($project) {
+                $kordinat_project = [
+                    'lat' => $project->latitude,
+                    'lng' => $project->longtitude,
+                    'popup' => $project->name,
+                    "project"=>1
+                ];
+                $data['records'][] = $kordinat_project;
+
+                $data['long'] = $project->longtitude;
+                $data['lat'] = $project->latitude;
+
+                if ($records) {
+                    foreach ($records as $row) {
+                        $lat = $row->latitude;
+                        $long = $row->longitude;
+                        $kantorLatitude = $project->latitude;
+                        $kantorLongtitude = $project->longtitude;
+        
+                        
+        
+                        $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+                        $data['records'][] = [
+                            'lat' => $row->latitude,
+                            'lng' => $row->longitude,
+                            'popup' => $row->nama.' '.$distance.' KM',
+                            "project"=>0
+                        ];
+                    }
+                }
+            }
+        }else{
+            if ($records) {
+                foreach ($records as $row) {
+                    $lat = $request->input('lat');
+                    $long = $request->input('long');
+                    $kantorLatitude = $data['master']->latitude;
+                    $kantorLongtitude = $data['master']->longitude;
+    
+                    
+    
+                    $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+                    $data['records'][] = [
+                        'lat' => $row->latitude,
+                        'lng' => $row->longitude,
+                        'popup' => $row->nama,
+                        "project"=>0
+                    ];
+                }
+            }
+        }
+
+        
+
+        
+
+        $data['project_id'] = $request->input('project_id') ?: '';
+
+        // dd($data);
+
+        return view('pages.operational.map.map_frontline', $data);
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; 
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = round($earthRadius * $c); 
+
+        return $distance;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -79,14 +169,14 @@ class Map extends Controller
         
 
         DB::table('users') // Specify the table name
-            ->where('name', $data['user_id']) // Where clause to filter records
+            ->where('id', $data['user_id']) // Where clause to filter records
             ->update([
                 "longitude" => $data['longitude'], // Update longitude
                 "latitude" => $data['latitude']    // Update latitude
             ]);
 
         $return = DB::table('users')
-        ->where('name', $data['user_id'])
+        ->where('id', $data['user_id'])
         ->first();
 
         return response()->json($return);

@@ -250,7 +250,13 @@
             <li class="nav-item">
                 <a href="{{route('map')}}" class="nav-link {{ active_class(['map']) }}">
                     <i class="link-icon" data-feather="map"></i>
-                    <span class="link-title">Maps</span>
+                    <span class="link-title">Maps Project</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{route('map-frontline')}}" class="nav-link {{ active_class(['map-frontline']) }}">
+                    <i class="link-icon" data-feather="map"></i>
+                    <span class="link-title">Maps Frontline</span>
                 </a>
             </li>
         

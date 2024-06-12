@@ -77,14 +77,7 @@ class Map extends Controller
         }else{
             if ($records) {
                 foreach ($records as $row) {
-                    $lat = $request->input('lat');
-                    $long = $request->input('long');
-                    $kantorLatitude = $data['master']->latitude;
-                    $kantorLongtitude = $data['master']->longitude;
-    
-                    
-    
-                    $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
+                   
                     $data['records'][] = [
                         'lat' => $row->latitude,
                         'lng' => $row->longitude,
@@ -92,6 +85,8 @@ class Map extends Controller
                         "project"=>0
                     ];
                 }
+                $data['long'] = '';
+                $data['lat'] ='';
             }
         }
 
@@ -99,7 +94,7 @@ class Map extends Controller
 
         
 
-        $data['project_id'] = $request->input('project_id') ?: '';
+        $data['project_id'] = $request->input('project_id') ?: 0;
 
         // dd($data);
 

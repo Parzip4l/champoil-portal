@@ -69,7 +69,7 @@
         let defaultCoordinates = [-6.200, 106.816];
         let titik = defaultCoordinates;
 
-        if (project_id) {
+        if (project_id != 0) {
             titik = [<?php echo $lat ?>,<?php echo $long ?>];
         }
         

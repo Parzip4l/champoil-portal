@@ -1,4 +1,3 @@
--- Active: 1717053366198@@127.0.0.1@3306
 <nav class="sidebar">
     <div class="sidebar-header">
         <img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="TRUEST Logo" style="width:50%;">

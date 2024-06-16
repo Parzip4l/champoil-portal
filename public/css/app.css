@@ -19470,8 +19470,8 @@ body {
 .main-wrapper .page-wrapper {
   min-height: 100vh;
   background: #f9fafb;
-  width: 100%;
-  margin-left: 0;
+  width: calc(100% - 240px);
+  margin-left: 240px;
   display: flex;
   flex-direction: column;
   transition: margin 0.1s ease, width 0.1s ease;

@@ -165,6 +165,8 @@ class TaskController extends Controller
         }else{
             $id_project = Auth::user()->project_id;
         }
+
+        $data['detail_project'] = Project::find($id_project);
         
         $data['project']=Project::all();
         $data['project_id']=$id_project;

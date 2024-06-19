@@ -7,9 +7,10 @@
     .timeline{
       max-width:100% !important;
     }
-
-   
-
+    th{
+      text-align:center !important;
+      vertical-align: middle;
+    }
     
   </style>
 @endpush
@@ -69,7 +70,7 @@
                     <div class="col-12 col-md-12">
                         <div class="card">
                         <div class="card-body">
-                            <div id='fullcalendar'></div>
+                            <div id='fullcalenda'></div>
                         </div>
                         </div>
                     </div>
@@ -80,7 +81,70 @@
     
 </div>
 <div class="row mt-3">
-<div class="col-md-12">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title"></h6>
+        <div class="table-responsive">
+            <table id="dataTableExample" class="table table-bordered table-responsive">
+              <thead>
+                <tr>
+                  <th colspan="16" class="text-center">
+                    {{ $detail_project->name }}
+                  </th>
+                </tr>
+                <tr>
+                  <th width="5" rowspan="2">No</th>
+                  <th width="10" rowspan="2">Shift</th>
+                  <th rowspan="2">Checkpoint</th>
+                  <th rowspan="2">Sub Point</th>
+                  <th rowspan="2">Officer</th>
+                  <th colspan="10">Time</th>
+                  <th rowspan="2">Event</th>
+                </tr>
+                <tr>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                  <th>20:00</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>{!! insert_line_breaks('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla condimentum euismod nisi, non vestibulum libero. Vivamus nec tortor a libero semper interdum. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer feugiat, nunc sit amet fermentum aliquet, leo elit gravida est, sit amet auctor metus mi eget odio. Nam sit amet venenatis odio. Morbi at nisi nec arcu vehicula faucibus non a eros. Suspendisse id turpis a lacus vehicula tempor.',30) !!}</td>
+                  <td>{!! insert_line_breaks('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla condimentum euismod nisi, non vestibulum libero. Vivamus nec tortor a libero semper interdum. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer feugiat, nunc sit amet fermentum aliquet, leo elit gravida est, sit amet auctor metus mi eget odio. Nam sit amet venenatis odio. Morbi at nisi nec arcu vehicula faucibus non a eros. Suspendisse id turpis a lacus vehicula tempor.',30) !!}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+
+                
+                
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="col-md-12">
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title mb-4">Detail <span id="tanggal_report"></span></h6>
@@ -89,7 +153,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 
 

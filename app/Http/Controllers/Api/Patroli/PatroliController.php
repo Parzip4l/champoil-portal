@@ -62,7 +62,7 @@ class PatroliController extends Controller
                 $insert=[
                     "unix_code"=>$data['unix_code'],
                     "id_task"=>$row['id'][$no],
-                    "employee_code"=>''
+                    "employee_code"=>$user->id
                 ];
                 $no++;
             }

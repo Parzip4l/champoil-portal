@@ -80,8 +80,8 @@
                                             <p>DATE : {{ date('d F Y H:i:s',strtotime($row->created_at)) }}</p><hr/>
                                             @if($row->detail)
                                                 @foreach($row->detail as $child)
-                                                    <p>{{$child->point_name}}<p>
-                                                        {!! $child->dmaic_value !!}
+                                                    <strong>{{$child->point_name}}</strong>
+                                                    {!! $child->dmaic_value !!}
                                                 @endforeach
                                             @endif
                                             <p>KEYWORD – KATA KUNCI MASALAH :</p>

@@ -61,7 +61,7 @@ class PatroliController extends Controller
             foreach($data['id'] as $row){
                 $insert=[
                     "unix_code"=>$data['unix_code'],
-                    "id_task"=>$row['id'][$no],
+                    "id_task"=>$data['id'][$no],
                     "employee_code"=>$user->id
                 ];
                 $no++;

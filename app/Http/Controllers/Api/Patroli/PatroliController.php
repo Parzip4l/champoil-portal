@@ -68,8 +68,13 @@ class PatroliController extends Controller
             }
         }
 
+        $return =[
+            "status"=>true,
+            "message"=>"Patroli Berhasil di Simpan"
+        ];
 
 
-        return response()->json($data);
+
+        return response()->json($return);
     }
 }

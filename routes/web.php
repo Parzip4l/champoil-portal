@@ -356,6 +356,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::post('/map-domisili', [App\Http\Controllers\Map::class, 'update_domisili'])->name('map-domisili');
         Route::get('/map-frontline', [App\Http\Controllers\Map::class, 'map_frontline'])->name('map-frontline');
 
+        /** DMAIC */
+        Route::get('/dmaic-report', [App\Http\Controllers\DMAIC\ReportController::class, 'index'])->name('dmaic-report');
+
     });
 });
 

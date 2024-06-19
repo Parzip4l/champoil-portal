@@ -17,6 +17,12 @@ function karyawan_bynik($nik){
   return $karyawan->where('nik',$nik)->first();
 }
 
+
+function project_byID($id){
+  $project = app('App\ModelCG\Project');
+  return $project->where('id',$id)->first();
+}
+
 if (!function_exists('insert_line_breaks')) {
   function insert_line_breaks($text, $interval = 30) {
       return preg_replace('/(.{1,' . $interval . '})(\s+|$)/u', '\\1<br>', $text);

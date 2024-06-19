@@ -219,7 +219,7 @@
                 <div class="collapse {{ show_class(['category']) }}" id="dmaic">
                     <ul class="nav sub-menu">
                         <li class="nav-item">
-                            <a href="{{ route('job-aplicant') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Report Data</a>
+                            <a href="{{ route('dmaic-report') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Report Data</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('test') }}" class="nav-link {{ active_class(['test']) }}">Category</a>

@@ -6,12 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 Use App\DMAIC;
 Use App\DMAIC_Relations;
-Use App\DMAICCategory;
-Use App\DMAICPoint;
-use App\Employee;
-use App\ModelCG\Project;
 
-class DmaicController extends Controller
+class ReportController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,7 +16,20 @@ class DmaicController extends Controller
      */
     public function index()
     {
-        //
+        $data['report']=DMAIC::select('dmaic.*', 'karyawan.nama as nama_karyawan','dmaic_category.category_name')
+                        ->join('karyawan', 'karyawan.id', '=', 'dmaic.nama')
+                        ->join('dmaic_category', 'dmaic_category.id', '=', 'dmaic.category')
+                        ->get();
+        if(!empty($data['report'])){
+            foreach($data['report'] as $row){
+                $row->detail = DMAIC_Relations::join('dmaic_point', 'dmaic_point.id', '=', 'dmaic_relations.dmaic_point')
+                                            ->where('dmaic_relations.dmaic_id',$row->id)
+                                            ->get();
+            }
+        }
+
+        // dd($data['report']);
+        return view('pages.dmaic.report',$data);
     }
 
     /**
@@ -30,12 +39,7 @@ class DmaicController extends Controller
      */
     public function create()
     {
-        
-        $data['category']=DMAICCategory::all();
-        $data['points']=DMAICPoint::all();
-        $data['employee']=Employee::where('unit_bisnis','Kas')->where('organisasi','Frontline Officer')->get();
-        $data['project']=Project::all();
-        return view('pages.dmaic.create',$data);
+        //
     }
 
     /**
@@ -46,36 +50,7 @@ class DmaicController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
-        $dmaic=[
-            "nama"=>$data['nama'],
-            "created_at"=>date('Y-m-d H:i:s'),
-            "project"=>$data['project'],
-            "category"=>$data['category']
-        ];
-
-        $dmic_insert = DMAIC::insertGetId($dmaic);
-        if($dmic_insert){
-            $no=0;
-            foreach($data['dmaic_point'] as $row){
-                $parent=[
-                    "dmaic_id"=>$dmic_insert,
-                    "dmaic_point"=>$data['dmaic_point'][$no],
-                    "created_at"=>date('Y-m-d H:i:s'),
-                    "dmaic_value"=>$data['dmaic_value'][$no]
-                ];
-
-                DMAIC_Relations::insert($parent);
-
-                $no++;
-            }
-        }
-
-        return redirect()->route('dmaic-success')->with(['success' => 'DMAIC Berhasil Disimpan!']);
-    }
-
-    public function page_success(){
-        return view('pages.dmaic.page_success');
+        //
     }
 
     /**

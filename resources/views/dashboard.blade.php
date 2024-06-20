@@ -376,16 +376,16 @@
                 @endif
 
                 @if ($dataAbsen->aprrove_status !=="Reject")
-                <a class="btn btn-sm btn-danger w-100" href="{{ route('reject.request', ['id' => $dataAbsen->id])}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $dataAbsen->id }}').submit();">
+                <a class="btn btn-sm btn-danger w-100" href="{{ route('reject.request', ['id' => $dataAbsen->unik_code])}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $dataAbsen->unik_code }}').submit();">
                     <span class="">Reject</span>
                 </a>
                 @endif
                 <!-- Form Approved -->
-                <form id="setujui-usulan-form-{{ $dataAbsen->id }}" action="{{ route('approve.request', ['id' => $dataAbsen->id]) }}" method="POST" style="display: none;">
+                <form id="setujui-usulan-form-{{ $dataAbsen->unik_code }}" action="{{ route('approve.request', ['id' => $dataAbsen->unik_code]) }}" method="POST" style="display: none;">
                     @csrf
                 </form>
                 <!-- Form Reject -->
-                <form id="reject-usulan-form-{{ $dataAbsen->id }}" action="{{ route('reject.request', ['id' => $dataAbsen->id]) }}" method="POST" style="display: none;">
+                <form id="reject-usulan-form-{{ $dataAbsen->unik_code }}" action="{{ route('reject.request', ['id' => $dataAbsen->unik_code]) }}" method="POST" style="display: none;">
                     @csrf
                 </form>
             </div>

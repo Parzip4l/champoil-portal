@@ -1,104 +1,131 @@
 @extends('layout.master')
 
 @push('plugin-styles')
-  <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Data Pengajuan Attendence</h5>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Employee</th>
-                                <th>Tanggal Diajukan</th>
-                                <th>Tanggal Pengajuan</th>
-                                <th>Keperluan</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <table id="dataTableExample" class="table table-striped nowrap">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Tanggal Diajukan</th>
+                            <th>Tanggal Pengajuan</th>
+                            <th>Keperluan</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($dataRequest as $data)
+                        <tr>
                             @php 
-                                $nomor = 1;
+                                $employeename = \App\Employee::where('nik', $data->employee)->first();
                             @endphp
-                            @foreach ($dataRequest as $data)
-                            <tr>
-                                @php 
-                                    $employeename = \App\Employee::where('nik', $data->employee)->first();
-                                @endphp
-                                <td> {{$nomor++}} </td>
-                                <td><a href="#" onclick="openSidebar('{{ $data }}')">{{ $employeename->nama }}</a></td>
-                                <td> {{ $data->created_at }} </td>
-                                <td> {{ $data->tanggal }} </td>
-                                <td> {{ $data->status }} </td>
-                                <td>{{$data->aprrove_status}}</td>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            @if ($data->aprrove_status !=="Approved")
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('approve.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $data->id }}').submit();">
-                                                <i data-feather="check" class="icon-sm me-2"></i>
-                                                <span class="">Approve</span>
-                                            </a>
-                                            @endif
+                            <td><a href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}">{{ $employeename->nama }}</a></td>
+                            <td> {{ $data->created_at }} </td>
+                            <td> {{ $data->tanggal }} </td>
+                            <td> {{ $data->status }} </td>
+                            <td>    {{$data->aprrove_status}}</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        @if ($data->aprrove_status !=="Approved")
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('approve.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $data->id }}').submit();">
+                                            <i data-feather="check" class="icon-sm me-2"></i>
+                                            <span class="">Approve</span>
+                                        </a>
+                                        @endif
 
-                                            @if ($data->aprrove_status !=="Reject")
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('reject.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $data->id }}').submit();">
-                                                <i data-feather="x" class="icon-sm me-2"></i>
-                                                <span class="">Reject</span>
-                                            </a>
-                                            @endif
+                                        @if ($data->aprrove_status !=="Reject")
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('reject.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $data->id }}').submit();">
+                                            <i data-feather="x" class="icon-sm me-2"></i>
+                                            <span class="">Reject</span>
+                                        </a>
+                                        @endif
 
-                                            <!-- Form Approved -->
-                                            <form id="setujui-usulan-form-{{ $data->id }}" action="{{ route('approve.request', $data->id) }}" method="POST" style="display: none;">
-                                                @csrf
-                                            </form>
-                                            <!-- Form Reject -->
-                                            <form id="reject-usulan-form-{{ $data->id }}" action="{{ route('reject.request', $data->id) }}" method="POST" style="display: none;">
-                                                @csrf
-                                            </form>
+                                        <!-- Form Approved -->
+                                        <form id="setujui-usulan-form-{{ $data->id }}" action="{{ route('approve.request', $data->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+                                        <!-- Form Reject -->
+                                        <form id="reject-usulan-form-{{ $data->id }}" action="{{ route('reject.request', $data->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
 
-                                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="openSidebar('{{ $data }}')">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Details</span>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}">
+                                            <i data-feather="eye" class="icon-sm me-2"></i>
+                                            <span class="">Details</span>
+                                        </a>
+                                        <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
+                                            @csrf @method('DELETE') 
+                                            <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                <i data-feather="trash" class="icon-sm me-2"></i>
+                                                <span class="">Delete</span>
                                             </a>
-                                            <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                                                @csrf @method('DELETE') 
-                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                                    <i data-feather="trash" class="icon-sm me-2"></i>
-                                                    <span class="">Delete</span>
-                                                </a>
-                                            </form>
-                                        </div>
+                                        </form>
                                     </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Details -->
+@foreach ($dataRequest as $data)
+@php 
+    $employeename = \App\Employee::where('nik', $data->employee)->first();
+@endphp
+<div class="modal fade" id="DetailPengajuan{{$data->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Details Pengajuan {{$employeename->nama}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group mb-2">
+                    <label for="" class="form-label">Employee</label>
+                    <input type="text" class="form-control" value="{{$employeename->nama}}">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="" class="form-label">Request Type</label>
+                    <input type="text" class="form-control" value="{{$data->status}}">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="" class="form-label">Tanggal</label>
+                    <input type="text" class="form-control" value="{{$data->tanggal}}">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="" class="form-label">Reason</label>
+                    <textarea name="" id="" class="form-control">{{$data->alasan}}</textarea>
+                </div>
+                <div class="form-group mb-2">
+                    <a href="{{ route('dokumen.download', $data->id) }}" class="btn btn-primary w-100">Download Attachment</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Sidebar Content -->
-<div id="mySidebar" class="sidebar">
-  <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
-    <div id="sidebarContent">
-    </div>
-</div>
+@endforeach
+<!-- End Modal -->
 @endsection
 
 @push('plugin-scripts')
@@ -108,89 +135,21 @@
 @endpush
 
 @push('custom-scripts')
-  <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
-    function openSidebar(details) {
-      // Update the sidebar content with the details
-      document.getElementById('sidebarContent').innerHTML = `
-      <h4 class="mb-3">Details</h4>
-        <div class="detail-sidebar-wrap">
-            <div class="form-group mb-3">
-                <label for="" class="form-label">Employee</label>
-                <h5>{{$employeename->nama}}</h5>
-            </div>
-            <div class="form-group mb-3">
-                <label for="" class="form-label">Keperluan</label>
-                <h5>{{$data->status}}</h5>
-            </div>
-            <div class="form-group mb-3">
-                <label for="" class="form-label">Tanggal Keperluan</label>
-                <h5>{{$data->tanggal}}</h5>
-            </div>
-            <div class="form-group mb-3">
-                <label for="" class="form-label">Alasan</label>
-                <h5>{{$data->alasan}}</h5>
-            </div>
-            <div class="form-group mb-3">
-                <label for="" class="form-label">Tanggal Pengajuan</label>
-                <h5>{{$data->created_at}}</h5>
-            </div>
-            <a href="{{route('dokumen.download', $data->id)}}" class="btn btn-primary mb-3">Download File Pendukung</a>
-        </div>
-      `;
-      document.getElementById('mySidebar').style.width = '350px'; // Adjust width as needed
-      document.getElementById('main').style.marginRight = '350px'; // Adjust margin as needed
+    $(document).ready(function() {
+    if ($.fn.DataTable.isDataTable('#dataTableExample')) {
+        $('#dataTableExample').DataTable().destroy();
     }
-
-    function closeSidebar() {
-      document.getElementById('mySidebar').style.width = '0';
-      document.getElementById('main').style.marginRight = '0';
-    }
+    
+    $('#dataTableExample').DataTable({
+        "order": [[0, 'desc']], // Mengurutkan berdasarkan kolom pertama (tanggal) secara menurun
+        "columnDefs": [
+            { "type": "date", "targets": 0 } // Mengatur tipe kolom pertama sebagai tanggal
+        ]
+    });
+});
   </script>
-  <style>
-
-    div#sidebarContent {
-        padding: 100px 0px 0px 50px;
-    }
-
-    .sidebar {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        top: 0;
-        right: 0;
-        background-color: #fff;
-        overflow-x: hidden;
-        transition: 0.5s;
-        z-index: 9999;
-        box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2);
-        -webkit-box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2);
-        -moz-box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2);
-        -ms-box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2);
-    }
-    .sidebar a.closebtn {
-      padding: 8px 8px 8px 32px;
-      text-decoration: none;
-      font-size: 25px;
-      color: #000;
-      display: block;
-      transition: 0.3s;
-    }
-    .sidebar a.closebtn:hover {
-      color: #ffc107;
-    }
-    .sidebar .closebtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 36px;
-      margin-right: 10px;
-    }
-    #main {
-      transition: margin-right .5s;
-    }
-  </style>
   <script>
     function showDeleteDataDialog(id) {
         Swal.fire({
@@ -213,7 +172,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Contact Successfully Deleted',
+                            title: 'Data Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert
@@ -221,7 +180,7 @@
                     } else {
                         // Handle error response if needed
                         Swal.fire({
-                            title: 'Contact Failed to Delete',
+                            title: 'Data Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });

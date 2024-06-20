@@ -84,6 +84,12 @@
                         <span class="link-title">Pengajuan Schedule</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('attendence-request.index') }}" class="nav-link {{ active_class(['attendance/attendence-request']) }}">
+                        <i class="link-icon" data-feather="calendar"></i>
+                        <span class="link-title">Attendance Request</span>
+                    </a>
+                </li>
                 @endif
             @endif
             @if(in_array('superadmin_access', $dataLogin))

@@ -33,7 +33,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Type</label>
-                                    <select name="status" class="js-example-basic-single form-select" data-width="100%" required>
+                                    <select name="status" class="form-select" data-width="100%" required>
                                         <option value="">Select Type</option>
                                         @foreach($typeRequest as $dataRequest)
                                             <option value="{{$dataRequest->code}}">{{$dataRequest->name}}</option>

@@ -25,7 +25,17 @@ class RequestControllers extends Controller
      */
     public function index()
     {
-        $dataRequest = RequestAbsen::all();
+        $userId = Auth::id();
+        $EmployeeCode = Auth::user()->employee_code;
+        $company = Employee::where('nik', $EmployeeCode)->first();
+
+        $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+                               ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                               ->select('requests_attendence.*')
+                               ->orderBy('requests_attendence.tanggal', 'desc')
+                               ->limit(50)
+                               ->get();
+
         return view('pages.absen.request.index', compact('dataRequest'));
     }
 
@@ -34,7 +44,7 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
 
-        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
+        $requestabsen = RequestAbsen::where('id', $id)->firstOrFail();
         if ($requestabsen->aprrove_status !== 'Approved') {
             $requestabsen->aprrove_status = 'Approved';
             $requestabsen->aprroved_by = $EmployeeCode;
@@ -91,7 +101,7 @@ class RequestControllers extends Controller
     public function download($id)
     {
         try {
-            $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
+            $requestabsen = RequestAbsen::where('id', $id)->firstOrFail();
         
             $file_path = storage_path('app/' . $requestabsen->dokumen);
         

@@ -43,7 +43,7 @@ class Map extends Controller
         $records = User::select('users.*', 'karyawan.*')
                         ->join('karyawan', 'karyawan.nik', '=', 'users.name')
                         ->whereNotNull('longitude')
-                        ->where('company',$company->unit_bisnis)
+                        ->where('company', $company->unit_bisnis)
                         ->get();
 
         $data['records'] = [];

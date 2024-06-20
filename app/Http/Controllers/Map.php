@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\ModelCG\Project;
 use App\User;
+use App\Employee;
+
 class Map extends Controller
 {
     /**
@@ -33,10 +35,15 @@ class Map extends Controller
 
     public function map_frontline(Request $request)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+
         $data['project'] = Project::all();
         $records = User::select('users.*', 'karyawan.*')
                         ->join('karyawan', 'karyawan.nik', '=', 'users.name')
                         ->whereNotNull('longitude')
+                        ->where('company',$company->unit_bisnis)
                         ->get();
 
         $data['records'] = [];

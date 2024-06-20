@@ -37,6 +37,12 @@
                     <span class="link-title">Employee Resign</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{route('map-frontline')}}" class="nav-link {{ active_class(['map-frontline']) }}">
+                    <i class="link-icon" data-feather="map"></i>
+                    <span class="link-title">Employee Home Maps</span>
+                </a>
+            </li>
             @endif
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin))
             <li class="nav-item nav-category">Time Management</li>
@@ -179,7 +185,7 @@
             </li>
             @endif
             @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin))
-            <li class="nav-item nav-category">Reqruitment</li>
+            <li class="nav-item nav-category">Recruitment</li>
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#reqruitment" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">
                     <i class="link-icon" data-feather="settings"></i>
@@ -252,15 +258,7 @@
                     <span class="link-title">Maps Project</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{route('map-frontline')}}" class="nav-link {{ active_class(['map-frontline']) }}">
-                    <i class="link-icon" data-feather="map"></i>
-                    <span class="link-title">Maps Frontline</span>
-                </a>
-            </li>
-        
             @endif
-            
         </ul>
     </div>
 </nav>

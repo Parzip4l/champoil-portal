@@ -88,7 +88,7 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
 
-        $requestabsen = RequestAbsen::where('unik_code', $id)->firstOrFail();
+        $requestabsen = RequestAbsen::where('id', $id)->firstOrFail();
         if ($requestabsen->aprrove_status !== 'Reject') {
             $requestabsen->aprrove_status = 'Reject';
             $requestabsen->aprroved_by = $EmployeeCode;

@@ -148,6 +148,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3  mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ url('version') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="database"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Apps Versions</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

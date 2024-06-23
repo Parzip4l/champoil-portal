@@ -235,6 +235,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
     // App Setting
     Route::resource('setting', App\Http\Controllers\Setting\SettingController::class);
+    Route::get('version', [App\Http\Controllers\Setting\SettingController::class, 'apps_version'])->name('version');
+    Route::post('version-save', [App\Http\Controllers\Setting\SettingController::class, 'save_version'])->name('version-save');
         // Pajak
         Route::resource('pajak', App\Http\Controllers\Pajak\PajakController::class);
         Route::get('/pajak-data/{pajakid}', [App\Http\Controllers\Pajak\PajakController::class, 'pajakdetails'])->name('pajak.details');

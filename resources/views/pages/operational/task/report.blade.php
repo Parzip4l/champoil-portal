@@ -90,7 +90,7 @@
               <thead>
                 <tr>
                   <th colspan="16" class="text-center">
-                    {{ $detail_project->name }}
+                    {{ @$detail_project->name }}
                   </th>
                 </tr>
                 <tr>

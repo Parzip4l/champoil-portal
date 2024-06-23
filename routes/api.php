@@ -90,6 +90,8 @@ Route::prefix('v1')->group(function () {
      */
     Route::get('/patroli_task/{id}', [PatroliController::class, 'checklist_task']);
     Route::post('/post-patroli', [PatroliController::class, 'patroli_save']);
+    Route::get('/patroli-detail/{id}', [PatroliController::class, 'detail']);
+    Route::get('/patroli-list', [PatroliController::class, 'list']);
 
 
     Route::get('/patroli-report', [TaskController::class, 'report_patroli']);

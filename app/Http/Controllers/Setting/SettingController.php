@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Setting;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Version;
+
 class SettingController extends Controller
 {
     /**
@@ -15,6 +17,26 @@ class SettingController extends Controller
     public function index()
     {
         return view('pages.app-setting.index');
+    }
+
+    public function apps_version()
+    {
+        $data['records']=Version::all();
+        return view('pages.app-setting.apps_versions',$data);
+    }
+
+    public function save_version(Request $request)
+    {
+        $data = $request->all();
+        $insert = [
+            'android'=>$data['android'],
+            'ios'=>$data['ios'],
+            'created_at'=>date('Y-m-d')
+        ];
+
+        Version::insert($insert);
+
+        return redirect()->route('version')->with('success', 'Data Successfully Added');
     }
 
     /**

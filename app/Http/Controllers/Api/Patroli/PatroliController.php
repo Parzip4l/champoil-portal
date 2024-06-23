@@ -4,7 +4,17 @@ namespace App\Http\Controllers\Api\Patroli;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
+use Carbon\Carbon;
 
 use App\ModelCG\Task;
 use App\ModelCG\List_task;
@@ -47,6 +57,46 @@ class PatroliController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    public function detail(Request $request){
+        $result=[
+            'error'=>false,
+            'message'=>'success',
+            'records'=>[
+                            [
+                                "tanggal" => "2024-06-23",
+                                "check_point" => "Main Gate",
+                                "petugas" => "John Doe",
+                            ],
+                            [
+                                "tanggal" => "2024-06-23",
+                                "check_point" => "Side Entrance",
+                                "petugas" => "Jane Smith",
+                            ],
+                            [
+                                "tanggal" => "2024-06-23",
+                                "check_point" => "Back Gate",
+                                "petugas" => "Alex Johnson",
+                            ],
+                        ]
+        ];
+        return response()->json($result);
+    }
+
+    public function list(Request $request){
+
+        $records=[];
+        $token = $request->bearerToken();
+        $user = Auth::guard('api')->user();
+        $nik = $user;
+
+        $result=[
+            'error'=>$user,
+            'message'=>'success',
+            'records'=>''
+        ];
+        return response()->json($result);
     }
 
     public function patroli_save(Request $request){

@@ -395,7 +395,7 @@
 @endforeach
 @endif
 <!-- End -->
-<div class="row mb-4">
+<div class="row mb-4 desktop">
     <div class="title-analytic d-flex justify-content-between mb-2">
         <div class="title-data align-self-center">
             <h5>Analytic Data</h5>

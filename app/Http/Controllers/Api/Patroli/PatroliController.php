@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Patroli;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -22,6 +21,7 @@ use App\ModelCG\Patroli;
 use App\ModelCG\Absen;
 use App\ModelCG\Temuan;
 use App\ModelCG\Status_patrol;
+use App\ModelCG\Schedule;
 
 class PatroliController extends Controller
 {
@@ -86,15 +86,40 @@ class PatroliController extends Controller
 
     public function list(Request $request){
 
-        $records=[];
         $token = $request->bearerToken();
         $user = Auth::guard('api')->user();
-        $nik = $user;
-
+        $nik = $user->employee_code;
+        $records=[];
+        if($nik){
+            $error=false;
+            $schedule = Schedule::whereDate('tanggal',date('Y-m-d'))
+                              ->where('employee',$nik)
+                              ->first();
+            if(!empty($schedule)){
+                $get_task=Task::where('project_id',$schedule->project)
+                                ->get();
+                if(!empty($get_task)){
+                    foreach($get_task as $parent){
+                        $list = List_task::where('id_master',$parent->id)
+                                         ->join('patrolis','patrolis.id_task','=','list_task.id')
+                                         ->where('employee_code',$nik)
+                                         ->get();
+                        if(!empty($list)){
+                            foreach($list as $record){
+                                $record->judul = $parent->judul;
+                            }
+                            $records=$list;
+                        }
+                    }
+                }
+            }
+        }else{
+            $error=true;
+        }
         $result=[
-            'error'=>$user,
+            'error'=>$error,
             'message'=>'success',
-            'records'=>''
+            'records'=>$records
         ];
         return response()->json($result);
     }

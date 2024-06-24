@@ -175,7 +175,7 @@
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#logBook" role="button" aria-expanded="{{ is_active_route(['logBook']) }}" aria-controls="logBook">
                     <i class="link-icon" data-feather="book-open"></i>
-                    <span class="link-title">Log Book</span>
+                    <span class="link-title">TRACK</span>
                     <i class="link-arrow" data-feather="chevron-down"></i>
                 </a>
                 <div class="collapse {{ show_class(['category']) }}" id="logBook">

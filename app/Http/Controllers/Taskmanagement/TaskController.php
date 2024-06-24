@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Taskmanagement;
 
 use App\Http\Controllers\Controller;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\ModelCG\Task;
@@ -11,6 +12,7 @@ use App\ModelCG\Patroli;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PDF;
 
 class TaskController extends Controller
 {
@@ -221,6 +223,28 @@ class TaskController extends Controller
             }
         }
         return view('pages.operational.task.report',$data);
+    }
+
+    public function download_qr($id){
+        // Generate the QR code
+        // Generate the QR code
+        // Generate QR code with desired URL or text
+        $image = QrCode::format('png')
+    ->merge(public_path('1644463030.png'), 0.5, true)
+    ->size(500)
+    ->errorCorrection('H')
+    ->generate('A simple example of QR code!');
+        
+        
+
+
+
+        // Load the PDF view with the QR code data
+        // $pdf = PDF::loadView('pages.operational.task.view_pdf', $data);
+
+        // Stream the PDF to the browser
+        // return $pdf->stream('qrcode.pdf');
+        // return view('pages.operational.task.view_pdf', $data);
     }
 
     

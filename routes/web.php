@@ -117,6 +117,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/qrcode/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
     Route::post('/task-update', [App\Http\Controllers\Taskmanagement\TaskController::class, 'update'])->name('task-update');
     Route::get('task-report', [App\Http\Controllers\Taskmanagement\TaskController::class,'report'])->name('task-report');
+    Route::get('task-download-qr/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class,'download_qr'])->name('task-download-qr');
     
     //patroli
     Route::get('/patroli', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'index'])->name('patroli');

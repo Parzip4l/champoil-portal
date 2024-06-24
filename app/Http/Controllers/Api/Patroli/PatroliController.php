@@ -107,7 +107,7 @@ class PatroliController extends Controller
                         if(!empty($list)){
                             foreach($list as $record){
                                 $record->judul = $parent->judul;
-                                $record->images= "";
+                                $record->images= "https://hris.truest.co.id/assets/images/logo/logodesktop.png";
                             }
                             $records=$list;
                         }

@@ -12,7 +12,6 @@
             <div class="card-header">
                 <h5 class="mb-0 align-self-center">
                     Data Patrol
-                    <a href="{{ route('task-download-qr', ['id' => @$_GET['project_id']]) }}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Download PDF QR</a>
                     <a href="{{route('task-report')}}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Report</a>
                     <a href="#" class="btn btn-sm btn-primary ml-3" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
                 </h5>

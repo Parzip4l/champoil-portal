@@ -221,25 +221,30 @@ class PayrolComponent extends Controller
         $code = Auth::user()->employee_code;
         $DataCode = Employee::where('nik', $code)->first();
 
+        // Cari data PayrolCM berdasarkan id
         $data = PayrolCM::find($id);
 
-        // Get data components
-        $allowence = Component::where('type','Allowences')
-                        ->where('id',$id)
-                        ->where('is_active','aktif')
-                        ->get();
-
-        $deduction = Component::where('type','Deductions')
-                        ->where('id',$id)
-                        ->where('is_active','aktif')
-                        ->get();
+        // Periksa apakah data ditemukan
         if (!$data) {
             return redirect()->route('payrol-component.index')->with('error', 'Payrol Component not found.');
         }
 
-        return view('pages.hc.payrol.editcomponent.edit', compact('data'));
-    }
+        // Ambil semua komponen yang aktif untuk Allowences dan Deductions
+        $allActiveAllowences = Component::where('type', 'Allowences')->where('is_active', 'aktif')->get();
+        $allActiveDeductions = Component::where('type', 'Deductions')->where('is_active', 'aktif')->get();
 
+        // Ambil ID komponen yang sudah ada di PayrolCM untuk Allowences dan Deductions
+        $existingAllowanceIds = collect(json_decode($data->allowances, true)['data'])->keys()->toArray();
+        $existingDeductionIds = collect(json_decode($data->deductions, true)['data'])->keys()->toArray();
+
+        // Ambil komponen Allowences yang tidak ada di PayrolCM
+        $missingAllowences = $allActiveAllowences->whereNotIn('id', $existingAllowanceIds);
+
+        // Ambil komponen Deductions yang tidak ada di PayrolCM
+        $missingDeductions = $allActiveDeductions->whereNotIn('id', $existingDeductionIds);
+
+        return view('pages.hc.payrol.editcomponent.edit', compact('data', 'missingAllowences', 'missingDeductions'));
+    }
 
     public function editns($id)
     {

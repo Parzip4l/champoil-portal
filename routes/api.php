@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\LmsController;
 use App\Http\Controllers\Api\Patroli\PatroliController;
 use App\Http\Controllers\Api\Task\TaskController;
 use App\Http\Controllers\Employee\EmployeeController;
+use App\Http\Controllers\Api\EmployeeController as ApiEmployee;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReferalController;
 use App\Http\Controllers\Api\Project\ProjectController;
@@ -75,7 +76,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/lms-nilai', [LmsController::class, 'hasilNilai']);
     Route::post('/post_test', [LmsController::class, 'SubmitTest']);
 
-    
+    Route::get('/turn_over_bulan', [ApiEmployee::class, 'turnover_statistik']);
 
 
     /**

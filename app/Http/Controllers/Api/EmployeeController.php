@@ -83,4 +83,29 @@ Thank you for your attention and cooperation. If you have any questions or issue
         return response()->json($result);
 
     }
+
+    public function turnover_statistik(){
+
+        $year = date('Y');
+        $month=[1,2,3,4,5,6,7,8,9,10,11,12];
+
+        $records=[];
+
+        foreach($month as $key=>$val){
+            $records[] = EmployeeResign::whereYear('created_at', $year)
+                                        ->whereMonth('created_at', $val)
+                                        ->where('unit_bisnis','=','Kas')
+                                        ->count();
+        }
+
+        
+
+        $result=[
+            "records"=>json_encode($records),
+            "message"=>"success",
+            "error"=>false
+        ];
+
+        return response()->json($result);
+    }
 }

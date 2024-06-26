@@ -27,6 +27,8 @@
                 $employee = \App\Employee::where('nik', $data->employee_code)->first();
                 $allowences = json_decode($data->allowances);
                 $deductions = json_decode($data->deductions);
+                $dataArray = json_decode($data->allowances, true);
+                $datadeduction = json_decode($data->deductions, true);
             @endphp
             <div class="row">
                 <div class="col-md-12 mb-2">
@@ -42,14 +44,16 @@
                     <label for="" class="form-label">Gaji Pokok</label>
                     <input type="number" name="basic_salary" class="form-control allowance" value="{{$data->basic_salary}}" required>   
                 </div>
-                @php
-                    $dataArray = json_decode($data->allowances, true);
-                    $datadeduction = json_decode($data->deductions, true);
-                @endphp
                 @foreach($dataArray['data'] as $id => $value)
                     <div class="col-md-6 mb-2">
                         <label for="" class="form-label">{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}</label>
                         <input type="number" name="allowances[{{$id}}][]" class="form-control allowance" value="{{$value[0]}}" required>   
+                    </div>
+                @endforeach
+                @foreach($missingAllowences as $component)
+                    <div class="col-md-6 mb-2">
+                        <label for="" class="form-label">{{ $component->name }}</label>
+                        <input type="number" name="allowances[{{$component->id}}][]" class="form-control allowance" value="0" required>   
                     </div>
                 @endforeach
                 <div class="title mt-2 mb-2">
@@ -61,6 +65,12 @@
                     <label for="" class="form-label">{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Nama tidak ditemukan' }}</label>
                     <input type="number" name="deductions[{{$id}}][]" class="form-control deduction" value="{{$value[0]}}" id="t_deduction" required>   
                 </div>
+                @endforeach
+                @foreach($missingDeductions as $component)
+                    <div class="col-md-6 mb-2">
+                        <label for="" class="form-label">{{ $component->name }}</label>
+                        <input type="number" name="deductions[{{$component->id}}][]" class="form-control deduction" value="0" required>   
+                    </div>
                 @endforeach
             </div>
           <button class="btn btn-primary" type="submit">Submit</button>

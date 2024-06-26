@@ -7,8 +7,10 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\ModelCG\Task;
+use App\ModelCG\List_task;
 use App\ModelCG\Project;
-use App\ModelCG\Patroli; 
+use App\ModelCG\Patroli;
+use App\ModelCG\Schedule; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -175,53 +177,23 @@ class TaskController extends Controller
         $data['client']=Auth::user()->project_id;
         $records = Project::all();
         $report = Task::where('project_id',$id_project)->get();
-        $data['report']=[];
-        // Mendapatkan tahun saat ini
-        $currentYear = Carbon::now()->year;
-
-        $dates = [];
-
-        for ($month = 1; $month <= 12; $month++) {
-            // Mendapatkan jumlah hari dalam bulan tertentu
-            $daysInMonth = Carbon::create($currentYear, $month, 1)->daysInMonth;
-            
-            for ($day = 1; $day <= $daysInMonth; $day++) {
-                $dates[] = Carbon::create($currentYear, $month, $day)->toDateString();
+        if(!empty($report)){
+            foreach($report as $row){
+                $row->sub_task = List_task::where('id_master',$row->id)->get();
+                $row->jml_sub = List_task::where('id_master',$row->id)->count();
             }
         }
 
-        if (!empty($dates)) {
-            foreach ($dates as $key => $val) {
-                $specifiedDate = $val;
-                $tanggal = date('d', strtotime($val));
-                $count = Patroli::join('master_tasks', 'master_tasks.id', '=', 'patrolis.id_task')
-                    ->where('master_tasks.project_id', $id_project)
-                    ->where(DB::raw('DATE_FORMAT(patrolis.created_at, "%Y-%m-%d")'), '=', $specifiedDate)
-                    ->count();
-                
-                if ($count == 0) {
-                    $label = "Empty";
-                    $backgroundColor = 'rgba(241,0,117,.25)';
-                    $borderColor = '#f10075';
-                } else {
-                    $label = "Detail";
-                    $backgroundColor = 'rgba(16,183,89, .25)';
-                    $borderColor = '#10b759';
-                }
+        $periode = Carbon::now()->addMonth()->format('F-Y');
+        $data['schedule'] = Schedule::where('periode', strtoupper($periode))
+                                    ->where('project', $id_project)
+                                    ->where('shift','!=','OFF')
+                                    ->select('shift', DB::raw('count(*) as total'))
+                                    ->groupBy('shift')
+                                    ->get();
 
-                $button = $label;
-
-                $data['report'][] = [
-                    "id" => $request->input('project_id') ? $request->input('project_id') : Auth::user()->project_id,
-                    "start" => $val,
-                    "backgroundColor" => $backgroundColor,
-                    "borderColor" => $borderColor,
-                    "jumlah" => $count,
-                    "title" => $label,
-                    "client" => Auth::user()->project_id
-                ];
-            }
-        }
+        $data['report']=$report;
+        
         return view('pages.operational.task.report',$data);
     }
 

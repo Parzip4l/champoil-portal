@@ -1,4 +1,21 @@
 <?php
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+
+function tanggal_bulan($year,$month){
+  
+  $startDate = Carbon::create($year, $month, 1);
+  $endDate = $startDate->copy()->endOfMonth();
+
+  $period = CarbonPeriod::create($startDate, $endDate);
+
+  $dates = [];
+  foreach ($period as $date) {
+      $dates[] = $date->format('Y-m-d');
+  }
+
+  return $dates;
+}
   
 function active_class($path, $active = 'active') {
   return call_user_func_array('Request::is', (array)$path) ? $active : '';

@@ -4,18 +4,19 @@
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
   <style>
-    .timeline{
-      max-width:100% !important;
+    .timeline {
+      max-width: 100% !important;
     }
-    th{
-      text-align:center !important;
+
+    th {
+      text-align: center !important;
       vertical-align: middle;
     }
-    
   </style>
 @endpush
 
 @section('content')
+@csrf
 <div class="row">
     <div class="col-md-12">
         @if($client==NULL)
@@ -30,17 +31,13 @@
                             <div class="col-auto">
                                 <label for="staticEmail2" class="visually-hidden">Project</label>
                                 <select name="project_id" class="form-control select2">
-                                    <option value="">-- Select Project -- </option>
+                                    <option value="">-- Select Project --</option>
                                     @if($project)
                                         @foreach($project as $pr)
                                             @php
-                                                if($project_id==$pr->id){
-                                                    $selected="selected";
-                                                }else{
-                                                    $selected="";
-                                                }
+                                                $selected = ($project_id == $pr->id) ? 'selected' : '';
                                             @endphp
-                                            <option value="{{ $pr->id }}" {{$selected}}>{{ $pr->name }}</option>
+                                            <option value="{{ $pr->id }}" {{ $selected }}>{{ $pr->name }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -54,314 +51,174 @@
             </div>
         </div>
         @endif
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-3 d-none d-md-block">
-                        <div class="card">
-                            <div class="card-body d-none">
-                                <h6 class="card-title mb-4">Full calendar</h6>
-                                <div id='external-events' class='external-events'>
-                                
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-12">
-                        <div class="card">
-                        <div class="card-body">
-                            <div id='fullcalenda'></div>
-                        </div>
-                        </div>
-                    </div>
+        
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">{{ @$detail_project->name }}</h6>
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table table-bordered table-responsive">
+                        <thead>
+                            <tr>
+                                <th colspan="17" class="text-center">
+                                    {{ @$detail_project->name }}
+                                </th>
+                            </tr>
+                            <tr>
+                                <th width="5" rowspan="2">No</th>
+                                <th rowspan="2">Checkpoint</th>
+                                <th rowspan="2">Sub Point</th>
+                                @if(tanggal_bulan(date('Y'),date('m')))
+                                    @foreach(tanggal_bulan(date('Y'),date('m')) as $tanggal )
+                                        <th rowspan="2">{{ $tanggal }}</th>
+                                    @endforeach
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($report)
+                                @foreach($report as $row)
+                                    <tr>
+                                        <td rowspan="{{ $row->jml_sub + 1 }}"></td>
+                                        <td rowspan="{{ $row->jml_sub + 1 }}">{!! insert_line_breaks($row->judul,30) !!}</td>
+                                    </tr>
+                                    @if($row->sub_task)
+                                        @foreach($row->sub_task as $sub)
+                                            <tr>
+                                                <td>{!! insert_line_breaks($sub->task,30) !!}</td>
+                                                @if(tanggal_bulan(date('Y'),date('m')))
+                                                    @foreach(tanggal_bulan(date('Y'),date('m')) as $tanggal )
+                                                        <td>
+                                                            @if($schedule)
+                                                                @foreach($schedule as $scdl)
+                                                                    <a href="javascript:void(0)" 
+                                                                       onclick="get_detail('{{$sub->id}}','{{ $tanggal }}','{{ $scdl->shift }}','{{ $_GET["project_id"] ?? "" }}')"
+                                                                       class="btn btn-xs btn-outline-primary mr-3">
+                                                                        {{ $scdl->shift }} 
+                                                                    </a>
+                                                                @endforeach
+                                                            @endif
+                                                        </td>
+                                                    @endforeach
+                                                @endif
+                                            </tr> 
+                                        @endforeach
+                                    @endif
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    
 </div>
-<div class="row mt-3">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="card-title"></h6>
-        <div class="table-responsive">
-            <table id="dataTableExample" class="table table-bordered table-responsive">
-              <thead>
-                <tr>
-                  <th colspan="16" class="text-center">
-                    {{ @$detail_project->name }}
-                  </th>
-                </tr>
-                <tr>
-                  <th width="5" rowspan="2">No</th>
-                  <th width="10" rowspan="2">Shift</th>
-                  <th rowspan="2">Checkpoint</th>
-                  <th rowspan="2">Sub Point</th>
-                  <th rowspan="2">Officer</th>
-                  <th colspan="10">Time</th>
-                  <th rowspan="2">Event</th>
-                </tr>
-                <tr>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                  <th>20:00</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>{!! insert_line_breaks('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla condimentum euismod nisi, non vestibulum libero. Vivamus nec tortor a libero semper interdum. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer feugiat, nunc sit amet fermentum aliquet, leo elit gravida est, sit amet auctor metus mi eget odio. Nam sit amet venenatis odio. Morbi at nisi nec arcu vehicula faucibus non a eros. Suspendisse id turpis a lacus vehicula tempor.',30) !!}</td>
-                  <td>{!! insert_line_breaks('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla condimentum euismod nisi, non vestibulum libero. Vivamus nec tortor a libero semper interdum. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer feugiat, nunc sit amet fermentum aliquet, leo elit gravida est, sit amet auctor metus mi eget odio. Nam sit amet venenatis odio. Morbi at nisi nec arcu vehicula faucibus non a eros. Suspendisse id turpis a lacus vehicula tempor.',30) !!}</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
 
-                
-                
-              </tbody>
+<!-- Modal -->
+<div class="modal fade modal-xl" id="detail-patrol" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detail Patrol</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+          
+              <table id="patrolTable" class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Task ID</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Time</th>
+                        <th>Petugas</th>
+                    </tr>
+                </thead>
+                <tbody id="patrolTableBody">
+                    <!-- Table rows will be dynamically added here -->
+                </tbody>
             </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="card-title mb-4">Detail <span id="tanggal_report"></span></h6>
-                <div id="list"></div>
-                
+                <!-- Modal content will be loaded dynamically via AJAX -->
             </div>
         </div>
     </div>
-</div> -->
+</div>
+<!-- End Modal -->
 
-
-
-
-
-<!-- End -->
 @endsection
 
 @push('plugin-scripts')
-
 <script src="{{ asset('assets/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/fullcalendar/index.global.min.js') }}"></script>
-
-  
 @endpush
 
 @push('custom-scripts')
 <script>
-    // npm package: fullcalendar
-// github link: https://github.com/fullcalendar/fullcalendar
-
-$(function() {
-
-// sample calendar events data
-
-var Draggable = FullCalendar.Draggable;
-var calendarEl = document.getElementById('fullcalendar');
-var containerEl = document.getElementById('external-events');
-
-var curYear = moment().format('YYYY');
-var curMonth = moment().format('MM');
-
-// Calendar Event Source
-var calendarEvents = {
-  id: 1,
-  backgroundColor: 'rgba(1,104,250, .15)',
-  borderColor: '#0168fa',
-  events: []
-};
-
-// Birthday Events Source
-var birthdayEvents = {
-  id: 2,
-  backgroundColor: 'rgba(16,183,89, .25)',
-  borderColor: '#10b759',
-  events: [
-    
-  ]
-};
-
-var holidayEvents = {
-  id: 3,
-  backgroundColor: 'rgba(241,0,117,.25)',
-  borderColor: '#f10075',
-  events: <?php echo json_encode($report, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>
-};
-
-var discoveredEvents = {
-  id: 4,
-  backgroundColor: 'rgba(0,204,204,.25)',
-  borderColor: '#00cccc',
-  events: [
-    
-  ]
-};
-
-var meetupEvents = {
-  id: 5,
-  backgroundColor: 'rgba(91,71,251,.2)',
-  borderColor: '#5b47fb',
-  events: [
-    
-  ]
-};
-
-
-var otherEvents = {
-  id: 6,
-  backgroundColor: 'rgba(253,126,20,.25)',
-  borderColor: '#fd7e14',
-  events: [
-   
-  ]
-};
-
-new Draggable(containerEl, {
-  itemSelector: '.fc-event',
-  eventData: function(eventEl) {
-    return {
-      title: eventEl.innerText
-    };
-  }
-});
-
-
-// initialize the calendar
-var calendar = new FullCalendar.Calendar(calendarEl, {
-  headerToolbar: {
-    left: "prev,today,next",
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-  },
-  editable: true,
-  droppable: true, // this allows things to be dropped onto the calendar
-  fixedWeekCount: true,
-  // height: 300,
-  initialView: 'dayGridMonth',
-  timeZone: 'UTC',
-  hiddenDays:[],
-  navLinks: 'true',
-  // weekNumbers: true,
-  // weekNumberFormat: {
-  //   week:'numeric',
-  // },
-  dayMaxEvents: 2,
-  events: [],
-  eventSources: [calendarEvents, birthdayEvents, holidayEvents, discoveredEvents, meetupEvents, otherEvents],
-  drop: function(info) {
-      // remove the element from the "Draggable Events" list
-      // info.draggedEl.parentNode.removeChild(info.draggedEl);
-  },
-  eventClick: function(info) {
-    var eventObj = info.event;
-    const date = new Date(eventObj.start);
-    const year = date.getFullYear();
-    let month = (date.getMonth() + 1).toString(); // Months are zero-indexed, so add 1
-    let day = date.getDate().toString();
-
-    // Pad month and day with leading zeros if necessary
-    if (month.length < 2) {
-      month = '0' + month;
-    }
-    if (day.length < 2) {
-      day = '0' + day;
+    // Function to open the detail patrol modal and load content via AJAX
+    var modalBody = $('#detail-patrol .modal-body');
+    var tableBody = document.getElementById("patrolTableBody");
+    tableBody.innerHTML = "";
+    function get_detail(id_task,tanggal, shift, project) {
+        $('#detail-patrol .modal-body #patrolTableBody').empty();
+        $('#detail-patrol').modal('show'); // Show the modal
+        // tableBody.clear();
+        // Your jQuery AJAX code here
+        $.ajax({
+            url: '/api/v1/patroli-report-dash',
+            type: 'POST',
+            data: {
+                tanggal: tanggal,
+                shift: shift,
+                project: project,
+                id_task:id_task
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+            },
+            success: function(response) {
+                // Example: Append new content dynamically
+                var dataPatrol = response.data_patrol;
+                for (var i = 0; i < dataPatrol.length; i++) {
+                    var row = `<tr>
+                                    <td>${i+1}</td>
+                                    <td>${dataPatrol[i].task_name}</td>
+                                    <td>${dataPatrol[i].label_status}</td>
+                                    <td>${dataPatrol[i].description}</td>
+                                    <td>${dataPatrol[i].format_tanggal}</td>
+                                    <td>${dataPatrol[i].petugas}</td>
+                                </tr>`;
+                    tableBody.innerHTML += row;
+                }
+                // Handle the response from the server
+            },
+            error: function(xhr, status, error) {
+                console.error("Error: " + error);
+                // Handle any errors
+            }
+        });
     }
 
-    // Combine into the desired format
-    const formattedDate = `${year}-${month}-${day}`;
+    // Initialize the FullCalendar
+    $(document).ready(function() {
+        var calendarEl = document.getElementById('fullcalendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            // Configuration options for FullCalendar
+            headerToolbar: {
+                left: "prev,today,next",
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+            },
+            initialView: 'dayGridMonth',
+            timeZone: 'UTC',
+            events: [] // Your events data here
+        });
 
-
-    
-    fetch('https://hris.truest.co.id/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      const reports = data.report;
-      $('#tanggal_report').text(formattedDate);
-      $('#list').empty();
-      // Loop through each report
-      reports.forEach(report => {
-        let reportHTML = 
-            '<ul class="timeline mb-3" style="background:#ffffff !important">'+
-              '<li class="event">'+
-                '<h3 class="title">'+report.judul+'</h3>';
-          
-          if (report.patroli.length > 0) {
-            reportHTML += '<ul class="timeline mt-10">';
-            report.patroli.forEach(patrol => {
-              reportHTML += 
-                '<li class="event mb-15">'+
-                  '<h3 class="title">'+patrol.task+'</h3>';
-                  reportHTML += '<ul class="timeline mt-10">';
-                      if(patrol.daily.length > 0){
-                      patrol.daily.forEach(daily => {
-                        let label_status="";
-                        if(daily.status==0){
-                          label_status="Kondisi Baik";
-                        }else{
-                          label_status="Kondisi Tidak Baik";
-                        }
-                        reportHTML += 
-                          '<li class="event mb-15">'+
-                            '<h3 class="title"> Petugas : '+daily.petugas+'</h3>'+
-                            '<p>Tanggal : '+daily.tanggal+'</p>'+
-                            '<p>Status : '+label_status+'</p>'+
-                            '<p>Keterangan : '+daily.deskripsi+'</p>';
-
-                            reportHTML +='</li>';
-
-                      });
-                    }
-                  reportHTML += '</ul>';
-                  
-                  reportHTML +='</li>';
-            });
-            reportHTML += '</ul>';
-          }
-
-          reportHTML += 
-              '</li>'+
-            '</ul>';
-          
-          $('#list').append(reportHTML);
-      });
-    })
-    .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
+        calendar.render();
     });
-  },
-});
-
-calendar.render();
-
-
-});
 </script>
 @endpush

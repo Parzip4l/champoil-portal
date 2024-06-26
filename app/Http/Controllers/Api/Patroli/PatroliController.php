@@ -22,6 +22,7 @@ use App\ModelCG\Absen;
 use App\ModelCG\Temuan;
 use App\ModelCG\Status_patrol;
 use App\ModelCG\Schedule;
+use App\Employee;
 
 class PatroliController extends Controller
 {
@@ -147,6 +148,52 @@ class PatroliController extends Controller
         $return =[
             "status"=>true,
             "message"=>"Patroli Berhasil di Simpan"
+        ];
+
+
+
+        return response()->json($return);
+    }
+
+    public function report_patrol(Request $request){
+        $tanggal=$request->input('tanggal');
+        $shift=$request->input('shift');
+        $project=$request->input('project');
+        $id_task=$request->input('id_task');
+        $result_patrol=[];
+
+        $get_user = Schedule::where('tanggal',$tanggal)
+                            ->where('shift',$shift)
+                            ->where('project',$project)
+                            ->first();
+        $user = Employee::where('nik',$get_user->employee)->first();
+        $data_patrol = Patroli::where('employee_code',$user->nik)
+                                ->where('id_task',$id_task)
+                                ->whereDate('created_at',$tanggal)
+                                ->get();
+        if(!empty($data_patrol)){
+            foreach($data_patrol as $row){
+                $petugas = Employee::where('nik',$row->employee_code)->first();
+                $row->format_tanggal = date('d F Y H:i:s',strtotime($row->created_at));
+                $task_name = List_task::where('id',$id_task)->first();
+                $row->task_name = $task_name->task;
+                $row->petugas = $petugas->nama;
+                if($row->status==1){
+                    $label="Baik";
+                }else{
+                    $label="Kurang Baik";
+                }
+
+                $row->label_status = $label;
+            }
+        }
+
+        $return =[
+            "status"=>true,
+            "records"=>$get_user,
+            "user"=>$user,
+            "data_patrol"=>$data_patrol,
+            "message"=>"Success"
         ];
 
 

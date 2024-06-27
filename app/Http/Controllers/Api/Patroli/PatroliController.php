@@ -45,17 +45,17 @@ class PatroliController extends Controller
         $distance = calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
         
         $allowedRadius = 5;
-        if ($distance <= $allowedRadius) {
-            if($data['master']){
+        // if ($distance <= $allowedRadius) {
+        //     if($data['master']){
                 $data['master']->list_task = List_task::where('id_master',$data['master']->id)->get();
                 $data['distance']=$distance;
-            }
-        } else {
-            $data['message']="Scan Rejected, Outside Radius!";
-            $data['distance']=$distance; // Perbaikan penulisan variabel distance
-            $data['lat']=$lat;
-            $data['long']=$long;
-        }
+        // //     }
+        // // } else {
+        // //     $data['message']="Scan Rejected, Outside Radius!";
+        // //     $data['distance']=$distance; // Perbaikan penulisan variabel distance
+        // //     $data['lat']=$lat;
+        // //     $data['long']=$long;
+        // }
 
         return response()->json($data);
     }

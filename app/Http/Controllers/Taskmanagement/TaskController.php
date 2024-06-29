@@ -159,6 +159,7 @@ class TaskController extends Controller
     public function qr_code($id){
         
         $data['unix_code']=$id;
+        $data['detail']=Task::where('unix_code',$id)->first();
         return view('pages.operational.task.qrcode',$data);
        
     }

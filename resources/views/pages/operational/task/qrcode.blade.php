@@ -3,6 +3,7 @@
     <!-- SJIS Support (optional) -->
     <script src="{{ asset('assets/js/qrcode_SJIS.js') }}"></script>
 
+    <h3>{{ $detail->judul }}</h3>
     <div id="qrcode"></div>
 
     <script>

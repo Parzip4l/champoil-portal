@@ -23,7 +23,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Judul</th>
-                                <th>Dokument</th>
+                                <th>File</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -101,8 +101,29 @@
                             <span class="input-group-text" id="basic-addon2">Jam</span>
                         </div>
                         <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Dokumen</label>
-                            <input type="file" class="form-control" name="file_name" required>    
+                            <label for="" class="form-label">Category</label>
+                            <select name="category" class="form-control" id="category" onchange="handleChange(event)">
+                                <option value="pdf">PDF</option>
+                                <option value="youtube">YOUTUBE</option>
+                                <option value="upload_video">UPLOAD VIDEO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-2" id="not_yt">
+                            <label for="" class="form-label">File</label>
+                            <input type="file" class="form-control" name="file_name">    
+                        </div>
+                        <div class="col-md-12 mb-2 d-none" id="yt">
+                            <label for="" class="form-label">URL</label>
+                            <input type="text" class="form-control" name="file_name">    
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Level</label>
+                            <select name="level" class="form-control" id="level">
+                                <option value="base">BASE</option>
+                                <option value="leader">LEADER</option>
+                                <option value="danru">DANRU</option>
+                                <option value="chief">CHIEFT</option>
+                            </select>
                         </div>
                         <div class="col-md-12 mt-2">
                             <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
@@ -127,6 +148,17 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
+    function handleChange(event) {
+        const selectedValue = event.target.value;
+        if(selectedValue=="youtube"){
+            $('#yt').removeClass('d-none');
+            $('#not_yt').addClass('d-none');
+        }else{
+            $('#yt').addClass('d-none');
+            $('#not_yt').removeClass('d-none');
+        }
+        
+    }
     function showDeleteDataDialog(id) {
         Swal.fire({
             title: 'Hapus Data',

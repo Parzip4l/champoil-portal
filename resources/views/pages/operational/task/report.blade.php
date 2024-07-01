@@ -43,6 +43,20 @@
                                 </select>
                             </div>
                             <div class="col-auto">
+                                <label for="staticEmail2" class="visually-hidden">Periode</label>
+                                <select name="periode" class="form-control select2">
+                                    <option value="">-- Select Periode --</option>
+                                    @if(bulan())
+                                        @foreach(bulan() as $key=>$value)
+                                            @php
+                                                $selected = ($periode == $value) ? 'selected' : '';
+                                            @endphp
+                                            <option value="{{ $value.'-'.date('Y') }}" {{ $selected }}>{{ $value }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="col-auto">
                                 <button type="submit" class="btn btn-primary mb-3">Filter</button>
                             </div>
                         </form>

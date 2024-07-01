@@ -46,77 +46,83 @@ class LmsController extends Controller
     public function ReadTest($id, Request $request)
     {
         $redirect = "";
-$error = false;
-$result = [];
-$url = "";
+        $error = false;
+        $result = [];
+        $url = "";
+        $cek=[];
+        $fullUrl="";
 
-// Retrieve the token from the request
-$token = $request->bearerToken();
+        // Retrieve the token from the request
+        $token = $request->bearerToken();
 
-// Authenticate the user based on the token
-$user = Auth::guard('api')->user();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
 
-try {
-    $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
-    $data['record'] = Knowledge::where('id', $id)->first();
-    $fileName = "";
+        try {
+            $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
+            $data['record'] = Knowledge::where('id', $id)->first();
+            $fileName = "";
 
-    if ($data['record']) {
-        $fileName = $data['record']->file_name;
-    }
+            if ($data['record']) {
+                $fileName = $data['record']->file_name;
+            }
 
-    // Check if the record exists
-    if (!$data['record']) {
-        return response()->json(['error' => true, 'redirect' => redirect()->route('some_error_route')->with('error', 'Knowledge record not found')]);
-    }
+            // Check if the record exists
+            if (!$data['record']) {
+                return response()->json(['error' => true, 'redirect' => redirect()->route('some_error_route')->with('error', 'Knowledge record not found')]);
+            }
 
-    $data['id_module'] = $id;
-    $data['file_module'] = $fileName;
+            $data['id_module'] = $id;
+            $data['file_module'] = $fileName;
 
-    // Check if the file exists
-    if (!$data['file_module']) {
-        return response()->json(['error' => true, 'redirect' => redirect()->route('some_error_route')->with('error', 'File not found')]);
-    }
+            // Check if the file exists
+            if (!$data['file_module']) {
+                return response()->json(['error' => true, 'redirect' => redirect()->route('some_error_route')->with('error', 'File not found')]);
+            }
 
-    user_read_module::insert([
-        "created_at" => now(),
-        "employee_code" => $user->employee_code,
-        "id_module" => $id
-    ]);
+            user_read_module::insert([
+                "created_at" => now(),
+                "employee_code" => $user->employee_code,
+                "id_module" => $id
+            ]);
 
-    $cek = Asign_test::where('id_test', $id)
-        ->where('employee_code', $user->employee_code)
-        ->where('status', 0)
-        ->first();
+            $cek = Asign_test::where('id_test', $id)
+                ->where('employee_code', $user->employee_code)
+                ->where('status', 0)
+                ->first();
 
-    if ($cek && $cek->module_read == 1) {
-        $redirectUrl = route('kas/user.test', ['id' => $id]);
-        return response()->json(['error' => true, 'redirect' => redirect()->to($redirectUrl)->with('success', 'Your Module Redirect')]);
-    } else {
-        $url = $data['file_module'];
-        // Generate the full URL for the file
-        $fullUrl = asset("storage/{$url}");
-    }
-} catch (\Exception $e) {
-    // Log the error or handle it appropriately
-    $url = 0;
-    $redirect = 0;
-    $error = true;
-    $auth = $user;
-}
+            if ($cek && $cek->module_read == 1) {
+                $redirectUrl = route('kas/user.test', ['id' => $id]);
+                return response()->json(['error' => true, 'redirect' => redirect()->to($redirectUrl)->with('success', 'Your Module Redirect')]);
+            } else {
+                $url = $data['file_module'];
+                // Generate the full URL for the file
+                if($data['record']->category =='youtube'){
+                    $fullUrl = $data['record']->file_name;
+                }else{
+                    $fullUrl = asset("storage/{$url}");
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error or handle it appropriately
+            $url = 0;
+            $redirect = 0;
+            $error = true;
+            $auth = $user;
+        }
 
-// Check if $cek is not null before accessing its properties
-$status = ($cek) ? $cek->module_read : 0;
+        // Check if $cek is not null before accessing its properties
+        $status = ($cek) ? $cek->module_read : 0;
 
-$result = [
-    "error" => $error,
-    "redirect" => $redirect,
-    "status" => $status,
-    "url" => $fullUrl,  // Include the full URL in the response
-    "user" => $user
-];
+        $result = [
+            "error" => $error,
+            "redirect" => $redirect,
+            "status" => $status,
+            "url" => $fullUrl,  // Include the full URL in the response
+            "user" => $user
+        ];
 
-return response()->json($result);
+        return response()->json($result);
 
     }
 

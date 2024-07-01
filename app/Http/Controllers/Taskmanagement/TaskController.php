@@ -171,6 +171,8 @@ class TaskController extends Controller
             $id_project = Auth::user()->project_id;
         }
 
+        $periode_filter = $request->input('periode')?$request->input('periode'):'';
+
         $data['detail_project'] = Project::find($id_project);
         
         $data['project']=Project::all();
@@ -184,8 +186,13 @@ class TaskController extends Controller
                 $row->jml_sub = List_task::where('id_master',$row->id)->count();
             }
         }
+        if(!empty($periode_filter)){
+            $periode = strtoupper($periode_filter);
+        }else{
+            $periode = Carbon::now()->addMonth()->format('F-Y');
+        }
 
-        $periode = Carbon::now()->addMonth()->format('F-Y');
+        
         $data['schedule'] = Schedule::where('periode', strtoupper($periode))
                                     ->where('project', $id_project)
                                     ->where('shift','!=','OFF')
@@ -194,7 +201,8 @@ class TaskController extends Controller
                                     ->get();
 
         $data['report']=$report;
-        
+        $data['periode'] = date('F',strtotime($periode_filter));
+
         return view('pages.operational.task.report',$data);
     }
 

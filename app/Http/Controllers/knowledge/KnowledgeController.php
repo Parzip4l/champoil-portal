@@ -59,13 +59,15 @@ class KnowledgeController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'file_name' => 'required|file', // Add file validation rule
+            // 'file_name' => 'required|file', // Add file validation rule
         ]);
     
         try {
             $knowledge = new Knowledge();
             $knowledge->title = $request->title;
             $knowledge->durasi = $request->durasi;
+            $knowledge->category = $request->category;
+            $knowledge->level = $request->level;
     
             if ($request->hasFile('file_name')) {
                 $file = $request->file('file_name');
@@ -75,6 +77,8 @@ class KnowledgeController extends Controller
                 $path = $file->storeAs('knowledge_test', $filename, 'public');
     
                 $knowledge->file_name = $path;
+            }else{
+                $knowledge->file_name = $request->file_name;
             }
     
             $knowledge->save();

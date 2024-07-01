@@ -199,25 +199,36 @@ class TaskController extends Controller
     }
 
     public function download_qr($id){
-        // Generate the QR code
-        // Generate the QR code
-        // Generate QR code with desired URL or text
-        $image = QrCode::format('png')
-    ->merge(public_path('1644463030.png'), 0.5, true)
-    ->size(500)
-    ->errorCorrection('H')
-    ->generate('A simple example of QR code!');
+        $result=[];
+        $records = Task::where('project_id',$id)->get();
+        if(!empty($records)){
+            foreach($records as $row){
+                $path = storage_path('app/public/qrcodes'); // Define the path to save the QR code
+
+                // Ensure the directory exists
+                if (!file_exists($path)) {
+                    mkdir($path, 0755, true);
+                }
+
+                $filename = $row->unix_code.'.png';
+                $filePath = $path . '/' . $filename;
+
+                // Generate the QR code and save it to the specified path
+                QrCode::format('png')->size(400)->generate($row->unix_code, $filePath);
+            }
+        }
         
+        $project = Project::find($id);
+
+        // Generate PDF using the view file 'pdf_view.blade.php' with the provided data
+        $pdf = PDF::loadView('pages.operational.task.view_pdf', ['records' => $records])->setPaper([0, 0, 350, 420]);
+
+        // Return the PDF as a download
+        return $pdf->stream('Qr_patroli_'.$project->name.'.pdf','F');
         
 
 
-
-        // Load the PDF view with the QR code data
-        // $pdf = PDF::loadView('pages.operational.task.view_pdf', $data);
-
-        // Stream the PDF to the browser
-        // return $pdf->stream('qrcode.pdf');
-        // return view('pages.operational.task.view_pdf', $data);
+        
     }
 
     

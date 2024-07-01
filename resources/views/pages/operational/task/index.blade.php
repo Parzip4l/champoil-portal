@@ -14,6 +14,7 @@
                     Data Patrol
                     <a href="{{route('task-report')}}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Report</a>
                     <a href="#" class="btn btn-sm btn-primary ml-3" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
+                    <a href="{{route('task-download-qr',['id'=>@$_GET['project_id']?@$_GET['project_id']:1])}}" class="btn btn-sm btn-danger ml-3" style="float:right;margin-right: 10px;">Export QR</a>
                 </h5>
                 
                 

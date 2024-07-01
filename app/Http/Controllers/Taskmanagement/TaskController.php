@@ -201,6 +201,7 @@ class TaskController extends Controller
                                     ->get();
 
         $data['report']=$report;
+        
         $data['periode'] = date('F',strtotime($periode_filter));
 
         return view('pages.operational.task.report',$data);

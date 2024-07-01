@@ -86,8 +86,8 @@
                                 <th width="5" rowspan="2">No</th>
                                 <th rowspan="2">Checkpoint</th>
                                 <th rowspan="2">Sub Point</th>
-                                @if(tanggal_bulan(date('Y'),date('m')))
-                                    @foreach(tanggal_bulan(date('Y'),date('m')) as $tanggal )
+                                @if(tanggal_bulan(date('Y'),date('m',strtotime($periode))))
+                                    @foreach(tanggal_bulan(date('Y'),date('m',strtotime($periode))) as $tanggal )
                                         <th rowspan="2">{{ $tanggal }}</th>
                                     @endforeach
                                 @endif
@@ -104,8 +104,8 @@
                                         @foreach($row->sub_task as $sub)
                                             <tr>
                                                 <td>{!! insert_line_breaks($sub->task,30) !!}</td>
-                                                @if(tanggal_bulan(date('Y'),date('m')))
-                                                    @foreach(tanggal_bulan(date('Y'),date('m')) as $tanggal )
+                                                @if(tanggal_bulan(date('Y'),date('m',strtotime($periode))))
+                                                    @foreach(tanggal_bulan(date('Y'),date('m',strtotime($periode))) as $tanggal )
                                                         <td>
                                                             @if($schedule)
                                                                 @foreach($schedule as $scdl)

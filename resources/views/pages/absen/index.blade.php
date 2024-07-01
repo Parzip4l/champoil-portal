@@ -37,19 +37,29 @@
                     
                         @csrf
                         <label for="organization" class="form-label">Filter :</label>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <select name="organization" class="form-control mb-2" id="organizationSelect">
                                 <option value="">Semua Organisasi</option>
                                 <option value="Management Leaders" {{ request('organization') == 'Management Leaders' ? 'selected' : '' }}>Management Leaders</option>
                                 <option value="Frontline Officer" {{ request('organization') == 'Frontline Officer' ? 'selected' : '' }}>Frontline Officer</option>
                             </select>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <select name="project" class="form-control mb-2 select2" id="project">
                                 <option value="">Project</option>
                                 @if($project)
                                     @foreach($project as $row)
                                         <option value="{{ $row->id }}" {{ request('project') == $row->id ? 'selected' : '' }}>{{ $row->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="periode" class="form-control mb-2 select2" id="periode">
+                                <option value="">Periode</option>
+                                @if(bulan())
+                                    @foreach(bulan() as $key=>$value)
+                                        <option value="{{ strtoupper($value).'-'.date('Y') }}">{{ $value }}</option>
                                     @endforeach
                                 @endif
                             </select>

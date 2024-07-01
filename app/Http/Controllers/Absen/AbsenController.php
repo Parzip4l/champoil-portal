@@ -36,6 +36,7 @@ class AbsenController extends Controller
         // Mendapatkan data organisasi terpilih (jika ada)
         $selectedOrganization = $request->input('organization');
         $project_id = $request->input('project');
+        $periode = $request->input('periode');
 
         // Menghitung tanggal mulai dan tanggal akhir berdasarkan aturan bisnis
         $today = now();
@@ -150,7 +151,8 @@ class AbsenController extends Controller
     {
         $selectedOrganization = $request->input('organization');
         $project = $request->input('project')?$request->input('project'):'';
-        return redirect()->route('absen.index', ['organization' => $selectedOrganization,'project'=>$project]);
+        $periode = $request->input('periode')?$request->input('periode'):'';
+        return redirect()->route('absen.index', ['organization' => $selectedOrganization,'project'=>$project,'periode'=>$periode]);
     }
 
 

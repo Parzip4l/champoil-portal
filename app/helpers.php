@@ -16,6 +16,19 @@ function tanggal_bulan($year,$month){
 
   return $dates;
 }
+
+function bulan(){
+  // Membuat array kosong untuk menampung nama-nama bulan
+  $months = [];
+
+  // Mengisi array dengan nama-nama bulan
+  for ($i = 1; $i <= 12; $i++) {
+      $months[] = Carbon::create()->month($i)->format('F');
+  }
+
+  return $months;
+
+}
   
 function active_class($path, $active = 'active') {
   return call_user_func_array('Request::is', (array)$path) ? $active : '';

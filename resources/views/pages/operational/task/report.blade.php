@@ -181,7 +181,6 @@
         $('#detail-patrol .modal-body #patrolTableBody').empty();
         $('#detail-patrol').modal('show'); // Show the modal
         // tableBody.clear();
-        // Your jQuery AJAX code here
         $.ajax({
             url: '/api/v1/patroli-report-dash',
             type: 'POST',

@@ -155,7 +155,7 @@ class KnowledgeController extends Controller
         
         $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
         $data['record'] = Knowledge::where('id', $id)->first();
-        dd($data['record']);
+        // dd($data['record']);
         $fileName="";
         
         if($data['record']->category =='pdf'){

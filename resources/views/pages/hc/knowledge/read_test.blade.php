@@ -9,11 +9,18 @@
 @section('content')
     <!-- <iframe src="{{ asset('knowledge_test/' . $file_module) }}#toolbar=0&embedded=true" width="400" height="800"></iframe> -->
     <!-- <iframe src="http://data.cityservice.co.id/aFyPRgtGlU3tLNb1kWvyqnZ6r3S3e3aMq14Uqd6G.pdf#toolbar=0&" width="400" height="800"></iframe> -->
+      @if($record->category == 'pdf')
       <div id="pdf-container">
         <canvas id="pdf-canvas"></canvas>
       </div>
       <button id="prev-page" class="btn btn-warning btn-sm">Previous Page</button>
       <button id="next-page" class="btn btn-secondary btn-sm">Next Page</button>
+      @endif
+
+      @if($record->category=='youtube')
+      <iframe width="100%" height="315" src="https://www.youtube.com/embed/5WCEBVJ8bmg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <a href="javascript:void(0)" id="vid_test"  class="btn btn-primary btn-sm">Lanjut Test</a>
+      @endif
       <a href="javascript:void(0)" id="goto_test"  class="btn btn-primary btn-sm">Lanjut Test</a>
 <!-- End -->
 @endsection
@@ -105,6 +112,24 @@
     });
     
     document.getElementById("goto_test").addEventListener("click", function() {
+        // Use SweetAlert2 to display a custom alert
+        Swal.fire({
+          title: 'Jika Anda Melanjutkan untuk test anda tidak dapat mengakses module kembali,?',
+          showDenyButton: true,
+          showCancelButton: false,
+          confirmButtonText: 'Yes',
+          denyButtonText: `No`,
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            window.location.href = "/kas/user.test/<?php echo $id_module ?>"
+          } else if (result.isDenied) {
+            Swal.fire('Changes are not saved', '', 'info')
+          }
+        })
+    });
+
+    document.getElementById("vid_test").addEventListener("click", function() {
         // Use SweetAlert2 to display a custom alert
         Swal.fire({
           title: 'Jika Anda Melanjutkan untuk test anda tidak dapat mengakses module kembali,?',

@@ -68,6 +68,8 @@ class KnowledgeController extends Controller
             $knowledge->durasi = $request->durasi;
             $knowledge->category = $request->category;
             $knowledge->level = $request->level;
+            $knowledge->url_video = $request->url_video;
+
     
             if ($request->hasFile('file_name')) {
                 $file = $request->file('file_name');
@@ -77,11 +79,10 @@ class KnowledgeController extends Controller
                 $path = $file->storeAs('knowledge_test', $filename, 'public');
     
                 $knowledge->file_name = $path;
-            }else{
-                $knowledge->file_name = $request->file_name;
             }
     
             $knowledge->save();
+
     
             return redirect()->route('knowledge_base.index')->with('success', 'Knowledge Successfully Added');
         } catch (\Exception $e) {

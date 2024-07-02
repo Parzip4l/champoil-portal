@@ -114,7 +114,7 @@
                         </div>
                         <div class="col-md-12 mb-2 d-none" id="yt">
                             <label for="" class="form-label">URL</label>
-                            <input type="text" class="form-control" name="file_name">    
+                            <input type="text" class="form-control" name="url_video">    
                         </div>
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Level</label>

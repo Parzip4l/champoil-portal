@@ -140,15 +140,15 @@ class PatroliController extends Controller
             foreach($data['id'] as $row){
                 // dd($request->file('photo'.$data['id'][$no][$no]));
                 $image="";
-                // if ($request->hasFile("photo{$data['id'][$no]}[0]")) {
-                //     $file = $request->file("photo{$data['id'][$no]}[0]");
-                //     $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
+                if ($request->hasFile("photo{$data['id'][$no]}[0]")) {
+                    $file = $request->file("photo{$data['id'][$no]}[0]");
+                    $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
             
-                //     // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
-                //     $path = $file->storeAs('patroli', $filename, 'public');
+                    // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
+                    $path = $file->storeAs('patroli', $filename, 'public');
             
-                //     $image = $path;
-                // }
+                    $image = $path;
+                }
                 $insert=[
                     "unix_code"=>$data['unix_code'],
                     "id_task"=>$data['id'][$no],
@@ -158,7 +158,7 @@ class PatroliController extends Controller
                     "created_at"=>date('Y-m-d H:i:s'),
                     "image"=>$image
                 ];
-                // $cek[]=$request->hasFile("photo{$data['id'][$no]}[0]");
+                $cek[]=$request->file("photo{$data['id'][$no]}[0]");
                 $no++;
 
                 // $cek[]=$request->hasFile("photo{$data['id'][$no]}[0]");
@@ -171,7 +171,7 @@ class PatroliController extends Controller
         $return =[
             "status"=>true,
             "message"=>"Patroli Berhasil di Simpan",
-            // "cek"=>$cek
+            "cek"=>$cek
         ];
 
 

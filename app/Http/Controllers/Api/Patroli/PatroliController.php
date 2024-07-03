@@ -143,7 +143,7 @@ class PatroliController extends Controller
                     $file = $request->file($photoKey)[0];
                     if ($file->isValid()) {
                         $filename = time() . '_' . $file->getClientOriginalName();
-                        $path = $file->storeAs('patroli', $filename, 'public');
+                        $file->move(public_path('/images/company_logo'), $filename);
                         $image = '/images/company_logo/' . $filename; // Simpan path relatif ke database
                     } else {
                         return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);

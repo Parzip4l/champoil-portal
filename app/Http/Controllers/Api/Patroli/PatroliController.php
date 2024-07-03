@@ -136,12 +136,23 @@ class PatroliController extends Controller
         if($data['id']){
             $no=0;
             foreach($data['id'] as $row){
+                $image="";
+                if ($request->hasFile('photo'.$data['id'][$no])) {
+                    $file = $request->file('photo'.$data['id'][$no]);
+                    $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
+        
+                    // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
+                    $path = $file->storeAs('patroli', $filename, 'public');
+        
+                    $image = $path;
+                }
                 $insert=[
                     "unix_code"=>$data['unix_code'],
                     "id_task"=>$data['id'][$no],
                     "status"=>$data['status'][$no],
                     "employee_code"=>$nik,
-                    "description"=>$data['keterangan'][$no]
+                    "description"=>$data['keterangan'][$no],
+                    "image"=>$image
                 ];
                 $no++;
 

@@ -223,7 +223,7 @@ class TaskController extends Controller
                 $filePath = $path . '/' . $filename;
 
                 // Generate the QR code and save it to the specified path
-                QrCode::format('png')->size(400)->generate($row->unix_code, $filePath);
+                QrCode::format('png')->size(150)->generate($row->unix_code, $filePath);
             }
         }
         

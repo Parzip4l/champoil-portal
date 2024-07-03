@@ -142,6 +142,8 @@ class PatroliController extends Controller
                     "employee_code"=>$user->id
                 ];
                 $no++;
+
+                Patroli::insert($insert);
             }
         }
 

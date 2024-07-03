@@ -126,58 +126,70 @@ class PatroliController extends Controller
         return response()->json($result);
     }
 
-    public function patroli_save(Request $request){
-
+    public function patroli_save(Request $request)
+    {
         $data = $request->all();
         $token = $request->bearerToken();
         $user = Auth::guard('api')->user();
         $nik = $user->employee_code;
 
-        
+        if (isset($data['id']) && is_array($data['id'])) {
+            $no = 0;
+            foreach ($data['id'] as $row) {
+                $image = "";
+                $photoKey = "photo{$data['id'][$no]}";
 
-        if($data['id']){
-            $no=0;
-            foreach($data['id'] as $row){
-                // dd($request->file('photo'.$data['id'][$no][$no]));
-                // $image="";
-                // if ($request->hasFile("photo{$data['id'][$no]}[0]")) {
-                //     $file = $request->file("photo{$data['id'][$no]}[0]");
-                //     $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
-            
-                //     // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
-                //     $path = $file->storeAs('patroli', $filename, 'public');
-            
-                //     $image = $path;
-                // }
-                $insert=[
-                    "unix_code"=>$data['unix_code'],
-                    "id_task"=>$data['id'][$no],
-                    "status"=>$data['status'][$no],
-                    "employee_code"=>$nik,
-                    "description"=>$data['keterangan'][$no],
-                    "created_at"=>date('Y-m-d H:i:s'),
-                    // "image"=>$image
+                // Pake debug jang log file
+                \Log::info('Checking file for key: ' . $photoKey);
+                \Log::info('Has file: ' . $request->hasFile($photoKey));
+                \Log::info('All request data: ', $data);
+
+                if ($request->hasFile($photoKey)) {
+                    $file = $request->file($photoKey)[0];
+
+                    // Debug Log Detailna didieu
+                    \Log::info('File details: ', [
+                        'isValid' => $file->isValid(),
+                        'originalName' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                        'mimeType' => $file->getMimeType()
+                    ]);
+
+                    if ($file && $file->isValid()) {
+                        $filename = time() . '_' . $file->getClientOriginalName(); 
+                        $path = $file->storeAs('patroli', $filename, 'public');
+                        $image = $path;
+                    } else {
+                        return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);
+                    }
+                }
+
+                $insert = [
+                    "unix_code" => $data['unix_code'],
+                    "id_task" => $data['id'][$no],
+                    "status" => $data['status'][$no],
+                    "employee_code" => $nik,
+                    "description" => $data['keterangan'][$no],
+                    "created_at" => date('Y-m-d H:i:s'),
+                    "image" => $image
                 ];
-                // $cek[]=$request->file("photo{$data['id'][$no]}[0]");
-                $no++;
-
-                // $cek[]=$request->hasFile("photo{$data['id'][$no]}[0]");
-                
 
                 Patroli::insert($insert);
+                $no++;
             }
+        } else {
+            return response()->json(['status' => false, 'message' => 'No task IDs provided.'], 400);
         }
 
-        $return =[
-            "status"=>true,
-            "message"=>"Patroli Berhasil di Simpan",
-            // "cek"=>$cek
+        $return = [
+            "status" => true,
+            "message" => "Patroli Berhasil di Simpan"
         ];
-
-
 
         return response()->json($return);
     }
+
+
 
     public function report_patrol(Request $request){
         $tanggal=$request->input('tanggal');

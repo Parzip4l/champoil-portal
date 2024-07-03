@@ -133,17 +133,20 @@ class PatroliController extends Controller
         $user = Auth::guard('api')->user();
         $nik = $user->employee_code;
 
+        
+
         if($data['id']){
             $no=0;
             foreach($data['id'] as $row){
+                // dd($request->file('photo'.$data['id'][$no][$no]));
                 $image="";
-                if ($request->hasFile('photo'.$data['id'][$no])) {
-                    $file = $request->file('photo'.$data['id'][$no]);
+                if ($request->hasFile("photo{$data['id'][$no]}[0]")) {
+                    $file = $request->file("photo{$data['id'][$no]}[0]");
                     $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
-        
+            
                     // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
                     $path = $file->storeAs('patroli', $filename, 'public');
-        
+            
                     $image = $path;
                 }
                 $insert=[
@@ -152,9 +155,12 @@ class PatroliController extends Controller
                     "status"=>$data['status'][$no],
                     "employee_code"=>$nik,
                     "description"=>$data['keterangan'][$no],
+                    "created_at"=>date('Y-m-d H:i:s'),
                     "image"=>$image
                 ];
                 $no++;
+
+                $cek[]=$insert;
 
                 Patroli::insert($insert);
             }
@@ -163,6 +169,7 @@ class PatroliController extends Controller
         $return =[
             "status"=>true,
             "message"=>"Patroli Berhasil di Simpan"
+            // "cek"=>$cek
         ];
 
 

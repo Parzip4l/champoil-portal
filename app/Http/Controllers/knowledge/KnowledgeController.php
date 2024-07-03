@@ -59,13 +59,17 @@ class KnowledgeController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'file_name' => 'required|file', // Add file validation rule
+            // 'file_name' => 'required|file', // Add file validation rule
         ]);
     
         try {
             $knowledge = new Knowledge();
             $knowledge->title = $request->title;
             $knowledge->durasi = $request->durasi;
+            $knowledge->category = $request->category;
+            $knowledge->level = $request->level;
+            $knowledge->url_video = $request->url_video;
+
     
             if ($request->hasFile('file_name')) {
                 $file = $request->file('file_name');
@@ -78,6 +82,7 @@ class KnowledgeController extends Controller
             }
     
             $knowledge->save();
+
     
             return redirect()->route('knowledge_base.index')->with('success', 'Knowledge Successfully Added');
         } catch (\Exception $e) {
@@ -150,12 +155,13 @@ class KnowledgeController extends Controller
         
         $data['records'] = Employee::where('organisasi', 'Frontline Officer')->get();
         $data['record'] = Knowledge::where('id', $id)->first();
-
+        // dd($data['record']);
         $fileName="";
         
-        if($data['record']){
+        if($data['record']->category =='pdf'){
             $fileName = $data['record']->file_name;
-
+        }else if($data['record']->category =='youtube'){
+            $fileName = $data['record']->url_video;
         }
         
         // Check if the record exists

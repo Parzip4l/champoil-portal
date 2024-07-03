@@ -133,21 +133,45 @@ class PatroliController extends Controller
         $user = Auth::guard('api')->user();
         $nik = $user->employee_code;
 
+        
+
         if($data['id']){
             $no=0;
             foreach($data['id'] as $row){
+                // dd($request->file('photo'.$data['id'][$no][$no]));
+                // $image="";
+                // if ($request->hasFile("photo{$data['id'][$no]}[0]")) {
+                //     $file = $request->file("photo{$data['id'][$no]}[0]");
+                //     $filename = time() . '_' . $file->getClientOriginalName(); // Use a more meaningful file name
+            
+                //     // Store the file in the 'public' disk (you can configure other disks in config/filesystems.php)
+                //     $path = $file->storeAs('patroli', $filename, 'public');
+            
+                //     $image = $path;
+                // }
                 $insert=[
                     "unix_code"=>$data['unix_code'],
                     "id_task"=>$data['id'][$no],
-                    "employee_code"=>$user->id
+                    "status"=>$data['status'][$no],
+                    "employee_code"=>$nik,
+                    "description"=>$data['keterangan'][$no],
+                    "created_at"=>date('Y-m-d H:i:s'),
+                    // "image"=>$image
                 ];
+                // $cek[]=$request->file("photo{$data['id'][$no]}[0]");
                 $no++;
+
+                // $cek[]=$request->hasFile("photo{$data['id'][$no]}[0]");
+                
+
+                Patroli::insert($insert);
             }
         }
 
         $return =[
             "status"=>true,
-            "message"=>"Patroli Berhasil di Simpan"
+            "message"=>"Patroli Berhasil di Simpan",
+            // "cek"=>$cek
         ];
 
 

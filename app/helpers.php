@@ -4,11 +4,15 @@ use Carbon\CarbonPeriod;
 
 function tanggal_bulan($year,$month){
   
-  $startDate = Carbon::create($year, $month, 1);
-  $endDate = $startDate->copy()->endOfMonth();
+  // Determine the start date
+  $startDate = Carbon::create($year, $month, 21)->subMonth();
+  // Determine the end date
+  $endDate = Carbon::create($year, $month, 20);
 
+  // Create the period
   $period = CarbonPeriod::create($startDate, $endDate);
 
+  // Collect the dates
   $dates = [];
   foreach ($period as $date) {
       $dates[] = $date->format('Y-m-d');

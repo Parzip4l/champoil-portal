@@ -171,6 +171,8 @@ class TaskController extends Controller
             $id_project = Auth::user()->project_id;
         }
 
+        $periode_filter = $request->input('periode')?$request->input('periode'):'';
+
         $data['detail_project'] = Project::find($id_project);
         
         $data['project']=Project::all();
@@ -184,8 +186,13 @@ class TaskController extends Controller
                 $row->jml_sub = List_task::where('id_master',$row->id)->count();
             }
         }
+        if(!empty($periode_filter)){
+            $periode = strtoupper($periode_filter);
+        }else{
+            $periode = Carbon::now()->addMonth()->format('F-Y');
+        }
 
-        $periode = Carbon::now()->addMonth()->format('F-Y');
+        
         $data['schedule'] = Schedule::where('periode', strtoupper($periode))
                                     ->where('project', $id_project)
                                     ->where('shift','!=','OFF')
@@ -195,6 +202,8 @@ class TaskController extends Controller
 
         $data['report']=$report;
         
+        $data['periode'] = date('F',strtotime($periode_filter));
+
         return view('pages.operational.task.report',$data);
     }
 
@@ -214,7 +223,7 @@ class TaskController extends Controller
                 $filePath = $path . '/' . $filename;
 
                 // Generate the QR code and save it to the specified path
-                QrCode::format('png')->size(400)->generate($row->unix_code, $filePath);
+                QrCode::format('png')->size(150)->generate($row->unix_code, $filePath);
             }
         }
         

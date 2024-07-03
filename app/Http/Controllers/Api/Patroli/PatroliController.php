@@ -140,7 +140,7 @@ class PatroliController extends Controller
                     "unix_code"=>$data['unix_code'],
                     "id_task"=>$data['id'][$no],
                     "status"=>$data['status'][$no],
-                    "employee_code"=>$user->id,
+                    "employee_code"=>$nik,
                     "description"=>$data['keterangan'][$no]
                 ];
                 $no++;

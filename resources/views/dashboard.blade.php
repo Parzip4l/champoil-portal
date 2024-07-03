@@ -235,7 +235,7 @@
                     </div>
                 </a>
             </div>
-            <!-- <div class="item">
+            <div class="item">
                 <a href="{{ route('patroli') }}">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="book"></i>
@@ -244,7 +244,7 @@
                         <p class="text-muted">Patroli</p>
                     </div>
                 </a>
-            </div> -->
+            </div>
             <div class="item">
                 <a href="javascript:void(0)" id="maps-update">
                     <div class="icon text-center">

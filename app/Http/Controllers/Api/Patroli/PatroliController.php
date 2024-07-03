@@ -129,63 +129,49 @@ class PatroliController extends Controller
     public function patroli_save(Request $request)
     {
         $data = $request->all();
-        $token = $request->bearerToken();
         $user = Auth::guard('api')->user();
         $nik = $user->employee_code;
-
+    
         if (isset($data['id']) && is_array($data['id'])) {
             $no = 0;
-            foreach ($data['id'] as $row) {
+            foreach ($data['id'] as $id) {
                 $image = "";
-                $photoKey = "photo{$data['id'][$no]}";
-
-                // Pake debug jang log file
-                \Log::info('Checking file for key: ' . $photoKey);
-                \Log::info('Has file: ' . $request->hasFile($photoKey));
-                \Log::info('All request data: ', $data);
-
+                $photoKey = "photo{$id}";
+                
+    
                 if ($request->hasFile($photoKey)) {
                     $file = $request->file($photoKey)[0];
-
-                    // Debug Log Detailna didieu
-                    \Log::info('File details: ', [
-                        'isValid' => $file->isValid(),
-                        'originalName' => $file->getClientOriginalName(),
-                        'size' => $file->getSize(),
-                        'mimeType' => $file->getMimeType()
-                    ]);
-
-                    if ($file && $file->isValid()) {
-                        $filename = time() . '_' . $file->getClientOriginalName(); 
+                    if ($file->isValid()) {
+                        $filename = time() . '_' . $file->getClientOriginalName();
                         $path = $file->storeAs('patroli', $filename, 'public');
-                        $image = $path;
+                        $image = '/images/company_logo/' . $filename; // Simpan path relatif ke database
                     } else {
                         return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);
                     }
                 }
-
+    
                 $insert = [
                     "unix_code" => $data['unix_code'],
-                    "id_task" => $data['id'][$no],
+                    "id_task" => $id,
                     "status" => $data['status'][$no],
                     "employee_code" => $nik,
                     "description" => $data['keterangan'][$no],
-                    "created_at" => date('Y-m-d H:i:s'),
+                    "created_at" => now(),
                     "image" => $image
                 ];
-
+    
                 Patroli::insert($insert);
                 $no++;
             }
         } else {
             return response()->json(['status' => false, 'message' => 'No task IDs provided.'], 400);
         }
-
+    
         $return = [
             "status" => true,
             "message" => "Patroli Berhasil di Simpan"
         ];
-
+    
         return response()->json($return);
     }
 

@@ -33,8 +33,7 @@
                 </div>
                 @if($client_id==NULL)
                 <form action="{{ route('attendance.filter') }}" method="get" id="filterForm">
-                <div class="row">
-                    
+                    <div class="row">
                         @csrf
                         <label for="organization" class="form-label">Filter :</label>
                         <div class="col-md-3">

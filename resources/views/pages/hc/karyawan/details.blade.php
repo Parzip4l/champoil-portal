@@ -21,7 +21,7 @@
                         <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Personal Info</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Attendence</a>
+                        <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Attendance</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="contact-line-tab" data-bs-toggle="tab" data-bs-target="#contact" role="tab" aria-controls="contact" aria-selected="false">Emergency Contact</a>
@@ -118,7 +118,7 @@
                     </div>
                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
                         <!-- Attendence Info -->
-                        <h5 class="mt-4">Attendece Record {{ \Carbon\Carbon::now()->format('F Y') }}</h5>
+                        <h5 class="mt-4">Attendance Record {{ \Carbon\Carbon::now()->format('F Y') }}</h5>
                         <div class="row mt-3">
                             <div class="col-md-4 mb-3">
                                 <div class="card">
@@ -160,7 +160,7 @@
                                             </div>
                                             <div class="data mb-3">
                                                 <h5>{{ $CountRequest }}</h5>
-                                                <p>Attendence Request</p>
+                                                <p>Attendance Request</p>
                                             </div>
                                             <div class="data mb-3">
                                                 <h5>{{ $izin }}</h5>
@@ -203,7 +203,7 @@
                                                 <th>Tanggal</th>
                                                 <th>Clock In</th>
                                                 <th>Clock Out</th>
-                                                <th>Attendence Code</th>
+                                                <th>Attendance Code</th>
                                                 @if(in_array('superadmin_access', $dataLogin) || in_array('hc_access', $dataLogin))
                                                 <th></th>
                                                 @endif
@@ -399,11 +399,15 @@
     }
 
     .item-details {
-        padding: 10px 25px;
-        background-color: #eee;
+        padding: 15px 25px;
+        background-color: #fff;
         border-radius: 10px;
         margin-top: 5px;
         margin-bottom: 5px;
+        position: relative;
+        border: 0.5px solid #eee;
+        box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2);
+        -webkit-box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2);
     }
 
     .item-details p {
@@ -411,6 +415,8 @@
         font-weight: 400;
         margin-bottom: 0px;
         color: #555;
+        position: absolute;
+        top : -7px;
     }
     /* Responsive */
     @media(max-width: 675px){

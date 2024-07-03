@@ -22,6 +22,12 @@
                     <span class="link-title">Dashboard</span>
                 </a>
             </li>
+            <li class="nav-item {{ active_class(['/pengumuman']) }}">
+                <a href="{{ url('/pengumuman') }}" class="nav-link">
+                    <i class="link-icon" data-feather="mic"></i>
+                    <span class="link-title">Announcement</span>
+                </a>
+            </li>
             @endif
             @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin))
             <li class="nav-item nav-category">Employee</li>

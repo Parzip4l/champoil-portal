@@ -234,6 +234,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Organisasi Routes
     Route::resource('organisasi', App\Http\Controllers\Organisasi\OrganisasiController::class);
 
+    // Pengumuman Routes
+    Route::resource('pengumuman', App\Http\Controllers\Pengumuman\PengumumanController::class);
+
     // App Setting
     Route::resource('setting', App\Http\Controllers\Setting\SettingController::class);
     Route::get('version', [App\Http\Controllers\Setting\SettingController::class, 'apps_version'])->name('version');

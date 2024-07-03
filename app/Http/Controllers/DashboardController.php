@@ -23,6 +23,8 @@ use App\PengajuanSchedule\PengajuanSchedule;
 use PDF;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Pengumuman\Pengumuman;
+Use App\Organisasi\Organisasi;
 
 class DashboardController extends Controller
 {
@@ -116,10 +118,19 @@ class DashboardController extends Controller
             ]
         ];
         //End Absensi Statistik
-
-
+        $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
+        $organisasiUser = $company->organisasi;
+        // Pengumuman 
+        $tanggal_sekarang = now()->format('Y-m-d');
+        $pengumuman = Pengumuman::where('end_date', '>=', $tanggal_sekarang)
+                        ->where(function ($query) use ($organisasiUser) {
+                            $query->where('tujuan', $organisasiUser)
+                                  ->orWhere('tujuan', 'semua');
+                        })
+                        ->get();
+        
         // Employee Statistik
-        $dataChartKaryawan = Employee::where('unit_bisnis',$company->unit_bisnis)
+        $dataChartKaryawan = Employee::where('unit_bisnis', $company->unit_bisnis)
         ->where('resign_status',0)
         ->get();
 
@@ -251,7 +262,8 @@ class DashboardController extends Controller
         return view('dashboard', 
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
-            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2'
+            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2',
+            'pengumuman'
         ));
     }
 

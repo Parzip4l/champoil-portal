@@ -304,13 +304,50 @@
     <div class="col-md-12">
         <div class="card custom-card2">
             <div class="card-body">
+            @if($pengumuman->isEmpty())
                 <h5 class="text-center mb-2">No announcement</h5>
                 <p class="text-center text-muted">Your Announcement Will Show Here</p>
+            @else
+                @foreach($pengumuman as $item)
+                <div class="content-pengumuman mb-3">
+                    <a href="" class="text-muted d-flex justify-content-between" data-bs-toggle="modal" data-bs-target="#ViewModalPengumuman{{$item->id}}">
+                        <div class="judul-isi">
+                            <h5 class="">{{ $item->judul }}</h5>
+                            <p class="textmuted">{{ $item->konten }}</p>
+                        </div>
+                        <p class="card-text align-self-center"><small class="text-muted">{{ $item->publish_date }}</small></p>
+                    </a>
+                </div>
+                @endforeach
+            @endif
             </div>
         </div>
     </div>
 </div>
 <!-- End Announcement -->
+
+<!-- Modal Detail Pengumuman -->
+@foreach($pengumuman as $data)
+<div class="modal fade" id="ViewModalPengumuman{{$data->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{$data->judul}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="header-pengumuman">
+                   <p>{{$data->konten}}</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p class="text-muted">Release Date : {{$data->publish_date}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+ <!-- End Modal -->
 
 @if(in_array('hr_access', $dataLogin))
 <!-- Request -->

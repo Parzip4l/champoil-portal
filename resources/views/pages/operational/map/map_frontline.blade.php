@@ -10,6 +10,9 @@
 @push('style')
 <style>
         #map { height: 500px; }
+        .leaflet-top.leaflet-right {
+            display: none;
+        }
 </style>
 @endpush
 
@@ -65,6 +68,7 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
     <script>
+        
         var project_id = "<?php echo $project_id; ?>";
 
         let defaultCoordinates = [-6.200, 106.816];

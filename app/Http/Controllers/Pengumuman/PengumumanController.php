@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Slack;
 
 class PengumumanController extends Controller
 {
@@ -82,6 +83,66 @@ class PengumumanController extends Controller
                 $pengumuman->attachments = $path;
             }
             $pengumuman->save();
+
+            if ($company->unit_bisnis === 'CHAMPOIL') {
+                $slackChannel = Slack::where('channel', 'General')->first();
+                $slackWebhookUrl = $slackChannel->url;
+                $today = now()->toDateString();
+                $data = [
+                    'text' => "Ada Pengumuman Baru Telah Terbit Di Aplikasi TRUEST",
+                    'attachments' => [
+                        [
+                            'fields' => [
+                                [
+                                    'title' => 'Judul',
+                                    'value' => $request->judul,
+                                    'short' => true,
+                                ],
+                                [
+                                    'title' => 'Tujuan',
+                                    'value' => $request->tujuan,
+                                    'short' => true,
+                                ],
+                                [
+                                    'title' => 'Untuk Lihat Detail Silahkan Buka Aplikasi TRUEST',
+                                    'short' => true,
+                                ]
+                            ],
+                        ],
+                    ],
+                    
+                ];
+
+                $data_string = json_encode($data);
+
+                $ch = curl_init($slackWebhookUrl);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($data_string),
+                ]);
+
+                $result = curl_exec($ch);
+
+                if ($result === false) {
+                    // Penanganan kesalahan jika Curl gagal
+                    $error = curl_error($ch);
+                    // Handle the error here
+                    return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+                }
+
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                if ($httpCode !== 200) {
+                    // Penanganan kesalahan jika Slack merespons selain status 200 OK
+                    // Handle the error here
+                    return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+                }
+
+                curl_close($ch);
+            }
 
             return redirect()->route('pengumuman.index')->with('success', 'Pengumuman berhasil dibuat');
         } catch (\Exception $e) {

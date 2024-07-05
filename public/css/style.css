@@ -75,6 +75,10 @@
     max-width: 100%;
     width: 100%;
     object-fit: cover;
+    height: 250px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    margin-top: 20px;
 }
 
 .owl-carousel .owl-item img {

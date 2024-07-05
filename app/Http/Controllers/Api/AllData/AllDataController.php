@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use App\Employee;
 use App\User;
 use App\Pengumuman\Pengumuman;
+use App\News\News;
 
 class AllDataController extends Controller
 {
@@ -52,6 +53,77 @@ class AllDataController extends Controller
             return response()->json(['dataPengumuman' => $pengumuman], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function showPengumuman($id)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = request()->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+            $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
+
+            // Cari pengumuman berdasarkan ID dan perusahaan (company)
+            $pengumuman = Pengumuman::where('id', $id)
+                                    ->where('company', $unitBisnis)
+                                    ->first();
+
+            if (!$pengumuman) {
+                return response()->json(['error' => 'Pengumuman tidak ditemukan'], 404);
+            }
+
+            return response()->json(['dataPengumuman' => $pengumuman], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function ListBerita(Request $request)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+            $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
+            $tanggal_sekarang = now()->format('Y-m-d');
+            $berita = News::where('company', $unitBisnis)->get();
+
+            return response()->json(['dataBerita' => $berita], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }   
+    }
+
+    public function showBerita($id)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = request()->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+            $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
+
+            // Cari berita berdasarkan ID dan perusahaan (company)
+            $berita = News::where('id', $id)
+                        ->where('company', $unitBisnis)
+                        ->first();
+
+            if (!$berita) {
+                return response()->json(['error' => 'Berita tidak ditemukan'], 404);
+            }
+
+            return response()->json(['dataBerita' => $berita], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
     /**

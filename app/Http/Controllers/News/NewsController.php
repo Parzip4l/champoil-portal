@@ -83,6 +83,11 @@ class NewsController extends Controller
                                     'short' => true,
                                 ],
                                 [
+                                    'title' => 'Author',
+                                    'value' => $company->nama,
+                                    'short' => true,
+                                ],
+                                [
                                     'title' => 'Untuk Lihat Detail Silahkan Buka Aplikasi TRUEST',
                                     'short' => true,
                                 ]

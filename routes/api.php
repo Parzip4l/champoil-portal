@@ -121,4 +121,8 @@ Route::prefix('v1')->group(function () {
     
     // Pengumuman
     Route::get('pengumuman', [AllDataController::class, 'ListPengumuman']);
+        Route::get('pengumuman/{id}', [AllDataController::class, 'showPengumuman']);
+    // Berita
+    Route::get('berita', [AllDataController::class, 'ListBerita']);
+        Route::get('berita/{id}', [AllDataController::class, 'showBerita']);
 });

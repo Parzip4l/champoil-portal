@@ -10,6 +10,7 @@ use App\Pengumuman\Pengumuman;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PengumumanController extends Controller
 {
@@ -65,6 +66,21 @@ class PengumumanController extends Controller
             $pengumuman->publish_date = $request->publish_date;
             $pengumuman->end_date = $request->end_date;
             $pengumuman->company = $company->unit_bisnis;
+            if ($request->hasFile('attachments')) {
+                $file = $request->file('attachments');
+                
+                // Mendapatkan ekstensi file
+                $extension = $file->getClientOriginalExtension();
+            
+                // Mengecek apakah file adalah PDF atau JPG
+                if ($extension !== 'pdf' && $extension !== 'jpg') {
+                    return redirect()->back()->with('error', 'Hanya file PDF dan JPG yang diizinkan.');
+                }
+            
+                // Jika file adalah PDF atau JPG maka simpan
+                $path = $file->store('public/files');
+                $pengumuman->attachments = $path;
+            }
             $pengumuman->save();
 
             return redirect()->route('pengumuman.index')->with('success', 'Pengumuman berhasil dibuat');
@@ -104,18 +120,9 @@ class PengumumanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $pengumuman = Pengumuman::findOrFail($id);
-
-        // Validasi bahwa user yang mengedit memiliki akses atau sesuai dengan perusahaan
-        $user = Auth::user();
-        $code = $user->employee_code;
+        $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        if (!$company || $pengumuman->company !== $company->unit_bisnis) {
-            return redirect()->route('pengumuman.index')->with('error', 'Anda tidak memiliki akses untuk mengedit pengumuman ini.');
-        }
-
-        // Lakukan validasi input
         $request->validate([
             'judul' => 'required|string|max:255',
             'konten' => 'required|string',
@@ -124,15 +131,53 @@ class PengumumanController extends Controller
         ]);
 
         try {
-            // Update pengumuman
+            $pengumuman = Pengumuman::findOrFail($id);
             $pengumuman->judul = $request->judul;
             $pengumuman->konten = $request->konten;
             $pengumuman->tujuan = $request->tujuan; // Mengubah array menjadi JSON string
             $pengumuman->publish_date = $request->publish_date;
             $pengumuman->end_date = $request->end_date;
+            $pengumuman->company = $company->unit_bisnis;
+
+            if ($request->hasFile('attachments')) {
+                $file = $request->file('attachments');
+
+                // Mendapatkan ekstensi file
+                $extension = $file->getClientOriginalExtension();
+
+                // Mengecek apakah file adalah PDF atau JPG
+                if ($extension !== 'pdf' && $extension !== 'jpg') {
+                    return redirect()->back()->with('error', 'Hanya file PDF dan JPG yang diizinkan.');
+                }
+
+                // Jika ada lampiran sebelumnya, hapus file lama
+                if ($pengumuman->attachments) {
+                    Storage::delete($pengumuman->attachments);
+                }
+
+                // Simpan file baru
+                $path = $file->store('public/files');
+                $pengumuman->attachments = $path;
+            }
+
             $pengumuman->save();
 
             return redirect()->route('pengumuman.index')->with('success', 'Pengumuman berhasil diperbarui');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadAttachment($id)
+    {
+        try {
+            $pengumuman = Pengumuman::findOrFail($id);
+
+            if ($pengumuman->attachments) {
+                return Storage::download($pengumuman->attachments);
+            } else {
+                return redirect()->back()->with('error', 'No attachment found.');
+            }
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

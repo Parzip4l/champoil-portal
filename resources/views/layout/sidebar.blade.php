@@ -28,6 +28,12 @@
                     <span class="link-title">Announcement</span>
                 </a>
             </li>
+            <li class="nav-item {{ active_class(['/news']) }}">
+                <a href="{{ url('/news') }}" class="nav-link">
+                    <i class="link-icon" data-feather="file-text"></i>
+                    <span class="link-title">News</span>
+                </a>
+            </li>
             @endif
             @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin))
             <li class="nav-item nav-category">Employee</li>

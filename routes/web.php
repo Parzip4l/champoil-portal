@@ -236,6 +236,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
     // Pengumuman Routes
     Route::resource('pengumuman', App\Http\Controllers\Pengumuman\PengumumanController::class);
+        Route::get('pengumuman/{id}/download', [App\Http\Controllers\Pengumuman\PengumumanController::class, 'downloadAttachment'])->name('pengumuman.download');
+
+    // News
+    Route::resource('news', App\Http\Controllers\News\NewsController::class);
 
     // App Setting
     Route::resource('setting', App\Http\Controllers\Setting\SettingController::class);

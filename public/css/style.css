@@ -54,7 +54,28 @@
     border-radius: 10px!important;
     border-color: #424874!important;
 }
+.title-news {
+    width: 100%;
+    max-width: 600px; /* Anda dapat mengubah nilai ini sesuai kebutuhan */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0 auto; /* Untuk menengahkan elemen jika lebar kurang dari 100% */
+}
 
+.excerpt-post {
+    width: 100%;
+    max-width: 600px; /* Anda dapat mengubah nilai ini sesuai kebutuhan */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0 auto; /* Untuk menengahkan elemen jika lebar kurang dari 100% */
+}
+.featured-image-single img{
+    max-width: 100%;
+    width: 100%;
+    object-fit: cover;
+}
 .menu-mobile-wrap {
     background: #fff;
     border-radius: 15px;

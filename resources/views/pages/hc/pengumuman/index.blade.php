@@ -115,6 +115,10 @@
                         <label for="Judul" class="form-label">Tanggal Berakhir</label>
                         <input type="date" name="end_date" class="form-control" required>
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="Judul" class="form-label">File</label>
+                        <input type="file" name="attachments" class="form-control">
+                    </div>
                     <button type="submit" class="btn btn-primary w-100">Buat Pengumuman</button>
                 </form>
             </div>
@@ -159,6 +163,10 @@
                     <div class="form-group mb-3">
                         <label for="Judul" class="form-label">Tanggal Berakhir</label>
                         <input type="date" name="end_date" class="form-control" value="{{$data->end_date}}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="Judul" class="form-label">File</label>
+                        <input type="file" name="attachments" class="form-control">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Update Pengumuman</button>
                 </form>

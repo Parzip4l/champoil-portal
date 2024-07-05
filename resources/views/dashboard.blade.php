@@ -341,7 +341,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <p class="text-muted">Release Date : {{$data->publish_date}}</p>
+                    <a href="{{ route('pengumuman.download', $data->id) }}" target="_blank" class="btn btn-primary w-100">
+                        Download Attachments
+                    </a>
+                
             </div>
         </div>
     </div>
@@ -431,6 +434,36 @@
 </div>
 @endforeach
 @endif
+<!-- News -->
+<div class="row mb-3 mobile">
+    <h5 class="mb-2">News</h5>
+    <div class="berita-wrap">
+        <div class="owl-carousel owl-theme news-owl">
+            @foreach($news as $datanews)
+            <div class="item">
+                <a href="{{route('news.show', $datanews->id)}}">
+                    <div class="card custom-card2">
+                        <div class="card-body">
+                            <div class="fetured-image">
+                                <img src="{{ asset('images/featuredimage/' . $datanews->featuredimage) }}" alt="{{$datanews->judul}}">
+                            </div>
+                            <div class="title-news">
+                                <h4 class="text-dark mb-2">{{$datanews->judul}}</h5>
+                            </div>
+                            <div class="excerpt-post mb-4">
+                                <p class="text-muted">{{$datanews->excerpt}}</p>
+                            </div>
+                            <div class="meta-desc">
+                                <p class="text-muted">Post By : {{$datanews->author}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
 <!-- End -->
 <div class="row mb-4 desktop">
     <div class="title-analytic d-flex justify-content-between mb-2">
@@ -875,6 +908,28 @@ $(function() {
                 },
                 1000: {
                     items: 6.5
+                }
+            }
+        });
+    }
+});
+$(function() {
+    'use strict';
+
+    if ($('.news-owl').length) {
+        $('.news-owl').owlCarousel({
+            loop: true,
+            margin: 25,
+            nav: false,
+            responsive: {
+                0: {
+                    items: 1.5
+                },
+                600: {
+                    items: 3
+                },
+                1000: {
+                    items: 5
                 }
             }
         });

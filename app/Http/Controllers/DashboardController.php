@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Pengumuman\Pengumuman;
 Use App\Organisasi\Organisasi;
+use App\News\News;
 
 class DashboardController extends Controller
 {
@@ -128,6 +129,9 @@ class DashboardController extends Controller
                                   ->orWhere('tujuan', 'semua');
                         })
                         ->get();
+
+        // News
+        $news = News::where('company', $company->unit_bisnis)->get();
         
         // Employee Statistik
         $dataChartKaryawan = Employee::where('unit_bisnis', $company->unit_bisnis)
@@ -263,7 +267,7 @@ class DashboardController extends Controller
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
             'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2',
-            'pengumuman'
+            'pengumuman','news'
         ));
     }
 

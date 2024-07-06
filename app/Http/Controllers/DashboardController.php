@@ -36,8 +36,20 @@ class DashboardController extends Controller
         // dd($code);
         
         $company = Employee::where('nik', $code)->first();
-        
+
         $today = now();
+
+        // Birthday Employee
+        $birthdays = Employee::where('unit_bisnis', $company->unit_bisnis)
+                     ->select('tanggal_lahir','nama')
+                     ->get();
+                     
+        $upcomingBirthdays = $birthdays->filter(function ($employee) use ($today) {
+            $birthDate = Carbon::parse($employee->tanggal_lahir)->setYear($today->year);
+            $employee->usia = Carbon::parse($employee->tanggal_lahir)->age;
+            return $birthDate->isToday() || ($birthDate->isAfter($today) && $birthDate->diffInDays($today) <= 7);
+        });
+        // Endbirthday
         $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
         $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
@@ -267,7 +279,7 @@ class DashboardController extends Controller
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
             'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2',
-            'pengumuman','news'
+            'pengumuman','news','upcomingBirthdays'
         ));
     }
 

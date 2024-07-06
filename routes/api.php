@@ -125,4 +125,7 @@ Route::prefix('v1')->group(function () {
     // Berita
     Route::get('berita', [AllDataController::class, 'ListBerita']);
         Route::get('berita/{id}', [AllDataController::class, 'showBerita']);
+
+    // Birthday
+    Route::get('birthdayEmployee', [AllDataController::class, 'BirtdayList']);
 });

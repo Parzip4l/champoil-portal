@@ -126,69 +126,34 @@ class AllDataController extends Controller
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    
+    public function BirtdayList(Request $request)
     {
-        //
-    }
+        try {
+            $token = request()->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+            $employeeCode = $user->name;
+            $today = now();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+            $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+            $birthdays = Employee::where('unit_bisnis', $unitBisnis)
+                     ->select('tanggal_lahir','nama')
+                     ->get();
+                     
+            $upcomingBirthdays = $birthdays->filter(function ($employee) use ($today) {
+                $birthDate = Carbon::parse($employee->tanggal_lahir)->setYear($today->year);
+                $employee->usia = Carbon::parse($employee->tanggal_lahir)->age;
+                return $birthDate->isToday() || ($birthDate->isAfter($today) && $birthDate->diffInDays($today) <= 7);
+            });
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+            return response()->json(['EmployeeBirthday' => $upcomingBirthdays], 200);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
     }
 }

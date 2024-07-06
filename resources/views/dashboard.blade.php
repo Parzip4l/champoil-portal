@@ -476,6 +476,39 @@
     </div>
     <hr>
 </div>
+
+<div class="row mb-4 desktop">
+    <div class="title-analytic d-flex justify-content-between mb-2">
+        <div class="title-data align-self-center">
+            <h5>Birthday Employee</h5>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <table class="table" id="dataTableExample1">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Tanggal Ulang Tahun</th>
+                            <th>Usia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($upcomingBirthdays as $birthdaydata)
+                        <tr>
+                            <td>{{$birthdaydata->nama}}</td>
+                            <td>{{$birthdaydata->tanggal_lahir}}</td>
+                            <td>{{$birthdaydata->usia}} Tahun</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table> 
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Chart Section -->
 <div class="chart-wrap mb-4 desktop">
     @if($user->project_id==NULL)

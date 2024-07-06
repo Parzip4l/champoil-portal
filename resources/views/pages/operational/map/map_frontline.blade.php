@@ -15,7 +15,11 @@
         }
 </style>
 @endpush
-
+@php 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+    $dataLogin = json_decode(Auth::user()->permission);
+    $user = Auth::user();
+@endphp
 @section('content')
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
@@ -65,11 +69,11 @@
 @endpush
 
 @push('custom-scripts')
-  <script src="{{ asset('assets/js/data-table.js') }}"></script>
-  <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+    <script src="{{ asset('assets/js/data-table.js') }}"></script>
+    <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
     <script>
-        
         var project_id = "<?php echo $project_id; ?>";
+        var userUnitBisnis = "<?php echo $employee->unit_bisnis; ?>";
 
         let defaultCoordinates = [-6.200, 106.816];
         let titik = defaultCoordinates;
@@ -92,8 +96,9 @@
             popupAnchor: [1, -34]
         });
 
+        var blueIconUrl = userUnitBisnis === 'CHAMPOIL' ? '<?php echo asset('engineer.png'); ?>' : '<?php echo asset('security.png'); ?>';
         var blueIcon = L.icon({
-            iconUrl: '<?php echo asset('security.png'); ?>',
+            iconUrl: blueIconUrl,
             iconSize: [40, 40],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34]

@@ -88,6 +88,8 @@ class ApiLoginController extends Controller
             $unit_bisnis = Employee::where('nik',$nik)->first();
             $today = now()->toDateString();
 
+            DB::beginTransaction();
+
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
                 ->first();
@@ -107,10 +109,11 @@ class ApiLoginController extends Controller
             }
 
             $existingAbsen = Absen::where('nik', $nik)
-            ->whereDate('tanggal', $today)
-            ->first();
+                ->whereDate('tanggal', $today)
+                ->first();
 
             if ($existingAbsen) {
+                DB::rollBack();
                 return response()->json(['message' => 'Clockin Rejected, Already Clocked In for Today!']);
             }
 
@@ -120,8 +123,10 @@ class ApiLoginController extends Controller
                     ->first();
 
                     if (!$scheduleKas) {
+                        DB::rollBack();
                         return response()->json(['message' => 'Clock In Rejected, Schedule not found! Please contact the Team Leader for the schedule.']);
                     }elseif ($scheduleKas->shift === 'OFF'){
+                        DB::rollBack();
                         return response()->json(['message' => 'Clock In Rejected, Schedule OFF. Please contact Team Leader for schedule changes!']);
                     }
 
@@ -155,12 +160,14 @@ class ApiLoginController extends Controller
                     'status' => $status,
                     'photo' => $filename,
                 ]);
-
+                DB::commit(); 
                 return response()->json(['message' => 'Clockin success, Happy Working Day!']);
             } else {
+                DB::rollBack();
                 return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
             }
         } catch (\Exception $e) {
+            DB::rollBack();
             // Log the error or handle it appropriately
             return response()->json(['message' => 'An error occurred while processing the request.']);
         }

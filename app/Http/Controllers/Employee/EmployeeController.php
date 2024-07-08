@@ -45,7 +45,8 @@ class EmployeeController extends Controller
             ->where('resign_status',0)
             ->get();
         }else{
-            $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
+            $karyawan = Employee::select('karyawan.*')
+                            ->where('unit_bisnis', $company->unit_bisnis)
                             ->join('schedules', function($join) {
                                 $join->on('karyawan.nik', '=', 'schedules.employee')
                                     ->where('schedules.project', Auth::user()->project_id)

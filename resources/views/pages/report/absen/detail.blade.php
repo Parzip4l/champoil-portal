@@ -48,7 +48,7 @@
                         @foreach($records as $row)
                             <tr>
                                 <td>{{ $no }}</td>
-                                <td>{{ $row->nama }}</td>
+                                <td>{{ $row->nama_karyawan }}</td>
                                 <td>{{ $row->tanggal }}</td>
                                 <td>{{ $row->shift }}</td>
                                 <td>{{ isset($row->clock_in)?$row->clock_in:'-' }}</td>

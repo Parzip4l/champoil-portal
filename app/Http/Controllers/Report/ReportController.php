@@ -123,8 +123,19 @@ class ReportController extends Controller
         }
 
         $records = Absen::where('project', $id)
-        ->whereBetween('tanggal', [$start, $end])
-        ->get();
+            ->whereBetween('tanggal', [$start, $end])
+            ->get();
+
+        foreach ($records as $record) {
+        
+            $employee = Employee::where('nik', $record->nik)->first();
+            if ($employee) {
+                $record->nama_karyawan = $employee->nama;
+            } else {
+                $record->nama_karyawan = 'Unknown';
+            }
+            
+        }
 
         // if ($records) {
         // foreach ($records as $row) {
@@ -144,8 +155,7 @@ class ReportController extends Controller
         //     }
         // }
         // }
-
-        return view('pages.report.absen.detail',$data);
+        return view('pages.report.absen.detail',compact('records'));
     }
 
     /**

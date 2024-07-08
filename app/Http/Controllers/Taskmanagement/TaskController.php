@@ -203,6 +203,7 @@ class TaskController extends Controller
         $data['report']=$report;
         
         $data['periode'] = date('F',strtotime($periode_filter));
+        $data['proj'] = $id_project;
 
         return view('pages.operational.task.report',$data);
     }

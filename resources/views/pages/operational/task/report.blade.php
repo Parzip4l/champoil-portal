@@ -16,6 +16,13 @@
 @endpush
 
 @section('content')
+@php 
+    if($proj){
+        $prjk = $proj;
+    }else{
+        $proj = $_GET["project_id"] ?? "";
+    }
+@endphp
 @csrf
 <div class="row">
     <div class="col-md-12">
@@ -24,7 +31,7 @@
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="mb-0 align-self-center">Filter Report</h5>
+                        <h5 class="mb-0 align-self-center">Filter Report </h5>
                     </div>
                     <div class="card-body">
                         <form class="row g-3">
@@ -112,7 +119,7 @@
                                                             @if($schedule)
                                                                 @foreach($schedule as $scdl)
                                                                     <a href="javascript:void(0)" 
-                                                                       onclick="get_detail('{{$sub->id}}','{{ $tanggal }}','{{ $scdl->shift }}','{{ $_GET["project_id"] ?? "" }}')"
+                                                                       onclick="get_detail('{{$sub->id}}','{{ $tanggal }}','{{ $scdl->shift }}','{{ $proj }}')"
                                                                        class="btn btn-xs btn-outline-primary mr-3">
                                                                         {{ $scdl->shift }} 
                                                                     </a>

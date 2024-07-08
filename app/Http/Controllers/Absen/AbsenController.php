@@ -649,7 +649,7 @@ class AbsenController extends Controller
         }
 
         // Check if there is an off schedule for the given date and nik
-        $offSchedule = Schedule::where('nik', $nik)
+        $offSchedule = Schedule::where('employee', $nik)
             ->where('tanggal', $tanggal)
             ->where('shift', 'OFF')
             ->first();
@@ -687,7 +687,7 @@ class AbsenController extends Controller
                 }
 
                 // Check if there is an off schedule for the given date and nik
-                $offSchedule = Schedule::where('nik', $nik)
+                $offSchedule = Schedule::where('employee', $nik)
                     ->where('tanggal', $tanggal)
                     ->where('shift', 'OFF')
                     ->first();

@@ -24,7 +24,7 @@
         <div class="card-header">
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-0">Report Absensi</h6>
+                    <h6 class="card-title align-self-center mb-2">Report Absensi</h6>
                     <form>
                         <div class="row">
                             @csrf
@@ -58,6 +58,8 @@
                     <th>Total Schedule</th>
                     <th>Total Absensi</th>
                     <th>Persentase</th>
+                    <th>Tanpa Clockout</th>
+                    <th>Persentase</th>
                     <th>Total Schedule Backup</th>
                     <th>Total Absensi</th>
                     <th>Persentase</th>
@@ -73,6 +75,8 @@
                             $absen_backup=0;
                             $percent_absen=0;
                             $percent_backup=0;
+                            $total_tidak_clockout= 0;
+                            $persentase_tidak_clockout = 0;
                         @endphp
                         @foreach($project as $row)
                             <tr>
@@ -85,6 +89,8 @@
                                 <td>{{ $row->schedule }}</td>
                                 <td>{{ $row->absen }}</td>
                                 <td>{{ $row->persentase_absen }} %</td>
+                                <td>{{ $row->tanpa_clockout }}</td>
+                                <td>{{ $row->persentase_tanpa_clockout }} %</td>
                                 <td>{{ $row->schedule_backup }}</td>
                                 <td>{{ $row->absen_backup }}</td>
                                 <td>{{ $row->persentase_backup }} %</td>
@@ -94,15 +100,16 @@
                                 $total_absen +=$row->absen;
                                 $schedule_backup +=$row->schedule_backup;
                                 $absen_backup +=$row->absen_backup;
-                                
+                                $total_tidak_clockout +=$row->tanpa_clockout;
                             $no++;
                         @endphp
-                        
-
                         @endforeach
                         @php 
                             if($total_absen > 0 && $total_schedule> 0){
                                 $percent_absen = round(($total_absen / $total_schedule) * 100,2);
+                            }
+                            if($total_absen > 0 && $total_tidak_clockout> 0){
+                                $persentase_tidak_clockout = round(($total_tidak_clockout / $total_absen) * 100, 2);
                             }
                             if($absen_backup > 0 && $schedule_backup> 0){
                                 $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
@@ -113,6 +120,8 @@
                             <td>{{ $total_schedule }}</td>
                             <td>{{ $total_absen }}</td>
                             <td>{{ $percent_absen }} %</td>
+                            <td>{{ $total_tidak_clockout }}</td>
+                            <td>{{ $persentase_tidak_clockout }} %</td>
                             <td>{{ $schedule_backup }}</td>
                             <td>{{ $absen_backup }}</td>
                             <td>{{ $percent_backup }} %</td>

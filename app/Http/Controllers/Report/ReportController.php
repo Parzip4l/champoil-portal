@@ -38,24 +38,37 @@ class ReportController extends Controller
 
             
         }
-        
-
 
         $project = Project::all();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
+                $row->persentase_tanpa_clockout = 0;
                 $row->schedule = Schedule::where('project',$row->id)
                                            ->whereBetween('tanggal', [$start, $end])
                                            ->where('shift','!=','OFF')
                                            ->count();
+
                 $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
               
 
                 $row->absen = Absen::where('project', $row->id)
                                     ->whereBetween('tanggal', [$start, $end])
                                     ->count();
+                
+                $row->tanpa_clockout = Absen::where('project', $row->id)
+                                    ->whereBetween('tanggal', [$start, $end])
+                                    ->whereNotNull('clock_in')
+                                    ->whereNull('clock_out')
+                                    ->count();
+
+                // Persentase Tanpa Clockout
+                if ($row->absen > 0) {
+                    $row->persentase_tanpa_clockout = round(($row->tanpa_clockout / $row->absen) * 100, 2);
+                } else {
+                    $row->persentase_tanpa_clockout = 0;
+                }
             
                 if($row->absen > 0 && $row->schedule > 0){
                     $row->persentase_absen = round(($row->absen / $row->schedule) * 100,2);
@@ -71,7 +84,6 @@ class ReportController extends Controller
         }
 
         $data['project']=$project;
-
         return view('pages.report.absen.index',$data);
     }
 
@@ -136,16 +148,14 @@ class ReportController extends Controller
             }
 
             $schedule = Schedule::where('employee', $record->nik)
-            ->whereDate('tanggal', $record->tanggal)
-            ->first();
+                ->whereDate('tanggal', $record->tanggal)
+                ->first();
 
-            if ($schedule) {
-                $record->shift = $schedule->shift; // Misalnya, tambahkan informasi shift ke objek $record
-                // Tambahkan informasi lain yang dibutuhkan dari tabel Schedule
-            } else {
-                $record->shift = 'Unknown'; // Atau atur nilai default jika jadwal tidak ditemukan
-            }
-            
+                if ($schedule) {
+                    $record->shift = $schedule->shift; 
+                } else {
+                    $record->shift = 'Unknown';
+                }
         }
 
         // if ($records) {

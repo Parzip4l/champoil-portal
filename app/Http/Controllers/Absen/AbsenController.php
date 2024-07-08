@@ -648,8 +648,20 @@ class AbsenController extends Controller
             });
         }
 
+        // Check if there is an off schedule for the given date and nik
+        $offSchedule = Schedule::where('nik', $nik)
+            ->where('tanggal', $tanggal)
+            ->where('shift', 'OFF')
+            ->first();
+
+        if ($offSchedule && $records->isEmpty()) {
+            // If there is an off schedule and no absen record left, delete the off schedule
+            $offSchedule->delete();
+        }
+
         return redirect()->route('absens.index', ['start_date' => $startDate, 'end_date' => $endDate])->with('success', 'Duplicate records deleted successfully.');
     }
+
 
     public function bulkDeleteDuplicates(Request $request)
     {
@@ -661,19 +673,34 @@ class AbsenController extends Controller
             foreach ($duplicates as $duplicate) {
                 list($nik, $tanggal) = explode('|', $duplicate);
 
+                // Find duplicate records for the given nik and date
                 $records = Absen::where('nik', $nik)
                     ->where('tanggal', $tanggal)
                     ->get();
 
+                // Keep one record and delete the others
                 if ($records->count() > 1) {
+                    // Delete all but the first record
                     $records->slice(1)->each(function($record) {
                         $record->delete();
                     });
+                }
+
+                // Check if there is an off schedule for the given date and nik
+                $offSchedule = Schedule::where('nik', $nik)
+                    ->where('tanggal', $tanggal)
+                    ->where('shift', 'OFF')
+                    ->first();
+
+                if ($offSchedule && $records->isEmpty()) {
+                    // If there is an off schedule and no absen record left, delete the off schedule
+                    $offSchedule->delete();
                 }
             }
         }
 
         return redirect()->route('absens.index', ['start_date' => $startDate, 'end_date' => $endDate])->with('success', 'Selected duplicate records deleted successfully.');
     }
+
 
 }

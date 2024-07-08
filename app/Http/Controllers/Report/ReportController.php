@@ -46,7 +46,7 @@ class ReportController extends Controller
             foreach($project as $row){
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
-                $row->schedule = Schedule::where('projec',$row->id)
+                $row->schedule = Schedule::where('project',$row->id)
                                            ->whereBetween('tanggal', [$start, $end])
                                            ->where('shift','!=','OFF')
                                            ->count();

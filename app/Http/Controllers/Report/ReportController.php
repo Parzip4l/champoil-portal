@@ -134,6 +134,17 @@ class ReportController extends Controller
             } else {
                 $record->nama_karyawan = 'Unknown';
             }
+
+            $schedule = Schedule::where('employee', $record->nik)
+            ->whereDate('tanggal', $record->tanggal)
+            ->first();
+
+            if ($schedule) {
+                $record->shift = $schedule->shift; // Misalnya, tambahkan informasi shift ke objek $record
+                // Tambahkan informasi lain yang dibutuhkan dari tabel Schedule
+            } else {
+                $record->shift = 'Unknown'; // Atau atur nilai default jika jadwal tidak ditemukan
+            }
             
         }
 
@@ -155,6 +166,7 @@ class ReportController extends Controller
         //     }
         // }
         // }
+        dd($record);
         return view('pages.report.absen.detail',compact('records'));
     }
 

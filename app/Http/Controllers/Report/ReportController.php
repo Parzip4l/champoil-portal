@@ -139,8 +139,8 @@ class ReportController extends Controller
             }
         }
         }
-
-        return view('pages.report.absen.detail',$data);
+        
+        return view('pages.report.absen.detail',compact('records'));
     }
 
     /**

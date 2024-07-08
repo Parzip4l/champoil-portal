@@ -25,12 +25,26 @@
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
                     <h6 class="card-title align-self-center mb-0">Report Absensi</h6>
-                    <div class="input-group mb-3">
-                        <input type="text" id="date_range" class="form-control" placeholder="Select Date" aria-label="Select Date" aria-describedby="basic-addon2">
-                            <button class="input-group-text btn-primary" id="search">
-                                <span  data-feather="search" ></span>
-                            </button>
-                    </div>
+                    <form>
+                        <div class="row">
+                            @csrf
+                            <div class="col-md-10">
+                                <select name="periode" class="form-control mb-2 select2" id="periode" required>
+                                    <option value="">Periode</option>
+                                    @if(bulan())
+                                        @foreach(bulan() as $key=>$value)
+                                            <option value="{{ strtoupper($value).'-'.date('Y') }}">{{ $value }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                            <button type="button" class="btn btn-primary" id='search'>Filter</button>
+                            </div>
+                        </div>  
+                    </form>
+                    
+                </div>
                 
             </div>
         </div>
@@ -146,10 +160,6 @@
         endDate = dateRangeArray[1];
     }
     
-
-    // You can use startDate and endDate as needed
-    console.log('Start Date:', startDate);
-    console.log('End Date:', dateRangeParam);
     flatpickr('#date_range', {
         mode: 'range',
         dateFormat: 'Y-m-d',
@@ -159,16 +169,10 @@
     // Button click event
     document.getElementById('search').addEventListener('click', function () {
         // Add your button click logic here
-        var range_date = $('#date_range').val();
-        window.location.href = '?periode=' + range_date;
+        var periode = $('#periode').val();
+        window.location.href = '?periode=' +periode ;
     });
-    function filter_absen(select) {
-        // Get the selected value from the dropdown
-        var selectedMonth = select.value;
-
-        // Update the URL with the selected value
-        window.location.href = '?periode=' + selectedMonth;
-    }
+    
     @if(session('success'))
         Swal.fire({
             icon: 'success',

@@ -26,12 +26,17 @@ class ReportController extends Controller
         $start = date('Y-m-d');
         $end = date('Y-m-d');
         if(!empty($request->input('periode'))){
-            $explode=explode('to',$request->input('periode'));
-            if(!empty($explode[0])){
-                $start = date('Y-m-d',strtotime($explode[0]));
-            }elseif(!empty($explode[1])){
-                $end = date('Y-m-d',strtotime($explode[1]));
-            }
+            $periode = $request->input('periode');
+            // Tambahkan satu bulan ke periode
+            $periode_plus_1_month = date('m', strtotime("+1 month", strtotime($periode)));
+
+            // Ambil bulan dari periode yang sudah ditambahkan satu bulan
+            $bulan = date('m', strtotime($periode));
+
+            $start = date('Y').'-'.$bulan.'-'.'21';
+            $end = date('Y').'-'.$periode_plus_1_month.'-'.'20';
+
+            
         }
         
 
@@ -117,29 +122,29 @@ class ReportController extends Controller
         }
         }
 
-        $records = Schedule::where('schedules.project', $id)
-        ->whereBetween('schedules.tanggal', [$start, $end])
+        $records = Absen::where('project', $id)
+        ->whereBetween('tanggal', [$start, $end])
         ->get();
 
-        if ($records) {
-        foreach ($records as $row) {
-            $currentDate = Carbon::parse($start); // Use Carbon library for date manipulation
+        // if ($records) {
+        // foreach ($records as $row) {
+        //     $currentDate = Carbon::parse($start); // Use Carbon library for date manipulation
 
-            while ($currentDate->lte($end)) {
-                // Cari data absen untuk tanggal saat ini
-                $attendanceData = Absen::whereDate('tanggal', $currentDate->format('Y-m-d'))->first();
+        //     while ($currentDate->lte($end)) {
+        //         // Cari data absen untuk tanggal saat ini
+        //         $attendanceData = Absen::whereDate('tanggal', $currentDate->format('Y-m-d'))->first();
 
-                // Buat array data untuk tanggal ini
-                $row->tanggal = $currentDate->format('Y-m-d');
-                $row->clock_in = $attendanceData ? $attendanceData->clock_in : '-';
-                $row->clock_out = $attendanceData ? $attendanceData->clock_out : '-';
-                $row->status = $attendanceData ? $attendanceData->status : '-';
+        //         // Buat array data untuk tanggal ini
+        //         $row->tanggal = $currentDate->format('Y-m-d');
+        //         $row->clock_in = $attendanceData ? $attendanceData->clock_in : '-';
+        //         $row->clock_out = $attendanceData ? $attendanceData->clock_out : '-';
+        //         $row->status = $attendanceData ? $attendanceData->status : '-';
 
-                $currentDate->addDay(); // Increment the current date
-            }
-        }
-        }
-
+        //         $currentDate->addDay(); // Increment the current date
+        //     }
+        // }
+        // }
+        $data['records']=$records;
         return view('pages.report.absen.detail',$data);
     }
 

@@ -28,13 +28,13 @@ class ReportController extends Controller
         if(!empty($request->input('periode'))){
             $periode = $request->input('periode');
             // Tambahkan satu bulan ke periode
-            $periode_plus_1_month = date('m', strtotime("+1 month", strtotime($periode)));
+            $periode_min_1_month = date('m', strtotime("-1 month", strtotime($periode)));
 
             // Ambil bulan dari periode yang sudah ditambahkan satu bulan
             $bulan = date('m', strtotime($periode));
 
-            $start = date('Y').'-'.$bulan.'-'.'21';
-            $end = date('Y').'-'.$periode_plus_1_month.'-'.'20';
+            $start = date('Y').'-'.$periode_min_1_month.'-'.'21';
+            $end = date('Y').'-'.$bulan.'-'.'20';
 
             
         }
@@ -46,7 +46,7 @@ class ReportController extends Controller
             foreach($project as $row){
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
-                $row->schedule = Schedule::where('project',$row->id)
+                $row->schedule = Schedule::where('projec',$row->id)
                                            ->whereBetween('tanggal', [$start, $end])
                                            ->where('shift','!=','OFF')
                                            ->count();

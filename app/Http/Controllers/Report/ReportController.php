@@ -144,7 +144,7 @@ class ReportController extends Controller
         //     }
         // }
         // }
-        $data['records']=$records;
+
         return view('pages.report.absen.detail',$data);
     }
 

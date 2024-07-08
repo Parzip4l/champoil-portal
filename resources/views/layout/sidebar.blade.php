@@ -119,7 +119,7 @@
                     <div class="collapse {{ show_class(['data']) }}" id="performance">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
-                                <a href="{{ url('master-data') }}" class="nav-link {{ active_class(['master-data']) }}">Performance Appraisal</a>
+                                <a href="{{ route('index.pa') }}" class="nav-link {{ active_class(['performance-appraisal/performance-master']) }}">Performance Appraisal</a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('setting.pa') }}" class="nav-link {{ active_class(['performance-appraisal/setting']) }}">Settings</a>

@@ -15,6 +15,7 @@ use App\Organisasi\Organisasi;
 use App\PerformanceAppraisal\FaktorModel;
 use App\PerformanceAppraisal\KategoriModel;
 use App\PerformanceAppraisal\PredikatModel;
+use App\PerformanceAppraisal\PaModel;
 
 class PerformanceController extends Controller
 {
@@ -255,5 +256,194 @@ class PerformanceController extends Controller
         $data->save();
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully']);
+    }
+
+    // Performance Appraisal Index 
+    public function indexPA()
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $padata = PaModel::where('company', $company->unit_bisnis)->get();
+
+        return view('pages.hc.pa.index', compact('padata'));
+    }
+
+    public function createPA()
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $totalKategori = $kategoriPa->count();
+
+        $faktor = FaktorModel::where('company', $company->unit_bisnis)
+        ->get();
+        $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
+        ->where('resign_status',0)
+        ->where('organisasi', 'Management Leaders')
+        ->get();
+
+        return view('pages.hc.pa.create', compact('faktor','employee','kategoriPa','totalKategori'));
+    }
+
+    public function storePerformance(Request $request)
+    {
+
+        $request->validate([
+            'periode' => 'required|string|max:255',
+        ]);
+    
+        try {
+            // Mendapatkan kode karyawan dari Auth
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+            
+            // Mendapatkan data karyawan dari input
+            $employeeData = Employee::where('nik', $request->nik)->first();
+    
+            // Membuat objek Performance Appraisal
+            $pa = new PaModel();
+            $pa->periode = $request->periode;
+            $pa->tahun = $request->tahun;
+            $pa->nik = $request->nik;
+            $pa->name = $employeeData->nama;
+            $pa->nilai_keseluruhan = $request->nilai_keseluruhan;
+            $pa->komentar_masukan = $request->komentar_masukan;
+            $pa->catatan_target = $request->catatan_target;
+            $pa->approve_byemployee = 'false';
+            $pa->created_by = $company->nama;
+            $pa->company = $company->unit_bisnis;
+    
+            // Mengambil kategori dari database berdasarkan unit bisnis perusahaan
+            $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+    
+            // Array untuk menyimpan data detail performance appraisal
+            $detailsData = [];
+    
+            // Looping untuk setiap kategori
+            foreach ($kategoriPa as $kategori) {
+                // Mengambil faktor dari database berdasarkan kategori
+                $faktors = FaktorModel::where('kategori', $kategori->name)->get();
+    
+                // Looping untuk setiap faktor dalam kategori
+                foreach ($faktors as $faktor) {
+                    // Mengambil nilai dan keterangan dari request berdasarkan id faktor
+                    $nilai = $request->nilai[$faktor->id] ?? null;
+                    $keterangan = $request->keterangan[$faktor->id] ?? null;
+    
+                    // Menambahkan data faktor ke dalam array detailsData
+                    $detailsData[] = [
+                        'id' => $faktor->id,
+                        'kategori' => $kategori->name,
+                        'name' => $faktor->name,
+                        'deskripsi' => $faktor->deskripsi,
+                        'bobot_nilai' => $faktor->bobot_nilai,
+                        'nilai' => $nilai,
+                        'keterangan' => $keterangan,
+                    ];
+                }
+            }
+            // Encode detailsData menjadi JSON sebelum disimpan
+            $pa->detailsdata = json_encode($detailsData);
+    
+            // Menyimpan data ke database
+            $pa->save();
+    
+            return redirect()->route('index.pa')->with('success', 'Performance Appraisal berhasil dibuat.');
+        } catch (\Exception $e) {
+            // Menangani kesalahan jika gagal menyimpan
+            return back()->with('error', 'Gagal menyimpan Performance Appraisal: ' . $e->getMessage());
+        }
+    }
+
+    public function editPerformance($id)
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        // Ambil data performa berdasarkan ID
+        $performance = PaModel::findOrFail($id);
+
+        // Ambil daftar karyawan untuk dropdown
+        $employee = Employee::all();
+
+        // Ambil daftar kategori PA untuk ditampilkan di form
+        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $totalKategori = $kategoriPa->count();
+
+        $faktor = FaktorModel::where('company', $company->unit_bisnis)
+        ->get();
+        // Tampilkan view edit dengan data yang diperlukan
+        return view('pages.hc.pa.edit', compact('performance', 'employee', 'kategoriPa','totalKategori','faktor'));
+    }
+    
+    public function updatePerformance(Request $request, $id)
+    {
+        $request->validate([
+            'periode' => 'required|string|max:255',
+        ]);
+
+        try {
+            // Mendapatkan kode karyawan dari Auth
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+
+            // Mendapatkan data karyawan dari input
+            $employeeData = Employee::where('nik', $request->nik)->first();
+
+            // Mengambil data Performance Appraisal yang akan diupdate
+            $pa = PaModel::findOrFail($id);
+
+            // Update data Performance Appraisal
+            $pa->periode = $request->periode;
+            $pa->tahun = $request->tahun;
+            $pa->nik = $request->nik;
+            $pa->name = $employeeData->nama;
+            $pa->nilai_keseluruhan = $request->nilai_keseluruhan;
+            $pa->komentar_masukan = $request->komentar_masukan;
+            $pa->catatan_target = $request->catatan_target;
+            // Jika perlu, tambahkan logika untuk field lainnya
+
+            // Mengambil kategori dari database berdasarkan unit bisnis perusahaan
+            $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+
+            // Array untuk menyimpan data detail performance appraisal
+            $detailsData = [];
+
+            // Looping untuk setiap kategori
+            foreach ($kategoriPa as $kategori) {
+                // Mengambil faktor dari database berdasarkan kategori
+                $faktors = FaktorModel::where('kategori', $kategori->name)->get();
+
+                // Looping untuk setiap faktor dalam kategori
+                foreach ($faktors as $faktor) {
+                    // Mengambil nilai dan keterangan dari request berdasarkan id faktor
+                    $nilai = $request->nilai[$faktor->id] ?? null;
+                    $keterangan = $request->keterangan[$faktor->id] ?? null;
+
+                    // Menambahkan data faktor ke dalam array detailsData
+                    $detailsData[] = [
+                        'id' => $faktor->id,
+                        'kategori' => $kategori->name,
+                        'name' => $faktor->name,
+                        'deskripsi' => $faktor->deskripsi,
+                        'bobot_nilai' => $faktor->bobot_nilai,
+                        'nilai' => $nilai,
+                        'keterangan' => $keterangan,
+                    ];
+                }
+            }
+
+            // Encode detailsData menjadi JSON sebelum disimpan
+            $pa->detailsdata = json_encode($detailsData);
+
+            // Menyimpan perubahan ke database
+            $pa->save();
+
+            return redirect()->route('index.pa')->with('success', 'Performance Appraisal berhasil diupdate.');
+        } catch (\Exception $e) {
+            // Menangani kesalahan jika gagal menyimpan
+            return back()->with('error', 'Gagal mengupdate Performance Appraisal: ' . $e->getMessage());
+        }
     }
 }

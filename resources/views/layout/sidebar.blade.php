@@ -55,6 +55,7 @@
                     <span class="link-title">Employee Home Maps</span>
                 </a>
             </li>
+            
             @endif
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('client_access', $dataLogin))
             <li class="nav-item nav-category">Time Management</li>
@@ -103,6 +104,27 @@
                     </a>
                 </li>
                 @endif
+            @endif
+            @if(in_array('superadmin_access', $dataLogin))
+            <li class="nav-item nav-category">Performance</li>
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#performance" role="button" aria-expanded="{{ is_active_route(['performance']) }}" aria-controls="performance">
+                        <i class="link-icon" data-feather="file-text"></i>
+                        <span class="link-title">Master</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['data']) }}" id="performance">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ url('master-data') }}" class="nav-link {{ active_class(['master-data']) }}">Performance Appraisal</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('setting.pa') }}" class="nav-link {{ active_class(['performance-appraisal/setting']) }}">Settings</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            
             @endif
             @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item nav-category">Payrol</li>

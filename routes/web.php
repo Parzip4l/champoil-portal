@@ -367,6 +367,30 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/dmaic-report', [App\Http\Controllers\DMAIC\ReportController::class, 'index'])->name('dmaic-report');
 
     });
+
+    // Data Performace Appraisal
+    Route::group(['prefix' => 'performance-appraisal'], function(){
+        // Setting PA
+        Route::get('/setting', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'setting'])->name('setting.pa');
+            Route::group(['prefix' => 'settings'], function(){
+                // Kategori
+                Route::get('/kategori', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'IndexsettingKategori'])->name('kategori-pa.setting');
+                Route::post('/kategori', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'storeKategori'])->name('kategori-pa.store');
+                Route::put('/kategori/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateKategori'])->name('kategori-pa.update');
+                Route::delete('/kategori/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deleteKategori'])->name('kategori-pa.destroy');
+                // Predikat
+                Route::get('/predikat', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'IndexsettingPredikat'])->name('predikat-pa.setting');
+                Route::post('/predikat', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'storePredikat'])->name('predikat-pa.store');
+                Route::put('/predikat/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updatePredikat'])->name('predikat-pa.update');
+                Route::delete('/predikat/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deletePredikat'])->name('predikat-pa.destroy');
+                // Faktor Data
+                Route::get('/faktor', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'IndexsettingFaktor'])->name('faktor-pa.setting');
+                Route::post('/faktor', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'storeFaktor'])->name('faktor-pa.store');
+                Route::put('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateFaktor'])->name('faktor-pa.update');
+                Route::delete('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deleteFaktor'])->name('faktor-pa.destroy');
+                Route::post('/update-status-faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateStatusFaktor'])->name('update-active-faktor');
+            });
+    });
 });
 
 Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');

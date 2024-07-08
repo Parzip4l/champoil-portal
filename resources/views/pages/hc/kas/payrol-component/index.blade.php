@@ -22,7 +22,7 @@
                                 <th>Component</th>
                                 <th>Tax</th>
                                 <th>Type</th>
-                                <th>Activ Status</th>
+                                <th>Aktif Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>

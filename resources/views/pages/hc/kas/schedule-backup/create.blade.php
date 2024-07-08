@@ -27,7 +27,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Shift</label>
-                                    <select class="js-example-basic-single form-select shift-backup" data-width="100%" name="shift[]" required>
+                                    <select class="form-control shift-backup" data-width="100%" name="shift[]" required>
                                         <option disabled selected>Select Shift</option>
                                         <option value="NS-P">Backup Pagi</option>
                                         <option value="NS-M">Backup Middle</option>
@@ -38,7 +38,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power</label>
-                                    <select class="js-example-basic-single form-select employee" data-width="100%" name="employee[]" id="employee" required>
+                                    <select class="form-control employee" data-width="100%" name="employee[]" id="employee" required>
                                         <option disabled selected>Select Employee</option>
                                     </select>
                                 </div>
@@ -46,7 +46,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Project</label>
-                                    <select class="js-example-basic-single form-select project" data-width="100%" name="project[]" id="projectSelect" required>
+                                    <select class="form-control project" data-width="100%" name="project[]" id="projectSelect" required>
                                         <option disabled selected>Select Project</option>
                                         @foreach($project as $project)
                                             <option value="{{$project->id}}">{{$project->name}}</option>
@@ -65,7 +65,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power Replace</label>
-                                    <select class="js-example-basic-single form-select replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect" required>
+                                    <select class="form-control replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect" required>
                                         <option disabled selected>Select Man Power</option>
                                     </select>
                                 </div>

@@ -981,7 +981,7 @@ class ApiLoginController extends Controller
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $yesterday)
                         ->first();
-    
+
                     if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
                         $alreadyClockIn = true;
                         $logs = Absen::where('user_id', $user->employee_code)
@@ -995,11 +995,15 @@ class ApiLoginController extends Controller
                         } else {
                             // Jika sudah ada log absen, cek apakah yang terakhir adalah clock in atau clock out
                             $lastLog = $logs->last();
-                    
+                            $now = now();
+                            $isTenAM = $now->hour === 10 && $now->minute === 00;
                             if ($lastLog->clock_out === null) {
                                 // Jika yang terakhir adalah clock in, set tombol ke clock out
                                 $alreadyClockIn = true;
                                 $alreadyClockOut = false;
+                                if ($isTenAM && !$alreadyClockOut) {
+                                    $alreadyClockIn = false;
+                                }
                             } else {
                                 // Jika yang terakhir adalah clock out, set tombol ke clock in
                                 $alreadyClockIn = false;
@@ -1103,12 +1107,17 @@ class ApiLoginController extends Controller
                 $currentDate = Carbon::now();
                 $nextMonth = $currentDate->addMonth();
                 $bulan = $nextMonth->format('F-Y');
+
+                $today = now();
+                $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+                $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
                 
                 $mySchedule = Schedule::with('project:id,name') // Eager loading
-                    ->where('employee', $employeeCode)
-                    ->where('periode', $bulan)
-                    ->select('project', 'tanggal', 'shift')
-                    ->get();
+                        ->where('employee', $employeeCode)
+                        ->whereDate('tanggal', '>=', $startOfMonth)
+                        ->whereDate('tanggal', '<=', $endOfMonth)
+                        ->select('project', 'tanggal', 'shift')
+                        ->get();
 
                 return response()->json(['data' => $mySchedule], 200);
             }
@@ -1134,10 +1143,15 @@ class ApiLoginController extends Controller
             } else {
                 $employeeCode = $user->employee_code;
                 $bulan = now()->format('F-Y');
+
+                $today = now();
+                $startOfMonth = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+                $endOfMonth = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
                 
                 $mySchedule = ScheduleBackup::with('project:id,name')
                     ->where('employee', $employeeCode)
-                    ->where('periode', $bulan)
+                    ->whereDate('tanggal', '>=', $startOfMonth)
+                    ->whereDate('tanggal', '<=', $endOfMonth)
                     ->select('project', 'tanggal', 'shift')
                     ->get();
 

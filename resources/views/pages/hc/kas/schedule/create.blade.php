@@ -21,7 +21,7 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="name" class="form-label">Pilih Karyawan</label>
-                                    <select class="js-example-basic-single form-select" data-width="100%" name="employee">
+                                    <select class="form-control" data-width="100%" name="employee">
                                         @foreach($employee as $data)
                                             <option value="{{$data->nik}}">{{$data->nama}}</option>
                                         @endforeach

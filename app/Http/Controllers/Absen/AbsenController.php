@@ -613,4 +613,67 @@ class AbsenController extends Controller
         ->delete();
         return redirect()->back()->with('success', 'Attendance successfully deleted');
     }
+
+
+    public function duplicateAttendance(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $duplicates = Absen::select('absens.nik', 'karyawan.nama', 'absens.tanggal', DB::raw('COUNT(*) as count'))
+            ->join('karyawan', 'absens.nik', '=', 'karyawan.nik')
+            ->whereBetween('absens.tanggal', [$startDate, $endDate])
+            ->groupBy('absens.nik', 'karyawan.nama', 'absens.tanggal')
+            ->having('count', '>', 1)
+            ->get();
+
+        return view('pages.absen.duplikat', compact('duplicates', 'startDate', 'endDate'));
+    }
+
+    public function deleteDuplicate($nik, $tanggal, Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Find duplicate records for the given nik and date
+        $records = Absen::where('nik', $nik)
+            ->where('tanggal', $tanggal)
+            ->get();
+
+        // Keep one record and delete the others
+        if ($records->count() > 1) {
+            // Delete all but the first record
+            $records->slice(1)->each(function($record) {
+                $record->delete();
+            });
+        }
+
+        return redirect()->route('absens.index', ['start_date' => $startDate, 'end_date' => $endDate])->with('success', 'Duplicate records deleted successfully.');
+    }
+
+    public function bulkDeleteDuplicates(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $duplicates = $request->input('duplicates');
+
+        if ($duplicates) {
+            foreach ($duplicates as $duplicate) {
+                list($nik, $tanggal) = explode('|', $duplicate);
+
+                $records = Absen::where('nik', $nik)
+                    ->where('tanggal', $tanggal)
+                    ->get();
+
+                if ($records->count() > 1) {
+                    $records->slice(1)->each(function($record) {
+                        $record->delete();
+                    });
+                }
+            }
+        }
+
+        return redirect()->route('absens.index', ['start_date' => $startDate, 'end_date' => $endDate])->with('success', 'Selected duplicate records deleted successfully.');
+    }
+
 }

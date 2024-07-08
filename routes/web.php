@@ -39,6 +39,11 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
 
+    // absenduplikat
+    Route::get('duplikat-absen', [App\Http\Controllers\Absen\AbsenController::class, 'duplicateAttendance'])->name('absens.index');
+    Route::delete('/absens/delete/{nik}/{tanggal}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteDuplicate'])->name('absens.deleteDuplicate');
+    Route::delete('/absens/bulk-delete-duplicates', [App\Http\Controllers\Absen\AbsenController::class, 'bulkDeleteDuplicates'])->name('absens.bulkDeleteDuplicates2');
+
     // Delete Absen
     Route::get('/delete-attendance/{date}/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteAttendance']);
     Route::get('/delete-attendance-backup/{date}/{nik}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteAttendanceBackup']);

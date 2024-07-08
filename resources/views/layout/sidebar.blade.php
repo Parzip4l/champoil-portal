@@ -70,6 +70,9 @@
                             <li class="nav-item">
                                 <a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ url('duplikat-absen') }}" class="nav-link {{ active_class(['duplikat-absen']) }}">Duplikat Record</a>
+                            </li>
                             @if($employee && $employee->unit_bisnis == 'Kas' && $user->project_id == NULL)
                                 <li class="nav-item">
                                     <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>

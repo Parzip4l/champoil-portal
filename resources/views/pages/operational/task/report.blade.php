@@ -19,7 +19,7 @@
 @csrf
 <div class="row">
     <div class="col-md-12">
-        @if($client==NULL)
+        
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
@@ -28,6 +28,7 @@
                     </div>
                     <div class="card-body">
                         <form class="row g-3">
+                        @if($client==NULL)
                             <div class="col-auto">
                                 <label for="staticEmail2" class="visually-hidden">Project</label>
                                 <select name="project_id" class="form-control select2">
@@ -42,6 +43,7 @@
                                     @endif
                                 </select>
                             </div>
+                            @endif
                             <div class="col-auto">
                                 <label for="staticEmail2" class="visually-hidden">Periode</label>
                                 <select name="periode" class="form-control select2">
@@ -64,7 +66,7 @@
                 </div>                
             </div>
         </div>
-        @endif
+        
         
     </div>
 </div>

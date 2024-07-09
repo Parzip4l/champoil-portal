@@ -157,6 +157,17 @@
                         <i class="icon-lg color-custom align-self-center" data-feather="chevron-right"></i>
                     </div>
                 </a>
+                <a href="{{url('performance-appraisal/my-performance')}}" class="d-flex justify-content-between menu-profile mb-3">
+                    <div class="d-flex">
+                        <div class="icon-profile-menu p-3 me-3" style="background: #9ADCFF;">
+                            <i class="icon-lg text-white" data-feather="file-text"></i>
+                        </div>
+                        <h5 class="align-self-center color-custom">Performance Appraisal</h5>
+                    </div>
+                    <div class="icon-right align-self-center">
+                        <i class="icon-lg color-custom align-self-center" data-feather="chevron-right"></i>
+                    </div>
+                </a>
                 <a href="#" class="d-flex justify-content-between menu-profile mb-3" data-bs-toggle="modal" data-bs-target=".ChangePassword">
                     <div class="d-flex">
                         <div class="icon-profile-menu p-3 me-3" style="background: #FF7171;">

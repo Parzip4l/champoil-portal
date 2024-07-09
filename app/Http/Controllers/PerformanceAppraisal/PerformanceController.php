@@ -446,4 +446,72 @@ class PerformanceController extends Controller
             return back()->with('error', 'Gagal mengupdate Performance Appraisal: ' . $e->getMessage());
         }
     }
+
+    public function MyPerformanceList()
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $predikats = PredikatModel::where('company', $employee->unit_bisnis)->get();
+        $paData = PaModel::where('nik', $code)->get();
+
+        if ($paData->isEmpty()) {
+            // Handle the case where no paData is found
+            return response()->json(['error' => 'No performance appraisal data found'], 404);
+        }
+        
+        foreach ($paData as $pa) {
+            $nilai_keseluruhan = floatval($pa->nilai_keseluruhan);
+            $predikatName = null;
+            
+            foreach ($predikats as $predikat) {
+                
+                $minNilai = floatval($predikat->min_nilai);
+                $maxNilai = floatval($predikat->max_nilai);
+               
+                if ($nilai_keseluruhan >= $minNilai && $nilai_keseluruhan <= $maxNilai) {
+                    $predikatName = $predikat->name;
+                    break;
+                }
+            }
+            $pa->predikat_name = $predikatName;
+        }
+        
+        return view('pages.hc.pa.myperformance', compact('paData','employee','predikatName'));
+    }
+
+    public function DetailPerformance($id)
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        // Ambil data performa berdasarkan ID
+        $performance = PaModel::findOrFail($id);
+
+        // Ambil daftar karyawan untuk dropdown
+        $employee = Employee::all();
+
+        // Ambil daftar kategori PA untuk ditampilkan di form
+        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $totalKategori = $kategoriPa->count();
+
+        $faktor = FaktorModel::where('company', $company->unit_bisnis)
+        ->get();
+        // Tampilkan view edit dengan data yang diperlukan
+        return view('pages.hc.pa.details', compact('performance', 'employee', 'kategoriPa','totalKategori','faktor'));
+    }
+
+    public function approvePa($id)
+    {
+        // Cari data berdasarkan id
+        $performance = PaModel::find($id);
+
+        // Pastikan data ditemukan
+        if ($performance) {
+            // Ubah nilai approve_byemployee menjadi true
+            $performance->approve_byemployee = 'true';
+            $performance->save();
+        }
+
+        // Kembali ke halaman sebelumnya atau ke halaman lain
+        return redirect()->back()->with('success', 'Tanda tangan berhasil.');
+    }
 }

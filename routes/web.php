@@ -382,6 +382,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::post('/store-performance', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'storePerformance'])->name('store.performance');
         Route::get('/edit-performance/{id}/edit', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'editPerformance'])->name('edit.pa');
         Route::put('/edit-performance/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updatePerformance'])->name('update.pa');
+        Route::get('/my-performance', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'MyPerformanceList'])->name('mypa.list');
+        Route::get('/my-performance/{id}/details', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'DetailPerformance'])->name('details.Mypa');
+        Route::get('/approve-myperformance/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'approvePa'])->name('approve.Mypa');
             Route::group(['prefix' => 'settings'], function(){
                 // Kategori
                 Route::get('/kategori', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'IndexsettingKategori'])->name('kategori-pa.setting');

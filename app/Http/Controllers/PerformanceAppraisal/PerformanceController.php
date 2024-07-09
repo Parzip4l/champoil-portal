@@ -406,11 +406,13 @@ class PerformanceController extends Controller
 
         // Ambil daftar karyawan untuk dropdown
         $employee = Employee::all();
+        $nikPemilikPa = $performance->nik;
 
+        $levelPemilik = Employee::where('nik',$nikPemilikPa)->first();
+        
         // Ambil daftar kategori PA untuk ditampilkan di form
-        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->where('level',$levelPemilik->golongan)->get();
         $totalKategori = $kategoriPa->count();
-
         $faktor = FaktorModel::where('company', $company->unit_bisnis)
         ->get();
         // Tampilkan view edit dengan data yang diperlukan

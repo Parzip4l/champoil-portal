@@ -267,7 +267,6 @@
 
                 let totalKategori = response.totalKategori;
                 $('#hidden_total_kategori').val(totalKategori);
-                console.log($('#hidden_total_kategori')); 
                 hitungTotal();
                 
                 // Load data faktor sesuai dengan level yang dipilih

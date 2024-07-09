@@ -103,10 +103,9 @@
                     <div class="form-group mb-3">
                         <label for="Konten" class="form-label">Level</label>
                         <select name="level" class="form-control" id="" required>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
+                            @foreach($level as $data)
+                                <option value="{{$data->name}}">{{$data->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Buat Kategori</button>
@@ -137,10 +136,9 @@
                     <div class="form-group mb-3">
                         <label for="Konten" class="form-label">Level</label>
                         <select name="level" class="form-control" id="" required>
-                            <option value="A" {{$data->level == 'A' ? 'selected' : ''}}>A</option>
-                            <option value="B" {{$data->level == 'B' ? 'selected' : ''}}>B</option>
-                            <option value="C" {{$data->level == 'C' ? 'selected' : ''}}>C</option>
-                            <option value="D" {{$data->level == 'D' ? 'selected' : ''}}>D</option>
+                            @foreach($level as $dataLevel)
+                                <option value="{{$dataLevel->name}}" @if($dataLevel->name == $data->level) selected @endif>{{$dataLevel->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Update Kategori</button>

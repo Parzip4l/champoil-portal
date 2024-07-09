@@ -21,7 +21,7 @@
 <div class="row mb-4">
     <div class="topbar-wrap d-flex justify-content-between">
         <div class="arrow-back">
-            <a href="{{route('setting.pa')}}" class="d-flex color-custom">
+            <a href="{{route('index.pa')}}" class="d-flex color-custom">
                 <i class="me-2 icon-lg" data-feather="chevron-left"></i>
                 <h5 class="align-self-center">Kembali</h5>
             </a>

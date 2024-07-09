@@ -68,7 +68,7 @@
                                     <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item d-flex align-items-center" href="" data-bs-toggle="modal" data-bs-target="#ModalKategori{{$data->id}}"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ModalFaktor{{$data->id}}"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
                                         <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                             @csrf @method('DELETE') 
                                             <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
@@ -122,10 +122,9 @@
                     <div class="form-group mb-3">
                         <label for="Konten" class="form-label">Level</label>
                         <select name="level" class="form-control" id="" required>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
+                            @foreach($level as $data)
+                                <option value="{{$data->name}}">{{$data->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Buat Faktor</button>
@@ -138,11 +137,11 @@
 
  <!-- Modal Edit kategori -->
 @foreach($faktor as $FaktorPA)
-<div class="modal fade" id="ModalFaktor{{$data->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="ModalFaktor{{$FaktorPA->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Update Faktor</h5>
+                <h5 class="modal-title" id="ModalFaktor">Update Faktor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
@@ -172,10 +171,9 @@
                     <div class="form-group mb-3">
                         <label for="Konten" class="form-label">Level</label>
                         <select name="level" class="form-control" id="" required>
-                            <option value="A" {{ $FaktorPA->level == 'A' ? 'selected' : '' }}>A</option>
-                            <option value="B" {{ $FaktorPA->level == 'B' ? 'selected' : '' }}>B</option>
-                            <option value="C" {{ $FaktorPA->level == 'C' ? 'selected' : '' }}>C</option>
-                            <option value="D" {{ $FaktorPA->level == 'D' ? 'selected' : '' }}>D</option>
+                            @foreach($level as $dataLevel)
+                                <option value="{{$dataLevel->name}}" @if($dataLevel->name == $data->level) selected @endif>{{$dataLevel->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Update Faktor</button>
@@ -244,44 +242,4 @@
         });
     }
     </script>
-    <script>
-    document.querySelectorAll('.status-switch').forEach(function(switchElem) {
-        switchElem.addEventListener('change', function() {
-            var id = this.getAttribute('data-id');
-            var isActive = this.checked ? 'aktif' : 'nonaktif';
-
-            fetch(`/update-status-faktor/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ is_active: isActive }) // Correct key name
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Status updated successfully',
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to update status',
-                    });
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred',
-                });
-            });
-        });
-    });
-</script>
 @endpush

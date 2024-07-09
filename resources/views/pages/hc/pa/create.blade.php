@@ -21,7 +21,7 @@
 <div class="row mb-4">
     <div class="topbar-wrap d-flex justify-content-between">
         <div class="arrow-back">
-            <a href="{{route('setting.pa')}}" class="d-flex color-custom">
+            <a href="{{route('index.pa')}}" class="d-flex color-custom">
                 <i class="me-2 icon-lg" data-feather="chevron-left"></i>
                 <h5 class="align-self-center">Kembali</h5>
             </a>
@@ -56,17 +56,19 @@
                         </div>
                         <div class="form-group mb-2">
                             <label for="Employee">Karyawan</label>
-                            <select name="nik" id="" class="form-control">
+                            <select name="nik" id="employee-select" class="form-control">
+                                <option value="">-- Pilih Karyawan --</option>
                                 @foreach($employee as $karyawan)
-                                    <option value="{{$karyawan->nik}}">{{$karyawan->nama}}</option>
+                                    <option value="{{$karyawan->nik}}" data-golongan="{{$karyawan->golongan}}">{{$karyawan->nama}}</option>
                                 @endforeach
                             </select>
+                            <input type="hidden" name="level" id="employee-level">
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <table id="" class="table">
+                        <table id="factor-table" class="table">
                             <thead>
                                 <tr>
                                     <th>Faktor</th>
@@ -76,7 +78,7 @@
                                     <th>Keterangan</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="factor-table-body">
                                 @foreach($kategoriPa as $kategori)
                                     <tr>
                                         <td colspan="5" style="background-color: #f0f0f0;">
@@ -120,24 +122,24 @@
                                 </tr>
                             </tfoot>
                         </table>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                    <table id="" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Komentar Atau Masukan</th>
-                                    <th>Catatan Target</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <td><textarea name="komentar_masukan" id="" class="form-control"></textarea></td>
-                                <td><textarea name="catatan_target" id="" class="form-control"></textarea></td>
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table id="" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Komentar Atau Masukan</th>
+                                        <th>Catatan Target</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <td><textarea name="komentar_masukan" id="" class="form-control"></textarea></td>
+                                    <td><textarea name="catatan_target" id="" class="form-control"></textarea></td>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
                 <button class="btn btn-primary w-100" type="submit">Buat Performance Appraisal</button>
             </form>
         </div>
@@ -223,6 +225,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let inputs = document.querySelectorAll('input[type="number"]');
+        
         inputs.forEach(function(input) {
             input.addEventListener('input', function() {
                 let max = parseInt(input.getAttribute('max'));
@@ -230,60 +233,112 @@
                     input.value = max; // Set nilai kembali ke nilai maksimum jika melebihi
                     // Tambahkan pesan kesalahan atau tindakan tambahan sesuai kebutuhan
                 }
+                updateNilaiFaktor(input); // Panggil fungsi untuk mengupdate nilai faktor setiap kali input berubah
+                hitungTotal(); // Panggil fungsi untuk menghitung total nilai setiap kali input berubah
+            });
+        });
+    });
+
+    function updateNilaiFaktor(input) {
+        let bobotNilai = parseFloat(input.parentElement.previousElementSibling.textContent); // Ambil bobot nilai dari elemen sebelumnya
+        let nilai = parseFloat(input.value); // Ambil nilai dari input saat ini
+
+        if (!isNaN(bobotNilai) && !isNaN(nilai)) {
+            let nilaiFaktor = bobotNilai * nilai / 100; // Hitung nilai faktor
+            input.parentElement.nextElementSibling.querySelector('input[name="nilaifaktor[]"]').value = nilaiFaktor.toFixed(2); // Update nilai faktor
+        }
+    }
+
+    function hitungTotal() {
+        var inputs = document.querySelectorAll('input[type="number"]');
+        var bobotElements = document.querySelectorAll("td:nth-child(2)"); // Select bobot columns
+        var nilaifaktorElements = document.getElementsByName("nilaifaktor[]");
+        var total = 0;
+        var totalKategori = {{ $totalKategori }}; // Gunakan total jumlah kategori dari controller
+
+        // Loop melalui semua nilai input dan menjumlahkannya
+        inputs.forEach(function(input, index) {
+            var nilai = parseFloat(input.value) || 0; // Konversi ke float, default ke 0 jika tidak valid
+            var bobot = parseFloat(bobotElements[index].innerText) / 100; // Konversi bobot ke desimal
+            var bobotNilai = nilai * bobot;
+
+            nilaifaktorElements[index].value = (bobotNilai).toFixed(2); // Update bidang bobot nilai tanpa perkalian dengan 100
+            total += bobotNilai;
+        });
+
+        // Bagi total dengan jumlah kategori dan bulatkan menjadi 2 tempat desimal
+        var result = Math.round((total / totalKategori) * 100) / 100;
+
+        // Tampilkan hasilnya di input hanya baca
+        document.getElementById("total_nilai").value = result.toFixed(2); // Tampilkan hasil dengan 2 tempat desimal
+    }
+
+    $(document).ready(function() {
+        $('#employee-select').change(function() {
+            var golongan = $(this).find(':selected').data('golongan');
+            $('#employee-level').val(golongan);
+
+            // Panggil Ajax untuk mendapatkan data faktor berdasarkan level
+            $.ajax({
+                url: "{{ route('update-active-faktor', ':level') }}".replace(':level', golongan),
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $('#factor-table-body').empty();
+
+                    let kategoriGrouped = {};
+
+                    response.faktors.forEach(faktor => {
+                        if (!kategoriGrouped[faktor.kategori]) {
+                            kategoriGrouped[faktor.kategori] = [];
+                        }
+                        kategoriGrouped[faktor.kategori].push(faktor);
+                    });
+
+                    for (let kategori in kategoriGrouped) {
+                        $('#factor-table-body').append(`
+                            <tr style="background-color: #f0f0f0;">
+                                <td colspan="5"><b>${kategori}</b></td>
+                            </tr>
+                        `);
+
+                        kategoriGrouped[kategori].forEach(faktor => {
+                            $('#factor-table-body').append(`
+                                <tr>
+                                    <td style="max-width: 200px;">
+                                        <div class="form-group" style="white-space: normal;">
+                                            <div class="faktor-name mx-2">
+                                                <p>${faktor.name}</p>
+                                                <input type="hidden" name="name[]" value="${faktor.name}">
+                                                <input type="hidden" name="id[]" value="${faktor.id}">
+                                            </div>
+                                            <div class="deskripsi-faktor mx-2">
+                                                <p class="text-muted">${faktor.deskripsi}</p>
+                                                <input type="hidden" name="deskripsi[]" value="${faktor.deskripsi}">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        ${faktor.bobot_nilai}%
+                                        <input type="hidden" name="bobot_nilai[]" value="${faktor.bobot_nilai}">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" name="nilai[${faktor.id}]" max="4" oninput="validity.valid||(value=''); hitungTotal();">
+                                    </td>
+                                    <td><input type="text" class="form-control" name="nilaifaktor[]" readonly></td>
+                                    <td><textarea name="keterangan[${faktor.id}]" class="form-control"></textarea></td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
             });
         });
     });
 </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    let inputs = document.querySelectorAll('input[type="number"]');
-    
-    inputs.forEach(function(input) {
-        input.addEventListener('input', function() {
-            let max = parseInt(input.getAttribute('max'));
-            if (parseInt(input.value) > max) {
-                input.value = max; // Set nilai kembali ke nilai maksimum jika melebihi
-                // Tambahkan pesan kesalahan atau tindakan tambahan sesuai kebutuhan
-            }
-            updateNilaiFaktor(input); // Panggil fungsi untuk mengupdate nilai faktor setiap kali input berubah
-            hitungTotal(); // Panggil fungsi untuk menghitung total nilai setiap kali input berubah
-        });
-    });
-});
 
-function updateNilaiFaktor(input) {
-    let bobotNilai = parseFloat(input.parentElement.previousElementSibling.textContent); // Ambil bobot nilai dari elemen sebelumnya
-    let nilai = parseFloat(input.value); // Ambil nilai dari input saat ini
 
-    if (!isNaN(bobotNilai) && !isNaN(nilai)) {
-        let nilaiFaktor = bobotNilai * nilai / 100; // Hitung nilai faktor
-        input.parentElement.nextElementSibling.querySelector('input[name="nilaifaktor[]"]').value = nilaiFaktor.toFixed(2); // Update nilai faktor
-    }
-}
-
-function hitungTotal() {
-    var inputs = document.querySelectorAll('input[type="number"]');
-    var bobotElements = document.querySelectorAll("td:nth-child(2)"); // Select bobot columns
-    var nilaifaktorElements = document.getElementsByName("nilaifaktor[]");
-    var total = 0;
-    var totalKategori = {{ $totalKategori }}; // Gunakan total jumlah kategori dari controller
-
-    // Loop melalui semua nilai input dan menjumlahkannya
-    inputs.forEach(function(input, index) {
-        var nilai = parseFloat(input.value) || 0; // Konversi ke float, default ke 0 jika tidak valid
-        var bobot = parseFloat(bobotElements[index].innerText) / 100; // Konversi bobot ke desimal
-        var bobotNilai = nilai * bobot;
-
-        nilaifaktorElements[index].value = (bobotNilai).toFixed(2); // Update bidang bobot nilai tanpa perkalian dengan 100
-        total += bobotNilai;
-    });
-
-    // Bagi total dengan jumlah kategori dan bulatkan menjadi 2 tempat desimal
-    var result = Math.round((total / totalKategori) * 100) / 100;
-
-    // Tampilkan hasilnya di input hanya baca
-    document.getElementById("total_nilai").value = result.toFixed(2); // Tampilkan hasil dengan 2 tempat desimal
-}
-
-</script>
 @endpush

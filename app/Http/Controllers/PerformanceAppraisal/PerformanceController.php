@@ -16,6 +16,7 @@ use App\PerformanceAppraisal\FaktorModel;
 use App\PerformanceAppraisal\KategoriModel;
 use App\PerformanceAppraisal\PredikatModel;
 use App\PerformanceAppraisal\PaModel;
+use App\Setting\Golongan\GolonganModel;
 
 class PerformanceController extends Controller
 {
@@ -30,8 +31,9 @@ class PerformanceController extends Controller
         $company = Employee::where('nik', $code)->first();
 
         $kategori = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $level = GolonganModel::where('company', $company->unit_bisnis)->get();
 
-        return view('pages.hc.pa.setting.kategori.index', compact('kategori'));
+        return view('pages.hc.pa.setting.kategori.index', compact('kategori','level'));
     }
 
     public function storeKategori(Request $request)
@@ -99,8 +101,9 @@ class PerformanceController extends Controller
         $company = Employee::where('nik', $code)->first();
 
         $predikat = PredikatModel::where('company', $company->unit_bisnis)->get();
+        $level = GolonganModel::where('company', $company->unit_bisnis)->get();
 
-        return view('pages.hc.pa.setting.predikat.index', compact('predikat'));
+        return view('pages.hc.pa.setting.predikat.index', compact('predikat','level'));
     }
 
     public function storePredikat(Request $request)
@@ -168,8 +171,9 @@ class PerformanceController extends Controller
 
         $faktor = FaktorModel::where('company', $company->unit_bisnis)->get();
         $kategori = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $level = GolonganModel::where('company', $company->unit_bisnis)->get();
 
-        return view('pages.hc.pa.setting.faktor.index', compact('faktor','kategori'));
+        return view('pages.hc.pa.setting.faktor.index', compact('faktor','kategori','level'));
     }
 
     public function storeFaktor(Request $request)
@@ -269,22 +273,42 @@ class PerformanceController extends Controller
         return view('pages.hc.pa.index', compact('padata'));
     }
 
-    public function createPA()
+    public function createPA(Request $request)
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
+        $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->where('level', $company->golongan)->get();
         $totalKategori = $kategoriPa->count();
-
         $faktor = FaktorModel::where('company', $company->unit_bisnis)
         ->get();
         $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
         ->where('resign_status',0)
         ->where('organisasi', 'Management Leaders')
         ->get();
-
         return view('pages.hc.pa.create', compact('faktor','employee','kategoriPa','totalKategori'));
+    }
+
+    public function getFactorsByLevel(Request $request)
+    {
+        try {
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+
+            if (!$company) {
+                return response()->json(['error' => 'Company not found'], 404);
+            }
+
+            $faktors = FaktorModel::where('company', $company->unit_bisnis)
+                ->where('level', $request->level)
+                ->get();
+
+                return response()->json([
+                    'faktors' => $faktors
+                ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function storePerformance(Request $request)
@@ -293,7 +317,7 @@ class PerformanceController extends Controller
         $request->validate([
             'periode' => 'required|string|max:255',
         ]);
-    
+
         try {
             // Mendapatkan kode karyawan dari Auth
             $code = Auth::user()->employee_code;
@@ -301,7 +325,7 @@ class PerformanceController extends Controller
             
             // Mendapatkan data karyawan dari input
             $employeeData = Employee::where('nik', $request->nik)->first();
-    
+
             // Membuat objek Performance Appraisal
             $pa = new PaModel();
             $pa->periode = $request->periode;
@@ -314,48 +338,52 @@ class PerformanceController extends Controller
             $pa->approve_byemployee = 'false';
             $pa->created_by = $company->nama;
             $pa->company = $company->unit_bisnis;
-    
+
             // Mengambil kategori dari database berdasarkan unit bisnis perusahaan
             $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->get();
-    
+
             // Array untuk menyimpan data detail performance appraisal
             $detailsData = [];
-    
+
             // Looping untuk setiap kategori
             foreach ($kategoriPa as $kategori) {
                 // Mengambil faktor dari database berdasarkan kategori
-                $faktors = FaktorModel::where('kategori', $kategori->name)->get();
-    
+                $faktors = FaktorModel::where('kategori', $kategori->name)->where('level', $request->level)->get();
+
                 // Looping untuk setiap faktor dalam kategori
                 foreach ($faktors as $faktor) {
                     // Mengambil nilai dan keterangan dari request berdasarkan id faktor
                     $nilai = $request->nilai[$faktor->id] ?? null;
                     $keterangan = $request->keterangan[$faktor->id] ?? null;
-    
-                    // Menambahkan data faktor ke dalam array detailsData
-                    $detailsData[] = [
-                        'id' => $faktor->id,
-                        'kategori' => $kategori->name,
-                        'name' => $faktor->name,
-                        'deskripsi' => $faktor->deskripsi,
-                        'bobot_nilai' => $faktor->bobot_nilai,
-                        'nilai' => $nilai,
-                        'keterangan' => $keterangan,
-                    ];
+
+                    // Menambahkan data faktor ke dalam array detailsData hanya jika nilai tidak null
+                    if ($nilai !== null) {
+                        $detailsData[] = [
+                            'id' => $faktor->id,
+                            'kategori' => $kategori->name,
+                            'name' => $faktor->name,
+                            'deskripsi' => $faktor->deskripsi,
+                            'bobot_nilai' => $faktor->bobot_nilai,
+                            'nilai' => $nilai,
+                            'keterangan' => $keterangan,
+                        ];
+                    }
                 }
             }
+
             // Encode detailsData menjadi JSON sebelum disimpan
             $pa->detailsdata = json_encode($detailsData);
-    
+
             // Menyimpan data ke database
             $pa->save();
-    
+
             return redirect()->route('index.pa')->with('success', 'Performance Appraisal berhasil dibuat.');
         } catch (\Exception $e) {
             // Menangani kesalahan jika gagal menyimpan
             return back()->with('error', 'Gagal menyimpan Performance Appraisal: ' . $e->getMessage());
         }
     }
+
 
     public function editPerformance($id)
     {

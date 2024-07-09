@@ -385,6 +385,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/my-performance', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'MyPerformanceList'])->name('mypa.list');
         Route::get('/my-performance/{id}/details', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'DetailPerformance'])->name('details.Mypa');
         Route::get('/approve-myperformance/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'approvePa'])->name('approve.Mypa');
+        Route::get('/get-faktor/{level}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'getFactorsByLevel'])->name('update-active-faktor');
             Route::group(['prefix' => 'settings'], function(){
                 // Kategori
                 Route::get('/kategori', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'IndexsettingKategori'])->name('kategori-pa.setting');
@@ -401,7 +402,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
                 Route::post('/faktor', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'storeFaktor'])->name('faktor-pa.store');
                 Route::put('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateFaktor'])->name('faktor-pa.update');
                 Route::delete('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deleteFaktor'])->name('faktor-pa.destroy');
-                Route::post('/update-status-faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateStatusFaktor'])->name('update-active-faktor');
+                
             });
     });
 

@@ -386,6 +386,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/my-performance/{id}/details', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'DetailPerformance'])->name('details.Mypa');
         Route::get('/approve-myperformance/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'approvePa'])->name('approve.Mypa');
         Route::get('/get-faktor/{level}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'getFactorsByLevel'])->name('update-active-faktor');
+        Route::get('/get-kategori/{level}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'getTotalKategori'])->name('update-active-kategori');
             Route::group(['prefix' => 'settings'], function(){
                 // Kategori
                 Route::get('/kategori', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'IndexsettingKategori'])->name('kategori-pa.setting');

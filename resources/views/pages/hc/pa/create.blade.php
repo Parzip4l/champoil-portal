@@ -54,6 +54,7 @@
                                 <option value="2026">2026</option>
                             </select>
                         </div>
+                        <input type="hidden" id="hidden_total_kategori" name="hidden_total_kategori" value="">
                         <div class="form-group mb-2">
                             <label for="Employee">Karyawan</label>
                             <select name="nik" id="employee-select" class="form-control">
@@ -110,6 +111,7 @@
                                             </td>
                                             <td><input type="text" class="form-control" name="nilaifaktor[]" readonly></td>
                                             <td><textarea name="keterangan[{{ $dataFaktor->id }}]" class="form-control"></textarea></td>
+                                            
                                         </tr>
                                     @endforeach
                                 @endforeach
@@ -249,96 +251,110 @@
         }
     }
 
-    function hitungTotal() {
-        var inputs = document.querySelectorAll('input[type="number"]');
-        var bobotElements = document.querySelectorAll("td:nth-child(2)"); // Select bobot columns
-        var nilaifaktorElements = document.getElementsByName("nilaifaktor[]");
-        var total = 0;
-        var totalKategori = {{ $totalKategori }}; // Gunakan total jumlah kategori dari controller
-
-        // Loop melalui semua nilai input dan menjumlahkannya
-        inputs.forEach(function(input, index) {
-            var nilai = parseFloat(input.value) || 0; // Konversi ke float, default ke 0 jika tidak valid
-            var bobot = parseFloat(bobotElements[index].innerText) / 100; // Konversi bobot ke desimal
-            var bobotNilai = nilai * bobot;
-
-            nilaifaktorElements[index].value = (bobotNilai).toFixed(2); // Update bidang bobot nilai tanpa perkalian dengan 100
-            total += bobotNilai;
-        });
-
-        // Bagi total dengan jumlah kategori dan bulatkan menjadi 2 tempat desimal
-        var result = Math.round((total / totalKategori) * 100) / 100;
-
-        // Tampilkan hasilnya di input hanya baca
-        document.getElementById("total_nilai").value = result.toFixed(2); // Tampilkan hasil dengan 2 tempat desimal
-    }
 
     $(document).ready(function() {
-        $('#employee-select').change(function() {
-            var golongan = $(this).find(':selected').data('golongan');
-            $('#employee-level').val(golongan);
+    $('#employee-select').change(function() {
+        var golongan = $(this).find(':selected').data('golongan');
+        $('#employee-level').val(golongan);
 
-            // Panggil Ajax untuk mendapatkan data faktor berdasarkan level
-            $.ajax({
-                url: "{{ route('update-active-faktor', ':level') }}".replace(':level', golongan),
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    $('#factor-table-body').empty();
+        // Panggil Ajax untuk mendapatkan data faktor dan total kategori berdasarkan level
+        $.ajax({
+            url: "{{ route('update-active-kategori', ':level') }}".replace(':level', golongan),
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                $('#factor-table-body').empty();
 
-                    let kategoriGrouped = {};
+                let totalKategori = response.totalKategori;
+                $('#hidden_total_kategori').val(totalKategori);
+                console.log($('#hidden_total_kategori')); 
+                hitungTotal();
+                
+                // Load data faktor sesuai dengan level yang dipilih
+                $.ajax({
+                    url: "{{ route('update-active-faktor', ':level') }}".replace(':level', golongan),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        let kategoriGrouped = {};
 
-                    response.faktors.forEach(faktor => {
-                        if (!kategoriGrouped[faktor.kategori]) {
-                            kategoriGrouped[faktor.kategori] = [];
-                        }
-                        kategoriGrouped[faktor.kategori].push(faktor);
-                    });
+                        response.faktors.forEach(faktor => {
+                            if (!kategoriGrouped[faktor.kategori]) {
+                                kategoriGrouped[faktor.kategori] = [];
+                            }
+                            kategoriGrouped[faktor.kategori].push(faktor);
+                        });
 
-                    for (let kategori in kategoriGrouped) {
-                        $('#factor-table-body').append(`
-                            <tr style="background-color: #f0f0f0;">
-                                <td colspan="5"><b>${kategori}</b></td>
-                            </tr>
-                        `);
-
-                        kategoriGrouped[kategori].forEach(faktor => {
+                        for (let kategori in kategoriGrouped) {
                             $('#factor-table-body').append(`
-                                <tr>
-                                    <td style="max-width: 200px;">
-                                        <div class="form-group" style="white-space: normal;">
-                                            <div class="faktor-name mx-2">
-                                                <p>${faktor.name}</p>
-                                                <input type="hidden" name="name[]" value="${faktor.name}">
-                                                <input type="hidden" name="id[]" value="${faktor.id}">
-                                            </div>
-                                            <div class="deskripsi-faktor mx-2">
-                                                <p class="text-muted">${faktor.deskripsi}</p>
-                                                <input type="hidden" name="deskripsi[]" value="${faktor.deskripsi}">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        ${faktor.bobot_nilai}%
-                                        <input type="hidden" name="bobot_nilai[]" value="${faktor.bobot_nilai}">
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control" name="nilai[${faktor.id}]" max="4" oninput="validity.valid||(value=''); hitungTotal();">
-                                    </td>
-                                    <td><input type="text" class="form-control" name="nilaifaktor[]" readonly></td>
-                                    <td><textarea name="keterangan[${faktor.id}]" class="form-control"></textarea></td>
+                                <tr style="background-color: #f0f0f0;">
+                                    <td colspan="5"><b>${kategori}</b></td>
                                 </tr>
                             `);
-                        });
+
+                            kategoriGrouped[kategori].forEach(faktor => {
+                                $('#factor-table-body').append(`
+                                    <tr>
+                                        <td style="max-width: 200px;">
+                                            <div class="form-group" style="white-space: normal;">
+                                                <div class="faktor-name mx-2">
+                                                    <p>${faktor.name}</p>
+                                                    <input type="hidden" name="name[]" value="${faktor.name}">
+                                                    <input type="hidden" name="id[]" value="${faktor.id}">
+                                                </div>
+                                                <div class="deskripsi-faktor mx-2">
+                                                    <p class="text-muted">${faktor.deskripsi}</p>
+                                                    <input type="hidden" name="deskripsi[]" value="${faktor.deskripsi}">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            ${faktor.bobot_nilai}%
+                                            <input type="hidden" name="bobot_nilai[]" value="${faktor.bobot_nilai}">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" name="nilai[${faktor.id}]" max="4" oninput="validity.valid||(value=''); hitungTotal();">
+                                        </td>
+                                        <td><input type="text" class="form-control" name="nilaifaktor[]" readonly></td>
+                                        <td><textarea name="keterangan[${faktor.id}]" class="form-control"></textarea></td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-            });
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
         });
     });
+});
+
+function hitungTotal(totalKategori) {
+    var totalKategori = parseFloat(document.getElementById("hidden_total_kategori").value);
+    var inputs = document.querySelectorAll('input[type="number"]');
+    var bobotElements = document.querySelectorAll("td:nth-child(2)"); // Select bobot columns
+    var nilaifaktorElements = document.getElementsByName("nilaifaktor[]");
+    var total = 0;
+    // Loop melalui semua nilai input dan menjumlahkannya
+    inputs.forEach(function(input, index) {
+        var nilai = parseFloat(input.value) || 0; // Konversi ke float, default ke 0 jika tidak valid
+        var bobot = parseFloat(bobotElements[index].innerText) / 100; // Konversi bobot ke desimal
+        var bobotNilai = nilai * bobot;
+
+        nilaifaktorElements[index].value = (bobotNilai).toFixed(2); // Update bidang bobot nilai tanpa perkalian dengan 100
+        total += bobotNilai;
+    });
+
+    // Bagi total dengan jumlah kategori dan bulatkan menjadi 2 tempat desimal
+    var result = Math.round((total / totalKategori) * 100) / 100;
+
+    // Tampilkan hasilnya di input hanya baca
+    document.getElementById("total_nilai").value = result.toFixed(2); // Tampilkan hasil dengan 2 tempat desimal
+}
 </script>
-
-
 @endpush

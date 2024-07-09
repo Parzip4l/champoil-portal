@@ -289,6 +289,18 @@ class PerformanceController extends Controller
         return view('pages.hc.pa.create', compact('faktor','employee','kategoriPa','totalKategori'));
     }
 
+    public function getTotalKategori($level)
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $totalKategori = KategoriModel::where('company', $company->unit_bisnis)
+            ->where('level', $level)
+            ->count();
+
+        return response()->json(['totalKategori' => $totalKategori]);
+    }
+
     public function getFactorsByLevel(Request $request)
     {
         try {

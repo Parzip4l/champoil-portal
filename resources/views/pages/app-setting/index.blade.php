@@ -236,6 +236,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <a href="{{ route('golongan.index') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Golongan Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">

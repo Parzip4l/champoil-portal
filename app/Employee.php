@@ -40,6 +40,7 @@ class Employee extends Model
         'jenis_kelamin',
         'unit_bisnis',
         'manager',
+        'level'
     ];
 
     public function karyawan()

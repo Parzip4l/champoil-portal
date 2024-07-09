@@ -62,9 +62,17 @@
                         </div>
                         <div class="col">
                             <label class="form-label">Jabatan</label>
-                            <select class=" form-select" data-width="100%" name="jabatan">
+                            <select class="form-select" data-width="100%" name="jabatan">
                                 @foreach($jabatan as $jabatan)
                                     <option value="{{$jabatan->name}}">{{$jabatan->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Atasan</label>
+                            <select class="form-select" data-width="100%" name="manager">
+                                @foreach($atasan as $dataAtasan)
+                                    <option value="{{$dataAtasan->nama}}">{{$dataAtasan->nama}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -111,11 +119,19 @@
                                 <option value="Permanent">Tetap</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col">
                             <label class="form-label">Organisasi</label>
                             <select class=" form-select" data-width="100%" name="organisasi">
                                 @foreach($organisasi as $organisasi)
                                     <option value="{{$organisasi->name}}">{{$organisasi->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Organisasi</label>
+                            <select class="form-select" data-width="100%" name="level">
+                                @foreach($golongan as $dataGolongan)
+                                    <option value="{{$dataGolongan->name}}">{{$dataGolongan->name}}</option>
                                 @endforeach
                             </select>
                         </div>

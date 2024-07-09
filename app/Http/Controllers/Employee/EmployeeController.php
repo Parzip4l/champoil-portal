@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Setting\Golongan\GolonganModel;
 
 class EmployeeController extends Controller
 {
@@ -130,7 +131,11 @@ class EmployeeController extends Controller
         $divisi = Divisi::where('company', $company->unit_bisnis)->get();
         $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
         $project = Project::all();
-        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project'));
+
+        $golongan = GolonganModel::where('company', $company->unit_bisnis)->get();
+        $atasan = Employee::where('unit_bisnis',$company->unit_bisnis)->where('resign_status',0)->where('organisasi', 'Management Leaders')->get();
+
+        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project','golongan','atasan'));
     }
 
     /**
@@ -142,7 +147,7 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         try{
-
+dd($request->all());
             $code = Auth::user()->employee_code;
             $company = Employee::where('nik', $code)->first();
 
@@ -179,6 +184,8 @@ class EmployeeController extends Controller
             $data->tanggungan = $request->tanggungan;
             $data->tax_code = $request->tax_code;
             $data->unit_bisnis = $company->unit_bisnis;
+            $employee->golongan = $request->level;
+            $employee->manager = $request->manager;
             $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
             if ($request->hasFile('gambar')) {
@@ -331,11 +338,14 @@ Password: ".$request->password;
             $unix = $this->generateCodeVisitor("karyawan","id", 4, "CITY");
         }
 
+        $golongan = GolonganModel::where('company', $employee->unit_bisnis)->get();
+        $atasan = Employee::where('unit_bisnis',$employee->unit_bisnis)->where('resign_status',0)->where('organisasi', 'Management Leaders')->get();
+
         $divisi = Divisi::where('company', $employee->unit_bisnis)->get();
         $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();
         $organisasi = Organisasi::where('company',$employee->unit_bisnis)->get();
-        // dd($unix);
-        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi'));
+
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan'));
         
     }
 
@@ -434,6 +444,8 @@ Password: ".$request->password;
             $employee->tanggungan = $request->input('tanggungan');
             $employee->tax_code = $request->input('tax_code');
             $employee->referal_code = $request->input('referal_code');
+            $employee->golongan = $request->input('golongan');
+            $employee->manager = $request->input('atasan_langsung');
 
             // Update the employee's photo if a new one is provided
             if ($request->hasFile('gambar')) {

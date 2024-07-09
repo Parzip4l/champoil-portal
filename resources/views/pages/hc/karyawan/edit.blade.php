@@ -54,7 +54,7 @@
                     <label for="kode_karyawan" class="form-label">Kode Karyawan</label>
                     <input id="kode_karyawan" class="form-control" name="nik" type="number" placeholder="xxx-xxx-xxx" value="{{$employee->nik}}" readonly>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col mb-3">
                     <label class="form-label">Divisi</label>
                     <select name="divisi" class="form-control" id="" required>
                         @foreach($divisi as $dataDivisi)
@@ -62,11 +62,19 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col mb-3">
                     <label class="form-label">Jabatan</label>
                     <select name="jabatan" class="form-control" id="" required>
                         @foreach($jabatan as $dataJabatan)
                             <option value="{{$dataJabatan->name}}" @if($dataJabatan->name == $employee->jabatan) selected @endif>{{$dataJabatan->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col mb-3">
+                    <label class="form-label">Atasan</label>
+                    <select name="atasan_langsung" class="form-control" id="" required>
+                        @foreach($atasan as $dataAtasan)
+                            <option value="{{$dataAtasan->nama}}" @if($dataAtasan->nama == $employee->manager) selected @endif>{{$dataAtasan->nama}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -78,7 +86,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Jenis Kelamin</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="jenis_kelamin" required>
+                    <select class="form-control" data-width="100%" name="jenis_kelamin" required>
                         <option value="Laki-Laki" {{$employee->jenis_kelamin == 'Laki-Laki' ? 'selected' : ''}}>Laki-Laki</option>
                         <option value="Perempuan" {{$employee->jenis_kelamin == 'Perempuan' ? 'selected' : ''}}>Perempuan</option>
                     </select>
@@ -101,16 +109,24 @@
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label">Status Kontrak</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="status_kontrak" required>
+                    <select class="form-control" data-width="100%" name="status_kontrak" required>
                         <option value="Contract" {{$employee->status_kontrak == 'Contract' ? 'selected' : ''}}>Kontrak</option>
                         <option value="Permanent" {{$employee->status_kontrak == 'Permanent' ? 'selected' : ''}}>Tetap</option>
                     </select>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col mb-3">
                     <label class="form-label">Organisasi</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="organisasi" required>
+                    <select class="form-control" data-width="100%" name="organisasi" required>
                         @foreach($organisasi as $dataOrganisasi)
                             <option value="{{$dataOrganisasi->name}}" @if($dataOrganisasi->name == $employee->organisasi) selected @endif>{{$dataOrganisasi->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col mb-3">
+                    <label class="form-label">Level</label>
+                    <select class="form-control" data-width="100%" name="golongan" required>
+                        @foreach($golongan as $dataGolongan)
+                            <option value="{{$dataGolongan->name}}" @if($dataGolongan->name == $employee->golongan) selected @endif>{{$dataGolongan->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -148,7 +164,7 @@
             <div class="row mb-3">
                 <div class="col">
                     <label class="form-label">Pendidikan Terakhir</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="pendidikan_trakhir" required>
+                    <select class="form-control" data-width="100%" name="pendidikan_trakhir" required>
                         <option value="SD" {{$employee->pendidikan_trakhir == 'SD' ? 'selected' : ''}}>SD</option>
                         <option value="SMP" {{$employee->pendidikan_trakhir == 'SMP' ? 'selected' : ''}}>SMP</option>
                         <option value="SMA" {{$employee->pendidikan_trakhir == 'SMA' ? 'selected' : ''}}>SMA</option>
@@ -167,7 +183,7 @@
             <div class="row mb-3">
                 <div class="col">
                     <label class="form-label">Sertifikasi</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="sertifikasi">
+                    <select class="form-control" data-width="100%" name="sertifikasi">
                         <option value="GADA PRATAMA" {{$employee->sertifikasi == 'GADA PRATAMA' ? 'selected' : ''}}>GADA PRATAMA</option>
                         <option value="GADA MADYA" {{$employee->sertifikasi == 'GADA MADYA' ? 'selected' : ''}}>GADA MADYA</option>
                         <option value="GADA UTAMA" {{$employee->sertifikasi == 'GADA UTAMA' ? 'selected' : ''}}>GADA UTAMA</option>
@@ -183,14 +199,14 @@
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label">Status Pernikahan</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="status_pernikahan" required>
+                    <select class="form-control" data-width="100%" name="status_pernikahan" required>
                         <option value="Married" {{$employee->status_pernikahan == 'Married' ? 'selected' : ''}}>Married</option>
                         <option value="Single" {{$employee->status_pernikahan == 'Single' ? 'selected' : ''}}>Single</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Jumlah Tanggungan</label>
-                    <select class="js-example-basic-single form-select" data-width="100%" name="tanggungan" required>
+                    <select class="form-control" data-width="100%" name="tanggungan" required>
                         <option value="0" {{$employee->tanggungan == '0' ? 'selected' : ''}}>0</option>
                         <option value="1" {{$employee->tanggungan == '1' ? 'selected' : ''}}>1</option>
                         <option value="2" {{$employee->tanggungan == '2' ? 'selected' : ''}}>2</option>
@@ -353,7 +369,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Jenis Kelamin</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="jenis_kelamin">
+                            <select class="form-control" data-width="100%" name="jenis_kelamin">
                                 <option value="Laki-Laki" {{$employee->jenis_kelamin == 'Laki-Laki' ? 'selected' : ''}}>Laki-Laki</option>
                                 <option value="Perempuan" {{$employee->jenis_kelamin == 'Perempuan' ? 'selected' : ''}}>Perempuan</option>
                             </select>
@@ -372,14 +388,14 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label class="form-label">Status Kontrak</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="status_kontrak">
+                            <select class="form-control" data-width="100%" name="status_kontrak">
                                 <option value="Contract" {{$employee->status_kontrak == 'Contract' ? 'selected' : ''}}>Kontrak</option>
                                 <option value="Permanent" {{$employee->status_kontrak == 'Permanent' ? 'selected' : ''}}>Tetap</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Organisasi</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="organisasi">
+                            <select class="form-control" data-width="100%" name="organisasi">
                                 <option value="Management Leaders" {{$employee->organisasi == 'Management Leaders' ? 'selected' : ''}}>Management Leaders</option>
                                 <option value="FRONTLINE OFFICER" {{$employee->organisasi == 'FRONTLINE OFFICER' ? 'selected' : ''}}>Frontline Officer</option>
                             </select>
@@ -412,14 +428,14 @@
                     <div class="row">
                         <div class="col mb-3">
                             <label class="form-label">Status Pernikahan</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="status_pernikahan">
+                            <select class="form-control" data-width="100%" name="status_pernikahan">
                                 <option value="Married" {{$employee->status_pernikahan == 'Married' ? 'selected' : ''}}>Married</option>
                                 <option value="Single" {{$employee->status_pernikahan == 'Single' ? 'selected' : ''}}>Single</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Jumlah Tanggungan</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="tanggungan">
+                            <select class="form-control" data-width="100%" name="tanggungan">
                                 <option value="0" {{$employee->tanggungan == '0' ? 'selected' : ''}}>0</option>
                                 <option value="1" {{$employee->tanggungan == '1' ? 'selected' : ''}}>1</option>
                                 <option value="2" {{$employee->tanggungan == '2' ? 'selected' : ''}}>2</option>

@@ -404,6 +404,14 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
                 Route::post('/update-status-faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateStatusFaktor'])->name('update-active-faktor');
             });
     });
+
+    // Company Setting
+    Route::group(['prefix' => 'company-setting'], function(){
+        Route::get('/golongan', [App\Http\Controllers\Setting\SettingController::class, 'IndexGolongan'])->name('golongan.index');
+        Route::post('/save-golongan', [App\Http\Controllers\Setting\SettingController::class, 'StoreGolongan'])->name('golongan.store');
+        Route::put('/update-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'UpdateGolongan'])->name('golongan.update');
+        Route::delete('/delete-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'DeleteGolongan'])->name('golongan.delete');
+    });
 });
 
 Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');

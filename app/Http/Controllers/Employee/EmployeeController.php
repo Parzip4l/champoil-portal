@@ -147,7 +147,6 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         try{
-dd($request->all());
             $code = Auth::user()->employee_code;
             $company = Employee::where('nik', $code)->first();
 

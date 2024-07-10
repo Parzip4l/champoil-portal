@@ -38,7 +38,7 @@
                             <div class="card-body">
                                 <a href="{{ route('kategori-pa.setting') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
-                                        <i data-feather="file"></i> 
+                                        <i data-feather="settings"></i> 
                                     </div>
                                     <div class="title-menu">
                                         <h6>Kategori Settings</h6>
@@ -52,7 +52,7 @@
                             <div class="card-body">
                                 <a href="{{ route('predikat-pa.setting') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
-                                        <i data-feather="file"></i> 
+                                        <i data-feather="settings"></i> 
                                     </div>
                                     <div class="title-menu">
                                         <h6>Predikat Settings</h6>

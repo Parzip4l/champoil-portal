@@ -111,7 +111,7 @@
                         <label for="Name" class="form-label">Kategori</label>
                         <select name="kategori" class="form-control" id="" required>
                             @foreach($kategori as $data)
-                                <option value="{{$data->name}}">{{$data->name}}</option>
+                                <option value="{{$data->name}}">{{$data->name}} ({{$data->level}})</option>
                             @endforeach
                         </select>
                     </div>

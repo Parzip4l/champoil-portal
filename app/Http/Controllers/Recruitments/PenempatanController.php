@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Setting\Golongan\GolonganModel;
 
 class PenempatanController extends Controller
 {
@@ -94,6 +95,7 @@ class PenempatanController extends Controller
         $data['divisi'] = Divisi::where('company', $company->unit_bisnis)->get();
         $data['organisasi'] = Organisasi::where('company', $company->unit_bisnis)->get();
         $data['project'] = Project::all();
+        $data['golongan'] = GolonganModel::where('company', $company->unit_bisnis)->get();
         return view('pages.recruitments.penempatan.create',$data);
     }
 

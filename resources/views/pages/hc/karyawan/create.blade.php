@@ -128,7 +128,7 @@
                             </select>
                         </div>
                         <div class="col">
-                            <label class="form-label">Organisasi</label>
+                            <label class="form-label">Golongan</label>
                             <select class="form-select" data-width="100%" name="level">
                                 @foreach($golongan as $dataGolongan)
                                     <option value="{{$dataGolongan->name}}">{{$dataGolongan->name}}</option>

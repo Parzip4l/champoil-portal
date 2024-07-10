@@ -566,7 +566,7 @@ Password: ".$request->password;
                 "join_date"=>$contact->joindate,
                 "meta_karyawan"=>json_encode($contact),
                 "created_at"=>date('Y-m-d H:i:s'),
-                "unis_bisnis"=>$contact->unit_bisnis
+                "unit_bisnis"=>$contact->unit_bisnis
             ];
             $insert_resign = EmployeeResign::insertGetId($data);
             if($insert_resign){

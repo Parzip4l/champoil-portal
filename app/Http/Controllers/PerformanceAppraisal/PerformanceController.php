@@ -285,6 +285,7 @@ class PerformanceController extends Controller
         $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
         ->where('resign_status',0)
         ->where('organisasi', 'Management Leaders')
+        ->where('manager', $company->nama)
         ->get();
         return view('pages.hc.pa.create', compact('faktor','employee','kategoriPa','totalKategori'));
     }

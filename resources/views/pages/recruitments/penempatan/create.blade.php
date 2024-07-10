@@ -119,6 +119,14 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col">
+                            <label class="form-label">Golongan</label>
+                            <select class="form-select" data-width="100%" name="level">
+                                @foreach($golongan as $dataGolongan)
+                                    <option value="{{$dataGolongan->name}}">{{$dataGolongan->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col">

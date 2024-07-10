@@ -183,8 +183,8 @@ class EmployeeController extends Controller
             $data->tanggungan = $request->tanggungan;
             $data->tax_code = $request->tax_code;
             $data->unit_bisnis = $company->unit_bisnis;
-            $employee->golongan = $request->level;
-            $employee->manager = $request->manager;
+            $data->golongan = $request->level;
+            $data->manager = $request->manager;
             $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
             if ($request->hasFile('gambar')) {

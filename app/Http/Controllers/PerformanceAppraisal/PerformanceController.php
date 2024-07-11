@@ -202,6 +202,27 @@ class PerformanceController extends Controller
         }
     }
 
+    public function duplicateFaktor($id)
+    {
+        // Temukan data asli berdasarkan ID
+        $originalData = FaktorModel::find($id);
+
+        if (!$originalData) {
+            return redirect()->back()->with('error', 'Data tidak ditemukan');
+        }
+
+        try {
+            // Duplikasi data
+            $newData = $originalData->replicate();
+            $newData->name = $originalData->name . ' (Copy)';
+            $newData->save();
+
+            return redirect()->route('faktor-pa.setting')->with('success', 'Faktor Data berhasil diduplikasi');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
     public function updateFaktor(Request $request, $id)
     {
         $code = Auth::user()->employee_code;

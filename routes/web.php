@@ -403,7 +403,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
                 Route::post('/faktor', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'storeFaktor'])->name('faktor-pa.store');
                 Route::put('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateFaktor'])->name('faktor-pa.update');
                 Route::delete('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deleteFaktor'])->name('faktor-pa.destroy');
-                
+                Route::get('/duplikat-faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'duplicateFaktor'])->name('faktor-pa.duplikat');
             });
     });
 

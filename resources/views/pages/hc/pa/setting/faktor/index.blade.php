@@ -69,6 +69,7 @@
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ModalFaktor{{$data->id}}"><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                                        <a class="dropdown-item d-flex align-items-center" href="{{route('faktor-pa.duplikat', $data->id)}}"><i data-feather="copy" class="icon-sm me-2"></i> <span class="">Duplikat</span></a>
                                         <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                             @csrf @method('DELETE') 
                                             <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
@@ -207,7 +208,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('kategori-pa.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('faktor-pa.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

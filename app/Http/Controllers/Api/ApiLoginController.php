@@ -984,75 +984,54 @@ class ApiLoginController extends Controller
 
                 // Cek Button
                 if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
-                
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $yesterday)
                         ->first();
-
-                    if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
+                
+                    if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
                         $alreadyClockIn = true;
-                        $logs = Absen::where('user_id', $user->employee_code)
-                                ->whereDate('tanggal', $yesterday)
-                                ->get();
-
-                        if ($logs->isEmpty()) {
-                            // Jika belum ada log absen, set tombol ke clock in
+                        $logsYesterday = Absen::where('user_id', $user->employee_code)
+                            ->whereDate('tanggal', $yesterday)
+                            ->get();
+                
+                        if ($logsYesterday->isEmpty()) {
+                            // Jika belum ada log absen kemarin, set tombol ke clock in
                             $alreadyClockIn = false;
                             $alreadyClockOut = false;
                         } else {
-                            // Jika sudah ada log absen, cek apakah yang terakhir adalah clock in atau clock out
-                            $lastLog = $logs->last();
+                            // Jika sudah ada log absen kemarin, cek apakah yang terakhir adalah clock in atau clock out
+                            $lastLogYesterday = $logsYesterday->last();
                             $now = now();
                             $isTenAM = $now->hour === 10 && $now->minute === 00;
-                            if ($lastLog->clock_out === null) {
+                
+                            if ($lastLogYesterday->clock_out === null) {
                                 // Jika yang terakhir adalah clock in, set tombol ke clock out
                                 $alreadyClockIn = true;
                                 $alreadyClockOut = false;
-                                if ($isTenAM && !$alreadyClockOut) {
+                                if ($isTenAM) {
                                     $alreadyClockIn = false;
                                 }
                             } else {
                                 // Jika yang terakhir adalah clock out, set tombol ke clock in
                                 $alreadyClockIn = false;
                                 $alreadyClockOut = false;
-                                
-                                $today = Carbon::today();
-                                $logs = Absen::where('user_id', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->get();
-                                
-                                
-                                $logsHarinini = Absen::where('user_id', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->first();
-                                
-                                if ($logsHarinini !== null) {
-                                    if ($logsHarinini->clock_in !== null) {
-                                        $alreadyClockIn = true;
-                                        $logs = Absen::where('user_id', $user->employee_code)
-                                            ->whereDate('tanggal', $today)
-                                            ->get();
-                                    } else {
-                                        $alreadyClockIn = false;
-                                        $alreadyClockOut = false;
-                                        $logs = Absen::where('user_id', $user->employee_code)
-                                            ->whereDate('tanggal', $today)
-                                            ->get();
-                                    }
-                                } else {
-                                    // Handle ketika $logsHarinini adalah null, misalnya memberikan pesan atau tindakan lainnya
-                                    $alreadyClockIn = false;
-                                    $alreadyClockOut = false;
-                                    $logs = collect(); // Menggunakan koleksi kosong untuk menghindari error jika dibutuhkan
-                                }
-                                
+                            }
+                        }
+                
+                        // Mengecek log hari ini
+                        $logsHariIni = Absen::where('user_id', $user->employee_code)
+                            ->whereDate('tanggal', Carbon::today())
+                            ->get();
+                
+                        if ($logsHariIni->isNotEmpty()) {
+                            $logPertamaHariIni = $logsHariIni->first();
+                            if ($logPertamaHariIni->clock_in !== null) {
+                                $alreadyClockIn = true;
                             }
                         }
                     }
-                    
                 }
                 
-
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda
                 $hour = date('H'); // Ambil jam saat ini

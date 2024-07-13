@@ -38,6 +38,7 @@ class RequestControllers extends Controller
                                         ->where('requests_attendence.aprrove_status','Pending')
                                         ->select('requests_attendence.*')
                                         ->orderBy('requests_attendence.tanggal', 'desc')
+                                        ->limit(500)
                                         ->get();
         }else{
             $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')

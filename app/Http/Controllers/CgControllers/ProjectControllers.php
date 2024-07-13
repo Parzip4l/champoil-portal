@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Employee;
 
+
 class ProjectControllers extends Controller
 {
     /**
@@ -112,9 +113,11 @@ class ProjectControllers extends Controller
      */
     public function show($id)
     {
+        $employee = Auth::user();
         // Mengambil data proyek berdasarkan project_code
         $project = Project::where('id', $id)->first();  // Ubah sesuai dengan model dan kolom yang benar
-
+        $atasan = Employee::where('unit_bisnis',$employee->company)->where('resign_status',0)->get();
+        
         if (!$project) {
             return abort(404); // Handle jika proyek tidak ditemukan
         }
@@ -122,7 +125,7 @@ class ProjectControllers extends Controller
         // Mengambil detail proyek berdasarkan project_code
         $projectDetails = ProjectDetails::where('project_code', $project->id)->get();
 
-        return view('pages.hc.kas.project.details', compact('project', 'projectDetails'));
+        return view('pages.hc.kas.project.details', compact('project', 'projectDetails','atasan'));
     }
 
     /**
@@ -152,6 +155,8 @@ class ProjectControllers extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        // dd($request->input('leader_pic'));
         try {
             $Project = Project::findOrFail($id);
             $Project->update([
@@ -161,6 +166,7 @@ class ProjectControllers extends Controller
                 'contract_start' => $request->input('contract_start'),
                 'end_contract' => $request->input('end_contract'),
                 'badan' => $request->input('badan'),
+                'leader_pic' => $request->input('leader_pic'),
             ]);
         
             return redirect()->back()->with('success', 'Data updated successfully');

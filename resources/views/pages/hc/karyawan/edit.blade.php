@@ -506,41 +506,7 @@
                             Show Password
                         </label>
                     </div>
-                    <div class="col-md-12 mb-2">
-                        <label class="form-label">Permission</label>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access" {{ in_array('dashboard_access', $employee->permissions) ? 'checked' : '' }}>
-                                    <label class="form-check-label">User</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access" {{ in_array('hr_access', $employee->permissions) ? 'checked' : '' }}>
-                                    <label class="form-check-label">HR</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access" {{ in_array('superadmin_access', $employee->permissions) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Super Admin</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access" {{ in_array('am_access', $employee->permissions) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Area Manager</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access" {{ in_array('pic_access', $employee->permissions) ? 'checked' : '' }}>
-                                    <label class="form-check-label">PIC Project</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   
                     @endif
                     <button class="btn btn-primary w-100 button-biru" type="submit">Update Data</button>
                 </form>

@@ -10,6 +10,8 @@ use App\ModelCG\Patroli;
 use App\ModelCG\Absen;
 use App\ModelCG\Temuan;
 use App\Employee;
+use App\ModelCG\Project;
+use PDF;
 use Illuminate\Support\Facades\Auth;
 
 class PatroliController extends Controller
@@ -153,6 +155,42 @@ class PatroliController extends Controller
         $distance = round($earthRadius * $c); 
 
         return $distance;
+    }
+
+    public function download_report(Request $request){
+        set_time_limit(300);
+        $data['project'] = Project::find($request->input('project_id'));
+
+        $explode = explode('-',$request->input('periode'));
+        
+        $data['kalender'] = tanggal_bulan($explode[1],date('m',strtotime($explode[0])));
+        $data['task']=Task::where('project_id',$request->input('project_id'))->get();
+       
+        if($data['kalender']){
+            foreach($data['kalender'] as $tgl){
+                if($data['task']){
+                    foreach($data['task'] as $row){
+                        $row->list=List_task::where('id_master',$row->id)->get();
+                        $row->count=List_task::where('id_master',$row->id)->count();
+                        if($row->list){
+                            foreach($row->list as $row2){
+                                $row2->detail = Patroli::where('id_task',$row->id)->whereDate('created_at', $tgl)->get();
+                                $row2->detail_count = Patroli::where('id_task',$row->id)->whereDate('created_at', $tgl)->count();
+                                $row->count2 = ($row->count*2)+1;
+                            }
+                        }
+                    }
+                }
+
+                // $pdf = PDF::loadView('pages.operational.patroli.download_pdf',$data)
+                //   ->setPaper('a4', 'landscape');
+                // $filePath = storage_path('app/public/reports/report_patroli_' . $data['project']->name . '.pdf');
+                // $pdf->save($filePath);
+            }
+        }
+
+        return response()->json($data);
+        
     }
 }
 

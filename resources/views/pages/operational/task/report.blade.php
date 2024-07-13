@@ -82,13 +82,22 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">{{ @$detail_project->name }}</h6>
+                <h6 class="card-title">
+                    {{ @$detail_project->name }}
+                </h6>
                 <div class="table-responsive">
+                <a href="javascript:void(0)" 
+                   class="btn btn-outline-danger btn-xs mb-3"
+                   id="download"
+                   style="float:right">
+                   <i class="link-icon" data-feather="file-text"></i> Export Pdf
+                </a> 
                     <table id="dataTableExample" class="table table-bordered table-responsive">
                         <thead>
                             <tr>
                                 <th colspan="17" class="text-center">
                                     {{ @$detail_project->name }}
+                                    
                                 </th>
                             </tr>
                             <tr>
@@ -225,22 +234,42 @@
         });
     }
 
+
+
     // Initialize the FullCalendar
     $(document).ready(function() {
-        var calendarEl = document.getElementById('fullcalendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            // Configuration options for FullCalendar
-            headerToolbar: {
-                left: "prev,today,next",
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-            },
-            initialView: 'dayGridMonth',
-            timeZone: 'UTC',
-            events: [] // Your events data here
-        });
 
-        calendar.render();
+
+
+        $('#download').click(function () {
+            // alert('ok');
+            var project_id = "{{$_GET['project_id']}}"; // Set your project ID here
+            var periode = "{{$_GET['periode']}}";; // Set your date here
+
+            // Get CSRF token
+            var token = $('meta[name="csrf-token"]').attr('content');
+
+            // AJAX request to generate and save the PDF
+            $.ajax({
+                url: "api/v1/download-report",
+                type: 'POST',
+                data: {
+                    _token: token,
+                    periode: periode,
+                    project_id: project_id
+                },
+                success: function (response) {
+                    // if (response.path) {
+                    //     window.location.href = response.path; // Redirect to the saved PDF
+                    // } else {
+                    //     alert('Failed to generate PDF');
+                    // }
+                },
+                error: function () {
+                    // alert('Error occurred while generating PDF');
+                }
+            });
+        });
     });
 </script>
 @endpush

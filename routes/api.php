@@ -96,6 +96,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/patroli-detail/{id}', [PatroliController::class, 'detail']);
     Route::get('/patroli-list', [PatroliController::class, 'list']);
 
+    Route::post('/download-report', [PatroliController::class, 'download_report']);
+
 
 
     Route::get('/patroli-report', [TaskController::class, 'report_patroli']);

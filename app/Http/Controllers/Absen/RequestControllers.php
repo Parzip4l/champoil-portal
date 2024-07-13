@@ -28,13 +28,26 @@ class RequestControllers extends Controller
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
         $company = Employee::where('nik', $EmployeeCode)->first();
-
-        $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+        
+        if($company->organisasi == 'Frontline Officer' || $company->organisasi =='FRONTLINE OFFICER'){
+            $get_project = Schedule::where('employee',$EmployeeCode)->first();
+            $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+                                        ->join('schedules', 'schedules.employee', '=', 'requests_attendence.employee')
+                                        ->where('schedules.project',$get_project->project)
+                                        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                        ->where('requests_attendence.aprrove_status','Pending')
+                                        ->select('requests_attendence.*')
+                                        ->orderBy('requests_attendence.tanggal', 'desc')
+                                        ->get();
+        }else{
+            $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                ->select('requests_attendence.*')
                                ->orderBy('requests_attendence.tanggal', 'desc')
                                ->limit(50)
                                ->get();
+        }
+        
 
         return view('pages.absen.request.index', compact('dataRequest'));
     }

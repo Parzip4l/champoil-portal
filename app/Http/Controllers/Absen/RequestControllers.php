@@ -35,6 +35,7 @@ class RequestControllers extends Controller
                                         ->join('schedules', 'schedules.employee', '=', 'requests_attendence.employee')
                                         ->where('schedules.project',$get_project->project)
                                         ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                        ->whereDate('requests_attendence.created_at','>','2024-06-20')
                                         ->where('requests_attendence.aprrove_status','Pending')
                                         ->select('requests_attendence.*')
                                         ->orderBy('requests_attendence.tanggal', 'desc')

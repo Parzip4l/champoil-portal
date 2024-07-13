@@ -11,6 +11,7 @@ use App\ModelCG\ScheduleBackup;
 use App\Absen;
 use App\Employee;
 use Carbon\Carbon;
+use App\Absen\RequestAbsen;
 
 
 class ReportController extends Controller
@@ -62,6 +63,12 @@ class ReportController extends Controller
                                     ->whereNotNull('clock_in')
                                     ->whereNull('clock_out')
                                     ->count();
+                $row->need_approval = RequestAbsen::where('project',$row->id)
+                                                    ->where('aprrove_status','Pending')
+                                                    ->count();
+                $row->approved = RequestAbsen::where('project',$row->id)
+                                                    ->where('aprrove_status','Approved')
+                                                    ->count();
 
                 // Persentase Tanpa Clockout
                 if ($row->absen > 0) {

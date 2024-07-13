@@ -63,6 +63,9 @@
                     <th>Total Schedule Backup</th>
                     <th>Total Absensi</th>
                     <th>Persentase</th>
+                    <th>Leader PIC</th>
+                    <th>Need Approval</th>
+                    <th>Approved</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -94,6 +97,9 @@
                                 <td>{{ $row->schedule_backup }}</td>
                                 <td>{{ $row->absen_backup }}</td>
                                 <td>{{ $row->persentase_backup }} %</td>
+                                <td>{{ @karyawan_bynik($row->leader_pic)->nama }}</td>
+                                <td>{{ $row->need_approval }}</td>
+                                <td>{{ $row->approved }}</td>
                             </tr>
                             @php
                                 $total_schedule +=$row->schedule;
@@ -125,6 +131,7 @@
                             <td>{{ $schedule_backup }}</td>
                             <td>{{ $absen_backup }}</td>
                             <td>{{ $percent_backup }} %</td>
+                            
                         </tr>
 
                     @endif

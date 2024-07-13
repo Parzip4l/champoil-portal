@@ -63,12 +63,18 @@ class ReportController extends Controller
                                     ->whereNotNull('clock_in')
                                     ->whereNull('clock_out')
                                     ->count();
-                $row->need_approval = RequestAbsen::where('project',$row->id)
-                                                    ->where('aprrove_status','Pending')
+                $row->need_approval = Schedule::join('requests_attendence','requests_attendence.employee','=','schedules.employee')
+                                                    ->where('schedules.project',$row->id)
+                                                    ->whereBetween('schedules.tanggal', [$start, $end])
+                                                    ->whereBetween('requests_attendence.tanggal', [$start, $end])
+                                                    ->where('requests_attendence.aprrove_status','Pending')
                                                     ->count();
-                $row->approved = RequestAbsen::where('project',$row->id)
-                                                    ->where('aprrove_status','Approved')
-                                                    ->count();
+                $row->approved = Schedule::join('requests_attendence','requests_attendence.employee','=','schedules.employee')
+                                            ->where('schedules.project',$row->id)
+                                            ->whereBetween('schedules.tanggal', [$start, $end])
+                                            ->whereBetween('requests_attendence.tanggal', [$start, $end])
+                                            ->where('requests_attendence.aprrove_status','Approved')
+                                            ->count();
 
                 // Persentase Tanpa Clockout
                 if ($row->absen > 0) {

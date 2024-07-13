@@ -33,7 +33,14 @@
                                     <option value="">Periode</option>
                                     @if(bulan())
                                         @foreach(bulan() as $key=>$value)
-                                            <option value="{{ strtoupper($value).'-'.date('Y') }}">{{ $value }}</option>
+                                            @php 
+                                                $checked="";
+                                                if(strtoupper($value).'-'.date('Y') == $_GET['periode']){
+                                                    $checked= 'selected';
+                                                }
+                                            @endphp
+                                                
+                                            <option value="{{ strtoupper($value).'-'.date('Y') }}" {{$checked}}>{{ $value }}</option>
                                         @endforeach
                                     @endif
                                 </select>

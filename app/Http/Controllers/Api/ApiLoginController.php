@@ -1199,9 +1199,8 @@ class ApiLoginController extends Controller
                                             ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                             ->whereDate('requests_attendence.created_at','>','2024-06-20')
                                             ->where('requests_attendence.aprrove_status','Pending')
-                                            ->select('requests_attendence.*')
+                                            ->select('requests_attendence.*','karyawan.nama')
                                             ->orderBy('requests_attendence.tanggal', 'desc')
-                                            ->limit(500)
                                             ->get();
                 $requestAbsen=[];
                 if($request_absen){

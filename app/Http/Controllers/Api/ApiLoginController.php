@@ -1191,12 +1191,45 @@ class ApiLoginController extends Controller
 
             $employeeCode = $user->name;
             $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
+            $company = Employee::where('nik', $employeeCode)->first();
 
-            $requestAbsen = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
-                ->where('requests_attendence.aprrove_status', 'Pending')
-                ->where('karyawan.unit_bisnis', $unitBisnis)
-                ->select('requests_attendence.*', 'karyawan.nama', 'karyawan.unit_bisnis')
-                ->get();
+            if($company->organisasi == 'Frontline Officer' || $company->organisasi =='FRONTLINE OFFICER'){
+                $get_project = Schedule::where('employee',$employeeCode)->first();
+                $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+                                            ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                            ->whereDate('requests_attendence.created_at','>','2024-06-20')
+                                            ->where('requests_attendence.aprrove_status','Pending')
+                                            ->select('requests_attendence.*')
+                                            ->orderBy('requests_attendence.tanggal', 'desc')
+                                            ->limit(500)
+                                            ->get();
+                $requestAbsen=[];
+                if($request_absen){
+                    foreach($request_absen as $row){
+                        $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20')
+                                ->where('project',$get_project->project)
+                                ->where('employee',$row->employee)
+                                ->count();
+                        if($cek > 0){
+                            $requestAbsen[]=$row;
+                        }
+                    }
+                    
+                }
+            }else{
+                $requestAbsen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+                                   ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                   ->select('requests_attendence.*')
+                                   ->orderBy('requests_attendence.tanggal', 'desc')
+                                   ->limit(50)
+                                   ->get();
+            }
+
+            // $requestAbsen = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
+            //     ->where('requests_attendence.aprrove_status', 'Pending')
+            //     ->where('karyawan.unit_bisnis', $unitBisnis)
+            //     ->select('requests_attendence.*', 'karyawan.nama', 'karyawan.unit_bisnis')
+            //     ->get();
 
             return response()->json(['dataRequest' => $requestAbsen], 200);
         } catch (\Exception $e) {

@@ -301,6 +301,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('project', App\Http\Controllers\CgControllers\ProjectControllers::class);
         Route::resource('project-details', App\Http\Controllers\CgControllers\ProjectDetailsController::class);
         Route::post('/import-excel', [App\Http\Controllers\CgControllers\ProjectDetailsController::class, 'importExcel'])->name('import.excel');
+        
 
         Route::resource('shift', App\Http\Controllers\CgControllers\ShiftControllers::class);
         Route::resource('schedule', App\Http\Controllers\CgControllers\ScheduleControllers::class);
@@ -309,7 +310,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('/get-employees/{projectId}',[ App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getManPower']);
         Route::post('/import-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'importSchedule'])->name('import.schedule');
         Route::get('export-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'exportSchedule'])->name('export.schedule');
-
+        Route::post('/read-excel', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'readExcel'])->name('read.excel');
+        Route::post('/post-data-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'post_data_schedule'])->name('post-data-schedule');
         // Schedule Details
         Route::get('/scheduleData/details/{project}/{periode}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetails'])->name('schedule.details');
         Route::get('/schedule/details/{project}/{periode}/{employee}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetailsEmployee'])->name('schedule.employee');

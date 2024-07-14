@@ -31,9 +31,7 @@ class RequestControllers extends Controller
         
         if($company->organisasi == 'Frontline Officer' || $company->organisasi =='FRONTLINE OFFICER'){
             $get_project = Schedule::where('employee',$EmployeeCode)->first();
-            $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
-                                        ->join('schedules', 'schedules.employee', '=', 'requests_attendence.employee')
-                                        ->where('schedules.project',$get_project->project)
+            $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                         ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                         ->whereDate('requests_attendence.created_at','>','2024-06-20')
                                         ->where('requests_attendence.aprrove_status','Pending')
@@ -41,6 +39,19 @@ class RequestControllers extends Controller
                                         ->orderBy('requests_attendence.tanggal', 'desc')
                                         ->limit(500)
                                         ->get();
+            $dataRequest=[];
+            if($request_absen){
+                foreach($request_absen as $row){
+                    $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20')
+                            ->where('project',$get_project->project)
+                            ->where('employee',$row->employee)
+                            ->count();
+                    if($cek > 0){
+                        $dataRequest[]=$row;
+                    }
+                }
+                
+            }
         }else{
             $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                ->where('karyawan.unit_bisnis', $company->unit_bisnis)

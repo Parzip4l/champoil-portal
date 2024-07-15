@@ -15,8 +15,6 @@ use App\Imports\ScheduleImport;
 use App\Exports\ScheduleExport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ScheduleControllers extends Controller
 {
@@ -126,57 +124,6 @@ class ScheduleControllers extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
         }
-    }
-
-    public function readExcel(Request $request){
-        
-       
-            $request->validate([
-                'csv_file' => 'required|mimes:xlsx,csv,txt',
-            ]);
-            $data = $request->file('csv_file');
-
-            $namaFIle = $data->getClientOriginalName();
-            $data->move('ScheduleImport', $namaFIle);
-
-
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(public_path('ScheduleImport/'.$namaFIle));
-            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-            $periode = Carbon::now()->addMonth()->format('F-Y');
-            $data = [
-                'records' => $sheetData,
-                'file_name' => $namaFIle,
-                'periode'=>$periode
-            ];
-            return view('pages.hc.kas.schedule.preview',$data);
-        
-    }
-
-    public function post_data_schedule(Request $request){
-        
-            $data=$request->all();
-            if(!empty($data['schedule_code'])){
-                $no=0;
-                foreach($data['schedule_code'] as $row){
-                    $insert=[
-                        "schedule_code"=>$data['schedule_code'][$no],
-                        "project"=>$data['project'][$no],
-                        "employee"=>$data['employee'][$no],
-                        "tanggal"=>$data['tanggal'][$no],
-                        "shift"=>$data['shift'][$no],
-                        "periode"=>$data['periode'][$no],
-                        "created_at"=>date('Y-m-d H:i:s')
-                    ];
-
-                    
-                    // Schedule::insert($insert);
-                    $no++;
-                }
-            }
-            dd($data);
-            return redirect()->route('schedule.index')->with('success', 'Import berhasil!');
-       
-        
     }
 
     public function exportSchedule() 

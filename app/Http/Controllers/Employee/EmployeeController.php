@@ -338,7 +338,7 @@ Password: ".$request->password;
         }
 
         $golongan = GolonganModel::where('company', $employee->unit_bisnis)->get();
-        $atasan = Employee::where('unit_bisnis',$employee->unit_bisnis)->where('resign_status',0)->where('organisasi', 'Management Leaders')->get();
+        $atasan = Employee::where('unit_bisnis',$employee->unit_bisnis)->where('resign_status',0)->get();
 
         $divisi = Divisi::where('company', $employee->unit_bisnis)->get();
         $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();

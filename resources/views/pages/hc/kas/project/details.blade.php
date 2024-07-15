@@ -111,6 +111,16 @@
                                             <input type="date" name="end_contract" class="form-control" value="{{$project->end_contract}}" required>
                                         </div>
 
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Leader PIC</label>
+                                            <select name="leader_pic" class="form-control select2" id="" required>
+                                                @foreach($atasan as $dataAtasan)
+                                                    <option value="{{$dataAtasan->nik}}">{{$dataAtasan->nama}}</option>
+                                                @endforeach
+                                            </select>
+                                                
+                                        </div>
+
                                         <button type="submit" class="btn btn-primary w-100">Update Data Project</button>
                                     </form>
                                 </div>

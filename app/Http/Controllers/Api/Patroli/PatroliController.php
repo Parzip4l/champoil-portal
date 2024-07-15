@@ -23,6 +23,10 @@ use App\ModelCG\Temuan;
 use App\ModelCG\Status_patrol;
 use App\ModelCG\Schedule;
 use App\Employee;
+use App\ModelCG\Project;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Storage;
 
 class PatroliController extends Controller
 {
@@ -163,19 +167,24 @@ class PatroliController extends Controller
                 Patroli::insert($insert);
                 $no++;
             }
+
+            $error=false;
+            $status=true;
+            $msg="Patroli Berhasil Dilakukan";
         } else {
-            return response()->json(['status' => false, 'message' => 'No task IDs provided.'], 400);
+            // return response()->json(['status' => false, 'message' => 'No task IDs provided.'], 400);
+            $error=true;
+            $status=false;
+            $msg="Patroli Gagal Dilakukan";
         }
     
         $return = [
-            "status" => true,
-            "message" => "Patroli Berhasil di Simpan"
+            "status" => $status,
+            "message" => $msg
         ];
     
         return response()->json($return);
     }
-
-
 
     public function report_patrol(Request $request){
         $tanggal=$request->input('tanggal');
@@ -222,4 +231,90 @@ class PatroliController extends Controller
 
         return response()->json($return);
     }
+
+    public function download_report(Request $request){
+        // Initialize PhpSpreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // Example data initialization (replace with your actual data fetching logic)
+        $project = Project::find($request->input('project_id'));
+        $explode = explode('-', $request->input('periode'));
+        $kalender = tanggal_bulan($explode[1], date('m', strtotime($explode[0])));
+        $tasks = Task::where('project_id', $request->input('project_id'))->get();
+    
+        // Set header styles
+        $sheet->getStyle('A1:H1')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+    
+        // Output project name
+        $sheet->setCellValue('A1', $project->name);
+        $sheet->mergeCells('A1:H1');
+    
+        // Set table headers
+        $sheet->setCellValue('A2', 'No');
+        $sheet->setCellValue('B2', 'Task');
+        
+    
+        // Example data writing
+        $rowNumber = 3;
+        $no = 1;
+        foreach ($kalender as $tgl) {
+           
+            
+            
+            foreach ($tasks as $row) {
+                $sheet->setCellValue('A' . $rowNumber, $no);
+                $sheet->setCellValue('B' . $rowNumber, $row->judul);
+    
+                if ($row->list) {
+                    $no2 = 1;
+                    foreach ($row->list as $rs) {
+                        $sheet->setCellValue('A' . ($rowNumber + 1), $no . '.' . $no2);
+                        $sheet->setCellValue('B' . ($rowNumber + 1), $rs->task);
+                        $rowNumber++;
+    
+                        if ($rs->detail) {
+                            foreach ($rs->detail as $det) {
+                                $sheet->setCellValue('A' . $rowNumber, ''); // No need for number again
+                                $sheet->setCellValue('B' . $rowNumber, ''); // No need for task again
+                                $sheet->setCellValue('C' . $rowNumber, ''); // No need for date again
+                                $sheet->setCellValue('D' . $rowNumber, date('H:i:s', strtotime($det->created_at)));
+                                $sheet->setCellValue('E' . $rowNumber, 'Status'); // Replace with actual status
+                                $sheet->setCellValue('F' . $rowNumber, 'Keterangan'); // Replace with actual keterangan
+                                $sheet->setCellValue('G' . $rowNumber, 'Foto'); // Replace with actual foto
+                                $sheet->setCellValue('H' . $rowNumber, 'Petugas'); // Replace with actual petugas
+                                $rowNumber++;
+                            }
+                        }
+    
+                        $no2++;
+                    }
+                }
+    
+                
+            }
+            $rowNumber++;
+            $no++;
+        }
+    
+        // Save Excel file
+        $writer = new Xlsx($spreadsheet);
+        Storage::makeDirectory('reports');
+        $fileName = 'project_' . str_replace(' ','_', $project->name) . '_report'.date('ymdhis').'.xlsx'; // Example file name
+        $filePath = storage_path('app/reports/' . $fileName); // Example storage path
+    
+        try {
+            $writer->save($filePath);
+        } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
+            return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
+        }
+    
+        // Return response with file path
+        return response()->json(['message' => 'Excel file saved successfully', 'path' => $filePath]);
+    }
+
+    
 }

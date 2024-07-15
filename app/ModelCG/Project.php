@@ -10,7 +10,7 @@ class Project extends Model
     use HasFactory;
     protected $connection = 'mysql_secondary';
     protected $table = 'projects';
-    protected $fillable = ['id','name','badan', 'latitude', 'longtitude', 'contract_start', 'end_contract','company']; 
+    protected $fillable = ['id','name','badan', 'latitude', 'longtitude', 'contract_start', 'end_contract','company','leader_pic']; 
 
     public function schedules()
     {

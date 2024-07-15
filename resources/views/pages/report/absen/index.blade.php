@@ -33,7 +33,14 @@
                                     <option value="">Periode</option>
                                     @if(bulan())
                                         @foreach(bulan() as $key=>$value)
-                                            <option value="{{ strtoupper($value).'-'.date('Y') }}">{{ $value }}</option>
+                                            @php 
+                                                $checked="";
+                                                if(strtoupper($value).'-'.date('Y') == $_GET['periode']){
+                                                    $checked= 'selected';
+                                                }
+                                            @endphp
+                                                
+                                            <option value="{{ strtoupper($value).'-'.date('Y') }}" {{$checked}}>{{ $value }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -63,6 +70,9 @@
                     <th>Total Schedule Backup</th>
                     <th>Total Absensi</th>
                     <th>Persentase</th>
+                    <th>Leader PIC</th>
+                    <th>Need Approval</th>
+                    <th>Approved</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -94,6 +104,9 @@
                                 <td>{{ $row->schedule_backup }}</td>
                                 <td>{{ $row->absen_backup }}</td>
                                 <td>{{ $row->persentase_backup }} %</td>
+                                <td>{{ @karyawan_bynik($row->leader_pic)->nama }}</td>
+                                <td>{{ $row->need_approval }}</td>
+                                <td>{{ $row->approved }}</td>
                             </tr>
                             @php
                                 $total_schedule +=$row->schedule;
@@ -125,6 +138,7 @@
                             <td>{{ $schedule_backup }}</td>
                             <td>{{ $absen_backup }}</td>
                             <td>{{ $percent_backup }} %</td>
+                            
                         </tr>
 
                     @endif

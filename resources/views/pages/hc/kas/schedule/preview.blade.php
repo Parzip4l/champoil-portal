@@ -95,19 +95,17 @@
             $.each(records, function(index, row) {
                 if (no > 0) {
                     var color = 'red';
-                    if(row.D !== NULL){
-                        if (row.F === periode) {
-                            color = "green";
-                        } else {
-                            $('#data-'+no).css('background-color','red');
-                            messages.push("Nama periode tidak sama, pada baris ke: " + no);
-                        }
-                        if (row.B) {
-                            color = "green";
-                        } else {
-                            $('#data-'+no).css('background-color','red');
-                            messages.push("Nama Project tidak boleh kosong, pada baris ke: " + no);
-                        }
+                    if (row.F === periode) {
+                        color = "green";
+                    } else {
+                        $('#data-'+no).css('background-color','red');
+                        messages.push("Nama periode tidak sama, pada baris ke: " + no);
+                    }
+                    if (row.B) {
+                        color = "green";
+                    } else {
+                        $('#data-'+no).css('background-color','red');
+                        messages.push("Nama Project tidak boleh kosong, pada baris ke: " + no);
                     }
                 }
                 no++;

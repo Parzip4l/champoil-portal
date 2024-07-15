@@ -43,7 +43,7 @@
                                 $msg = [];
                             @endphp
                             @foreach($records as $row)
-                                @if($no > 0)
+                                @if($no > 0 && $row['D'] != NULL)
                                     <input type="hidden" name="schedule_code[]" value="{{$row['A']}}">
                                     <input type="hidden" name="project[]" value="{{$row['B']}}">
                                     <input type="hidden" name="employee[]" value="{{$row['C']}}">

@@ -127,49 +127,41 @@
                         </ul>
                     </div>
                 </li>
-            
             @endif
             @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item nav-category">Payrol</li>
-            <li class="nav-item {{ active_class(['payroll']) }}">
-                <a href="{{ url('/payroll') }}" class="nav-link">
+            <li class="nav-item {{ active_class(['']) }}">
+                <a class="nav-link" data-bs-toggle="collapse" href="#PayrolMaster" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="PayrolMaster">
                     <i class="link-icon" data-feather="dollar-sign"></i>
-                    <span class="link-title">Payrol Data</span>
+                    <span class="link-title">Payrol Master</span>
+                    <i class="link-arrow" data-feather="chevron-down"></i>
                 </a>
-            </li>
-            <li class="nav-item {{ active_class(['payslip']) }}">
-                <a href="{{ url('/payslip') }}" class="nav-link">
-                    <i class="link-icon" data-feather="bar-chart"></i>
-                    <span class="link-title">Payrol History</span>
-                </a>
-            </li>
-            @if($employee && $employee->unit_bisnis == 'CHAMPOIL')
-            <li class="nav-item {{ active_class(['payroll.ns']) }}">
-                <a href="{{ route('payroll.ns') }}" class="nav-link">
-                    <i class="link-icon" data-feather="dollar-sign"></i>
-                    <span class="link-title">Payrol Frontline</span>
-                </a>
-            </li>
-            @endif
-            @if($employee && $employee->unit_bisnis == 'Kas')
-            <li class="nav-item {{ active_class(['payroll-kas.index']) }}">
-                <a href="{{ route('payroll-kas.index') }}" class="nav-link">
-                    <i class="link-icon" data-feather="dollar-sign"></i>
-                    <span class="link-title">Payrol Frontline</span>
-                </a>
-            </li>
-            @endif
-            <li class="nav-item {{ active_class(['payrol-component']) }}">
-                <a href="{{ url('/payrol-component') }}" class="nav-link">
-                    <i class="link-icon" data-feather="user-plus"></i>
-                    <span class="link-title">Assign Component</span>
-                </a>
-            </li>
-            <li class="nav-item {{ active_class(['component-data']) }}">
-                <a href="{{ url('/component-data') }}" class="nav-link">
-                    <i class="link-icon" data-feather="settings"></i>
-                    <span class="link-title">Component Master</span>
-                </a>
+                <div class="collapse {{ show_class(['category']) }}" id="PayrolMaster">
+                    <ul class="nav sub-menu">
+                        <li class="nav-item">
+                            <a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payrol Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payrol History</a>
+                        </li>
+                        @if($employee && $employee->unit_bisnis == 'CHAMPOIL')
+                        <li class="nav-item">
+                            <a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payrol Frontline</a>
+                        </li>
+                        @endif
+                        @if($employee && $employee->unit_bisnis == 'Kas')
+                        <li class="nav-item">
+                            <a href="{{ route('payroll-kas.index') }}" class="nav-link {{ active_class(['payroll-kas.index']) }}">Payrol Frontline</a>
+                        </li>
+                        @endif
+                        <li class="nav-item">
+                            <a href="{{ url('payrol-component') }}" class="nav-link {{ active_class(['payrol-component']) }}">Assign Component</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('component-data') }}" class="nav-link {{ active_class(['component-data']) }}">Component Master</a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             @endif
             @if(in_array('superadmin_access', $dataLogin))
@@ -222,6 +214,39 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ url('logbook-barang') }}" class="nav-link {{ active_class(['logbook-barang']) }}">Barang</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            @endif
+            <!-- Assets Management -->
+            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
+            <li class="nav-item nav-category">Assets Management</li>
+            <li class="nav-item {{ active_class(['']) }}">
+                <a class="nav-link" data-bs-toggle="collapse" href="#AssetManagement" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="AssetManagement">
+                    <i class="link-icon" data-feather="box"></i>
+                    <span class="link-title">Assets Management</span>
+                    <i class="link-arrow" data-feather="chevron-down"></i>
+                </a>
+                <div class="collapse {{ show_class(['category']) }}" id="AssetManagement">
+                    <ul class="nav sub-menu">
+                        <li class="nav-item">
+                            <a href="{{ route('asset.index') }}" class="nav-link {{ active_class(['asset-management/asset']) }}">Asset</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('asset-stock.index') }}" class="nav-link {{ active_class(['asset-management/asset-stock']) }}">Asset Stok</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('asset-category.index') }}" class="nav-link {{ active_class(['asset-management/asset-category']) }}">Asset Kategori</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Vendor Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi Histori</a>
                         </li>
                     </ul>
                 </div>

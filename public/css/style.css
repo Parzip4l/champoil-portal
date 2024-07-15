@@ -201,9 +201,12 @@ a.text-muted.nav-link.active {
     color: #fff;
 }
 
+.text-right {
+    text-align: right!important;
+}
 
 .feedback-button-wrap {
-    position: fixed;
+    position: none;
     bottom: 30%;
     left: 0;
     background: #424874;

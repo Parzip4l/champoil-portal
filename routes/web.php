@@ -407,6 +407,27 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
             });
     });
 
+    // Assets Management
+    Route::group(['prefix' => 'assets-management'], function(){
+        // Asset Master
+        Route::get('/asset', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'IndexAsset'])->name('asset.index');
+        Route::post('/simpan-asset', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StoreAsset'])->name('asset.store');
+        Route::put('/update-asset/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'UpdateAsset'])->name('asset.update');
+        Route::delete('/delete-asset/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'DestroyAsset'])->name('asset.destroy');
+
+        // Asset Stock
+        Route::get('/asset-stock', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockIndex'])->name('asset-stock.index');
+        Route::post('/simpan-asset-stock', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockStore'])->name('asset-stock.store');
+        Route::put('/update-asset-stock/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockUpdate'])->name('asset-stock.update');
+        Route::delete('/delete-asset-stock/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockDestroy'])->name('asset-stock.destroy');
+
+        // Asset Category
+        Route::get('/asset-category', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'IndexCategory'])->name('asset-category.index');
+        Route::post('/simpan-asset-category', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StoreCategory'])->name('asset-category.store');
+        Route::put('/update-asset-category/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'UpdateCategory'])->name('asset-category.update');
+        Route::delete('/delete-asset-category/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'DestroyCategory'])->name('asset-category.destroy');
+    });
+
     // Company Setting
     Route::group(['prefix' => 'company-setting'], function(){
         Route::get('/golongan', [App\Http\Controllers\Setting\SettingController::class, 'IndexGolongan'])->name('golongan.index');

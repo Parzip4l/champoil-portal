@@ -33,10 +33,13 @@
                         </thead>
                         <tbody>
                             @foreach($asset as $data)
+                            @php
+                                $dataCategory = App\AssetManagement\CategoryAsset::where('id', $data->category)->first();
+                            @endphp
                             <tr>
                                 <td>{{$data->unix_code}}</td>
                                 <td>{{$data->name}}</td>
-                                <td>{{$data->category}}</td>
+                                <td>{{$dataCategory->name}}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

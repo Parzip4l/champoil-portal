@@ -13,10 +13,10 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-6 align-self-center">
-                        <h6 class="card-title mb-0">Asset Stok Master</h6>
+                        <h6 class="card-title mb-0">Vendor Master</h6>
                     </div>
                     <div class="col-md-6 align-self-center text-right">
-                        <a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalStockAssets">Create Stok</a>
+                        <a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalStockAssets">Add Vendor</a>
                     </div>      
                 </div>
             </div>
@@ -26,21 +26,17 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Qty</th>
-                                <th>Vendor</th>
+                                <th>Address</th>
+                                <th>Phone</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($assetStock as $data)
-                            @php
-                                $dataAsset = App\AssetManagement\MasterAsset::where('id', $data->asset_id)->first();
-                                $dataVendor = App\AssetManagement\VendorAsset::where('id', $data->vendor_id)->first();
-                            @endphp
+                            @foreach($vendor as $data)
                             <tr>
-                                <td>{{$dataAsset->name}}</td>
-                                <td>{{$data->qty}}</td>
-                                <td>{{$dataVendor->name}}</td>
+                                <td>{{$data->name}}</td>
+                                <td>{{$data->address}}</td>
+                                <td>{{$data->phone}}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -76,33 +72,25 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="ModalStockAssets">Tambah Data Stock Assets</h5>
+                <h5 class="modal-title" id="ModalStockAssets">Add Vendor Data</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('asset-stock.store') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('asset-vendor.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group mb-3">
                         <label for="Judul" class="form-label">Name</label>
-                        <select name="asset_id" id="tujuan" class="form-control" required>
-                            @foreach($assetData as $data)
-                            <option value="{{$data->id}}">{{$data->name}}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" class="form-control" name="name" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="tujuan" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" name="qty" required>
+                        <label for="tujuan" class="form-label">Address</label>
+                        <input type="text" class="form-control" name="address" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="tujuan" class="form-label">Vendor</label>
-                        <select name="vendor_id" id="tujuan" class="form-control" required>
-                            @foreach($vendor as $data)
-                            <option value="{{$data->id}}">{{$data->name}}</option>
-                            @endforeach
-                        </select>
+                        <label for="tujuan" class="form-label">phone</label>
+                        <input type="number" class="form-control" name="phone" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Tambahkan Stock Asset</button>
+                    <button type="submit" class="btn btn-primary w-100">Add Vendor Data</button>
                 </form>
             </div>
         </div>
@@ -110,39 +98,31 @@
 </div>
 
 <!-- Modal Update -->
-@foreach($assetStock as $data)
+@foreach($vendor as $data)
 <div class="modal fade" id="ModalStockAssets{{$data->id}}" tabindex="-1" aria-labelledby="ModalStockAssets" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="ModalStockAssets">Tambah Data Stock Assets</h5>
+                <h5 class="modal-title" id="ModalStockAssets">Update Vendor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('asset-stock.update', $data->id) }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('asset-vendor.update', $data->id) }}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="form-group mb-3">
                         <label for="Judul" class="form-label">Name</label>
-                        <select name="asset_id" id="tujuan" class="form-control" required>
-                            @foreach($assetData as $dataAssets)
-                                <option value="{{$dataAssets->id}}" @if($dataAssets->id == $data->asset_id) selected @endif>{{$dataAssets->name}}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" class="form-control" name="name" value="{{$data->name}}" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="tujuan" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" name="qty" value="{{$data->qty}}" required>
+                        <label for="tujuan" class="form-label">Address</label>
+                        <input type="text" class="form-control" name="address" value="{{$data->address}}" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="tujuan" class="form-label">Vendor</label>
-                        <select name="vendor_id" id="tujuan" class="form-control" required>
-                            @foreach($vendor as $dataVendor)
-                                <option value="{{$dataVendor->id}}" @if($dataVendor->id == $data->vendor_id) selected @endif>{{$dataVendor->name}}</option>
-                            @endforeach
-                        </select>
+                        <label for="tujuan" class="form-label">Phone</label>
+                        <input type="number" class="form-control" name="phone" value="{{$data->phone}}" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Update Stock Asset</button>
+                    <button type="submit" class="btn btn-primary w-100">Update Vendor Data</button>
                 </form>
             </div>
         </div>
@@ -189,7 +169,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('asset-stock.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('asset-vendor.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

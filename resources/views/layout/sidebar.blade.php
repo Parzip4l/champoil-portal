@@ -240,7 +240,7 @@
                             <a href="{{ route('asset-category.index') }}" class="nav-link {{ active_class(['asset-management/asset-category']) }}">Asset Kategori</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Vendor Data</a>
+                            <a href="{{ route('asset-vendor.index') }}" class="nav-link {{ active_class(['asset-management/asset-vendor']) }}">Vendor Data</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi</a>

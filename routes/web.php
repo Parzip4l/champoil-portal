@@ -420,14 +420,20 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Asset Stock
         Route::get('/asset-stock', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockIndex'])->name('asset-stock.index');
         Route::post('/simpan-asset-stock', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockStore'])->name('asset-stock.store');
-        Route::put('/update-asset-stock/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockUpdate'])->name('asset-stock.update');
-        Route::delete('/delete-asset-stock/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StockDestroy'])->name('asset-stock.destroy');
+        Route::put('/update-asset-stock/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'UpdateStock'])->name('asset-stock.update');
+        Route::delete('/delete-asset-stock/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'DestoryStock'])->name('asset-stock.destroy');
 
         // Asset Category
         Route::get('/asset-category', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'IndexCategory'])->name('asset-category.index');
         Route::post('/simpan-asset-category', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'StoreCategory'])->name('asset-category.store');
         Route::put('/update-asset-category/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'UpdateCategory'])->name('asset-category.update');
         Route::delete('/delete-asset-category/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'DestroyCategory'])->name('asset-category.destroy');
+
+        // Vendor Asset
+        Route::get('/asset-vendor', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'IndexVendor'])->name('asset-vendor.index');
+        Route::post('/simpan-asset-vendor', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'VendorStore'])->name('asset-vendor.store');
+        Route::put('/update-asset-vendor/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'UpdateVendor'])->name('asset-vendor.update');
+        Route::delete('/delete-asset-vendor/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'DestroyVendor'])->name('asset-vendor.destroy');
     });
 
     // Company Setting

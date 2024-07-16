@@ -105,8 +105,9 @@ class AllAssetsController extends Controller
 
         $assetStock = StockAsset::where('company', $company->unit_bisnis)->get();
         $assetData = MasterAsset::where('company', $company->unit_bisnis)->get();
+        $vendor = VendorAsset::where('company', $company->unit_bisnis)->get();
 
-        return view('pages.asset-management.stock', compact('assetStock','assetData'));
+        return view('pages.asset-management.stock', compact('assetStock','assetData','vendor'));
     }
 
     public function StockStore(Request $request)
@@ -128,7 +129,7 @@ class AllAssetsController extends Controller
             $stock->company = $company->unit_bisnis;
             $stock->save();
 
-            return redirect()->route('asset-stocks.index')->with('success', 'Stock berhasil dibuat');
+            return redirect()->route('asset-stock.index')->with('success', 'Stock berhasil dibuat');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -149,7 +150,7 @@ class AllAssetsController extends Controller
             $stock->vendor_id = $request->vendor_id;
             $stock->save();
 
-            return redirect()->route('asset-stocks.index')->with('success', 'Stock berhasil diupdate');
+            return redirect()->route('asset-stock.index')->with('success', 'Stock berhasil diupdate');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -159,9 +160,8 @@ class AllAssetsController extends Controller
     {
         try {
             $stock = StockAsset::findOrFail($id);
-            dd($stock);
             $stock->delete();
-            return redirect()->route('asset-stocks.index')->with('success', 'Stock berhasil dihapus');
+            return redirect()->route('asset-stock.index')->with('success', 'Stock berhasil dihapus');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -231,4 +231,71 @@ class AllAssetsController extends Controller
     }
 
     // Asset Category End
+
+    // Vendor Controller Start
+
+    public function IndexVendor()
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $vendor = VendorAsset::where('company', $company->unit_bisnis)->get();
+
+        return view('pages.asset-management.vendor', compact('vendor'));
+    }
+
+    public function VendorStore(Request $request)
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        try {
+            $vendor = new VendorAsset();
+            $vendor->name = $request->name;
+            $vendor->address = $request->address;
+            $vendor->phone = $request->phone;
+            $vendor->company = $company->unit_bisnis;
+            $vendor->save();
+
+            return redirect()->route('asset-vendor.index')->with('success', 'Vendor berhasil dibuat');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function UpdateVendor(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        try {
+            $vendor = VendorAsset::findOrFail($id);
+            $vendor->name = $request->name;
+            $vendor->address = $request->address;
+            $vendor->phone = $request->phone;
+            $vendor->save();
+
+            return redirect()->route('asset-vendor.index')->with('success', 'Vendor berhasil diupdate');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function DestroyVendor($id)
+    {
+        try {
+            $vendor = VendorAsset::findOrFail($id);
+            $vendor->delete();
+            return redirect()->route('asset-vendor.index')->with('success', 'Vendor berhasil dihapus');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // End Vendor
 }

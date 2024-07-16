@@ -214,6 +214,7 @@ a.text-muted.nav-link.active {
     border-radius: 0 5px 5px 0;
     z-index: 999;
     transition: background-color 200ms ease-out;
+    display: none!important;
 }
 
 .icon-feedback p {

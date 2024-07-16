@@ -99,10 +99,7 @@
                                     $color="";
                                 }
 
-                                if($row->name == 'ESCALIGHTS PLUIT'){
-                                    $row->schedule = $row->schedule*2;
-                                    $row->persentase_absen = round(($row->schedule / $row->absen) * 100, 2);
-                                }
+                              
                             @endphp
                             <tr style="{{ $color }}">
                                 <td>{{ $no }}</td>

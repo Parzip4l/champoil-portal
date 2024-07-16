@@ -98,6 +98,10 @@
                                 }else{
                                     $color="";
                                 }
+
+                                @if($row->name == 'ESCALIGHTS PLUIT'){
+                                    $row->schedule = $row->schedule*2;
+                                }
                             @endphp
                             <tr style="{{ $color }}">
                                 <td>{{ $no }}</td>

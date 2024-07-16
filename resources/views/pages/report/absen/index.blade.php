@@ -87,12 +87,25 @@
                             $percent_backup=0;
                             $total_tidak_clockout= 0;
                             $persentase_tidak_clockout = 0;
+                            $color="";
                         @endphp
                         @foreach($project as $row)
-                            <tr>
+                            @php 
+                                if($row->persentase_absen <= 50 ){
+                                    $color="background-color:red";
+                                }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
+                                    $color="background-color:yellow";
+                                }else{
+                                    $color="";
+                                }
+
+                              
+                            @endphp
+                            <tr style="{{ $color }}">
                                 <td>{{ $no }}</td>
                                 <td>
-                                    <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}">
+                                    <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}"
+                                       style="color:black">
                                         {{ $row->name }}
                                     </a>
                                 </td>
@@ -127,8 +140,14 @@
                             if($absen_backup > 0 && $schedule_backup> 0){
                                 $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
                             }
+
+                            if($percent_absen <= 50 ){
+                                $color="background-color:red";
+                            }else if($percent_absen >50 && $percent_absen >80 ){
+                                $color="background-color:yellow";
+                            }
                         @endphp
-                        <tr>
+                        <tr style="{{ $color }}">
                             <td colspan=2>Total</td>
                             <td>{{ $total_schedule }}</td>
                             <td>{{ $total_absen }}</td>
@@ -138,7 +157,8 @@
                             <td>{{ $schedule_backup }}</td>
                             <td>{{ $absen_backup }}</td>
                             <td>{{ $percent_backup }} %</td>
-                            
+                            <td></td>
+                            <td></td>
                         </tr>
 
                     @endif

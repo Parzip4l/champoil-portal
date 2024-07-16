@@ -87,6 +87,7 @@
                             $percent_backup=0;
                             $total_tidak_clockout= 0;
                             $persentase_tidak_clockout = 0;
+                            $color="";
                         @endphp
                         @foreach($project as $row)
                             <tr>
@@ -127,8 +128,14 @@
                             if($absen_backup > 0 && $schedule_backup> 0){
                                 $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
                             }
+
+                            if($percent_absen <= 50 ){
+                                $color="background-color:red";
+                            }else if($percent_absen >50 && $percent_absen >80 ){
+                                $color="background-color:yellow";
+                            }
                         @endphp
-                        <tr>
+                        <tr style="{{ $color }}">
                             <td colspan=2>Total</td>
                             <td>{{ $total_schedule }}</td>
                             <td>{{ $total_absen }}</td>

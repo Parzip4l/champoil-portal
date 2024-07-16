@@ -99,7 +99,7 @@
                                     $color="";
                                 }
 
-                                @if($row->name == 'ESCALIGHTS PLUIT'){
+                                if($row->name == 'ESCALIGHTS PLUIT'){
                                     $row->schedule = $row->schedule*2;
                                 }
                             @endphp

@@ -113,32 +113,34 @@
             @endif
             <!-- Reqruitment -->
             @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin))
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#reqruitment" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">
-                    <i class="link-icon" data-feather="user-plus"></i>
-                    <span class="link-title">Reqruitment</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['category']) }}" id="reqruitment">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ route('job-aplicant') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Job Aplicant</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('test') }}" class="nav-link {{ active_class(['test']) }}">Result Test</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">Medis Result</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Training Data</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('penempatan') }}" class="nav-link {{ active_class(['penempatan']) }}">Penempatan</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+                @if($employee && $employee->unit_bisnis == 'Kas')
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#reqruitment" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">
+                        <i class="link-icon" data-feather="user-plus"></i>
+                        <span class="link-title">Reqruitment</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['category']) }}" id="reqruitment">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('job-aplicant') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Job Aplicant</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('test') }}" class="nav-link {{ active_class(['test']) }}">Result Test</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">Medis Result</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Training Data</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('penempatan') }}" class="nav-link {{ active_class(['penempatan']) }}">Penempatan</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                @endif
             @endif
             @if(in_array('superadmin_access', $dataLogin))
             <!-- News And Announcement -->
@@ -209,6 +211,7 @@
                     <span class="link-title">LMS</span>
                 </a>
             </li>
+            @if($employee && $employee->unit_bisnis == 'Kas')
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#task_management" role="button" aria-expanded="{{ is_active_route(['task_management']) }}" aria-controls="task_management">
                     <i class="link-icon" data-feather="clock"></i>
@@ -229,6 +232,8 @@
                     </ul>
                 </div>
             </li>
+            @endif
+            @if($employee && $employee->unit_bisnis == 'Kas')
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#logBook" role="button" aria-expanded="{{ is_active_route(['logBook']) }}" aria-controls="logBook">
                     <i class="link-icon" data-feather="book"></i>
@@ -246,6 +251,7 @@
                     </ul>
                 </div>
             </li>
+            @endif
             @endif
             <!-- Assets Management -->
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
@@ -281,38 +287,42 @@
             @endif
             <!-- Report DMAIC -->
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#dmaic" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">
-                    <i class="link-icon" data-feather="file-text"></i>
-                    <span class="link-title">DMAIC Master</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['category']) }}" id="dmaic">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ route('dmaic-report') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Report Data</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('test') }}" class="nav-link {{ active_class(['test']) }}">Category</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">DMAIC List</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Analytic</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+                @if($employee && $employee->unit_bisnis == 'Kas')
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#dmaic" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">
+                        <i class="link-icon" data-feather="file-text"></i>
+                        <span class="link-title">DMAIC Master</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['category']) }}" id="dmaic">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('dmaic-report') }}" class="nav-link {{ active_class(['job-aplicant']) }}">Report Data</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('test') }}" class="nav-link {{ active_class(['test']) }}">Category</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">DMAIC List</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Analytic</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                @endif
             @endif
             @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin))
-            <!-- Maps Project -->
-            <li class="nav-item">
-                <a href="{{route('map')}}" class="nav-link {{ active_class(['map']) }}">
-                    <i class="link-icon" data-feather="map"></i>
-                    <span class="link-title">Maps Project</span>
-                </a>
-            </li>
+                @if($employee && $employee->unit_bisnis == 'Kas')
+                <!-- Maps Project -->
+                <li class="nav-item">
+                    <a href="{{route('map')}}" class="nav-link {{ active_class(['map']) }}">
+                        <i class="link-icon" data-feather="map"></i>
+                        <span class="link-title">Maps Project</span>
+                    </a>
+                </li>
+                @endif
             @endif
             <!-- Apps Settings -->
             @if(in_array('superadmin_access', $dataLogin))

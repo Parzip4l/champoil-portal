@@ -90,10 +90,20 @@
                             $color="";
                         @endphp
                         @foreach($project as $row)
-                            <tr>
+                            @php 
+                                if($row->persentase_absen <= 50 ){
+                                    $color="background-color:red";
+                                }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
+                                    $color="background-color:yellow";
+                                }else{
+                                    $color="";
+                                }
+                            @endphp
+                            <tr style="{{ $color }}">
                                 <td>{{ $no }}</td>
                                 <td>
-                                    <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}">
+                                    <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}"
+                                       style="color:black">
                                         {{ $row->name }}
                                     </a>
                                 </td>
@@ -145,7 +155,8 @@
                             <td>{{ $schedule_backup }}</td>
                             <td>{{ $absen_backup }}</td>
                             <td>{{ $percent_backup }} %</td>
-                            
+                            <td></td>
+                            <td></td>
                         </tr>
 
                     @endif

@@ -31,18 +31,28 @@ class DashboardController extends Controller
 {
     public function index()
     {   
-        // Request Approval
         $code = Auth::user()->employee_code;
-        // dd($code);
-        
         $company = Employee::where('nik', $code)->first();
 
+        // Greeting
         $today = now();
+        $hour = $today->hour;
+        $hariini2 = Carbon::now();
 
+        if ($hour >= 1 && $hour < 11) {
+            $greeting = 'Selamat Pagi';
+        } elseif ($hour >= 11 && $hour < 16) {
+            $greeting = 'Selamat Siang';
+        } elseif ($hour >= 16 && $hour < 20) {
+            $greeting = 'Selamat Sore';
+        } else {
+            $greeting = 'Selamat Malam';
+        }
         // Birthday Employee
         $birthdays = Employee::where('unit_bisnis', $company->unit_bisnis)
-                     ->select('tanggal_lahir','nama')
-                     ->get();
+                        ->where('resign_status', 0)
+                        ->select('tanggal_lahir','nama','gambar')
+                        ->get();
                      
         $upcomingBirthdays = $birthdays->filter(function ($employee) use ($today) {
             $birthDate = Carbon::parse($employee->tanggal_lahir)->setYear($today->year);
@@ -52,7 +62,6 @@ class DashboardController extends Controller
         // Endbirthday
         $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
         $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
-
         $dataRequest = RequestAbsen::join('karyawan', 'requests_attendence.employee', '=', 'karyawan.nik')
             ->where('karyawan.unit_bisnis', $company->unit_bisnis)
             ->where('aprrove_status', 'Pending')
@@ -179,7 +188,7 @@ class DashboardController extends Controller
             ->where('resign_status', 0)
             ->where('berakhirkontrak', '>', $today)
             ->where('berakhirkontrak', '<=', now()->addMonth()->format('Y-m-d'))
-            ->select('nama','berakhirkontrak')
+            ->select('nama','berakhirkontrak', 'gambar')
             ->get();
 
         foreach ($kontrakKaryawan as $employee) {
@@ -217,7 +226,7 @@ class DashboardController extends Controller
                 $userId = Auth::id();
                 $EmployeeCode = Auth::user()->employee_code;
                 $hariini = now()->format('Y-m-d');
-        
+                
                 // Get Karyawan data for the authenticated user
                 $datakaryawan = Employee::join('users', 'karyawan.nik', '=', 'users.employee_code')
                     ->where('users.employee_code', $userId)
@@ -279,7 +288,7 @@ class DashboardController extends Controller
         compact(
             'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
             'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2',
-            'pengumuman','news','upcomingBirthdays'
+            'pengumuman','news','upcomingBirthdays','greeting','hariini2'
         ));
     }
 

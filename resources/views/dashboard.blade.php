@@ -17,7 +17,8 @@
     $dataLogin = json_decode(Auth::user()->permission);
     $user = Auth::user();
 @endphp
-<div class="absen-wrap mb-2">
+<!-- Mobile Wrap -->
+<div class="absen-wrap mb-2 mobile">
     <div class="row">
         <div class="col-md-12 mb-2">
             <!-- Employee Login Details -->
@@ -437,7 +438,7 @@
 <!-- News -->
 <div class="row mb-3 mobile">
     <h5 class="mb-2">News</h5>
-    <div class="berita-wrap">
+        <div class="berita-wrap">
         <div class="owl-carousel owl-theme news-owl">
             @foreach($news as $datanews)
             <div class="item">
@@ -466,44 +467,99 @@
 </div>
 <!-- End -->
 <div class="row mb-4 desktop">
-    <div class="title-analytic d-flex justify-content-between mb-2">
-        <div class="title-data align-self-center">
-            <h5>Analytic Data</h5>
-        </div>
-        <div class="button-detail-analytic">
-            <a href="https://analytic.truest.co.id/login" target="_blank" class="btn btn-primary">Lihat Details</a>
-        </div>
+    <div class="col-md-12">
+        <h4>{{$greeting}}, {{$employee->nama}}!</h4>
+        <p class="text-muted">It's {{$hariini2->format('D')}}, {{$hariini2->format('d M Y')}}</p>
     </div>
-    <hr>
 </div>
-
-<div class="row mb-4 desktop">
-    <div class="title-analytic d-flex justify-content-between mb-2">
-        <div class="title-data align-self-center">
-            <h5>Birthday Employee</h5>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card custom-card2">
-            <div class="card-body">
-                <table class="table" id="dataTableExample1">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Tanggal Ulang Tahun</th>
-                            <th>Usia</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+<!-- Desktop Wrap -->
+<div class="header-wrap">
+    <div class="row mb-4 desktop d-flex">
+        <div class="col-md-4">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <div class="title-data mb-3">
+                        <h6>Birthday Employee</h6>
+                    </div>
+                    <div class="employee-birthday-wrap">
+                    @if($upcomingBirthdays->isEmpty())
+                        <h5 class="text-center mb-2">No Data</h5>
+                        <p class="text-center text-muted">Your data Will Show Here</p>
+                        @else
                         @foreach($upcomingBirthdays as $birthdaydata)
-                        <tr>
-                            <td>{{$birthdaydata->nama}}</td>
-                            <td>{{$birthdaydata->tanggal_lahir}}</td>
-                            <td>{{$birthdaydata->usia}} Tahun</td>
-                        </tr>
+                        @php 
+                            $usiaBaru = $birthdaydata->usia + 1;
+                        @endphp
+                        <div class="employee-item d-flex mb-2">
+                            <div class="photo-profile me-2">
+                                <img src="{{ asset('images/' . $birthdaydata->gambar) }}" alt="">
+                            </div>
+                            <div class="detail-item-employee-wrap align-self-center">
+                                <div class="detail-employee ">
+                                    <h6>{{$birthdaydata->nama}}</h6>
+                                </div>
+                                <div class="tanggal-lahir align-self-center">
+                                    <p class="text-muted" style="font-size: 12px;">{{$birthdaydata->tanggal_lahir}} || {{$usiaBaru}} Tahun</p>
+                                </div>
+                            </div>
+                        </div>
                         @endforeach
-                    </tbody>
-                </table> 
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <h6 class="mb-3">Daftar Kontrak Yang Akan Segera Berakhir</h6>
+                    @if($kontrakKaryawan->isEmpty())
+                        <h5 class="text-center mb-2">No Data</h5>
+                        <p class="text-center text-muted">Your data Will Show Here</p>
+                        @else
+                    <div class="employee-birthday-wrap">
+                        @foreach($kontrakKaryawan as $DataKontrak)
+                        <div class="employee-item d-flex mb-2">
+                            <div class="photo-profile me-2">
+                                <img src="{{ asset('images/' . $DataKontrak->gambar) }}" alt="">
+                            </div>
+                            <div class="detail-item-employee-wrap align-self-center">
+                                <div class="detail-employee ">
+                                    <h6>{{$DataKontrak->nama}}</h6>
+                                </div>
+                                <div class="tanggal-lahir align-self-center">
+                                    <p class="text-muted" style="font-size: 12px;">{{ now()->diffInDays($DataKontrak->berakhirkontrak, false) }} Hari</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    @if($pengumuman->isEmpty())
+                        <h5 class="text-center mb-2">No announcement</h5>
+                        <p class="text-center text-muted">Your Announcement Will Show Here</p>
+                    @else
+                        @foreach($pengumuman as $item)
+                        <div class="content-pengumuman mb-3">
+                            <a href="" class="text-muted d-flex justify-content-between" data-bs-toggle="modal" data-bs-target="#ViewModalPengumuman{{$item->id}}">
+                                <div class="judul-isi">
+                                    <h5 class="">{{ $item->judul }}</h5>
+                                    <p class="textmuted">{{ $item->konten }}</p>
+                                </div>
+                                <p class="card-text align-self-center"><small class="text-muted">{{ $item->publish_date }}</small></p>
+                            </a>
+                        </div>
+                        @endforeach
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -514,9 +570,9 @@
     @if($user->project_id==NULL)
     <div class="row mb-4">
         <div class="col-md-6">
-            <h6 class="mb-2">Daftar karyawan tanpa keterangan hari ini.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
+                    <h6 class="mb-2">Daftar karyawan tanpa keterangan hari ini.</h6>
                     <table class="table" id="dataTableExample">
                         <thead>
                             <tr>
@@ -538,15 +594,15 @@
         </div>
     
         <div class="col-md-6">
-            <h6 class="mb-2">Total Absensi Day to Day.</h6>
             <div class="card custom-card2 mb-4">
                 <div class="card-body">
+                    <h6 class="mb-2">Total Absensi Day to Day.</h6>
                     <canvas id="ChartAbsen"></canvas>    
                 </div>
             </div>
-            <h6 class="mb-2">Total Absensi Periode.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
+                    <h6 class="mb-2">Total Absensi Periode.</h6>
                     <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
                 </div>
             </div>
@@ -555,18 +611,18 @@
     
     <div class="row">
         <div class="col-md-6">
-        <h6 class="mb-2">Total Karyawan.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
+                <h6 class="mb-2">Total Karyawan.</h6>
                     <canvas id="ChartKaryawan"></canvas>    
                 </div>
             </div>
         </div>
         @if($user->project_id ==NULL)
         <div class="col-md-6">
-            <h6 class="mb-2">Daftar karyawan yang akan segera berakhir kontrak.</h6>
             <div class="card custom-card2">
                 <div class="card-body">
+                    <h6 class="mb-2">Daftar karyawan yang akan segera berakhir kontrak.</h6>
                     <table class="table table-responsive">
                         <thead>
                             <tr>
@@ -624,183 +680,6 @@
     </div>
 </div>
 <!-- End Task -->
-
-<!-- Modal Announcement -->
-<div class="modal fade" id="announcementModal" tabindex="-1" role="dialog" aria-labelledby="announcementModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="announcementModalLabel">TRUEST HRIS Announcement</h5>
-            </div>
-            <div class="modal-body">
-                <!-- Add your announcement content here -->
-                <p>1. Aplikasi TRUEST HRIS Untuk saat ini sedang dilakukan maintenance. Mohon Maaf Untuk Ketidaknyamanannya.</p><br>
-                <p>2. Dikarenakan Aplikasi Sedang Dilakukan Meiantenance, Absensi bisa digunakan di browser HP Masing Masing. Klik <a href="https://hris.truest.co.id">Disini</a></p><br>
-                <p>3. Saat untuk update data pribadi sudah bisa dilukan masing masing termasuk foto profile.</p>
-                @if($employee === 'Kas' )
-                <p>4. Untuk PIC Project Sudah Bisa Membuat Pengajuan Schedule Yang Akan Disetujui Oleh Area Manager.</p>
-                @endif
-                <button type="button" class="btn btn-primary mt-2" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Feedback Form -->
-<div class="feedback-button-wrap">
-    <a href="#" data-bs-toggle="modal" data-bs-target=".Feedback">
-        <div class="icon-feedback d-flex">
-            <i class="icon-lg text-white" data-feather="heart"></i>
-            <p class="text-white">Feedback</p>
-        </div>
-    </a>
-</div>
-
-<div class="modal fade bd-example-modal-lg Feedback" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="#PersonalInfo">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h5 class="text-center">Feedback & Suggestions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-            </div>
-            <div class="modal-body">
-                @if(!$feedback)
-                <form action="{{route('feedback.store')}}" method="POST">
-                    @csrf
-                    <input type="hidden" name="name" value="{{ $employee->nik }}">
-                    <input type="hidden" name="email" value="{{ $employee->email }}">
-                    <div class="rating">
-                    <h6 class="mb-3">How was your experience using TRUEST ?</h6>
-                    <ul class="feedback mb-3">
-                        <li class="angry">
-                            <div>
-                                <label for="rating1">
-                                    <svg class="eye left">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="eye right">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="mouth">
-                                        <use xlink:href="#mouth"></use>
-                                    </svg>
-                                </label>
-                            </div>
-                            <input type="radio" name="rating" value="1" class="rating" id="rating1">
-                        </li>
-                        <li class="sad">
-                            <div>
-                                <label for="rating2">
-                                    <svg class="eye left">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="eye right">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="mouth">
-                                        <use xlink:href="#mouth"></use>
-                                    </svg>
-                                </label>
-                            </div>
-                            <input type="radio" name="rating" value="2" class="rating" id="rating2">
-                        </li>
-                        <li class="ok">
-                            <div>
-                                <label for="rating3"> 
-                                    <svg class="eye left">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                </label> 
-                            </div>
-                            <input type="radio" name="rating" value="3" class="rating" id="rating3">
-                        </li>
-                        <li class="good active">
-                            <div>
-                                <label for="rating4">
-                                    <svg class="eye left">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="eye right">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="mouth">
-                                        <use xlink:href="#mouth"></use>
-                                    </svg>
-                                </label>
-                            </div>
-                            <input type="radio" name="rating" value="4" class="rating" id="rating4">
-                        </li>
-                        <li class="happy">
-                            <div>
-                                <label for="rating5">
-                                    <svg class="eye left">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="eye right">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                </label>
-                            </div>
-                            <input type="radio" name="rating" value="5" class="rating" id="rating5">
-                        </li>
-                    </ul>
-                            
-                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 4" id="eye">
-                            <path d="M1,1 C1.83333333,2.16666667 2.66666667,2.75 3.5,2.75 C4.33333333,2.75 5.16666667,2.16666667 6,1"></path>
-                        </symbol>
-                        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 7" id="mouth">
-                            <path d="M1,5.5 C3.66666667,2.5 6.33333333,1 9,1 C11.6666667,1 14.3333333,2.5 17,5.5"></path>
-                        </symbol>
-                    </svg>
-
-                    <h6 class="mb-2">Every feedback helps us a lot. What can we improve on ?</h6>
-                    <input type="text" class="form-control mb-3" name="feedback" placeholder="Share your feedback.." required>
-
-                    <button type="submit" class="btn btn-primary w-100 bg-custom-biru" style="border-radius:10px; border-color: #424874;">Share Feedback</button>
-                </form>
-                @else
-                <div class="feedback-berhasil">
-                    <ul class="feedback mb-3">
-                        <li class="good active">
-                            <div>
-                                <label for="rating4">
-                                    <svg class="eye left">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="eye right">
-                                        <use xlink:href="#eye"></use>
-                                    </svg>
-                                    <svg class="mouth">
-                                        <use xlink:href="#mouth"></use>
-                                    </svg>
-                                </label>
-                            </div>
-                        </li>
-                    </ul>
-                    <h5 class="text-center mb-1">Thanks For Feedback</h5>
-                    <p class="text-muted text-center">Every feedback helps us a lot.</p>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                    <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 4" id="eye">
-                        <path d="M1,1 C1.83333333,2.16666667 2.66666667,2.75 3.5,2.75 C4.33333333,2.75 5.16666667,2.16666667 6,1"></path>
-                    </symbol>
-                    <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 7" id="mouth">
-                        <path d="M1,5.5 C3.66666667,2.5 6.33333333,1 9,1 C11.6666667,1 14.3333333,2.5 17,5.5"></path>
-                    </symbol>
-                </svg>
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- End Feedback -->
-<div class="row">
-    <div class="download-apk">
-        
-    </div>
-</div>
 
 @endsection
 
@@ -887,41 +766,6 @@
             }
         });
     });
-</script>
-<script>
-    $(document).ready(function () {
-        // Check if the modal has been closed before using a cookie
-        if (!getCookie("announcementModalClosed")) {
-            $('#announcementModal').modal('show');
-        }
-
-        // Set a cookie when the modal is closed
-        $('#announcementModal').on('hidden.bs.modal', function () {
-            setCookie("announcementModalClosed", "true", 365);
-        });
-    });
-
-    // Cookie functions
-    function setCookie(name, value, days) {
-        var expires = "";
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    }
-
-    function getCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-        }
-        return null;
-    }
 </script>
 <script>
 $(function() {
@@ -1091,7 +935,7 @@ $(function() {
     document.addEventListener("DOMContentLoaded", function() {
         var ctx = document.getElementById('ChartAbsen').getContext('2d');
         var ChartAbsen = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: data,
         });
     });
@@ -1107,14 +951,30 @@ $(function() {
     });
     
     var dataKaryawan = {!! json_encode($ChartKaryawan) !!};
-    
-    document.addEventListener("DOMContentLoaded", function() {
-        var ctx = document.getElementById('ChartKaryawan').getContext('2d');
-        var ChartKaryawan = new Chart(ctx, {
-            type: 'bar',
-            data: dataKaryawan,
-        });
+
+document.addEventListener("DOMContentLoaded", function() {
+    var ctx = document.getElementById('ChartKaryawan').getContext('2d');
+    var ChartKaryawan = new Chart(ctx, {
+        type: 'bar',
+        data: dataKaryawan,
+        options: {
+            scales: {
+                x: {
+                    stacked: true
+                },
+                y: {
+                    stacked: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
     });
+});
   </script>
   <script>
         var ctx = document.getElementById('salaryChart').getContext('2d');

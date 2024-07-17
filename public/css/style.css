@@ -508,6 +508,14 @@ input.rating {
     height: 53px;
 }
 
+.employee-birthday-wrap .photo-profile img {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border: 1px solid #aaa;
+    border-radius: 50%;
+}
+
 .wrapper-pengajuan.d-flex.mb-4:last-child{
     margin-bottom: 0!important;
 }

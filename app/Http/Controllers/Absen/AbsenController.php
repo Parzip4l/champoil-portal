@@ -266,6 +266,14 @@ class AbsenController extends Controller
             // Hitung Radius
             $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
 
+            $existingAbsen = Absen::where('nik', $nik)
+                ->whereDate('tanggal', $today)
+                ->first();
+
+            if ($existingAbsen) {
+                return redirect()->back()->with('error', 'Clockin Rejected, Already Clocked In for Today!');
+            }
+
             if ($distance <= $allowedRadius) {
                 // Simpan Data
                 $absensi = new absen();

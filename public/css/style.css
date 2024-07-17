@@ -505,6 +505,7 @@ input.rating {
 .wrapper-pengajuan .foto-profile img {
     border-radius: 50%;
     object-fit: cover;
+    height: 53px;
 }
 
 .wrapper-pengajuan.d-flex.mb-4:last-child{

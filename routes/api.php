@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\VersionController;
 use App\Http\Controllers\Api\Analytics\AnalyticsController;
 use App\Http\Controllers\Api\Analytics\EmployeeAnalytics;
 use App\Http\Controllers\Api\AllData\AllDataController;
+use App\Http\Controllers\Api\Schedules\ScheduleController;
 
 Route::prefix('v1')->group(function () {
 
@@ -117,8 +118,10 @@ Route::prefix('v1')->group(function () {
     // Analytics
     Route::get('unique-visitors', [AnalyticsController::class, 'getUniqueVisitorsCount']);
     Route::get('employee-count', [EmployeeAnalytics::class, 'getEmployeeCount']);
-
     Route::post('/map-domisili', [App\Http\Controllers\Map::class, 'update_domisili'])->name('map-domisili');
+
+    //Schedule
+    Route::get('project-schedules/{id}', [ScheduleController::class, 'data_shift']);
 
     
     // Pengumuman

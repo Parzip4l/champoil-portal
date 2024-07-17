@@ -55,10 +55,8 @@
                             <tr>
                                 <th>#</th>
                                 <th>Judul</th>
-                                <th>Jam Patrol Shift 1</th>
-                                <th>Jam Patrol Shift 2</th>
-                                <th>Jam Patrol Shift 3</th>
-                                <th>Jam Patrol Shift 4</th>
+                                <th>Jadwal Per-shift</th>
+                                
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -89,10 +87,7 @@
                                 <td> 
                                     {{ $record->judul }} <br/> {{ $record->project_name }}<br/>{{$longlat}}
                                 </td>
-                                <td>{{ $record->jam_mulai_shift_1 }} s/d {{ $record->jam_akhir_shift_1 }}</td>
-                                <td>{{ $record->jam_mulai_shift_2 }} s/d {{ $record->jam_akhir_shift_2 }}</td>
-                                <td>{{ $record->jam_mulai_shift_3 }} s/d {{ $record->jam_akhir_shift_3 }}</td>
-                                <td>{{ $record->jam_mulai_shift_4 }} s/d {{ $record->jam_akhir_shift_4 }}</td>
+                                <td></td>
                                 <td><span class="<?php echo $class ?>">{{ $label }}</span></td>
                                 <td>
                                     <div class="dropdown">

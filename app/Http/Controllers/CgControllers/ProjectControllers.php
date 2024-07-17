@@ -5,6 +5,8 @@ namespace App\Http\Controllers\CgControllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Project;
+use App\ModelCG\Shift;
+use App\ModelCG\ProjectRelations;
 use App\ModelCG\ProjectDetails;
 use App\ModelCG\Jabatan;
 use Illuminate\Support\Str;
@@ -115,17 +117,25 @@ class ProjectControllers extends Controller
     {
         $employee = Auth::user();
         // Mengambil data proyek berdasarkan project_code
-        $project = Project::where('id', $id)->first();  // Ubah sesuai dengan model dan kolom yang benar
-        $atasan = Employee::where('unit_bisnis',$employee->company)->where('resign_status',0)->get();
+        $data['project'] = Project::where('id', $id)->first();  // Ubah sesuai dengan model dan kolom yang benar
+        $data['atasan'] = Employee::where('unit_bisnis',$employee->company)->where('resign_status',0)->get();
         
-        if (!$project) {
+        if (!$data['project']) {
             return abort(404); // Handle jika proyek tidak ditemukan
         }
 
         // Mengambil detail proyek berdasarkan project_code
-        $projectDetails = ProjectDetails::where('project_code', $project->id)->get();
+        $data['projectDetails'] = ProjectDetails::where('project_code', $data['project']->id)->get();
+        $data['shift'] = Shift::all();
+        if($data['shift']){
+            foreach($data['shift'] as $row){
+                $row->count = ProjectRelations::where('id_project',$id)
+                                                ->where('id_shift',$row->id)
+                                                ->count();
+            }
+        }
 
-        return view('pages.hc.kas.project.details', compact('project', 'projectDetails','atasan'));
+        return view('pages.hc.kas.project.details',$data);
     }
 
     /**
@@ -142,8 +152,9 @@ class ProjectControllers extends Controller
             return abort(404); // Handle jika proyek tidak ditemukan
         }
 
-        $projectDetails = ProjectDetails::where('project_code', $project->id)->get();
-        return view('pages.hc.kas.project.edit', compact('projectDetails'));
+        $data['projectDetails'] = ProjectDetails::where('project_code', $project->id)->get();
+        $data['shift'] = Shift::all();
+        return view('pages.hc.kas.project.edit',$data);
     }
 
     /**
@@ -168,6 +179,18 @@ class ProjectControllers extends Controller
                 'badan' => $request->input('badan'),
                 'leader_pic' => $request->input('leader_pic'),
             ]);
+
+            $cek = ProjectRelations::where('id_project', $id)->delete();
+            $data = $request->all();
+            if($data['shift']){
+                foreach($data['shift'] as $row){
+                    $insert=[
+                        "id_project"=>$id,
+                        "id_shift"=>$row
+                    ];
+                    ProjectRelations::insert($insert);
+                }
+            }
         
             return redirect()->back()->with('success', 'Data updated successfully');
         } catch (\Exception $e) {

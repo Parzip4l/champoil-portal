@@ -86,6 +86,7 @@ Portfolio: https://behance.net/muhamadsobirin3
     $(document).ready(function() {
         
         $('.select2').select2();
+        $('#project_filter').select2();
     } );
     </script>
 </body>

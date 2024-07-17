@@ -120,7 +120,26 @@
                                             </select>
                                                 
                                         </div>
-
+                                        <label for="" class="form-label">SHIFT</label><br/>
+                                        @if($shift)
+                                            @foreach($shift as $row_shift)
+                                                @php 
+                                                    if($row_shift->count==0){
+                                                        $checked="";
+                                                    }else{
+                                                        $checked="checked";
+                                                    }
+                                                @endphp
+                                                <input class="form-check-input" 
+                                                       name="shift[]" 
+                                                       type="checkbox" 
+                                                       id="shift-{{$row_shift->id}}" 
+                                                       value="{{$row_shift->id}}"
+                                                       {{$checked}}>
+                                                <label class="form-check-label" for="shift-{{$row_shift->id}}">{{$row_shift->name}}</label><br/>
+                                               
+                                            @endforeach
+                                        @endif
                                         <button type="submit" class="btn btn-primary w-100">Update Data Project</button>
                                     </form>
                                 </div>
@@ -395,12 +414,14 @@
   <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
   <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+  
 @endpush
 
 @push('custom-scripts')
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
     <script src="{{ asset('assets/js/project.js') }}"></script>
+    
     
     <script>
         @if(session('success'))

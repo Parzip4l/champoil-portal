@@ -1,5 +1,19 @@
 @extends('layout.master')
+<style>
+.select2-container {
+    z-index: 10000; /* Atur sesuai kebutuhan */
+}
 
+.select2-container--open {
+    z-index: 10000; /* Atur sesuai kebutuhan */
+}
+
+/* Optional: Atur z-index dari elemen yang menghalangi */
+.zindex-fix {
+    position: relative; /* Pastikan elemen ini berada di atas elemen lain */
+    z-index: 1000; /* Atur sesuai kebutuhan */
+}
+</style>
 @push('plugin-styles')
     <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
@@ -20,25 +34,19 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
-                                    <label for="name" class="form-label">Pilih Karyawan</label>
-                                    <select class="form-control" data-width="100%" name="employee">
-                                        @foreach($employee as $data)
-                                            <option value="{{$data->nik}}">{{$data->nama}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group mb-3">
                                     <label for="" class="form-label">Project</label>
-                                        <select name="project" id="" class="form-control">
+                                        <select name="project" 
+                                                id="" 
+                                                class="form-control"
+                                                onchange="handleSelectChange(this)">
                                             @foreach($project as $projectd)
                                                 <option value="{{$projectd->id}}">{{$projectd->name}}</option>
                                             @endforeach
                                         </select>
+                                        
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 d-none">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Periode</label>
                                     <input type="text" class="form-control" name="periode" value="{{ $current_month }}-{{ $current_year }}" readonly>
@@ -46,31 +54,29 @@
                             </div>
                         </div>
                         <hr>
+                        @if($filter_project)
                         <div class="row">
-                            <div class="col-md-6">
-                                @foreach ($dates_for_form as $date => $formatted_date)
-                                <div class="form-group mb-3">
-                                    <label for="" class="form-label">Schedule {{ $date }}</label>
-                                    <input type="date" class="form-control" name="tanggal[]" value="{{ $date }}">
-                                </div>
-                                @endforeach
-                            </div>
-                            <div class="col-md-6">
-                                    @foreach ($dates_for_form as $date => $formatted_date)
-                                    <div class="form-group mb-3">
-                                        <label for="" class="form-label">Shift</label>
-                                        <select name="shift[]" class="form-control">
-                                            <option disabled>{{ $formatted_date }}</option>
-                                            @foreach ($shift as $shiftItem)
-                                                <option value="{{ $shiftItem->code }}">({{ $shiftItem->code }}) {{ $shiftItem->name }}</option>
-                                            @endforeach
-                                        </select>
+                            <div class="col-md-3 d-none d-md-block">
+                                <div class="card">
+                                    <div class="card-body d-none">
+                                        <h6 class="card-title mb-4">Full calendar</h6>
+                                        <div id='external-events' class='external-events'>
+                                        
+                                        </div>
                                     </div>
-                                    @endforeach
-                                
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12">
+                                <div class="card">
+                                <div class="card-body">
+                                    <div id='fullcalendar'></div>
+                                </div>
+                                </div>
                             </div>
                         </div>
+                        @endif
                     </div>
+                    
                     <!-- Add other input fields as needed -->
 
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -80,6 +86,40 @@
     </div>
 </div>
 
+<div class="modal modal-lg" tabindex="-1" id="createEventModal"> 
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle1">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="data_employee">
+        <input type="hidden" name="project" value="{{ $_GET['project_id'] }}">
+        <div class="modal-body">
+            <div class="row">
+                <div class="form-group mb-3">
+                    <label for="name" class="form-label">Pilih Karyawan</label>
+                    <select class="form-control zindex-fix select2" 
+                            data-width="100%" 
+                            name="employee[]" 
+                            id="list_employee"
+                            multiple>
+                        @foreach($employee as $data)
+                            <option value="{{$data->nik}}">{{$data->nama}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('plugin-scripts')
@@ -87,6 +127,8 @@
   <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/moment/moment.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/fullcalendar/index.global.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
@@ -156,5 +198,85 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    // $(document).ready(function() {
+        
+    // } );
+</script>
+<script>
+$(function() {
+
+// sample calendar events data
+var Draggable = FullCalendar.Draggable;
+var calendarEl = document.getElementById('fullcalendar');
+var containerEl = document.getElementById('external-events');
+
+// Calendar Event Source
+var calendarEvents = {
+    id: 1,
+    backgroundColor: 'rgba(1,104,250, .15)',
+    borderColor: '#0168fa',
+    events: <?php echo $shift ?>
+};
+
+new Draggable(containerEl, {
+    itemSelector: '.fc-event',
+    eventData: function(eventEl) {
+        return {
+            title: eventEl.innerText
+        };
+    }
+});
+
+// initialize the calendar
+var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+        left: "prev,today,next",
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+    },
+    editable: true,
+    droppable: true, // this allows things to be dropped onto the calendar
+    fixedWeekCount: true,
+    initialView: 'timeGridWeek', // Set the initial view to week view
+    timeZone: 'Asia/Jakarta',
+    hiddenDays: [],
+    navLinks: 'true',
+    weekNumbers: true,
+    // weekNumberFormat: {
+    //   week:'numeric',
+    // },
+    dayMaxEvents: 2,
+    events: [],
+    eventSources: [calendarEvents],
+    drop: function(info) {
+        // remove the element from the "Draggable Events" list
+        // info.draggedEl.parentNode.removeChild(info.draggedEl);
+    },
+    eventClick: function(info) {
+        var eventObj = info.event;
+        console.log(info);
+        $('#modalTitle1').html(eventObj.title);
+        $('#modalBody1').html(eventObj._def.extendedProps.description);
+        $('#eventUrl').attr('href', eventObj.url);
+        $('#fullCalModal').modal("show");
+    },
+    dateClick: function(info) {
+        $("#createEventModal").modal("show");
+        console.log(info);
+    },
+    // Optional: Set the initial date to the current week
+    initialDate: moment().startOf('week').format('YYYY-MM-DD')
+});
+
+calendar.render();
+});
+
+function handleSelectChange(selectElement) {
+    const selectedValue = selectElement.value;
+    window.location.href = '?project_id='+selectedValue;
+    // You can add more logic here to handle the change event
+}
 </script>
 @endpush

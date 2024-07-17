@@ -243,8 +243,8 @@
 
         $('#download').click(function () {
             // alert('ok');
-            var project_id = "{{$_GET['project_id']}}"; // Set your project ID here
-            var periode = "{{$_GET['periode']}}";; // Set your date here
+            var project_id = "{{@$_GET['project_id']}}"; // Set your project ID here
+            var periode = "{{@$_GET['periode']}}";; // Set your date here
 
             // Get CSRF token
             var token = $('meta[name="csrf-token"]').attr('content');

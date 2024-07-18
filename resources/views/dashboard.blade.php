@@ -472,6 +472,121 @@
         <p class="text-muted">It's {{$hariini2->format('D')}}, {{$hariini2->format('d M Y')}}</p>
     </div>
 </div>
+
+<div class="row mb-4 d-flex desktop">
+    <div class="col-md-3">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="title-card">
+                    <h6>Total Karyawan</h6>
+                </div>
+                @php  $totalKaryawan = $DataManagement + $DataFrontline @endphp
+                <div class="count mt-2">
+                    <h2>{{$totalKaryawan}}</h2>
+                </div>
+            </div>
+            <div class="card-footer d-flex">
+                @if ($percentageChangeAll > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($percentageChangeAll, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @elseif ($percentageChangeAll < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($percentageChangeAll, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($percentageChangeAll, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="title-card">
+                    <h6>Management Leaders</h6>
+                </div>
+                <div class="count mt-2">
+                    <h2>{{$DataManagement}}</h2>
+                </div>
+            </div>
+            <div class="card-footer d-flex">
+                @if ($percentageChangeManagement > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($percentageChangeManagement, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @elseif ($percentageChangeManagement < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($percentageChangeManagement, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($percentageChangeManagement, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="title-card">
+                    <h6>Frontline Officer</h6>
+                </div>
+                <div class="count mt-2">
+                    <h2>{{$DataFrontline}}</h2>
+                </div>
+            </div>
+            <div class="card-footer d-flex">
+                @if ($percentageChangeFrontline > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($percentageChangeFrontline, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @elseif ($percentageChangeFrontline < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($percentageChangeFrontline, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($percentageChangeFrontline, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="title-card">
+                    <h6>Payrol Bulan Ini</h6>
+                </div>
+                <div class="count mt-2">
+                    <h2>Rp {{ number_format($totalValue) }}</h2>
+                </div>
+            </div>
+            <div class="card-footer d-flex">
+                @if ($percentageChange > 0)
+                    <span class="badge rounded-pill me-2 bg-success"><i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($percentageChange, 2) }}%</span> <p class="text-muted "> Dari Periode sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-danger"><i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($percentageChange, 2) }}%</span>  <p class="text-muted "> Dari periode sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Desktop Wrap -->
 <div class="header-wrap desktop">
     <div class="row mb-4 desktop d-flex">
@@ -488,10 +603,10 @@
                         @else
                         @foreach($upcomingBirthdays as $birthdaydata)
                         @php 
-                            $usiaBaru = $birthdaydata->usia + 1;
+                            $usiaBaru = $birthdaydata->usia;
                         @endphp
                         <div class="employee-item d-flex mb-2">
-                            <div class="photo-profile me-2">
+                            <div class="photo-profile2 me-2 align-self-center">
                                 <img src="{{ asset('images/' . $birthdaydata->gambar) }}" alt="">
                             </div>
                             <div class="detail-item-employee-wrap align-self-center">
@@ -499,7 +614,7 @@
                                     <h6>{{$birthdaydata->nama}}</h6>
                                 </div>
                                 <div class="tanggal-lahir align-self-center">
-                                    <p class="text-muted" style="font-size: 12px;">{{$birthdaydata->tanggal_lahir}} || {{$usiaBaru}} Tahun</p>
+                                    <p class="text-muted" style="font-size: 12px;">{{$birthdaydata->tanggal_lahir}}</p><span class="badge rounded-pill me-2 bg-primary">{{$usiaBaru}} Tahun</span>
                                 </div>
                             </div>
                         </div>

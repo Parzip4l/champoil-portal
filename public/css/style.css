@@ -516,6 +516,14 @@ input.rating {
     border-radius: 50%;
 }
 
+.employee-birthday-wrap .photo-profile2 img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border: 1px solid #aaa;
+    border-radius: 50%;
+}
+
 .wrapper-pengajuan.d-flex.mb-4:last-child{
     margin-bottom: 0!important;
 }

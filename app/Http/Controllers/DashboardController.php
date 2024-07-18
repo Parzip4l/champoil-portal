@@ -162,6 +162,33 @@ class DashboardController extends Controller
         ->where('resign_status',0)
         ->get();
 
+        $dataChartKaryawanCurrent = Employee::whereYear('created_at', now()->year)
+        ->where('unit_bisnis', $company->unit_bisnis)
+        ->where('resign_status',0)
+        ->whereMonth('created_at', now()->month)
+        ->get();
+
+        // Ambil data karyawan bulan sebelumnya
+        $dataChartKaryawanPrevious = Employee::whereYear('created_at', now()->subMonth()->year)
+        ->where('unit_bisnis', $company->unit_bisnis)
+        ->where('resign_status',0)
+        ->whereMonth('created_at', now()->subMonth()->month)
+        ->get();
+
+        // Hitung jumlah karyawan bulan ini
+        $DataFrontlineCurrent = $dataChartKaryawanCurrent->where('organisasi', 'Frontline Officer')->count();
+        $DataManagementCurrent = $dataChartKaryawanCurrent->where('organisasi', 'Management Leaders')->count();
+        $DataAllKaryawanCurrent = $dataChartKaryawanCurrent->count();
+
+        // Hitung jumlah karyawan bulan sebelumnya
+        $DataFrontlinePrevious = $dataChartKaryawanPrevious->where('organisasi', 'Frontline Officer')->count();
+        $DataManagementPrevious = $dataChartKaryawanPrevious->where('organisasi', 'Management Leaders')->count();
+        $DataAllKaryawanPrevious = $dataChartKaryawanPrevious->count();
+
+        $percentageChangeFrontline = $DataFrontlinePrevious > 0 ? (($DataFrontlineCurrent - $DataFrontlinePrevious) / $DataFrontlinePrevious * 100) : 0;
+        $percentageChangeManagement = $DataManagementPrevious > 0 ? (($DataManagementCurrent - $DataManagementPrevious) / $DataManagementPrevious * 100) : 0;
+        $percentageChangeAll = $DataAllKaryawanPrevious > 0 ? (($DataAllKaryawanCurrent - $DataAllKaryawanPrevious) / $DataAllKaryawanPrevious * 100) : 0;
+
         if($company->unit_bisnis === 'CHAMPOIL')
         {
             $DataFrontline = $dataChartKaryawan->where('organisasi','Frontline Officer')->count();
@@ -285,14 +312,35 @@ class DashboardController extends Controller
         $frontlineData2 = $frontlineSalaries->groupBy(function ($salary) {
             return $salary->created_at->format('Y');
         })->map->sum('thp');
+        
+        $lastPeriod = $managementData->keys()->last();
+        $lastValue = $managementData->last();
 
+        $lastPeriodF = $frontlineData->keys()->last();
+        $lastValueF = $frontlineData->last();
 
-        return view('dashboard', 
-        compact(
-            'karyawan','alreadyClockIn','alreadyClockOut','isSameDay','datakaryawan','logs','hariini','asign_test','dataRequest','pengajuanSchedule',
-            'dataAbsenByDay','DataTotalKehadiran','ChartKaryawan', 'kontrakKaryawan','karyawanTidakAbsenHariIni','managementData','frontlineData','managementData2','frontlineData2',
-            'pengumuman','news','upcomingBirthdays','greeting','hariini2'
-        ));
+        $previousPeriod = $managementData->keys()->slice(-2, 1)->first();
+        $previousValue = $managementData->get($previousPeriod);
+
+        $previousPeriodF = $frontlineData->keys()->slice(-2, 1)->first();
+        $previousValueF = $frontlineData->get($previousPeriodF);
+
+        $totalValue = $lastValueF + $lastValue;
+        $previusValue = $previousValue + $previousValueF;
+        $percentageChange = ($totalValue - $previusValue) / $previusValue * 100;
+
+        // End Payrol Statistik
+
+        $compactVariables = [
+            'karyawan', 'alreadyClockIn', 'alreadyClockOut', 'isSameDay', 'datakaryawan', 'logs', 'hariini',
+            'asign_test', 'dataRequest', 'pengajuanSchedule', 'dataAbsenByDay', 'DataTotalKehadiran',
+            'ChartKaryawan', 'kontrakKaryawan', 'karyawanTidakAbsenHariIni', 'managementData', 'frontlineData',
+            'managementData2', 'frontlineData2', 'pengumuman', 'news', 'upcomingBirthdays', 'greeting', 'hariini2',
+            'DataManagement', 'DataFrontline', 'totalValue', 'percentageChange', 'percentageChangeManagement','percentageChangeFrontline',
+            'percentageChangeAll'
+        ];
+        
+        return view('dashboard', compact(...$compactVariables));
     }
 
     public function StoreFeedback(Request $request)

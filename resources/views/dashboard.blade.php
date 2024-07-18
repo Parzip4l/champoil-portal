@@ -592,10 +592,10 @@
     <div class="row mb-4 desktop d-flex">
         <div class="col-md-4">
             <div class="card custom-card2">
+                <div class="card-header">
+                    <h6>Birthday Employee</h6>
+                </div>
                 <div class="card-body">
-                    <div class="title-data mb-3">
-                        <h6>Birthday Employee</h6>
-                    </div>
                     <div class="employee-birthday-wrap">
                     @if($upcomingBirthdays->isEmpty())
                         <h5 class="text-center mb-2">No Data</h5>
@@ -627,8 +627,10 @@
 
         <div class="col-md-4">
             <div class="card custom-card2">
+                <div class="card-header">
+                    <h6>Kontrak Reminder</h6>
+                </div>
                 <div class="card-body">
-                    <h6 class="mb-3">Daftar Kontrak Yang Akan Segera Berakhir</h6>
                     @if($kontrakKaryawan->isEmpty())
                         <h5 class="text-center mb-2">No Data</h5>
                         <p class="text-center text-muted">Your data Will Show Here</p>
@@ -657,12 +659,14 @@
 
         <div class="col-md-4">
             <div class="card custom-card2">
+                <div class="card-header">
+                    <h6>Pengumuman</h6>
+                </div>
                 <div class="card-body">
                     @if($pengumuman->isEmpty())
                         <h5 class="text-center mb-2">No announcement</h5>
                         <p class="text-center text-muted">Your Announcement Will Show Here</p>
                     @else
-                        <h6 class="mb-2">Pengumuman</h6>
                         @foreach($pengumuman as $item)
                         <div class="content-pengumuman mb-3">
                             <a href="" class="text-muted d-flex justify-content-between" data-bs-toggle="modal" data-bs-target="#ViewModalPengumuman{{$item->id}}">
@@ -687,8 +691,10 @@
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card custom-card2 mb-4">
+                <div class="card-header">
+                    <h6>Daftar karyawan tanpa keterangan hari ini.</h6>
+                </div>
                 <div class="card-body">
-                    <h6 class="mb-3">Daftar karyawan tanpa keterangan hari ini.</h6>
                     @if($karyawanTidakAbsenHariIni->isEmpty())
                         <h5 class="text-center mb-2">No Data</h5>
                         <p class="text-center text-muted">Your data Will Show Here</p>
@@ -763,8 +769,10 @@
                 </div>
             </div>
             <div class="card custom-card2">
+                <div class="card-header">
+                    <h6>Total Absensi Periode.</h6>
+                </div>
                 <div class="card-body">
-                    <h6 class="mb-2">Total Absensi Periode.</h6>
                     <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
                 </div>
             </div>
@@ -772,21 +780,25 @@
 
         <div class="col-md-8">
             <div class="card custom-card2 mb-4">
+                <div class="card-header">
+                    <h6>Statistik Absensi Harian.</h6>
+                </div>
                 <div class="card-body">
-                    <h6 class="mb-2">Total Absensi Day to Day.</h6>
                     <canvas id="ChartAbsen"></canvas>    
                 </div>
             </div>
             <div class="card custom-card2">
+                <div class="card-header">
+                    <h6>Payrol Statistik By Year.</h6>
+                </div>
                 <div class="card-body">
-                <h6 class="mb-2">Total Karyawan.</h6>
-                    <canvas id="ChartKaryawan"></canvas>    
+                    <canvas id="salaryChart"></canvas>   
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-3">
+    <div class="row mt-3 d-none">
         <div class="col-md-6">
         <h6 class="mb-2">Payrol Statistik</h6>
             <div class="card custom-card2">
@@ -799,7 +811,7 @@
         <h6 class="mb-2">Payrol Statistik Years</h6>
             <div class="card custom-card2">
                 <div class="card-body">
-                    <canvas id="salaryChartYears"></canvas>    
+                     
                 </div>
             </div>
         </div>

@@ -473,7 +473,7 @@
     </div>
 </div>
 <!-- Desktop Wrap -->
-<div class="header-wrap">
+<div class="header-wrap desktop">
     <div class="row mb-4 desktop d-flex">
         <div class="col-md-4">
             <div class="card custom-card2">
@@ -547,6 +547,7 @@
                         <h5 class="text-center mb-2">No announcement</h5>
                         <p class="text-center text-muted">Your Announcement Will Show Here</p>
                     @else
+                        <h6 class="mb-2">Pengumuman</h6>
                         @foreach($pengumuman as $item)
                         <div class="content-pengumuman mb-3">
                             <a href="" class="text-muted d-flex justify-content-between" data-bs-toggle="modal" data-bs-target="#ViewModalPengumuman{{$item->id}}">
@@ -569,35 +570,81 @@
 <div class="chart-wrap mb-4 desktop">
     @if($user->project_id==NULL)
     <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card custom-card2">
-                <div class="card-body">
-                    <h6 class="mb-2">Daftar karyawan tanpa keterangan hari ini.</h6>
-                    <table class="table" id="dataTableExample">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Organisasi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($karyawanTidakAbsenHariIni as $alpha)
-                            <tr>
-                                <td>{{$alpha->nama}}</td>
-                                <td>{{$alpha->organisasi}}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table> 
-                </div>
-            </div>
-        </div>
-    
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card custom-card2 mb-4">
                 <div class="card-body">
-                    <h6 class="mb-2">Total Absensi Day to Day.</h6>
-                    <canvas id="ChartAbsen"></canvas>    
+                    <h6 class="mb-3">Daftar karyawan tanpa keterangan hari ini.</h6>
+                    @if($karyawanTidakAbsenHariIni->isEmpty())
+                        <h5 class="text-center mb-2">No Data</h5>
+                        <p class="text-center text-muted">Your data Will Show Here</p>
+                        @else
+                    <div class="employee-birthday-wrap">
+                        @foreach($karyawanTidakAbsenHariIni as $alpha)
+                        <div class="employee-item d-flex mb-2">
+                            <div class="photo-profile me-2">
+                                <img src="{{ asset('images/' . $alpha->gambar) }}" alt="">
+                            </div>
+                            <div class="detail-item-employee-wrap align-self-center">
+                                <div class="detail-employee ">
+                                    <h6>{{$alpha->nama}}</h6>
+                                </div>
+                                <div class="tanggal-lahir align-self-center">
+                                    <p class="text-muted" style="font-size: 12px;">{{$alpha->organisasi}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                    @if ($karyawanTidakAbsenHariIni->hasPages())
+                        <ul class="pagination-custom">
+                            <!-- Previous Page Link -->
+                            @if ($karyawanTidakAbsenHariIni->onFirstPage())
+                                <li class="disabled"><span>&laquo;</span></li>
+                            @else
+                                <li><a href="{{ $karyawanTidakAbsenHariIni->previousPageUrl() }}" rel="prev">&laquo;</a></li>
+                            @endif
+
+                            <!-- Pagination Elements -->
+                            @php
+                                $start = max($karyawanTidakAbsenHariIni->currentPage() - 2, 1);
+                                $end = min($karyawanTidakAbsenHariIni->currentPage() + 2, $karyawanTidakAbsenHariIni->lastPage());
+                            @endphp
+
+                            @if ($start > 1)
+                                <li><a href="{{ $karyawanTidakAbsenHariIni->url(1) }}">1</a></li>
+                                @if ($start > 2)
+                                    <li class="disabled"><span>...</span></li>
+                                @endif
+                            @endif
+
+                            @for ($page = $start; $page <= $end; $page++)
+                                @if ($page == $karyawanTidakAbsenHariIni->currentPage())
+                                    <li class="active"><span>{{ $page }}</span></li>
+                                @else
+                                    <li><a href="{{ $karyawanTidakAbsenHariIni->url($page) }}">{{ $page }}</a></li>
+                                @endif
+                            @endfor
+
+                            @if ($end < $karyawanTidakAbsenHariIni->lastPage())
+                                @if ($end < $karyawanTidakAbsenHariIni->lastPage() - 1)
+                                    <li class="disabled"><span>...</span></li>
+                                @endif
+                                <li><a href="{{ $karyawanTidakAbsenHariIni->url($karyawanTidakAbsenHariIni->lastPage()) }}">{{ $karyawanTidakAbsenHariIni->lastPage() }}</a></li>
+                            @endif
+
+                            <!-- Next Page Link -->
+                            @if ($karyawanTidakAbsenHariIni->hasMorePages())
+                                <li><a href="{{ $karyawanTidakAbsenHariIni->nextPageUrl() }}" rel="next"> &raquo;</a></li>
+                            @else
+                                <li class="disabled"><span> &raquo;</span></li>
+                            @endif
+                        </ul>
+                        <div class="pagination-summary">
+                            Showing {{ $karyawanTidakAbsenHariIni->firstItem() }} to {{ $karyawanTidakAbsenHariIni->lastItem() }} of {{ $karyawanTidakAbsenHariIni->total() }} results
+                        </div>
+                    @endif
+                    
                 </div>
             </div>
             <div class="card custom-card2">
@@ -607,10 +654,14 @@
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-6">
+
+        <div class="col-md-8">
+            <div class="card custom-card2 mb-4">
+                <div class="card-body">
+                    <h6 class="mb-2">Total Absensi Day to Day.</h6>
+                    <canvas id="ChartAbsen"></canvas>    
+                </div>
+            </div>
             <div class="card custom-card2">
                 <div class="card-body">
                 <h6 class="mb-2">Total Karyawan.</h6>
@@ -618,34 +669,8 @@
                 </div>
             </div>
         </div>
-        @if($user->project_id ==NULL)
-        <div class="col-md-6">
-            <div class="card custom-card2">
-                <div class="card-body">
-                    <h6 class="mb-2">Daftar karyawan yang akan segera berakhir kontrak.</h6>
-                    <table class="table table-responsive">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Tanggal Berakhir</th>
-                                <th>Sisa Kontrak</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($kontrakKaryawan as $dataKontrak)
-                            <tr>
-                                <td>{{$dataKontrak->nama}}</td>
-                                <td>{{$dataKontrak->berakhirkontrak}}</td>
-                                <td>{{ now()->diffInDays($dataKontrak->berakhirkontrak, false) }} Hari</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>    
-                </div>
-            </div>
-        </div>
-        @endif
     </div>
+
     <div class="row mt-3">
         <div class="col-md-6">
         <h6 class="mb-2">Payrol Statistik</h6>

@@ -204,8 +204,8 @@ class DashboardController extends Controller
             ->where('unit_bisnis',$company->unit_bisnis)
             ->where('resign_status',0)
             ->whereNull('absens.nik')
-            ->select('karyawan.nama','karyawan.organisasi')
-            ->get();
+            ->select('karyawan.nama','karyawan.organisasi', 'karyawan.gambar')
+            ->paginate(7);
         // End Employee Statistik
 
 

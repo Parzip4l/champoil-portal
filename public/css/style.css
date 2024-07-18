@@ -526,6 +526,29 @@ a.navbar-brand img {
     object-fit: cover;
 }
 
+/* Pagination */
+ul.pagination-custom  {
+    display: flex;
+    padding-left: 0;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+ul.pagination-custom  li {
+    list-style-type: none;
+    padding: 12px 18px;
+    border: 1px solid #dee2e6;
+    margin-left: -1px;
+}
+
+ul.pagination-custom  li:first-child {
+    border-radius: 10px 0px 0px 10px;
+}
+
+ul.pagination-custom  li:last-child {
+    border-radius: 0px 10px 10px 0px;
+}
+
 @keyframes shake {
     30% {
         transform: perspective(240px) rotateX(var(--step-1-rx, 0deg)) rotateY(var(--step-1-ry, 0deg)) rotateZ(var(--step-1-rz, 0deg)) translateZ(10px);

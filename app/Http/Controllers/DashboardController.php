@@ -88,9 +88,10 @@ class DashboardController extends Controller
         $labels = [];
         $currentDate = $startDate->copy();
         while ($currentDate->lte($endDate)) {
-            $labels[] = $currentDate->format('Y-m-d');
+            $labels[] = $currentDate->format('d M'); // Ubah format tanggal ke 'D d M'
             $currentDate->addDay();
         }
+
         // Calculate the total absences for each day
         $dataAbsenByDay = [
             'labels' => $labels,
@@ -104,7 +105,9 @@ class DashboardController extends Controller
         ];
 
         foreach ($labels as $label) {
-            $absencesCount = $DataHadir->where('tanggal', $label)->count();
+            // Konversi kembali ke format 'Y-m-d' untuk pencarian data di $DataHadir
+            $dateForDatabase = date('Y-m-d', strtotime($label));
+            $absencesCount = $DataHadir->where('tanggal', $dateForDatabase)->count();
             $dataAbsenByDay['datasets'][0]['data'][] = $absencesCount;
         }
 

@@ -789,7 +789,7 @@
             </div>
             <div class="card custom-card2">
                 <div class="card-header">
-                    <h6>Payrol Statistik By Year.</h6>
+                    <h6>Payrol Statistik.</h6>
                 </div>
                 <div class="card-body">
                     <canvas id="salaryChart"></canvas>   

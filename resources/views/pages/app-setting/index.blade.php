@@ -20,7 +20,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="" class="text-center link-settings" data-bs-target="#usersModal" data-bs-toggle="modal">
                                     <div class="icon-menu-settings mb-2">
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="col mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('users') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -48,7 +48,7 @@
                         </div>
                     </div>
                     <div class="col mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('request-type') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <div class="col mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ route('project.index') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -79,7 +79,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-3  mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('additional-component') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -93,7 +93,7 @@
                         </div>
                     </div>
                     <div class="col-md-3  mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('garda-pratama') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -107,7 +107,7 @@
                         </div>
                     </div>
                     <div class="col-md-3  mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('thr-component') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -121,7 +121,7 @@
                         </div>
                     </div>
                     <div class="col-md-3  mb-4 mb">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('koperasi') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -135,7 +135,21 @@
                         </div>
                     </div>
                     <div class="col-md-3  mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('emergency-data.index') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="alert-circle"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Panic Button</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3  mb-4">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('activities') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -149,7 +163,7 @@
                         </div>
                     </div>
                     <div class="col-md-3  mb-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('version') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -179,7 +193,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col mb-2">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('company') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -193,7 +207,7 @@
                         </div>
                     </div>
                     <div class="col mb-2">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('organisasi') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -207,7 +221,7 @@
                         </div>
                     </div>
                     <div class="col mb-2">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ url('divisi') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -223,7 +237,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 mb-2">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ route('jabatan.index') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -237,7 +251,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 mb-2">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ route('golongan.index') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">
@@ -251,7 +265,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card">
+                        <div class="card custom-card2">
                             <div class="card-body">
                                 <a href="{{ route('pajak.index') }}" class="text-center link-settings">
                                     <div class="icon-menu-settings mb-2">

@@ -142,6 +142,16 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/save-task-item', [App\Http\Controllers\ops\TaskgController::class, 'save_item'])->name('save-task-item');
     Route::post('/save_data', [App\Http\Controllers\ops\TaskgController::class, 'store'])->name('save_data');
 
+    // Emergency 
+    Route::group(['prefix' => 'emergency'], function(){
+        Route::resource('emergency-data', App\Http\Controllers\Emergency\EmergencyController::class);
+        Route::resource('emergency-category', App\Http\Controllers\Emergency\EmergencyCategoryController::class);
+        Route::post('/update-status/{id}', [App\Http\Controllers\Emergency\EmergencyController::class, 'updateStatus'])->name('update.status');
+        Route::put('/update-status-cancel/{id}', [App\Http\Controllers\Emergency\EmergencyController::class, 'CancelRequest'])->name('cancel.status');
+        Route::get('/page', [App\Http\Controllers\Emergency\EmergencyController::class, 'userpages'])->name('emergency.user');
+        Route::post('/submit-emergency', [App\Http\Controllers\Emergency\EmergencyController::class, 'storeRequest'])->name('emergency.store');
+    });
+
     
 });
 
@@ -443,6 +453,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::put('/update-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'UpdateGolongan'])->name('golongan.update');
         Route::delete('/delete-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'DeleteGolongan'])->name('golongan.delete');
     });
+
+    
 });
 
 Route::get('/get-attendance-data', [App\Http\Controllers\Employee\EmployeeController::class, 'getAttendanceData'])->name('absen.getDataDetails');

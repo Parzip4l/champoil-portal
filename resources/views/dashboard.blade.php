@@ -177,6 +177,16 @@
     <div class="menu-absen-wrap">
         <div class="owl-carousel owl-theme owl-basic">
             <div class="item">
+                <a href="{{route('emergency.user')}}">
+                    <div class="icon text-center">
+                        <i class="icon-lg text-white" data-feather="alert-circle"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Emergency</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
                 <a href="#">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="dollar-sign"></i>
@@ -342,10 +352,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                    <a href="{{ route('pengumuman.download', $data->id) }}" target="_blank" class="btn btn-primary w-100">
-                        Download Attachments
-                    </a>
-                
+                <a href="{{ route('pengumuman.download', $data->id) }}" target="_blank" class="btn btn-primary w-100">
+                    Download Attachments
+                </a>
             </div>
         </div>
     </div>
@@ -1189,4 +1198,28 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     </script>
+    <style>
+        .modal-bottom {
+            position: fixed;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            margin: 0;
+            border-radius: 25px 25px 0 0;
+            max-width: 100%;
+        }
+        .modal-header {
+            border-bottom: none;
+        }
+        .modal-body {
+            text-align: center;
+        }
+
+        a.btn.btn-custom {
+            background: red;
+            padding: 100px 75px;
+            border-radius: 50%;
+            color: #fff;
+        }
+    </style>
 @endpush

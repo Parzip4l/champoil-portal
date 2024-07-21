@@ -155,7 +155,6 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
         // Komentar
         Route::post('/tasks/{id}/comments', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeKomen'])->name('tasks.comments.store');
 
-
     // Emergency 
     Route::group(['prefix' => 'emergency'], function(){
         Route::resource('emergency-data', App\Http\Controllers\Emergency\EmergencyController::class);

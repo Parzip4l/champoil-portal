@@ -1,10 +1,11 @@
 @extends('layout.master')
 
 @push('plugin-styles')
-  <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.carousel.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.carousel.min.css') }}" rel="stylesheet" />
+    
 @endpush
 
 @section('content')
@@ -332,7 +333,7 @@
                             <div class="komen-wrap">
                                 <div class="comments-section">
                                     <h5 class="mb-2">Activities</h5>
-                                    <div class="comments-container" style="max-height: 130px; overflow-y: auto;">
+                                    <div class="comments-container" style="max-height: 200px; overflow-y: auto;">
                                         @foreach ($data->comments as $comment)
                                         <div class="card custom-card2 mb-3">
                                             <div class="card-body">
@@ -355,7 +356,8 @@
                                     <form action="{{ route('tasks.comments.store', $data->id) }}" method="POST" class="mt-3">
                                         @csrf
                                         <div class="form-group mb-2">
-                                            <textarea name="content" class="form-control" placeholder="Add a comment" required></textarea>
+                                            <textarea name="content" id="comment-textarea" class="form-control mention" placeholder="Add a comment" required></textarea>
+                                            <div id="mention-menu" style="display: none; position: absolute; border: 1px solid #ccc; background: #fff; z-index: 1000;"></div>
                                         </div>
                                         <button type="submit" class="btn btn-sm btn-primary">Add Comment</button>
                                     </form>
@@ -568,11 +570,11 @@
 @endsection
 
 @push('plugin-scripts')
-  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
-  <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
-  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-  <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
-  <script src="{{ asset('assets/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
@@ -852,4 +854,95 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('comment-textarea');
+    const mentionMenu = document.getElementById('mention-menu');
+    let mentionUsers = [];
+
+    // Fetch mention users from the server with CSRF token
+    fetch('/api/mention-users', {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        mentionUsers = data;
+    })
+    .catch(error => console.error('Error fetching mention users:', error));
+
+    textarea.addEventListener('input', function(e) {
+        const cursorPosition = getCaretPosition(textarea);
+        const textBeforeCursor = textarea.value.substring(0, cursorPosition);
+        const lastWord = textBeforeCursor.split(' ').pop();
+
+        if (lastWord.startsWith('@')) {
+            const searchTerm = lastWord.substring(1).toLowerCase();
+            const filteredUsers = mentionUsers.filter(user => user.nama.toLowerCase().includes(searchTerm));
+            showMentionMenu(filteredUsers, cursorPosition);
+        } else {
+            mentionMenu.style.display = 'none';
+        }
+    });
+
+    mentionMenu.addEventListener('click', function(e) {
+        const userId = e.target.dataset.id;
+        if (userId) {
+            insertMention(userId, e.target.innerText);
+            mentionMenu.style.display = 'none';
+        }
+    });
+
+    function getCaretPosition(el) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(el);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            return preCaretRange.toString().length;
+        }
+        return 0;
+    }
+
+    function showMentionMenu(users, cursorPosition) {
+        mentionMenu.innerHTML = users.map(user => `<div data-id="${user.id}" class="mention-menu-item" style="padding: 8px; cursor: pointer;">${user.nama}</div>`).join('');
+        mentionMenu.style.display = 'block';
+        // Position menu
+        mentionMenu.style.top = (textarea.offsetTop + textarea.clientHeight) + 'px';
+        mentionMenu.style.left = textarea.offsetLeft + 'px';
+    }
+
+    function insertMention(userId, userName) {
+        const cursorPosition = getCaretPosition(textarea);
+        const textBeforeCursor = textarea.value.substring(0, cursorPosition);
+        const textAfterCursor = textarea.value.substring(cursorPosition);
+        const newText = `${textBeforeCursor.substring(0, textBeforeCursor.lastIndexOf('@'))}@${userName} ${textAfterCursor}`;
+        textarea.value = newText;
+        // Set cursor position to end of mention
+        textarea.setSelectionRange(textBeforeCursor.length + userName.length + 2, textBeforeCursor.length + userName.length + 2);
+    }
+});
+</script>
+
+<style>
+    .mention-menu {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        position: absolute;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    .mention-menu-item {
+        padding: 5px;
+        cursor: pointer;
+    }
+    .mention-menu-item:hover {
+        background-color: #eee;
+    }
+</style>
 @endpush

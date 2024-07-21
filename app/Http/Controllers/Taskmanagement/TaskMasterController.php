@@ -60,8 +60,10 @@ class TaskMasterController extends Controller
         $groupedTasks = $taskData->groupBy('status');
         $subtask = Subtask::all();
         $user = Employee::where('unit_bisnis', $employee->unit_bisnis)->where('resign_status',0)->get();
+
+        $mentionUsers = Employee::select('nik', 'nama')->get();
         
-        return view('pages.taskmanagement.index', compact('taskData', 'subtask', 'groupedTasks','user'));
+        return view('pages.taskmanagement.index', compact('taskData', 'subtask', 'groupedTasks','user','mentionUsers'));
     }
 
 
@@ -407,5 +409,4 @@ class TaskMasterController extends Controller
 
         return redirect()->back()->with('success', 'Comment added.');
     }
-
 }

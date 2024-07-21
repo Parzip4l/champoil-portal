@@ -203,7 +203,7 @@
             <!-- End Payrol -->
 
             <!-- Task & Report Menu -->
-            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('dashboard_access', $dataLogin) || in_array('client_access', $dataLogin))
             <li class="nav-item nav-category">Task & Report </li>
             <li class="nav-item">
                 <a href="{{ route('knowledge_base.index') }}" class="nav-link">
@@ -211,28 +211,28 @@
                     <span class="link-title">LMS</span>
                 </a>
             </li>
-            @if($employee && $employee->unit_bisnis == 'Kas')
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#task_management" role="button" aria-expanded="{{ is_active_route(['task_management']) }}" aria-controls="task_management">
-                    <i class="link-icon" data-feather="clock"></i>
+                    <i class="link-icon" data-feather="check-circle"></i>
                     <span class="link-title">Task Management</span>
                     <i class="link-arrow" data-feather="chevron-down"></i>
                 </a>
                 <div class="collapse {{ show_class(['category']) }}" id="task_management">
                     <ul class="nav sub-menu">
+                        @if($employee && $employee->unit_bisnis == 'Kas')
                         <li class="nav-item">
                             <a href="{{ url('task') }}" class="nav-link {{ active_class(['task']) }}">Patroli</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Audit</a>
                         </li>
+                        @endif
                         <li class="nav-item">
-                            <a href="{{ route('taskg.index') }}" class="nav-link {{ active_class(['taskg.index']) }}">Task</a>
+                            <a href="{{ route('task-management.index') }}" class="nav-link {{ active_class(['task-management.index']) }}">Task</a>
                         </li>
                     </ul>
                 </div>
             </li>
-            @endif
             @if($employee && $employee->unit_bisnis == 'Kas')
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#logBook" role="button" aria-expanded="{{ is_active_route(['logBook']) }}" aria-controls="logBook">

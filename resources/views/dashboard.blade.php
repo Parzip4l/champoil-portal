@@ -482,6 +482,7 @@
     </div>
 </div>
 
+@if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('client_access', $dataLogin))
 <div class="row mb-4 d-flex desktop">
     <div class="col-md-3">
         <div class="card custom-card2">
@@ -594,7 +595,7 @@
         </div>
     </div>
 </div>
-
+@endif
 
 <!-- Desktop Wrap -->
 <div class="header-wrap desktop">
@@ -777,6 +778,7 @@
                     
                 </div>
             </div>
+            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('client_access', $dataLogin))
             <div class="card custom-card2">
                 <div class="card-header">
                     <h6>Total Absensi Periode.</h6>
@@ -785,6 +787,7 @@
                     <canvas id="PersentaseHadir" style="max-height:294px;"></canvas>      
                 </div>
             </div>
+            @endif
         </div>
 
         <div class="col-md-8">
@@ -796,6 +799,7 @@
                     <canvas id="ChartAbsen"></canvas>    
                 </div>
             </div>
+            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('client_access', $dataLogin))
             <div class="card custom-card2">
                 <div class="card-header">
                     <h6>Payrol Statistik.</h6>
@@ -804,6 +808,7 @@
                     <canvas id="salaryChart"></canvas>   
                 </div>
             </div>
+            @endif
         </div>
     </div>
 

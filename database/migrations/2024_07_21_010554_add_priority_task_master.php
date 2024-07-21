@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('task_user', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('task_id');
-            $table->string('user_id');
-            $table->timestamps();
+        Schema::table('task_master', function (Blueprint $table) {
+            $table->string('priority');
         });
     }
 
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('task_user');
+        Schema::table('task_master', function (Blueprint $table) {
+            //
+        });
     }
 };

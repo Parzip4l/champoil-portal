@@ -14,9 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('task_user', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('task_id');
-            $table->string('user_id');
+            $table->id();
             $table->timestamps();
         });
     }

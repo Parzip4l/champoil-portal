@@ -2997,8 +2997,8 @@ textarea.is-invalid.typeahead.tt-hint, .select2-container--default .select2-sear
 .wizard > .actions a:active,
 .wizard > .actions a:hover, div.tox .tox-button:not(.tox-button--naked):not(.tox-button--secondary), .swal2-popup .swal2-actions button.swal2-confirm {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #6571ff;
-  --bs-btn-border-color: #6571ff;
+  --bs-btn-bg: #424874;
+  --bs-btn-border-color: #424874;
   --bs-btn-hover-color: #fff;
   --bs-btn-hover-bg: #5660d9;
   --bs-btn-hover-border-color: #515acc;
@@ -3010,6 +3010,7 @@ textarea.is-invalid.typeahead.tt-hint, .select2-container--default .select2-sear
   --bs-btn-disabled-color: #fff;
   --bs-btn-disabled-bg: #6571ff;
   --bs-btn-disabled-border-color: #6571ff;
+  border-radius: 8px;
 }
 
 .btn-secondary, div.tox .tox-button--secondary {

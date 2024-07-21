@@ -35,6 +35,46 @@
     border-radius : 10px;
 }
 
+img.image-task {
+    cursor: pointer;
+}
+
+.data-user {
+    position: relative;
+    display: inline-block;
+}
+
+a.btn.btn-subtask {
+    padding: 2px 5px;
+    background: #6571ff;
+    color: #fff;
+    margin-top: -5px;
+}
+
+img.image-task{
+    width: 25px!important;
+    height: 25px!important;
+}
+
+.tooltips-name {
+    display: none;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-30%);
+    background-color: #fff;
+    padding: 5px;
+    border: 1px solid #aaa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.data-user:hover .tooltips-name {
+    display: block; 
+}
+
 .menu-item {
     background: #7286D3;
     padding: 15px;

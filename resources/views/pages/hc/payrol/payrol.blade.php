@@ -58,7 +58,7 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="" class="form-label">Select Employee</label>
-                                <select class="js-example-basic-multiple form-select" id="employeeSelect" name="employee_code[]" multiple="multiple" data-width="100%">
+                                <select class="form-control select2" id="employeeSelect" name="employee_code[]" multiple="multiple" data-width="100%">
                                     @foreach ($payrol as $data)
                                         @php
                                             $user = Auth::user();

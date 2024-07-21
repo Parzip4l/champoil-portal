@@ -27,7 +27,7 @@
             <div class="row">
                 <div class="col-md-12 mb-2">
                     <label for="" class="form-label">Karyawan</label>
-                    <select class="form-control" data-width="100%" name="employee_code" required>
+                    <select class="form-control select2" data-width="100%" name="employee_code" required>
                         @foreach($employee as $karyawan)
                             <option value="{{$karyawan->nik}}">{{$karyawan->nama}}</option>
                         @endforeach

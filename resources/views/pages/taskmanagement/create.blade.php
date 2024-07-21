@@ -56,19 +56,19 @@
                         <textarea name="deskripsi" class="form-control" id=""></textarea>
                     </div>
                     <div class="row">
-                        <div class="col">
+                        <div class="col-md-4 col-12">
                             <div class="form-group mb-2">
                                 <label class="form-label" for="Due Date">Due Date</label>
                                 <input type="date" class="form-control" name="due_date" required>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-md-4 col-12">
                             <div class="form-group mb-2">
                                 <label class="form-label" for="Due Date">File</label>
                                 <input type="file" class="form-control" name="attachments" required>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-md-4 col-12">
                             <div class="form-group mb-2">
                                 <label class="form-label" for="Due Date">Prioritas</label>
                                 <select name="priority" class="form-control" id="">

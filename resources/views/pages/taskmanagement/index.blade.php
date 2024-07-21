@@ -4,6 +4,7 @@
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/owl-carousel/assets/owl.carousel.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -19,7 +20,7 @@
         {{ session('error') }}
     </div>
 @endif
-<div class="row mb-4">
+<div class="row mb-2">
     <div class="topbar-wrap d-flex justify-content-between">
         <div class="arrow-back">
             <a href="{{route('setting.pa')}}" class="d-flex color-custom">
@@ -29,7 +30,7 @@
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row desktop">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">
         <div class="card-header">
@@ -182,8 +183,8 @@
                 <h5 class="modal-title" id="subtaskModalDetailsLabel">Detail Subtask</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <table class="table">
+            <div class="modal-body table-responsive">
+                <table class="table table-responsive">
                     <thead>
                         <tr>
                             <th>Select</th>
@@ -296,41 +297,186 @@
                         <h6>{{$data->updated_at->format('d M Y')}}</h6>
                     </div>
                     @endif
-
-                    <h6 class="mb-3 mt-4">Subtasks</h6>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Status</th>
-                                <th>Description</th>
-                                <th>Due Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($data->subtasks as $subtask)
+                    <div class="item-details d-flex mb-3">
+                        <h6 class="text-muted align-self-center" style="width:100px;">Attachments</h6>
+                        <a href="{{route('task.download',$data->id)}}"><i class="me-2 icon-lg" data-feather="download-cloud"></i>Download</a>
+                    </div>
+                    <hr>
+                    <div class="title-header-data d-flex justify-content-between">
+                        <h6 class="align-self-center">Subtasks</h6>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#subtaskModal" data-task-id="{{ $data->id }}" class="btn btn-sm btn-primary mobile">Tambah Subtask</a>
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $subtask->title }}</td>
-                                    <td>
-                                        <span class="badge {{ $subtask->status == 'Completed' ? 'bg-success' : 'bg-warning' }}">{{ $subtask->status }}</span>
-                                    </td>
-                                    <td>{{ $subtask->description ?? 'N/A' }}</td>
-                                    <td>{{ $subtask->due_date}}</td>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Due Date</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">No subtasks available</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse ($data->subtasks as $subtask)
+                                    <tr>
+                                        <td>{{ $subtask->title }}</td>
+                                        <td>
+                                            <span class="badge {{ $subtask->status == 'Completed' ? 'bg-success' : 'bg-warning' }}">{{ $subtask->status }}</span>
+                                        </td>
+                                        <td>{{ $subtask->description ?? 'N/A' }}</td>
+                                        <td>{{ $subtask->due_date}}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">No subtasks available</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 @endforeach
 
+<!-- Mobile View -->
+@php 
+    $user = Auth::user(); 
+    $employeeDetails = \App\Employee::where('nik', Auth::user()->employee_code)->first(); 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+@endphp
+<div class="row mobile mb-2">
+    <div class="col-md-12 grid-margin stretch-card">
+       
+    </div>
+</div>
 
+<!-- \Filter Data -->
+<div class="row mobile">
+    <div class="col-md-12">
+        <div class="tombol-mobile-task-wrap d-flex justify-content-between">
+            <div class="filters">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Filter
+                    </button>
+                    <div class="dropdown-menu p-4" aria-labelledby="filterDropdown">
+                        <a class="dropdown-item filter-btn mb-2" data-status="All">All</a>
+                        <a class="dropdown-item filter-btn mb-2" data-status="Low">Low</a>
+                        <a class="dropdown-item filter-btn mb-2" data-status="Medium">Medium</a>
+                        <a class="dropdown-item filter-btn mb-2" data-status="High">High</a>
+                    </div>
+                </div>
+            </div>
+            <div class="add-data">
+                <a href="{{route('task-management.create')}}" class="btn btn-primary">Create Task</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mobile">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div id="taskCarousel" class="owl-carousel owl-theme owl-basic">
+            @foreach ($groupedTasks as $status => $tasks)
+                @foreach ($tasks as $task)
+                    @if($task->status !== 'Completed')
+                        <div class="card custom-card2 task-data" data-status="{{ $task->priority }}">
+                            <div class="card-body {{ strtolower($task->priority) }}">
+                                <div class="header-data-wrap d-flex justify-content-between">
+                                    <div class="priority-data mb-3">
+                                        @if($task->priority == 'Low')
+                                            <span class="badge rounded-pill bg-primary">{{ $task->priority }}</span>
+                                        @elseif($task->priority == 'Medium')
+                                            <span class="badge rounded-pill bg-warning">{{ $task->priority }}</span>
+                                        @elseif($task->priority == 'High')
+                                            <span class="badge rounded-pill bg-danger">{{ $task->priority }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="status">
+                                        <a href="" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$task->id}}" class="details-mobile"><i class="icon-lg" data-feather="arrow-up-right"></i></a>
+                                    </div>
+                                </div>
+                                @php
+                                    $date = \Carbon\Carbon::parse($task->due_date);
+                                @endphp
+                                <h3 class="two-lines">{{ $task->title }}</h3>
+                                <p class="text-muted mt-2">{{ $date->format('D, d M Y') }}</p>
+                                <p class="mt-2">Task Completed : <a href="" data-bs-toggle="modal" data-bs-target="#subtaskModalDetails{{ $task->id }}">
+                                    @if($task->total_subtasks > 0)
+                                        {{ $task->completed_subtasks }}/{{ $task->total_subtasks }}
+                                    @else
+                                        0/0
+                                    @endif
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <div class="footer-data-wrap">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="assigned-users d-flex">
+                                                @foreach ($task->assignedUsers->take(2) as $index => $user)
+                                                    <img src="{{ asset('images/' . $user->gambar) }}" class="avatar-small" alt="{{ $user->nama }}">
+                                                @endforeach
+                                                @if ($task->assignedUsers->count() > 2)
+                                                    <h5 class="additional-users align-self-center text-muted">+{{ $task->assignedUsers->count() - 2 }}</h5>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col align-self-center">
+                                            <div class="progress">
+                                                <div class="progress-bar" role="progressbar" style="width: {{ $task->progress }}%;" aria-valuenow="{{ $task->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                    {{ round($task->progress) }}%
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            @endforeach
+        </div>
+    </div>
+</div>
+<div class="row mobile">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Recent Task</h5>
+            </div>
+            <div class="card-body">
+                <div class="item-wrap-data">
+                    @foreach ($groupedTasks as $status => $tasks)
+                        @foreach ($tasks as $task)
+                            @if($task->status == 'Completed')
+                                <div class="item-completed mb-4">
+                                    <a href="" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$task->id}}">
+                                        <div class="title-wrap-data-complete d-flex justify-content-between">
+                                            <div class="title-data-mobile">
+                                                <h5 class="mb-1">{{$task->title}}</h5>
+                                                <p class="text-muted">{{$task->updated_at->format('D, d M Y')}}</p>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="priority-data mb-3">
+                                                    <span class="badge rounded-pill bg-success">{{ $task->status }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif
+                        @endforeach
+                    @endforeach
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+<!-- End Mobile View -->
 @endsection
 
 @push('plugin-scripts')
@@ -338,12 +484,57 @@
   <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/owl-carousel/owl.carousel.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script src="{{ asset('assets/js/select2.js') }}"></script>
+  <script>
+$(document).ready(function(){
+  $(".owl-carousel").owlCarousel({
+      items: 1.5, // Number of items to display
+      loop: true, // Loop through items
+      margin: 10, // Margin between items
+      nav: false, // Show next/prev buttons
+      dots: false, // Show dots navigation
+      autoplay: false, 
+      responsive: {
+          0: {
+              items: 1.5
+          },
+          600: {
+              items: 2
+          },
+          1000: {
+              items: 3
+          }
+      }
+  });
+
+  // Filter functionality
+  $('.filter-btn').click(function() {
+      var status = $(this).attr('data-status');
+      $('.filter-btn').removeClass('active');
+      $(this).addClass('active');
+      filterProjects(status);
+  });
+
+  function filterProjects(status) {
+      $('.item').each(function() {
+          if ($(this).attr('data-status') === status || status === 'All') {
+              $(this).show();
+          } else {
+              $(this).hide();
+          }
+      });
+
+      // Reinitialize Owl Carousel after filtering
+      $(".owl-carousel").trigger('refresh.owl.carousel');
+  }
+});
+</script>
   <script>
     function showDeleteDataDialog(id) {
         Swal.fire({
@@ -486,4 +677,40 @@
         });
     });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const tasks = document.querySelectorAll(".task-data");
+    const noTasksMessage = document.querySelector(".no-tasks-message");
+
+    filterButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const status = button.getAttribute("data-status");
+            let visibleTasks = 0;
+
+            tasks.forEach(task => {
+                if (status === "All" || task.getAttribute("data-status") === status) {
+                    task.style.display = "flex";
+                    task.closest('.owl-item').classList.remove('d-none');
+                    visibleTasks++;
+                } else {
+                    task.style.display = "none";
+                    task.closest('.owl-item').classList.add('d-none');
+                }
+            });
+
+            if (visibleTasks === 0) {
+                noTasksMessage.style.display = "flex";
+            } else {
+                noTasksMessage.style.display = "none";
+            }
+        });
+    });
+
+    // Trigger initial filter to show all tasks and hide no tasks message
+    filterButtons[0].click();
+});
+</script>
+
 @endpush

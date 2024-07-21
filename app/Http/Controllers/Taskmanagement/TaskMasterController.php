@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 // Model
 use App\TaskManagement\TaskMaster;
@@ -94,7 +95,7 @@ class TaskMasterController extends Controller
                 $extension = $file->getClientOriginalExtension();
             
                 // Mengecek apakah file adalah PDF atau JPG
-                if ($extension !== 'pdf' && $extension !== 'jpg') {
+                if ($extension !== 'pdf' && $extension !== 'jpg' && $extension !== 'zip' && $extension !== 'rar') {
                     return redirect()->back()->with('error', 'Hanya file PDF dan JPG yang diizinkan.');
                 }
             
@@ -301,6 +302,21 @@ class TaskMasterController extends Controller
         }
 
         return redirect()->back()->with('error', 'Subtask not found');
+    }
+
+    public function downloadAttachment($id)
+    {
+        try {
+            $task = TaskMaster::findOrFail($id);
+
+            if ($task->attachments) {
+                return Storage::download($task->attachments);
+            } else {
+                return redirect()->back()->with('error', 'No attachment found.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
 }

@@ -37,6 +37,12 @@
 
 img.image-task {
     cursor: pointer;
+    object-fit: cover;
+}
+
+img.wd-45.ht-45.rounded-circle {
+    height: 45px!important;
+    object-fit: cover;
 }
 
 .data-user {

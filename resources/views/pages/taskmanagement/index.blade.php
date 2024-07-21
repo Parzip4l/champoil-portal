@@ -336,6 +336,7 @@
                                 <tr>
                                     <th>Title</th>
                                     <th>Status</th>
+                                    <th>Time Tracking</th>
                                     <th>Description</th>
                                     <th>Due Date</th>
                                 </tr>
@@ -346,6 +347,15 @@
                                         <td>{{ $subtask->title }}</td>
                                         <td>
                                             <span class="badge {{ $subtask->status == 'Completed' ? 'bg-success' : 'bg-warning' }}">{{ $subtask->status }}</span>
+                                        </td>
+                                        <td>
+                                        @if($subtask->time_start && !$subtask->time_end)
+                                            Tracking Sedang Berjalan
+                                        @elseif($subtask->time_start && $subtask->time_end)
+                                            {{ \Carbon\Carbon::parse($subtask->time_start)->diffForHumans(\Carbon\Carbon::parse($subtask->time_end), true) }}
+                                        @else
+                                            Tidak di Track
+                                        @endif
                                         </td>
                                         <td>{{ $subtask->description ?? 'N/A' }}</td>
                                         <td>{{ $subtask->due_date}}</td>

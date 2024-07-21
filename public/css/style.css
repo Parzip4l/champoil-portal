@@ -98,6 +98,14 @@ img.image-task{
     color: #fff;
 }
 
+h5.additional-users.align-self-center.text-muted {
+    background: #eee;
+    border-radius: 20px;
+    padding: 9px;
+    margin-left: -20px;
+    font-size: 10px;
+}
+
 .two-lines {
     display: -webkit-box;
     -webkit-line-clamp: 2;

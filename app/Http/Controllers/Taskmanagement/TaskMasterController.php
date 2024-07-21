@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 // Model
 use App\TaskManagement\TaskMaster;
@@ -317,6 +318,54 @@ class TaskMasterController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function startTracking($id, Request $request)
+    {
+        $subtask = Subtask::findOrFail($id);
+        $subtask->latitude_start = $request->input('latitude_start');
+        $subtask->longitude_start = $request->input('longitude_start');
+        $subtask->time_start = Carbon::now();
+        $subtask->save();
+
+        return redirect()->back()->with('success', 'Tracking started.');
+    }
+
+    public function stopTracking(Request $request, $id)
+    {
+        $subtask = Subtask::findOrFail($id);
+        
+        $subtask->latitude_end = $request->input('latitude_stop');
+        $subtask->longitude_end = $request->input('longitude_stop');
+        $subtask->time_end = Carbon::now();
+        $subtask->status = 'Completed';
+        $subtask->save();
+
+        $task = TaskMaster::find($subtask->task_id);
+
+            if ($task) {
+                // Calculate subtasks status
+                $totalSubtasks = Subtask::where('task_id', $task->id)->count();
+                $completedSubtasks = Subtask::where('task_id', $task->id)
+                                            ->where('status', 'Completed') // Adjust the status check if needed
+                                            ->count();
+                
+                if ($totalSubtasks === 0) {
+                    $task->status = 'TO DO'; // No subtasks
+                } elseif ($completedSubtasks === 0) {
+                    $task->status = 'TO DO'; // No subtasks completed
+                } elseif ($completedSubtasks < $totalSubtasks) {
+                    $task->status = 'In Progress'; // Some subtasks completed
+                } else {
+                    $task->status = 'Completed'; // All subtasks completed
+                }
+
+                // Save the task status and progress
+                $task->progress = ($totalSubtasks > 0) ? round(($completedSubtasks / $totalSubtasks) * 100) : 0;
+                $task->save();
+            }
+            
+        return redirect()->back()->with('success', 'Tracking stopped.');
     }
 
 }

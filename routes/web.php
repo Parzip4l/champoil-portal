@@ -149,6 +149,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
         Route::post('/subtask/update-status/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateStatus'])->name('update-status.subtask');
         Route::put('subtask-edit/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateSubtask'])->name('subtask.update');
         Route::delete('subtask/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'destroySubtask'])->name('subtask.destroy');
+        // Tracking
+        Route::post('/subtasks/{id}/start', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'startTracking'])->name('subtasks.start');
+        Route::post('/subtasks/{id}/stop', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'stopTracking'])->name('subtasks.stop');
 
     // Emergency 
     Route::group(['prefix' => 'emergency'], function(){

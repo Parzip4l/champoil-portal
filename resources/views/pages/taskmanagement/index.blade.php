@@ -192,6 +192,7 @@
                             <th>Status</th>
                             <th>Deskripsi</th>
                             <th>Due Date</th>
+                            <th>Tracking</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
@@ -211,6 +212,29 @@
                                 </td>
                                 <td>{{ $subtask->description }}</td>
                                 <td>{{ $subtask->due_date }}</td>
+                                <td>
+                                    @if($subtask->time_start == null)
+                                        <form action="{{ route('subtasks.start', $subtask->id) }}" method="POST" id="form-tracking">
+                                            @csrf
+                                            <input type="hidden" name="latitude_start" id="latitude_start">
+                                            <input type="hidden" name="longitude_start" id="longitude_start">
+                                            <button type="submit" id="btn-tracking" class="btn btn-sm btn-success"><i class="icon-sm" data-feather="play-circle"></i></button>
+                                        </form>
+                                    @else
+                                        @if($subtask->time_end == null)
+                                            <form action="{{ route('subtasks.stop', $subtask->id) }}" method="POST" id="form-tracking-stop">
+                                                @csrf
+                                                <input type="hidden" name="latitude_stop" id="latitude_stop">
+                                                <input type="hidden" name="longitude_stop" id="longitude_stop">
+                                                <button type="submit" id="btn-tracking-stop" class="btn btn-sm btn-danger"><i class="icon-sm" data-feather="stop-circle"></i></button>
+                                            </form>
+                                        @else
+                                            <span>
+                                                {{ \Carbon\Carbon::parse($subtask->time_start)->diffForHumans(\Carbon\Carbon::parse($subtask->time_end), true) }}
+                                            </span>
+                                        @endif
+                                    @endif
+                                </td>
                                 <td>
                                     <form method="POST" action="{{ route('subtask.destroy', $subtask->id) }}" style="display:inline;">
                                         @csrf
@@ -712,5 +736,56 @@ document.addEventListener("DOMContentLoaded", function() {
     filterButtons[0].click();
 });
 </script>
+<script>
+    $(document).ready(function () {
+        // Mengambil data lokasi pengguna saat tombol absen ditekan
+        $('#btn-tracking').on('click', function (e) {
+            e.preventDefault(); // Prevent the default behavior of the link
 
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    // Mengisi nilai hidden input dengan data lokasi pengguna
+                    $('#latitude_start').val(position.coords.latitude);
+                    $('#longitude_start').val(position.coords.longitude);
+
+                    // Mengirim form absen
+                    $('#form-tracking').submit();
+                }, function (error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        // Pengguna menolak izin lokasi
+                        alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+                    }
+                });
+            } else {
+                alert('Geolocation tidak didukung oleh browser Anda');
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Mengambil data lokasi pengguna saat tombol absen ditekan
+        $('#btn-tracking-stop').on('click', function (e) {
+            e.preventDefault(); // Prevent the default behavior of the link
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    // Mengisi nilai hidden input dengan data lokasi pengguna
+                    $('#latitude_stop').val(position.coords.latitude);
+                    $('#longitude_stop').val(position.coords.longitude);
+
+                    // Mengirim form absen
+                    $('#form-tracking-stop').submit();
+                }, function (error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        // Pengguna menolak izin lokasi
+                        alert('Anda perlu memberikan izin lokasi untuk menggunakan fitur ini');
+                    }
+                });
+            } else {
+                alert('Geolocation tidak didukung oleh browser Anda');
+            }
+        });
+    });
+</script>
 @endpush

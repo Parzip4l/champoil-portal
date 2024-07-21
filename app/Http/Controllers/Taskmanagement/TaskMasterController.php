@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use App\TaskManagement\TaskMaster;
 use App\TaskManagement\Subtask;
 use App\TaskManagement\TaskUser;
+use App\TaskManagement\TaskComment;
 use App\Employee;
 
 class TaskMasterController extends Controller
@@ -46,8 +47,16 @@ class TaskMasterController extends Controller
             $task->assignedUsers = TaskUser::where('task_id', $task->id)
                                             ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
                                             ->get(['karyawan.nama', 'karyawan.gambar']);
+            
+            // Get Komen
+            $task->comments = TaskComment::where('task_id', $task->id)
+                             ->join('karyawan', 'task_comment.nik', '=', 'karyawan.nik')
+                             ->get(['task_comment.*', 'karyawan.nama as commenter_name', 'karyawan.gambar as commenter_photo']);
+            //  Comment Count
+            $task->commentCount = TaskComment::where('task_id', $task->id)->count();
+            $task->remaining_days = Carbon::now()->diffInDays(Carbon::parse($task->due_date), false);
         }
-
+        
         $groupedTasks = $taskData->groupBy('status');
         $subtask = Subtask::all();
         $user = Employee::where('unit_bisnis', $employee->unit_bisnis)->where('resign_status',0)->get();
@@ -364,8 +373,39 @@ class TaskMasterController extends Controller
                 $task->progress = ($totalSubtasks > 0) ? round(($completedSubtasks / $totalSubtasks) * 100) : 0;
                 $task->save();
             }
-            
+
         return redirect()->back()->with('success', 'Tracking stopped.');
+    }
+
+    // Komentar
+
+    public function storeKomen(Request $request, $taskId)
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        $task = TaskMaster::findOrFail($taskId);
+        $comment = new TaskComment();
+        $comment->task_id = $task->id;
+        $comment->nik = $code;
+        $comment->content = $request->content;
+        if ($request->hasFile('attachments')) {
+            $file = $request->file('attachments');
+            
+            // Mendapatkan ekstensi file
+            $extension = $file->getClientOriginalExtension();
+        
+            // Jika file adalah PDF atau JPG maka simpan
+            $path = $file->store('public/files');
+            $comment->attachments = $path;
+        }
+        $comment->save();
+
+        return redirect()->back()->with('success', 'Comment added.');
     }
 
 }

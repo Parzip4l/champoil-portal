@@ -255,75 +255,113 @@
 <!-- Modal Details -->
 @foreach ($taskData as $data)
     <div class="modal fade" id="ModalDetails{{ $data->id }}" tabindex="-1" aria-labelledby="modalDetailsLabel{{ $data->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalDetailsLabel{{ $data->id }}">Detail Task - {{ $data->title }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h5 class="mb-2">{{$data->title}}</h5>
-                    <p class="text-muted mb-4">{{$data->description}}</p>
-                    
-                    <div class="item-details d-flex mb-3">
-                        <h6 class="text-muted" style="width:100px;">Priority</h6>
-                        @if($data->priority == 'Low')
-                            <span class="badge rounded-pill bg-primary">{{ $data->priority }}</span>
-                        @elseif($data->priority == 'Medium')
-                            <span class="badge rounded-pill bg-warning">{{ $data->priority }}</span>
-                        @elseif($data->priority == 'High')
-                            <span class="badge rounded-pill bg-danger">{{ $data->priority }}</span>
-                        @endif
-                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="mb-2">{{$data->title}}</h5>
+                            <p class="text-muted mb-4">{{$data->description}}</p>
+                            
+                            <div class="item-details d-flex mb-3">
+                                <h6 class="text-muted" style="width:100px;">Priority</h6>
+                                @if($data->priority == 'Low')
+                                    <span class="badge rounded-pill bg-primary">{{ $data->priority }}</span>
+                                @elseif($data->priority == 'Medium')
+                                    <span class="badge rounded-pill bg-warning">{{ $data->priority }}</span>
+                                @elseif($data->priority == 'High')
+                                    <span class="badge rounded-pill bg-danger">{{ $data->priority }}</span>
+                                @endif
+                            </div>
 
-                    <div class="item-details d-flex mb-3">
-                        <h6 class="text-muted align-self-center" style="width:100px;">Assign To</h6>
-                        @foreach($data->assignedUsers as $user)
-                        <div class="data-user d-flex">
-                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $user->gambar) }}" alt="{{ $user->nama }}">
-                            <div class="tooltips-name">
-                                <p class="text-muted">{{ $user->nama }}</p>
+                            <div class="item-details d-flex mb-3">
+                                <h6 class="text-muted align-self-center" style="width:100px;">Assign To</h6>
+                                @foreach($data->assignedUsers as $user)
+                                <div class="data-user d-flex">
+                                    <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $user->gambar) }}" alt="{{ $user->nama }}">
+                                    <div class="tooltips-name">
+                                        <p class="text-muted">{{ $user->nama }}</p>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            <div class="item-details d-flex mb-3">
+                                <h6 class="text-muted align-self-center" style="width:100px;">Status</h6>
+                                <span class="badge rounded-pill {{ $data->status == 'Completed' ? 'bg-success' : 'bg-warning' }}">{{ $data->status }}</span>
+                            </div>
+                            <div class="item-details d-flex mb-3">
+                                <h6 class="text-muted align-self-center" style="width:100px;">Due Date</h6>
+                                @php
+                                    // Define Indonesian day names and month names
+                                    $daysInId = ['Sun' => 'Minggu', 'Mon' => 'Senin', 'Tue' => 'Selasa', 'Wed' => 'Rabu', 'Thu' => 'Kamis', 'Fri' => 'Jumat', 'Sat' => 'Sabtu'];
+                                    $monthsInId = ['01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Ags', '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'];
+                                @endphp
+                                @if($data->due_date)
+                                    @php
+                                        $date = \Carbon\Carbon::parse($data->due_date);
+                                        $day = $daysInId[$date->format('D')];
+                                        $month = $monthsInId[$date->format('m')];
+                                        $formattedDate = "{$day}, {$date->format('d')} {$month} {$date->format('Y')}";
+                                    @endphp
+                                    <h6>
+                                        {{ $formattedDate }}
+                                        @if ($date->isPast())
+                                            <span class="text-danger"> - Expired Due Date</span>
+                                        @endif
+                                    </h6>
+                                @else
+                                    <span class="text-muted">N/A</span>
+                                @endif
+                            </div>
+                            @if($data->status == 'Completed')
+                            <div class="item-details d-flex mb-3">
+                                <h6 class="text-muted align-self-center" style="width:100px;">Completed At</h6>
+                                <h6>{{$data->updated_at->format('d M Y')}}</h6>
+                            </div>
+                            @endif
+                            <div class="item-details d-flex mb-3">
+                                <h6 class="text-muted align-self-center" style="width:100px;">Attachments</h6>
+                                <a href="{{route('task.download',$data->id)}}"><i class="me-2 icon-lg" data-feather="download-cloud"></i>Download</a>
                             </div>
                         </div>
-                        @endforeach
-                    </div>
-                    <div class="item-details d-flex mb-3">
-                        <h6 class="text-muted align-self-center" style="width:100px;">Status</h6>
-                        <span class="badge rounded-pill {{ $data->status == 'Completed' ? 'bg-success' : 'bg-warning' }}">{{ $data->status }}</span>
-                    </div>
-                    <div class="item-details d-flex mb-3">
-                        <h6 class="text-muted align-self-center" style="width:100px;">Due Date</h6>
-                        @php
-                            // Define Indonesian day names and month names
-                            $daysInId = ['Sun' => 'Minggu', 'Mon' => 'Senin', 'Tue' => 'Selasa', 'Wed' => 'Rabu', 'Thu' => 'Kamis', 'Fri' => 'Jumat', 'Sat' => 'Sabtu'];
-                            $monthsInId = ['01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Ags', '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'];
-                        @endphp
-                        @if($data->due_date)
-                            @php
-                                $date = \Carbon\Carbon::parse($data->due_date);
-                                $day = $daysInId[$date->format('D')];
-                                $month = $monthsInId[$date->format('m')];
-                                $formattedDate = "{$day}, {$date->format('d')} {$month} {$date->format('Y')}";
-                            @endphp
-                            <h6>
-                                {{ $formattedDate }}
-                                @if ($date->isPast())
-                                    <span class="text-danger"> - Expired Due Date</span>
-                                @endif
-                            </h6>
-                        @else
-                            <span class="text-muted">N/A</span>
-                        @endif
-                    </div>
-                    @if($data->status == 'Completed')
-                    <div class="item-details d-flex mb-3">
-                        <h6 class="text-muted align-self-center" style="width:100px;">Completed At</h6>
-                        <h6>{{$data->updated_at->format('d M Y')}}</h6>
-                    </div>
-                    @endif
-                    <div class="item-details d-flex mb-3">
-                        <h6 class="text-muted align-self-center" style="width:100px;">Attachments</h6>
-                        <a href="{{route('task.download',$data->id)}}"><i class="me-2 icon-lg" data-feather="download-cloud"></i>Download</a>
+                        <div class="col-md-8">
+                            <div class="komen-wrap">
+                                <div class="comments-section">
+                                    <h5 class="mb-2">Activities</h5>
+                                    <div class="comments-container" style="max-height: 130px; overflow-y: auto;">
+                                        @foreach ($data->comments as $comment)
+                                        <div class="card custom-card2 mb-3">
+                                            <div class="card-body">
+                                                <div class="head-comment-wrap d-flex">
+                                                    <div class="ava-comment me-2">
+                                                        <img class="wd-45 ht-45 rounded-circle" src="{{ asset('images/' . $comment->commenter_photo) }}" alt="{{$comment->commenter_name}}">
+                                                    </div>
+                                                    <div class="user-comment me-2 align-self-center">
+                                                        <h6>{{$comment->commenter_name}}</h6>
+                                                        <p class="text-muted">{{ \Carbon\Carbon::parse($comment->created_at)->diffForHumans() }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="comment-data mt-2">
+                                                    <p class="text-muted">{{ $comment->content }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    <form action="{{ route('tasks.comments.store', $data->id) }}" method="POST" class="mt-3">
+                                        @csrf
+                                        <div class="form-group mb-2">
+                                            <textarea name="content" class="form-control" placeholder="Add a comment" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-primary">Add Comment</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <div class="title-header-data d-flex justify-content-between">
@@ -445,11 +483,17 @@
                                     @endif
                                     </a>
                                 </p>
+                                <p class="text-muted mt-2">Progress</p>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ $task->progress }}%;" aria-valuenow="{{ $task->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ round($task->progress) }}%
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-footer">
                                 <div class="footer-data-wrap">
                                     <div class="row">
-                                        <div class="col">
+                                        <div class="col-4">
                                             <div class="assigned-users d-flex">
                                                 @foreach ($task->assignedUsers->take(2) as $index => $user)
                                                     <img src="{{ asset('images/' . $user->gambar) }}" class="avatar-small" alt="{{ $user->nama }}">
@@ -459,10 +503,20 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <div class="col align-self-center">
-                                            <div class="progress">
-                                                <div class="progress-bar" role="progressbar" style="width: {{ $task->progress }}%;" aria-valuenow="{{ $task->progress }}" aria-valuemin="0" aria-valuemax="100">
-                                                    {{ round($task->progress) }}%
+                                        <div class="col-8 align-self-center">
+                                            <div class="meta-data d-flex">
+                                                <div class="comment-meta d-flex me-2">
+                                                    <i class="me-2 icon-md align-self-center" data-feather="message-square"></i><p class="align-self-center">{{$task->commentCount}}</p>
+                                                </div>
+                                                <div class="remaining-time d-flex">
+                                                    <i class="me-2 icon-md align-self-center" data-feather="clock"></i>
+                                                    @if($task->remaining_days > 0)
+                                                        <p>{{ $task->remaining_days }} Days</p>
+                                                    @elseif($task->remaining_days == 0)
+                                                        <p class="text-warning">Due Today</p> 
+                                                    @else
+                                                        <p class="text-danger">Late {{ abs($task->remaining_days) }} Days</p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -528,7 +582,7 @@
   <script>
 $(document).ready(function(){
   $(".owl-carousel").owlCarousel({
-      items: 1.5, // Number of items to display
+      items: 1.3, // Number of items to display
       loop: true, // Loop through items
       margin: 10, // Margin between items
       nav: false, // Show next/prev buttons
@@ -536,7 +590,7 @@ $(document).ready(function(){
       autoplay: false, 
       responsive: {
           0: {
-              items: 1.5
+              items: 1.3
           },
           600: {
               items: 2

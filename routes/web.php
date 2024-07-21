@@ -152,6 +152,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
         // Tracking
         Route::post('/subtasks/{id}/start', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'startTracking'])->name('subtasks.start');
         Route::post('/subtasks/{id}/stop', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'stopTracking'])->name('subtasks.stop');
+        // Komentar
+        Route::post('/tasks/{id}/comments', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeKomen'])->name('tasks.comments.store');
+
 
     // Emergency 
     Route::group(['prefix' => 'emergency'], function(){

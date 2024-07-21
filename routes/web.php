@@ -142,12 +142,12 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/save-task-item', [App\Http\Controllers\ops\TaskgController::class, 'save_item'])->name('save-task-item');
     Route::post('/save_data', [App\Http\Controllers\ops\TaskgController::class, 'store'])->name('save_data');
     // Task V2
-    Route::resource('task-management', App\Http\Controllers\TaskManagement\TaskMasterController::class);
-    Route::post('/subtasks', [App\Http\Controllers\TaskManagement\TaskMasterController::class, 'storeSubtask'])->name('subtasks.store');
+    Route::resource('task-management', App\Http\Controllers\Taskmanagement\TaskMasterController::class);
+    Route::post('/subtasks', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeSubtask'])->name('subtasks.store');
         // Subtask Status
-        Route::post('/subtask/update-status/{id}', [App\Http\Controllers\TaskManagement\TaskMasterController::class, 'updateStatus'])->name('update-status.subtask');
-        Route::put('subtask-edit/{id}', [App\Http\Controllers\TaskManagement\TaskMasterController::class, 'updateSubtask'])->name('subtask.update');
-        Route::delete('subtask/{id}', [App\Http\Controllers\TaskManagement\TaskMasterController::class, 'destroySubtask'])->name('subtask.destroy');
+        Route::post('/subtask/update-status/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateStatus'])->name('update-status.subtask');
+        Route::put('subtask-edit/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateSubtask'])->name('subtask.update');
+        Route::delete('subtask/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'destroySubtask'])->name('subtask.destroy');
 
     // Emergency 
     Route::group(['prefix' => 'emergency'], function(){

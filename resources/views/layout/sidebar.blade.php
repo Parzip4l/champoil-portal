@@ -23,93 +23,117 @@
                 </a>
             </li>
             @endif
+            @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
+                <li class="nav-item {{ active_class(['kas']) }}">
+                    <a href="{{ url('/kas') }}" class="nav-link">
+                        <i class="link-icon" data-feather="users"></i>
+                        <span class="link-title">Customer Data</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ active_class(['kas']) }}">
+                    <a href="{{ url('/kas') }}" class="nav-link">
+                        <i class="link-icon" data-feather="file-text"></i>
+                        <span class="link-title">Invoice</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ active_class(['kas']) }}">
+                    <a href="{{ url('/kas') }}" class="nav-link">
+                        <i class="link-icon" data-feather="folder"></i>
+                        <span class="link-title">Document Controls</span>
+                    </a>
+                </li>
+            @endif
 
             <!-- Employee Data -->
-            @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin))
-            <li class="nav-item nav-category">Employee</li>
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#timemanagement" role="button" aria-expanded="{{ is_active_route(['timemanagement']) }}" aria-controls="timemanagement">
-                    <i class="link-icon" data-feather="clock"></i>
-                    <span class="link-title">Time Management</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['data']) }}" id="timemanagement">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('duplikat-absen') }}" class="nav-link {{ active_class(['duplikat-absen']) }}">Duplikat Record</a>
-                        </li>
-                        @if($employee && $employee->unit_bisnis == 'Kas' && $user->project_id == NULL)
+            @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
+                @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin))
+                <li class="nav-item nav-category">Employee</li>
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#timemanagement" role="button" aria-expanded="{{ is_active_route(['timemanagement']) }}" aria-controls="timemanagement">
+                        <i class="link-icon" data-feather="clock"></i>
+                        <span class="link-title">Time Management</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['data']) }}" id="timemanagement">
+                        <ul class="nav sub-menu">
                             <li class="nav-item">
-                                <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>
+                                <a href="{{ url('absen') }}" class="nav-link {{ active_class(['absen']) }}">Attendance Record</a>
                             </li>
-                        @endif
-                        @if($employee && $employee->unit_bisnis == 'Kas')
-                            <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
-                            @if($user->project_id == NULL)
-                            <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
+                            <li class="nav-item">
+                                <a href="{{ url('duplikat-absen') }}" class="nav-link {{ active_class(['duplikat-absen']) }}">Duplikat Record</a>
+                            </li>
+                            @if($employee && $employee->unit_bisnis == 'Kas' && $user->project_id == NULL)
+                                <li class="nav-item">
+                                    <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>
+                                </li>
                             @endif
-                        @endif
-                        @if($user->project_id == NULL)
-                            <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['shift']) }}">Shift</a></li>
-                        @endif
-                        @if($employee && $employee->unit_bisnis == 'Kas'  && $user->project_id == NULL)
-                            <li class="nav-item"><a href="{{ url(route('report.index') . '?periode='.date('M-Y')) }}" class="nav-link {{ active_class(['kas/report']) }}">Report</a></li>
-                        @endif
-                        @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('client_access', $dataLogin))
-                        <li class="nav-item">
-                            <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">Pengajuan Schedule</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('attendence-request.index') }}" class="nav-link {{ active_class(['attendance/attendence-request']) }}">Attendance Request</a>
-                        </li>
-                        @endif
-                    </ul>
-                </div>
-            </li>
-            <!-- Employee Menu -->
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#employee_management" role="button" aria-expanded="{{ is_active_route(['employee_management']) }}" aria-controls="employee_management">
-                    <i class="link-icon" data-feather="users"></i>
-                    <span class="link-title">Employee Data</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['data']) }}" id="employee_management">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee Data</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('employee-resign') }}" class="nav-link {{ active_class(['employee-resign']) }}">Employee Resign</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('map-frontline') }}" class="nav-link {{ active_class(['map-frontline']) }}">Employee Home Maps</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+                            @if($employee && $employee->unit_bisnis == 'Kas')
+                                <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
+                                @if($user->project_id == NULL)
+                                <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
+                                @endif
+                            @endif
+                            @if($user->project_id == NULL)
+                                <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['shift']) }}">Shift</a></li>
+                            @endif
+                            @if($employee && $employee->unit_bisnis == 'Kas'  && $user->project_id == NULL)
+                                <li class="nav-item"><a href="{{ url(route('report.index') . '?periode='.date('M-Y')) }}" class="nav-link {{ active_class(['kas/report']) }}">Report</a></li>
+                            @endif
+                            @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('client_access', $dataLogin))
+                            <li class="nav-item">
+                                <a href="{{ route('pengajuan-schedule.index') }}" class="nav-link {{ active_class(['kas/pengajuan-schedule']) }}">Pengajuan Schedule</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('attendence-request.index') }}" class="nav-link {{ active_class(['attendance/attendence-request']) }}">Attendance Request</a>
+                            </li>
+                            @endif
+                        </ul>
+                    </div>
+                </li>
+                <!-- Employee Menu -->
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#employee_management" role="button" aria-expanded="{{ is_active_route(['employee_management']) }}" aria-controls="employee_management">
+                        <i class="link-icon" data-feather="users"></i>
+                        <span class="link-title">Employee Data</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['data']) }}" id="employee_management">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee Data</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ url('employee-resign') }}" class="nav-link {{ active_class(['employee-resign']) }}">Employee Resign</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('map-frontline') }}" class="nav-link {{ active_class(['map-frontline']) }}">Employee Home Maps</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                @endif
             @endif
             <!-- Performance Appraisal Menu -->
-            @if(in_array('superadmin_access', $dataLogin))
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#performance" role="button" aria-expanded="{{ is_active_route(['performance']) }}" aria-controls="performance">
-                    <i class="link-icon" data-feather="file-text"></i>
-                    <span class="link-title">Performance Master</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['data']) }}" id="performance">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ route('index.pa') }}" class="nav-link {{ active_class(['performance-appraisal/performance-master']) }}">Performance Appraisal</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('setting.pa') }}" class="nav-link {{ active_class(['performance-appraisal/setting']) }}">Settings</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+            @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
+                @if(in_array('superadmin_access', $dataLogin))
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#performance" role="button" aria-expanded="{{ is_active_route(['performance']) }}" aria-controls="performance">
+                        <i class="link-icon" data-feather="file-text"></i>
+                        <span class="link-title">Performance Master</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['data']) }}" id="performance">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('index.pa') }}" class="nav-link {{ active_class(['performance-appraisal/performance-master']) }}">Performance Appraisal</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('setting.pa') }}" class="nav-link {{ active_class(['performance-appraisal/setting']) }}">Settings</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                @endif
             @endif
             <!-- Reqruitment -->
             @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin))
@@ -142,20 +166,22 @@
                 </li>
                 @endif
             @endif
-            @if(in_array('superadmin_access', $dataLogin))
-            <!-- News And Announcement -->
-            <li class="nav-item {{ active_class(['/pengumuman']) }}">
-                <a href="{{ url('/pengumuman') }}" class="nav-link">
-                    <i class="link-icon" data-feather="mic"></i>
-                    <span class="link-title">Announcement</span>
-                </a>
-            </li>
-            <li class="nav-item {{ active_class(['/news']) }}">
-                <a href="{{ url('/news') }}" class="nav-link">
-                    <i class="link-icon" data-feather="file-text"></i>
-                    <span class="link-title">News</span>
-                </a>
-            </li>
+            @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
+                @if(in_array('superadmin_access', $dataLogin))
+                <!-- News And Announcement -->
+                <li class="nav-item {{ active_class(['/pengumuman']) }}">
+                    <a href="{{ url('/pengumuman') }}" class="nav-link">
+                        <i class="link-icon" data-feather="mic"></i>
+                        <span class="link-title">Announcement</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ active_class(['/news']) }}">
+                    <a href="{{ url('/news') }}" class="nav-link">
+                        <i class="link-icon" data-feather="file-text"></i>
+                        <span class="link-title">News</span>
+                    </a>
+                </li>
+                @endif
             @endif
             <!-- Payroll Menu -->
             @if(in_array('superadmin_access', $dataLogin))
@@ -193,12 +219,22 @@
                     </ul>
                 </div>
             </li>
-            <li class="nav-item {{ active_class(['koperasi']) }}">
-                <a href="{{ url('/koperasi') }}" class="nav-link">
-                    <i class="link-icon" data-feather="users"></i>
-                    <span class="link-title">Koperasi</span>
-                </a>
-            </li>
+                @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
+                    <li class="nav-item {{ active_class(['koperasi']) }}">
+                        <a href="{{ url('/koperasi') }}" class="nav-link">
+                            <i class="link-icon" data-feather="users"></i>
+                            <span class="link-title">Koperasi</span>
+                        </a>
+                    </li>
+                @endif
+                @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
+                    <li class="nav-item {{ active_class(['kas']) }}">
+                        <a href="{{ url('/kas') }}" class="nav-link">
+                            <i class="link-icon" data-feather="file"></i>
+                            <span class="link-title">Laporan Kas</span>
+                        </a>
+                    </li>
+                @endif
             @endif
             <!-- End Payrol -->
 
@@ -254,36 +290,38 @@
             @endif
             @endif
             <!-- Assets Management -->
-            @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
-            <li class="nav-item {{ active_class(['']) }}">
-                <a class="nav-link" data-bs-toggle="collapse" href="#AssetManagement" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="AssetManagement">
-                    <i class="link-icon" data-feather="box"></i>
-                    <span class="link-title">Assets Management</span>
-                    <i class="link-arrow" data-feather="chevron-down"></i>
-                </a>
-                <div class="collapse {{ show_class(['category']) }}" id="AssetManagement">
-                    <ul class="nav sub-menu">
-                        <li class="nav-item">
-                            <a href="{{ route('asset.index') }}" class="nav-link {{ active_class(['asset-management/asset']) }}">Asset</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('asset-stock.index') }}" class="nav-link {{ active_class(['asset-management/asset-stock']) }}">Asset Stok</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('asset-category.index') }}" class="nav-link {{ active_class(['asset-management/asset-category']) }}">Asset Kategori</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('asset-vendor.index') }}" class="nav-link {{ active_class(['asset-management/asset-vendor']) }}">Vendor Data</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi Histori</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+            @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
+                @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
+                <li class="nav-item {{ active_class(['']) }}">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#AssetManagement" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="AssetManagement">
+                        <i class="link-icon" data-feather="box"></i>
+                        <span class="link-title">Assets Management</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse {{ show_class(['category']) }}" id="AssetManagement">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('asset.index') }}" class="nav-link {{ active_class(['asset-management/asset']) }}">Asset</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('asset-stock.index') }}" class="nav-link {{ active_class(['asset-management/asset-stock']) }}">Asset Stok</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('asset-category.index') }}" class="nav-link {{ active_class(['asset-management/asset-category']) }}">Asset Kategori</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('asset-vendor.index') }}" class="nav-link {{ active_class(['asset-management/asset-vendor']) }}">Vendor Data</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi Histori</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                @endif
             @endif
             <!-- Report DMAIC -->
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))

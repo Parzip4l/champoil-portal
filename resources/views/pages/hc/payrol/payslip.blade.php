@@ -7,7 +7,11 @@
 @endpush
 
 @section('content')
-
+@php 
+        $user = Auth::user();
+        $dataLogin = json_decode(Auth::user()->permission); 
+        $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    @endphp
 @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -30,9 +34,11 @@
                     <li class="nav-item">
                         <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
                     </li>
+                    @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
                     <li class="nav-item">
                         <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Frontline Officer</a>
                     </li>
+                    @endif
                 </ul>
                 <div class="tab-content mt-3" id="lineTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">

@@ -458,6 +458,25 @@ class TaskMasterController extends Controller
         return redirect()->back()->with('success', 'Subtask updated successfully');
     }
 
+    public function destroy($id)
+    {
+        $taskMaster = TaskMaster::find($id);
+
+        if ($taskMaster) {
+            // Delete related records first
+            Subtask::where('task_id', $id)->delete();
+            TaskUser::where('task_id', $id)->delete();
+            TaskComment::where('task_id', $id)->delete();
+
+            // Delete the task master
+            $taskMaster->delete();
+
+            return redirect()->back()->with('success', 'Task and related data deleted successfully');
+        }
+
+        return redirect()->back()->with('error', 'Subtask not found');
+    }
+
     public function destroySubtask($id)
     {
         $subtask = Subtask::find($id);
@@ -561,5 +580,16 @@ class TaskMasterController extends Controller
         $comment->save();
 
         return redirect()->back()->with('success', 'Comment added.');
+    }
+
+    public function updateStatusDrag(Request $request, $id)
+    {
+        $task = TaskMaster::find($id);
+        if ($task) {
+            $task->status = $request->input('status');
+            $task->save();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 404);
     }
 }

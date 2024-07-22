@@ -147,6 +147,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/subtasks', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeSubtask'])->name('subtasks.store');
         // Subtask Status
         Route::post('/subtask/update-status/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateStatus'])->name('update-status.subtask');
+        Route::patch('/tasks/{id}/status', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateStatusDrag']);
         Route::put('subtask-edit/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateSubtask'])->name('subtask.update');
         Route::delete('subtask/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'destroySubtask'])->name('subtask.destroy');
         // Tracking

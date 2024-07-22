@@ -28,7 +28,7 @@ class TaskMasterController extends Controller
         // Get the IDs of tasks assigned to the current user
         $assignedTaskIds = TaskUser::where('nik', $code)->pluck('task_id');
         
-        // Fetch tasks that are assigned to the current user
+        // Fetch all tasks that are assigned to the current user
         $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
                             ->where('company', $employee->unit_bisnis)
                             ->get();
@@ -48,11 +48,11 @@ class TaskMasterController extends Controller
                                             ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
                                             ->get(['karyawan.nama', 'karyawan.gambar']);
             
-            // Get Komen
+            // Get comments
             $task->comments = TaskComment::where('task_id', $task->id)
-                             ->join('karyawan', 'task_comment.nik', '=', 'karyawan.nik')
-                             ->get(['task_comment.*', 'karyawan.nama as commenter_name', 'karyawan.gambar as commenter_photo']);
-            //  Comment Count
+                            ->join('karyawan', 'task_comment.nik', '=', 'karyawan.nik')
+                            ->get(['task_comment.*', 'karyawan.nama as commenter_name', 'karyawan.gambar as commenter_photo']);
+            // Comment count
             $task->commentCount = TaskComment::where('task_id', $task->id)->count();
             $task->remaining_days = Carbon::now()->diffInDays(Carbon::parse($task->due_date), false);
         }
@@ -62,9 +62,52 @@ class TaskMasterController extends Controller
         $user = Employee::where('unit_bisnis', $employee->unit_bisnis)->where('resign_status',0)->get();
 
         $mentionUsers = Employee::select('nik', 'nama')->get();
+
+        // Fetch tasks for current period
+        $currentDate = Carbon::now();
+        $currentTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                    ->where('company', $employee->unit_bisnis)
+                                    ->whereMonth('created_at', $currentDate->month)
+                                    ->whereYear('created_at', $currentDate->year)
+                                    ->get();
         
-        return view('pages.taskmanagement.index', compact('taskData', 'subtask', 'groupedTasks','user','mentionUsers'));
+        // Calculate totals for current period
+        $totalTasks = $currentTaskData->count();
+        $completedTasks = $currentTaskData->where('status', 'Completed')->count();
+        $inProgressTasks = $currentTaskData->where('status', 'In Progress')->count();
+        $overdueTasks = $currentTaskData->filter(function ($task) {
+            return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+        })->count();
+
+        // Fetch tasks for previous period
+        $previousDate = $currentDate->copy()->subMonth();
+        $previousTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                    ->where('company', $employee->unit_bisnis)
+                                    ->whereMonth('created_at', $previousDate->month)
+                                    ->whereYear('created_at', $previousDate->year)
+                                    ->get();
+
+        // Calculate totals for previous period
+        $previousTotalTasks = $previousTaskData->count();
+        $previousCompletedTasks = $previousTaskData->where('status', 'Completed')->count();
+        $previousInProgressTasks = $previousTaskData->where('status', 'In Progress')->count();
+        $previousOverdueTasks = $previousTaskData->filter(function ($task) {
+            return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+        })->count();
+
+        // Calculate percentages
+        $totalTasksPercentage = $previousTotalTasks > 0 ? (($totalTasks - $previousTotalTasks) / $previousTotalTasks) * 100 : 0;
+        $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
+        $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
+        $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
+
+        return view('pages.taskmanagement.index', compact(
+            'taskData', 'subtask', 'groupedTasks', 'user', 'mentionUsers',
+            'totalTasks', 'completedTasks', 'inProgressTasks', 'overdueTasks',
+            'totalTasksPercentage', 'completedTasksPercentage', 'inProgressTasksPercentage', 'overdueTasksPercentage'
+        ));
     }
+
 
 
     public function create()

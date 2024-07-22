@@ -21,13 +21,127 @@
         {{ session('error') }}
     </div>
 @endif
-<div class="row mb-2">
+<div class="row mb-3">
     <div class="topbar-wrap d-flex justify-content-between">
         <div class="arrow-back">
-            <a href="{{route('setting.pa')}}" class="d-flex color-custom">
+            <a href="{{url('dashboard')}}" class="d-flex color-custom">
                 <i class="me-2 icon-lg" data-feather="chevron-left"></i>
                 <h5 class="align-self-center">Kembali</h5>
             </a>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-3 col-12 mb-2">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h6>Total Task</h6>
+            </div>
+            <div class="card-body">
+                <h2>{{$totalTasks }}</h2>
+            </div>
+            <div class="card-footer task-management-analytics d-flex">
+                @if ($totalTasksPercentage > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($totalTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @elseif ($totalTasksPercentage < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($totalTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($totalTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-12 mb-2">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h6>Task Selesai</h6>
+            </div>
+            <div class="card-body">
+                <h2>{{$completedTasks}}</h2>
+            </div>
+            <div class="card-footer task-management-analytics d-flex">
+                @if ($completedTasksPercentage > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($completedTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @elseif ($completedTasksPercentage < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($completedTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($completedTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-12 mb-2">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h6>Task In Progress</h6>
+            </div>
+            <div class="card-body">
+                <h2>{{$inProgressTasks}}</h2>
+            </div>
+            <div class="card-footer task-management-analytics d-flex">
+                @if ($inProgressTasksPercentage > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($inProgressTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @elseif ($inProgressTasksPercentage < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($inProgressTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($inProgressTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-12 mb-2">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h6>Task Over Due</h6>
+            </div>
+            <div class="card-body">
+                <h2>{{$overdueTasks}}</h2>
+            </div>
+            <div class="card-footer task-management-analytics d-flex">
+                @if ($overdueTasksPercentage > 0)
+                    <span class="badge rounded-pill me-2 bg-success">
+                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($overdueTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @elseif ($overdueTasksPercentage < 0)
+                    <span class="badge rounded-pill me-2 bg-danger">
+                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($overdueTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @else
+                    <span class="badge rounded-pill me-2 bg-secondary">
+                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($overdueTasksPercentage, 2) }}%
+                    </span>
+                    <p class="text-muted">Dari Periode Sebelumnya</p>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -46,6 +160,11 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
+                <!-- Input untuk pencarian -->
+                <div class="mb-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search for tasks...">
+                </div>
+
                 @foreach(['Completed' => 'bg-success', 'In Progress' => 'bg-warning', 'TO DO' => 'bg-primary'] as $status => $badgeClass)
                     @if(isset($groupedTasks[$status]) && $groupedTasks[$status]->isNotEmpty())
                         <h4>{{ $status }}</h4>
@@ -61,7 +180,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="task-table">
                                 @foreach($groupedTasks[$status] as $data)
                                 <tr>
                                     <td><a href="#" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$data->id}}">{{ $data->title }}</a></td>
@@ -138,6 +257,7 @@
                 @endforeach
             </div>
         </div>
+
     </div>
   </div>
 </div>
@@ -532,7 +652,7 @@
         </div>
     </div>
 </div>
-<div class="row mobile">
+<div class="row mobile pb-6">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header">
@@ -945,4 +1065,23 @@ document.addEventListener('DOMContentLoaded', function() {
         background-color: #eee;
     }
 </style>
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+    let input = this.value.toLowerCase();
+    let tables = document.querySelectorAll('.task-table');
+    
+    tables.forEach(table => {
+        let rows = table.getElementsByTagName('tr');
+        
+        Array.from(rows).forEach(row => {
+            let taskTitle = row.getElementsByTagName('td')[0].innerText.toLowerCase();
+            if (taskTitle.includes(input)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 @endpush

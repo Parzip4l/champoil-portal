@@ -291,7 +291,7 @@
             @endif
             <!-- Assets Management -->
             @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
-                @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin))
+                @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin)|| in_array('sc_access', $dataLogin))
                 <li class="nav-item {{ active_class(['']) }}">
                     <a class="nav-link" data-bs-toggle="collapse" href="#AssetManagement" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="AssetManagement">
                         <i class="link-icon" data-feather="box"></i>

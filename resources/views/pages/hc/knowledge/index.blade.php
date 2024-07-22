@@ -119,10 +119,11 @@
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Level</label>
                             <select name="level" class="form-control" id="level">
-                                <option value="base">BASE</option>
-                                <option value="leader">LEADER</option>
-                                <option value="danru">DANRU</option>
-                                <option value="chief">CHIEFT</option>
+                                <option value="1">Mandatory Skill</option>
+                                <option value="2">Value added Skill</option>
+                                <option value="3">Basic Skill</option>
+                                <option value="4">Intermediate Skill</option>
+                                <option value="5">Advance Skill</option>
                             </select>
                         </div>
                         <div class="col-md-12 mt-2">

@@ -93,15 +93,19 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col mb-3">
+                <div class="col-md-3 mb-3">
                     <label for="kode_karyawan" class="form-label">Email</label>
                     <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id" value="{{$employee->email}}" required>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
                     <input id="telepon" class="form-control" name="telepon" type="text" placeholder="08xxxxxx" value="{{$employee->telepon}}" required>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3">
+                    <label for="kode_karyawan" class="form-label">Slack ID</label>
+                    <input id="slack_id" class="form-control" name="slack_id" value="{{$employee->slack_id}}" type="text" required>
+                </div>
+                <div class="col-md-3 mb-3">
                     <label for="kode_karyawan" class="form-label">Nomor Telepon Darurat</label>
                     <input id="telepon" class="form-control" name="telepon_darurat" type="text" placeholder="08xxxxxx" value="{{$employee->telepon_darurat}}">
                 </div>
@@ -380,10 +384,7 @@
                             <label for="kode_karyawan" class="form-label">Email</label>
                             <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id" value="{{$employee->email}}" readonly>
                         </div>
-                        <div class="col">
-                            <label for="kode_karyawan" class="form-label">Slack ID</label>
-                            <input id="slack_id" class="form-control" name="slack_id" type="text" required>
-                        </div>
+                        
                         <div class="col-md-6 mb-3">
                             <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
                             <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx" value="{{$employee->telepon}}" required>

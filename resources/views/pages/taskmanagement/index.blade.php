@@ -161,10 +161,19 @@
         <div class="card-body">
             <div class="table-responsive">
                 <!-- Input untuk pencarian -->
-                <div class="mb-4">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search for tasks...">
-                </div>
-
+                 <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <button class="btn btn-success" id="filterAll">All Task</button>
+                            <button class="btn btn-primary" id="filterMyTasks">My Tasks</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search for tasks...">
+                        </div>
+                    </div>
+                 </div>
                 @foreach(['Completed' => 'bg-success', 'In Progress' => 'bg-warning', 'TO DO' => 'bg-primary'] as $status => $badgeClass)
                     @if(isset($groupedTasks[$status]) && $groupedTasks[$status]->isNotEmpty())
                         <h4>{{ $status }}</h4>
@@ -176,6 +185,7 @@
                                     <th>Priority</th>
                                     <th>Status</th>
                                     <th>Subtask</th>
+                                    <th>Due Date</th>
                                     <th>User</th>
                                     <th>Action</th>
                                 </tr>
@@ -219,10 +229,14 @@
                                             <i data-feather="plus" class="icon-sm"></i>
                                         </a>
                                     </td>
+                                    @php
+                                        $formattedDate = \Carbon\Carbon::parse($data->due_date);
+                                    @endphp
+                                    <td>{{$formattedDate->format('D, d M Y')}}</td>
                                     <td class="d-flex">
                                         @foreach($data->assignedUsers as $user)
                                         <div class="data-user d-flex">
-                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $user->gambar) }}" alt="{{ $user->nama }}">
+                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $user->gambar) }}" alt="{{ $user->nik }}">
                                             <div class="tooltips-name">
                                                 <p class="text-muted">{{ $user->nama }}</p>
                                             </div>
@@ -1009,5 +1023,36 @@ document.getElementById('searchInput').addEventListener('input', function() {
         });
     });
 });
+</script>
+<script>
+    document.getElementById('filterAll').addEventListener('click', function() {
+    // Tampilkan semua baris tugas
+    const tasks = document.querySelectorAll('.task-table tr');
+    tasks.forEach(task => {
+        task.style.display = 'table-row'; // Tampilkan semua baris
+    });
+});
+
+document.getElementById('filterMyTasks').addEventListener('click', function() {
+    const userNIK = '{{ Auth::user()->name }}'; // Menggunakan NIK dari Auth
+    const tasks = document.querySelectorAll('.task-table tr');
+
+    tasks.forEach(task => {
+        const assignedUsers = task.querySelector('.data-user');
+        if (assignedUsers) {
+            const userImages = assignedUsers.querySelectorAll('img');
+            const isAssignedToUser = Array.from(userImages).some(img => {
+                const altText = img.alt || ''; // Default to empty string if alt is undefined
+                return altText === userNIK; // Periksa NIK pengguna
+            });
+            if (isAssignedToUser) {
+                task.style.display = 'table-row'; // Tampilkan baris jika sesuai
+            } else {
+                task.style.display = 'none'; // Sembunyikan baris jika tidak sesuai
+            }
+        }
+    });
+});
+
 </script>
 @endpush

@@ -24,15 +24,25 @@ class TaskMasterController extends Controller
     {
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
+        $userRoles = json_decode(Auth::user()->permission);  // Assuming roles are stored in a way you can access them
+
+        // Initialize $assignedTaskIds as null
+        $assignedTaskIds = null;
         
-        // Get the IDs of tasks assigned to the current user
-        $assignedTaskIds = TaskUser::where('nik', $code)->pluck('task_id');
-        
-        // Fetch all tasks that are assigned to the current user
-        $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
-                            ->where('company', $employee->unit_bisnis)
-                            ->get();
-        
+        // Check if user has superadmin_access or similar role
+        if (in_array('superadmin_access', $userRoles) || in_array('am_access', $userRoles) || in_array('client_access', $userRoles)) {
+            // Fetch all tasks for users with the access role
+            $taskData = TaskMaster::where('company', $employee->unit_bisnis)->get();
+        } else {
+            // Get the IDs of tasks assigned to the current user
+            $assignedTaskIds = TaskUser::where('nik', $code)->pluck('task_id');
+            
+            // Fetch all tasks that are assigned to the current user
+            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $employee->unit_bisnis)
+                                ->get();
+        }
+
         foreach ($taskData as $task) {
             $task->subtasks = Subtask::where('task_id', $task->id)->get();
             $task->total_subtasks = $task->subtasks->count();
@@ -46,7 +56,7 @@ class TaskMasterController extends Controller
             // Get assigned users for the task
             $task->assignedUsers = TaskUser::where('task_id', $task->id)
                                             ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
-                                            ->get(['karyawan.nama', 'karyawan.gambar']);
+                                            ->get(['karyawan.nama', 'karyawan.gambar', 'karyawan.nik']);
             
             // Get comments
             $task->comments = TaskComment::where('task_id', $task->id)
@@ -63,43 +73,82 @@ class TaskMasterController extends Controller
 
         $mentionUsers = Employee::select('nik', 'nama')->get();
 
-        // Fetch tasks for current period
+        // Only calculate and fetch tasks for current and previous periods
         $currentDate = Carbon::now();
-        $currentTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
-                                    ->where('company', $employee->unit_bisnis)
-                                    ->whereMonth('created_at', $currentDate->month)
-                                    ->whereYear('created_at', $currentDate->year)
-                                    ->get();
         
-        // Calculate totals for current period
-        $totalTasks = $currentTaskData->count();
-        $completedTasks = $currentTaskData->where('status', 'Completed')->count();
-        $inProgressTasks = $currentTaskData->where('status', 'In Progress')->count();
-        $overdueTasks = $currentTaskData->filter(function ($task) {
-            return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
-        })->count();
+        if ($assignedTaskIds) {
+            // Calculate statistics for assigned tasks only
+            $currentTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                        ->where('company', $employee->unit_bisnis)
+                                        ->whereMonth('created_at', $currentDate->month)
+                                        ->whereYear('created_at', $currentDate->year)
+                                        ->get();
 
-        // Fetch tasks for previous period
-        $previousDate = $currentDate->copy()->subMonth();
-        $previousTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
-                                    ->where('company', $employee->unit_bisnis)
-                                    ->whereMonth('created_at', $previousDate->month)
-                                    ->whereYear('created_at', $previousDate->year)
-                                    ->get();
+            // Calculate totals for current period
+            $totalTasks = $currentTaskData->count();
+            $completedTasks = $currentTaskData->where('status', 'Completed')->count();
+            $inProgressTasks = $currentTaskData->where('status', 'In Progress')->count();
+            $overdueTasks = $currentTaskData->filter(function ($task) {
+                return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+            })->count();
 
-        // Calculate totals for previous period
-        $previousTotalTasks = $previousTaskData->count();
-        $previousCompletedTasks = $previousTaskData->where('status', 'Completed')->count();
-        $previousInProgressTasks = $previousTaskData->where('status', 'In Progress')->count();
-        $previousOverdueTasks = $previousTaskData->filter(function ($task) {
-            return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
-        })->count();
+            // Fetch tasks for previous period
+            $previousDate = $currentDate->copy()->subMonth();
+            $previousTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                        ->where('company', $employee->unit_bisnis)
+                                        ->whereMonth('created_at', $previousDate->month)
+                                        ->whereYear('created_at', $previousDate->year)
+                                        ->get();
 
-        // Calculate percentages
-        $totalTasksPercentage = $previousTotalTasks > 0 ? (($totalTasks - $previousTotalTasks) / $previousTotalTasks) * 100 : 0;
-        $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
-        $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
-        $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
+            // Calculate totals for previous period
+            $previousTotalTasks = $previousTaskData->count();
+            $previousCompletedTasks = $previousTaskData->where('status', 'Completed')->count();
+            $previousInProgressTasks = $previousTaskData->where('status', 'In Progress')->count();
+            $previousOverdueTasks = $previousTaskData->filter(function ($task) {
+                return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+            })->count();
+
+            // Calculate percentages
+            $totalTasksPercentage = $previousTotalTasks > 0 ? (($totalTasks - $previousTotalTasks) / $previousTotalTasks) * 100 : 0;
+            $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
+            $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
+            $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
+        } else {
+            // If superadmin, calculate stats for all tasks
+            $currentTaskData = TaskMaster::where('company', $employee->unit_bisnis)
+                                        ->whereMonth('created_at', $currentDate->month)
+                                        ->whereYear('created_at', $currentDate->year)
+                                        ->get();
+
+            // Calculate totals for current period
+            $totalTasks = $currentTaskData->count();
+            $completedTasks = $currentTaskData->where('status', 'Completed')->count();
+            $inProgressTasks = $currentTaskData->where('status', 'In Progress')->count();
+            $overdueTasks = $currentTaskData->filter(function ($task) {
+                return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+            })->count();
+
+            // Fetch tasks for previous period
+            $previousDate = $currentDate->copy()->subMonth();
+            $previousTaskData = TaskMaster::where('company', $employee->unit_bisnis)
+                                        ->whereMonth('created_at', $previousDate->month)
+                                        ->whereYear('created_at', $previousDate->year)
+                                        ->get();
+
+            // Calculate totals for previous period
+            $previousTotalTasks = $previousTaskData->count();
+            $previousCompletedTasks = $previousTaskData->where('status', 'Completed')->count();
+            $previousInProgressTasks = $previousTaskData->where('status', 'In Progress')->count();
+            $previousOverdueTasks = $previousTaskData->filter(function ($task) {
+                return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+            })->count();
+
+            // Calculate percentages
+            $totalTasksPercentage = $previousTotalTasks > 0 ? (($totalTasks - $previousTotalTasks) / $previousTotalTasks) * 100 : 0;
+            $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
+            $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
+            $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
+        }
 
         return view('pages.taskmanagement.index', compact(
             'taskData', 'subtask', 'groupedTasks', 'user', 'mentionUsers',
@@ -107,6 +156,7 @@ class TaskMasterController extends Controller
             'totalTasksPercentage', 'completedTasksPercentage', 'inProgressTasksPercentage', 'overdueTasksPercentage'
         ));
     }
+
 
 
 
@@ -128,9 +178,11 @@ class TaskMasterController extends Controller
         if (!$company) {
             return redirect()->back()->with('error', 'Company not found for the current user.');
         }
+
         $request->validate([
             'title' => 'required|string|max:255',
         ]);
+
         DB::beginTransaction();
         try {
             // Simpan Task
@@ -143,6 +195,7 @@ class TaskMasterController extends Controller
             $task->due_date = $request->due_date;
             $task->priority = $request->priority;
             $task->company = $company->unit_bisnis;
+
             if ($request->hasFile('attachments')) {
                 $file = $request->file('attachments');
                 
@@ -159,14 +212,34 @@ class TaskMasterController extends Controller
                 $task->attachments = $path;
             }
 
-           $task->save();
+            $task->save();
 
-           foreach ($request->user as $userNik) {
+            foreach ($request->user as $userNik) {
                 TaskUser::create([
                     'task_id' => $task_id,
                     'nik' => $userNik,
                 ]);
             }
+
+            // Check if there are subtasks and if repeat interval is provided
+            $hasSubtasks = Subtask::where('task_id', $task_id)->exists();
+
+            if ($hasSubtasks && $request->repeat_interval) {
+                $task->repeat_interval = $request->repeat_interval;
+                switch ($task->repeat_interval) {
+                    case 'daily':
+                        $task->next_due_date = Carbon::parse($task->due_date)->addDay();
+                        break;
+                    case 'weekly':
+                        $task->next_due_date = Carbon::parse($task->due_date)->addWeek();
+                        break;
+                    case 'monthly':
+                        $task->next_due_date = Carbon::parse($task->due_date)->addMonth();
+                        break;
+                }
+                $task->save();
+            }
+
             DB::commit();
             return redirect()->route('task-management.index')->with('success', 'Task berhasil dibuat');
         } catch (\Exception $e) {
@@ -174,6 +247,7 @@ class TaskMasterController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     public function edit($id)
     {
@@ -211,38 +285,74 @@ class TaskMasterController extends Controller
             return redirect()->route('task-management.index')->with('error', 'Task not found');
         }
 
-        // Update task details
-        $task->title = $request->input('title');
-        $task->description = $request->input('deskripsi');
-        $task->due_date = $request->input('due_date');
-        $task->priority = $request->input('priority');
+        DB::beginTransaction();
+        try {
+            // Update task details
+            $task->title = $request->input('title');
+            $task->description = $request->input('deskripsi');
+            $task->due_date = $request->input('due_date');
+            $task->priority = $request->input('priority');
 
-        // Handle file upload
-        if ($request->hasFile('attachments')) {
-            $file = $request->file('attachments');
-            $filename = time() . '-' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename); // Adjust path as needed
-            $task->attachments = $filename;
+            // Handle file upload
+            if ($request->hasFile('attachments')) {
+                $file = $request->file('attachments');
+                $extension = $file->getClientOriginalExtension();
+
+                if ($extension !== 'pdf' && $extension !== 'jpg' && $extension !== 'zip' && $extension !== 'rar') {
+                    return redirect()->back()->with('error', 'Only PDF, JPG, ZIP, and RAR files are allowed.');
+                }
+
+                $filename = time() . '-' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename); // Adjust path as needed
+                $task->attachments = $filename;
+            }
+
+            $task->save();
+
+            // Update assigned users
+            $assignedUsers = $request->input('user');
+
+            // Delete existing assignments
+            TaskUser::where('task_id', $id)->delete();
+
+            // Add new assignments
+            foreach ($assignedUsers as $nik) {
+                TaskUser::create([
+                    'task_id' => $task->id,
+                    'nik' => $nik,
+                ]);
+            }
+
+            // Check if there are subtasks and if repeat interval is provided
+            $hasSubtasks = Subtask::where('task_id', $task->id)->exists();
+
+        if ($hasSubtasks && $request->repeat_interval) {
+            $task->repeat_interval = $request->repeat_interval;
+            switch ($task->repeat_interval) {
+                case 'daily':
+                    $task->next_due_date = Carbon::parse($task->due_date)->addDay();
+                    break;
+                case 'weekly':
+                    $task->next_due_date = Carbon::parse($task->due_date)->addWeek();
+                    break;
+                case 'monthly':
+                    $task->next_due_date = Carbon::parse($task->due_date)->addMonth();
+                    break;
+            }
+            $task->save();
+        } elseif (!$hasSubtasks) {
+            // Mengembalikan error jika tidak ada subtasks
+            return redirect()->back()->with('error', 'Task tidak memiliki subtask.');
         }
 
-        $task->save();
-
-        // Update assigned users
-        $assignedUsers = $request->input('user');
-
-        // Delete existing assignments
-        TaskUser::where('task_id', $id)->delete();
-
-        // Add new assignments
-        foreach ($assignedUsers as $nik) {
-            TaskUser::create([
-                'task_id' => $task->id,
-                'nik' => $nik,
-            ]);
+            DB::commit();
+            return redirect()->route('task-management.index')->with('success', 'Task updated successfully');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
-
-        return redirect()->route('task-management.index')->with('success', 'Task updated successfully');
     }
+
 
 
     public function storeSubtask(Request $request)

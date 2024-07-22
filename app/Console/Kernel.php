@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        \App\Console\Commands\RepeatTasks::class,
     ];
 
     /**
@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('kirim:artikel')->dailyAt('08:30');
+        $schedule->command('tasks:repeat')->daily();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 @push('plugin-styles')
     <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
     <!-- Add other plugin styles if needed -->
 @endpush
 
@@ -78,6 +79,15 @@
                         </div>
                     </div>
                     <div class="form-group mb-2">
+                        <label class="form-label" for="repeat_interval">Repeat Interval</label>
+                        <select name="repeat_interval" class="form-control">
+                            <option value="">None</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-2">
                         <label class="form-label" for="user">Assign User</label>
                         <div class="custom-select-wrapper">
                             <select name="user[]" class="form-control select2" multiple>
@@ -101,10 +111,29 @@
 
 @push('plugin-scripts')
   <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <!-- Add other plugin scripts if needed -->
 @endpush
 
 @push('custom-scripts')
     <script src="{{ asset('assets/js/select2.js') }}"></script>
+    <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
     <!-- Add other custom scripts if needed -->
+    <script>
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '{{ session('error') }}',
+            });
+        @endif
+    </script>
 @endpush

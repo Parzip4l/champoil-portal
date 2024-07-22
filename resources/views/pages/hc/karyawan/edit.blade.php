@@ -380,6 +380,10 @@
                             <label for="kode_karyawan" class="form-label">Email</label>
                             <input id="email" class="form-control" name="email" type="email" placeholder="johndoe@champoil.co.id" value="{{$employee->email}}" readonly>
                         </div>
+                        <div class="col">
+                            <label for="kode_karyawan" class="form-label">Slack ID</label>
+                            <input id="slack_id" class="form-control" name="slack_id" type="text" required>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
                             <input id="telepon" class="form-control" name="telepon" type="number" placeholder="08xxxxxx" value="{{$employee->telepon}}" required>

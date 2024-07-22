@@ -40,7 +40,8 @@ class Employee extends Model
         'jenis_kelamin',
         'unit_bisnis',
         'manager',
-        'level'
+        'level',
+        'slack_id'
     ];
 
     public function karyawan()

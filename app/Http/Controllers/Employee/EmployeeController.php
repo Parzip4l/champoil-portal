@@ -185,6 +185,7 @@ class EmployeeController extends Controller
             $data->unit_bisnis = $company->unit_bisnis;
             $data->golongan = $request->level;
             $data->manager = $request->manager;
+            $data->slack_id = $request->slack_id;
             $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
             if ($request->hasFile('gambar')) {
@@ -445,6 +446,8 @@ Password: ".$request->password;
             $employee->referal_code = $request->input('referal_code');
             $employee->golongan = $request->input('golongan');
             $employee->manager = $request->input('atasan_langsung');
+            $employee->slack_id = $request->input('slack_id');
+            
 
             // Update the employee's photo if a new one is provided
             if ($request->hasFile('gambar')) {

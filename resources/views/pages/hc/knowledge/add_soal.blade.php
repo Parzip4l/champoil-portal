@@ -59,90 +59,126 @@
                     </div>
                     @endforeach
                     <?php }else{ ?>
+                        @if($value_master->soal)
+                            @foreach($value_master->soal as $row)
+                            <div class="mb-3">
+                                <label class="form-label" for="basic-default-fullname">Quessioner</label>
+                                <textarea class="form-control">{{ $row->master_soal }}</textarea>
+                                @if($row->list_jawaban)
+                                    @foreach($row->list_jawaban as $jwb)
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
+                                                    <span id="basic-icon-default-fullname2" 
+                                                            class="input-group-text">A</span>
+                                                    <input type="text" 
+                                                            class="form-control" 
+                                                            value="{{ $jwb->jawaban }}"
+                                                            id="basic-icon-default-fullname" 
+                                                            placeholder="Option">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2  mt-3">
+                                                <input type="text" 
+                                                        class="form-control" 
+                                                        value="{{ $jwb->point }}"
+                                                        placeholder="Point"
+                                                        id="basic-default-fullname">
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                                
+
+                                <hr/>
+                                
+                            </div>
+                            @endforeach
+                        @endif
                     <div id="list_soal">
                     <div class="mb-3">
                         <label class="form-label" for="basic-default-fullname">Quessioner</label>
                         <textarea class="form-control" name="master_soal[]"></textarea>
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
-                                        <span id="basic-icon-default-fullname2" 
-                                              class="input-group-text">A</span>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               name="jawaban_1[]"
-                                               id="basic-icon-default-fullname" 
-                                               placeholder="Option">
-                                    </div>
-                                </div>
-                                <div class="col-md-2  mt-3">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
+                                    <span id="basic-icon-default-fullname2" 
+                                            class="input-group-text">A</span>
                                     <input type="text" 
-                                           name="point_1[]" 
-                                           class="form-control" 
-                                           placeholder="Point"
-                                           id="basic-default-fullname">
+                                            class="form-control" 
+                                            name="jawaban_1[]"
+                                            id="basic-icon-default-fullname" 
+                                            placeholder="Option">
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
-                                        <span id="basic-icon-default-fullname2" 
-                                              class="input-group-text">B</span>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               name="jawaban_1[]"
-                                               id="basic-icon-default-fullname" 
-                                               placeholder="Option">
-                                    </div>
-                                </div>
-                                <div class="col-md-2  mt-3">
+                            <div class="col-md-2  mt-3">
+                                <input type="text" 
+                                        name="point_1[]" 
+                                        class="form-control" 
+                                        placeholder="Point"
+                                        id="basic-default-fullname">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
+                                    <span id="basic-icon-default-fullname2" 
+                                            class="input-group-text">B</span>
                                     <input type="text" 
-                                           name="point_1[]" 
-                                           class="form-control" 
-                                           placeholder="Point"
-                                           id="basic-default-fullname">
+                                            class="form-control" 
+                                            name="jawaban_1[]"
+                                            id="basic-icon-default-fullname" 
+                                            placeholder="Option">
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
-                                        <span id="basic-icon-default-fullname2" 
-                                              class="input-group-text">C</span>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               name="jawaban_1[]"
-                                               id="basic-icon-default-fullname" 
-                                               placeholder="Option">
-                                    </div>
-                                </div>
-                                <div class="col-md-2  mt-3">
+                            <div class="col-md-2  mt-3">
+                                <input type="text" 
+                                        name="point_1[]" 
+                                        class="form-control" 
+                                        placeholder="Point"
+                                        id="basic-default-fullname">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
+                                    <span id="basic-icon-default-fullname2" 
+                                            class="input-group-text">C</span>
                                     <input type="text" 
-                                           name="point_1[]" 
-                                           class="form-control" 
-                                           placeholder="Point"
-                                           id="basic-default-fullname">
+                                            class="form-control" 
+                                            name="jawaban_1[]"
+                                            id="basic-icon-default-fullname" 
+                                            placeholder="Option">
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
-                                        <span id="basic-icon-default-fullname2" 
-                                              class="input-group-text">D</span>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               name="jawaban_1[]"
-                                               id="basic-icon-default-fullname" 
-                                               placeholder="Option">
-                                    </div>
-                                </div>
-                                <div class="col-md-2  mt-3">
+                            <div class="col-md-2  mt-3">
+                                <input type="text" 
+                                        name="point_1[]" 
+                                        class="form-control" 
+                                        placeholder="Point"
+                                        id="basic-default-fullname">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="input-group input-group-merge mt-3" style="margin-left:30px; padding-right:10px">
+                                    <span id="basic-icon-default-fullname2" 
+                                            class="input-group-text">D</span>
                                     <input type="text" 
-                                           name="point_1[]" 
-                                           class="form-control" 
-                                           placeholder="Point"
-                                           id="basic-default-fullname">
+                                            class="form-control" 
+                                            name="jawaban_1[]"
+                                            id="basic-icon-default-fullname" 
+                                            placeholder="Option">
                                 </div>
-                            </div><hr/>
+                            </div>
+                            <div class="col-md-2  mt-3">
+                                <input type="text" 
+                                        name="point_1[]" 
+                                        class="form-control" 
+                                        placeholder="Point"
+                                        id="basic-default-fullname">
+                            </div>
+                        </div><hr/>
                         
                     </div>
                     </div>

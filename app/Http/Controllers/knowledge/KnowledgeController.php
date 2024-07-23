@@ -141,6 +141,15 @@ class KnowledgeController extends Controller
 
     public function add_soal($id){
         $data['value_master'] = Knowledge::find($id);
+        if($data['value_master']){
+                $data['value_master']->soal = Knowledge_soal::where('master_test',$data['value_master']->id)->get();
+                if($data['value_master']->soal){
+                    foreach($data['value_master']->soal as $row){
+                        $row->list_jawaban = Knowledge_jawaban::where('id_soal',$row->id)->get();
+                    }
+                }
+                
+        }
         return view('pages.hc.knowledge.add_soal',$data);
     }
 

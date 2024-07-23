@@ -9,7 +9,12 @@
 @endpush
 
 @section('content')
-
+@php 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+    $feedback = \App\Feedback::where('name', Auth::user()->name)->first();
+    $dataLogin = json_decode(Auth::user()->permission);
+    $user = Auth::user();
+@endphp
 @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -21,126 +26,68 @@
         {{ session('error') }}
     </div>
 @endif
-<div class="row mb-3">
-    <div class="topbar-wrap d-flex justify-content-between">
-        <div class="arrow-back">
-            <a href="{{url('dashboard')}}" class="d-flex color-custom">
-                <i class="me-2 icon-lg" data-feather="chevron-left"></i>
-                <h5 class="align-self-center">Kembali</h5>
-            </a>
+<div class="row mb-2">
+    <div class="top-mobile-wrap d-flex justify-content-between">
+        <div class="greeting-wrap">
+            <h4>Hi, {{$employee->nama}}!</h4>
+            <h6>{{$greeting}}</h6>
+        </div>
+        <div class="create-new-task mobile">
+            <a href="{{route('task-management.create')}}" class="btn btn-primary"><i class="icon-sm" data-feather="plus"></i></a>
         </div>
     </div>
 </div>
 <div class="row mb-4">
-    <div class="col-md-3 col-12 mb-2">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h6>Total Task</h6>
-            </div>
-            <div class="card-body">
-                <h2>{{$totalTasks }}</h2>
-            </div>
-            <div class="card-footer task-management-analytics d-flex">
-                @if ($totalTasksPercentage > 0)
-                    <span class="badge rounded-pill me-2 bg-success">
-                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($totalTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @elseif ($totalTasksPercentage < 0)
-                    <span class="badge rounded-pill me-2 bg-danger">
-                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($totalTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @else
-                    <span class="badge rounded-pill me-2 bg-secondary">
-                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($totalTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @endif
+    <h4 class="mobile mb-2 mt-4">Task Overview</h4>
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#777CF0">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="file-text"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$totalTasks }}</h1>
+                        <p>Total Task</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-12 mb-2">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h6>Task Selesai</h6>
-            </div>
-            <div class="card-body">
-                <h2>{{$completedTasks}}</h2>
-            </div>
-            <div class="card-footer task-management-analytics d-flex">
-                @if ($completedTasksPercentage > 0)
-                    <span class="badge rounded-pill me-2 bg-success">
-                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($completedTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @elseif ($completedTasksPercentage < 0)
-                    <span class="badge rounded-pill me-2 bg-danger">
-                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($completedTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @else
-                    <span class="badge rounded-pill me-2 bg-secondary">
-                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($completedTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @endif
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#44BBF9">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="check-circle"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$completedTasks}}</h1>
+                        <p>Completed</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-12 mb-2">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h6>Task In Progress</h6>
-            </div>
-            <div class="card-body">
-                <h2>{{$inProgressTasks}}</h2>
-            </div>
-            <div class="card-footer task-management-analytics d-flex">
-                @if ($inProgressTasksPercentage > 0)
-                    <span class="badge rounded-pill me-2 bg-success">
-                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($inProgressTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @elseif ($inProgressTasksPercentage < 0)
-                    <span class="badge rounded-pill me-2 bg-danger">
-                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($inProgressTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @else
-                    <span class="badge rounded-pill me-2 bg-secondary">
-                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($inProgressTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @endif
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#FBB855">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="clock"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$inProgressTasks}}</h1>
+                        <p>In Progress</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-12 mb-2">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h6>Task Over Due</h6>
-            </div>
-            <div class="card-body">
-                <h2>{{$overdueTasks}}</h2>
-            </div>
-            <div class="card-footer task-management-analytics d-flex">
-                @if ($overdueTasksPercentage > 0)
-                    <span class="badge rounded-pill me-2 bg-success">
-                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($overdueTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @elseif ($overdueTasksPercentage < 0)
-                    <span class="badge rounded-pill me-2 bg-danger">
-                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($overdueTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @else
-                    <span class="badge rounded-pill me-2 bg-secondary">
-                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($overdueTasksPercentage, 2) }}%
-                    </span>
-                    <p class="text-muted">Dari Periode Sebelumnya</p>
-                @endif
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#C10000">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="x-circle"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$overdueTasks}}</h1>
+                        <p>Over Due</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -284,7 +231,7 @@
                 <h5 class="modal-title" id="subtaskModalLabel">Tambah Subtask</h5>
             </div>
             <div class="modal-body">
-                <form id="subtaskForm" action="{{ route('subtasks.store') }}" method="POST">
+                <form id="subtaskForm" action="{{ route('subtasks.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="task_id" id="task_id">
                     <div class="form-group mb-2">
@@ -294,6 +241,10 @@
                     <div class="form-group mb-2">
                         <label class="form-label" for="description">Deskripsi</label>
                         <textarea name="description[]" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="form-label" for="description">Attachements</label>
+                        <input type="file" class="form-control" name="attachments[]">
                     </div>
                     <div class="form-group mb-2">
                         <label class="form-label" for="due_date">Due Date</label>
@@ -309,10 +260,11 @@
         </div>
     </div>
 </div>
+
 <!-- Detail Subtask -->
 @foreach ($taskData as $data)
 <div class="modal fade modal-subtask" id="subtaskModalDetails{{ $data->id }}" tabindex="-1" aria-labelledby="subtaskModalDetailsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="subtaskModalDetailsLabel">Detail Subtask</h5>
@@ -322,11 +274,12 @@
                 <table class="table table-responsive">
                     <thead>
                         <tr>
-                            <th>Select</th>
+                            <th>Complete Subtask</th>
                             <th>Judul</th>
                             <th>Status</th>
                             <th>Deskripsi</th>
                             <th>Due Date</th>
+                            <th>Attachemnts</th>
                             <th>Tracking</th>
                             <th>Delete</th>
                         </tr>
@@ -347,6 +300,13 @@
                                 </td>
                                 <td>{{ $subtask->description }}</td>
                                 <td>{{ $subtask->due_date }}</td>
+                                <td>
+                                    @if($subtask->attachments != null)
+                                    <a href="{{route('subtask.download',$subtask->id)}}"><i class="icon-lg" data-feather="download-cloud"></i> Download</a>
+                                    @else
+                                    No Attachment Data
+                                    @endif
+                                </td>
                                 <td>
                                     @if($subtask->time_start == null)
                                         <form action="{{ route('subtasks.start', $subtask->id) }}" method="POST" id="form-tracking">
@@ -563,23 +523,12 @@
 <!-- \Filter Data -->
 <div class="row mobile">
     <div class="col-md-12">
-        <div class="tombol-mobile-task-wrap d-flex justify-content-between">
-            <div class="filters">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Filter
-                    </button>
-                    <div class="dropdown-menu p-4" aria-labelledby="filterDropdown">
-                        <a class="dropdown-item filter-btn mb-2" data-status="All">All</a>
-                        <a class="dropdown-item filter-btn mb-2" data-status="Low">Low</a>
-                        <a class="dropdown-item filter-btn mb-2" data-status="Medium">Medium</a>
-                        <a class="dropdown-item filter-btn mb-2" data-status="High">High</a>
-                    </div>
-                </div>
-            </div>
-            <div class="add-data">
-                <a href="{{route('task-management.create')}}" class="btn btn-primary">Create Task</a>
-            </div>
+    <h4 class="mobile mb-2 mt-4">Filter Task</h4>
+        <div class="tombol-mobile-task-wrap d-flex mb-4">
+            <a class="dropdown-item filter-btn me-2 text-center mb-2" data-status="All" style="background:#204498;">All</a>
+            <a class="dropdown-item filter-btn me-2 text-center mb-2" style="background:#7E85F9;" data-status="Low">Low</a>
+            <a class="dropdown-item filter-btn me-2 text-center mb-2" style="background:#FCB040;" data-status="Medium">Medium</a>
+            <a class="dropdown-item filter-btn me-2 text-center mb-2" style="background:#C10000;" data-status="High">High</a>
         </div>
     </div>
 </div>
@@ -667,39 +616,68 @@
     </div>
 </div>
 <div class="row mobile pb-6">
-    <div class="col-md-12 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h5>Recent Task</h5>
-            </div>
-            <div class="card-body">
-                <div class="item-wrap-data">
-                    @foreach ($groupedTasks as $status => $tasks)
-                        @foreach ($tasks as $task)
-                            @if($task->status == 'Completed')
-                                <div class="item-completed mb-4">
-                                    <a href="" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$task->id}}">
-                                        <div class="title-wrap-data-complete d-flex justify-content-between">
-                                            <div class="title-data-mobile">
-                                                <h5 class="mb-1">{{$task->title}}</h5>
-                                                <p class="text-muted">{{$task->updated_at->format('D, d M Y')}}</p>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="priority-data mb-3">
-                                                    <span class="badge rounded-pill bg-success">{{ $task->status }}</span>
-                                                </div>
+    <div class="title-mobile mobile d-flex justify-content-between mb-2">
+        <h4 class="mobile mb-2 mt-4">Completed Task</h4>
+        <a href="" class="mb-2 mt-4 align-self-center">View All Task</a>
+    </div>
+    @foreach ($groupedTasks as $status => $tasks)
+            @foreach ($tasks as $task)
+                @if($task->status == 'Completed')
+                <div class="col-md-12 mb-2">
+                    <div class="card custom-card2">
+                        <div class="card-body">
+                            <div class="item-completed">
+                                <a href="{{route('task-management.show', $task->id)}}">
+                                    <div class="title-wrap-data-complete d-flex justify-content-between">
+                                        <div class="title-data-mobile">
+                                            <h5 class="mb-1">{{$task->title}}</h5>
+                                            <p class="text-muted">{{$task->updated_at->format('D, d M Y')}}</p>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="priority-data mb-3">
+                                                <span class="badge rounded-pill bg-success">{{ $task->status }}</span>
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
+                                </a>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="assigned-users d-flex">
+                                            @foreach ($task->assignedUsers->take(2) as $index => $user)
+                                                <img src="{{ asset('images/' . $user->gambar) }}" class="avatar-small" alt="{{ $user->nama }}">
+                                            @endforeach
+                                            @if ($task->assignedUsers->count() > 2)
+                                                <h5 class="additional-users align-self-center text-muted">+{{ $task->assignedUsers->count() - 2 }}</h5>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-6 align-self-center">
+                                        <div class="meta-data d-flex" style="justify-content:flex-end">
+                                            <div class="comment-meta d-flex me-2">
+                                                <i class="me-2 icon-md align-self-center" data-feather="message-square"></i><p class="align-self-center">{{$task->commentCount}}</p>
+                                            </div>
+                                            <div class="remaining-time d-flex">
+                                                <i class="me-2 icon-md align-self-center" data-feather="clock"></i>
+                                                @if($task->remaining_days > 0)
+                                                    <p>{{ $task->remaining_days }} Days</p>
+                                                @elseif($task->remaining_days == 0)
+                                                    <p class="text-warning">Due Today</p> 
+                                                @else
+                                                    <p class="text-danger">Late {{ abs($task->remaining_days) }} Days</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-                        @endforeach
-                    @endforeach
+                            </div>
+                        </div>
+                    </div>       
                 </div>
-            </div>
-        </div>        
-    </div>
+            @endif
+        @endforeach
+    @endforeach 
 </div>
+    
 <!-- End Mobile View -->
 @endsection
 
@@ -834,6 +812,10 @@ $(document).ready(function(){
             <div class="form-group mb-2">
                 <label class="form-label" for="description">Deskripsi</label>
                 <textarea name="description[]" class="form-control"></textarea>
+            </div>
+            <div class="form-group mb-2">
+                <label class="form-label" for="description">Attachements</label>
+                <input type="file" class="form-control" name="attachments[]">
             </div>
             <div class="form-group mb-2">
                 <label class="form-label" for="due_date">Tanggal Jatuh Tempo</label>

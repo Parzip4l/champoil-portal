@@ -26,6 +26,20 @@ class TaskMasterController extends Controller
         $employee = Employee::where('nik', $code)->first();
         $userRoles = json_decode(Auth::user()->permission);  // Assuming roles are stored in a way you can access them
 
+        $today = now();
+        $hour = $today->hour;
+        $hariini2 = Carbon::now();
+
+        if ($hour >= 1 && $hour < 11) {
+            $greeting = 'Selamat Pagi';
+        } elseif ($hour >= 11 && $hour < 16) {
+            $greeting = 'Selamat Siang';
+        } elseif ($hour >= 16 && $hour < 20) {
+            $greeting = 'Selamat Sore';
+        } else {
+            $greeting = 'Selamat Malam';
+        }
+
         // Initialize $assignedTaskIds as null
         $assignedTaskIds = null;
         
@@ -153,12 +167,44 @@ class TaskMasterController extends Controller
         return view('pages.taskmanagement.index', compact(
             'taskData', 'subtask', 'groupedTasks', 'user', 'mentionUsers',
             'totalTasks', 'completedTasks', 'inProgressTasks', 'overdueTasks',
-            'totalTasksPercentage', 'completedTasksPercentage', 'inProgressTasksPercentage', 'overdueTasksPercentage'
+            'totalTasksPercentage', 'completedTasksPercentage', 'inProgressTasksPercentage', 'overdueTasksPercentage','greeting'
         ));
     }
 
+    public function show($id)
+    {
+        // Fetch the task details
+        $task = TaskMaster::where('id', $id) ->first();
 
+        if (!$task) {
+            return response()->json(['error' => 'Task not found'], 404);
+        }
 
+        // Fetch the subtasks related to the task
+        $task->subtasks = Subtask::where('task_id', $task->id)->get();
+        $task->total_subtasks = $task->subtasks->count();
+        $task->completed_subtasks = $task->subtasks->where('status', 'Completed')->count();
+
+        // Calculate progress percentage
+        $task->progress = $task->total_subtasks > 0
+            ? ($task->completed_subtasks / $task->total_subtasks) * 100
+            : 0;
+
+        // Get assigned users for the task
+        $task->assignedUsers = TaskUser::where('task_id', $task->id)
+                                        ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
+                                        ->get(['karyawan.nama', 'karyawan.gambar', 'karyawan.nik']);
+
+        // Get comments
+        $task->comments = TaskComment::where('task_id', $task->id)
+                        ->join('karyawan', 'task_comment.nik', '=', 'karyawan.nik')
+                        ->get(['task_comment.*', 'karyawan.nama as commenter_name', 'karyawan.gambar as commenter_photo']);
+        // Comment count
+        $task->commentCount = TaskComment::where('task_id', $task->id)->count();
+        $task->remaining_days = Carbon::now()->diffInDays(Carbon::parse($task->due_date), false);
+
+        return view('pages.taskmanagement.show', compact('task'));
+    }
 
     public function create()
     {
@@ -174,7 +220,7 @@ class TaskMasterController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-
+        dd($request->user);
         if (!$company) {
             return redirect()->back()->with('error', 'Company not found for the current user.');
         }
@@ -353,15 +399,10 @@ class TaskMasterController extends Controller
         }
     }
 
-
-
     public function storeSubtask(Request $request)
     {   
         $request->validate([
-            'task_id' => 'required|exists:task_master,id',
-            'title.*' => 'required|string|max:255',
         ]);
-
         DB::beginTransaction();
         try {
             for ($i = 0; $i < count($request->title); $i++) {
@@ -371,6 +412,16 @@ class TaskMasterController extends Controller
                 $subtask->title = $request->title[$i];
                 $subtask->description = $request->description[$i] ?? null;
                 $subtask->due_date = $request->due_date[$i] ?? null;
+
+                // Handle file upload for each subtask
+                if ($request->hasFile("attachments.$i")) {
+                    $file = $request->file("attachments.$i");
+
+                    // Save the file
+                    $path = $file->store('public/file');
+                    $subtask->attachments = $path;
+                }
+
                 $subtask->save();
             }
 
@@ -389,6 +440,7 @@ class TaskMasterController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     public function updateStatus(Request $request, $id)
     {
@@ -492,6 +544,21 @@ class TaskMasterController extends Controller
     {
         try {
             $task = TaskMaster::findOrFail($id);
+
+            if ($task->attachments) {
+                return Storage::download($task->attachments);
+            } else {
+                return redirect()->back()->with('error', 'No attachment found.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadAttachmentSubtask($id)
+    {
+        try {
+            $task = Subtask::findOrFail($id);
 
             if ($task->attachments) {
                 return Storage::download($task->attachments);

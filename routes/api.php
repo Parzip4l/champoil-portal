@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Analytics\AnalyticsController;
 use App\Http\Controllers\Api\Analytics\EmployeeAnalytics;
 use App\Http\Controllers\Api\AllData\AllDataController;
 use App\Http\Controllers\Api\Schedules\ScheduleController;
+use App\Http\Controllers\Api\AllData\TaskManagementApi;
 
 Route::prefix('v1')->group(function () {
 
@@ -37,6 +38,28 @@ Route::prefix('v1')->group(function () {
     Route::get('/employee-resign', [App\Http\Controllers\Api\EmployeeController::class, 'resign'])->name('employee-resign');
     Route::get('/parentMenu/{id}', [App\Http\Controllers\MenuController::class, 'parentChild'])->name('parentMenu');
     Route::get('/all-employee', [App\Http\Controllers\Api\EmployeeController::class, 'all_employee'])->name('all-employee');
+
+    // Task Management
+        // Task Master
+        Route::get('/task-management', [TaskManagementApi::class, 'index']);
+        Route::get('tasks/{id}', [TaskManagementApi::class, 'show']);
+        Route::post('/create-master-task', [TaskManagementApi::class, 'store']);
+        Route::put('tasks-update/{id}', [TaskManagementApi::class, 'update']);
+        Route::delete('/tasks/{id}', [TaskManagementApi::class, 'destroy']);
+        Route::get('/tasks/{id}/download-attachment', [TaskManagementApi::class, 'downloadAttachment']);
+        Route::post('/tasks/{id}/comments', [TaskManagementApi::class, 'storeComment']);
+            // Subtask
+            Route::post('subtasks', [TaskManagementApi::class, 'storeSubtask']);
+            Route::get('subtasks/{id}', [TaskManagementApi::class, 'showSubtask']);
+            Route::delete('subtask-delete/{id}', [TaskManagementApi::class, 'deleteSubtask']);
+            Route::put('/subtasks/{id}/status', [TaskManagementApi::class, 'updateStatus']);
+            Route::get('/subtasks/{id}/download-attachment', [TaskManagementApi::class, 'downloadAttachmentSubtask']);
+            // tracking
+            Route::post('/subtasks/{id}/start-tracking', [TaskManagementApi::class, 'startTracking']);
+            Route::post('/subtasks/{id}/pause', [TaskManagementApi::class, 'pauseTracking'])->name('subtasks.pause');
+            Route::post('/subtasks/{id}/resume', [TaskManagementApi::class, 'resumeTracking'])->name('subtasks.resume');
+            Route::post('/subtasks/{id}/stop-tracking', [TaskManagementApi::class, 'stopTracking']);
+
 
     /**
      * Referal

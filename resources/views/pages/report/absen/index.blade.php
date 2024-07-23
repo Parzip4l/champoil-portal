@@ -92,9 +92,9 @@
                         @foreach($project as $row)
                             @php 
                                 if($row->persentase_absen <= 50 ){
-                                    $color="background-color:red";
+                                    $color="background-color:#ff6f74";
                                 }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
-                                    $color="background-color:yellow";
+                                    $color="background-color:#fff199";
                                 }else{
                                     $color="";
                                 }
@@ -142,9 +142,9 @@
                             }
 
                             if($percent_absen <= 50 ){
-                                $color="background-color:red";
+                                $color="background-color:#ff6f74";
                             }else if($percent_absen >50 && $percent_absen >80 ){
-                                $color="background-color:yellow";
+                                $color="background-color:#fff199";
                             }
                         @endphp
                         <tr style="{{ $color }}">

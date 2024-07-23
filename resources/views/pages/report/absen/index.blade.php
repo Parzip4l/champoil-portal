@@ -48,6 +48,7 @@
                             <div class="col-md-2">
                             <button type="button" class="btn btn-primary" id='search'>Filter</button>
                             </div>
+                            
                         </div>  
                     </form>
                     
@@ -57,6 +58,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
+            <a href="javascript:void(0)" class="btn btn-xs btn-warning" style="float:right;text-white">Rekap</a>
             <table id="dataTableExample" class="table">
                 <thead>
                 <tr>
@@ -92,9 +94,9 @@
                         @foreach($project as $row)
                             @php 
                                 if($row->persentase_absen <= 50 ){
-                                    $color="background-color:red";
+                                    $color="background-color:#ff6f74";
                                 }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
-                                    $color="background-color:yellow";
+                                    $color="background-color:#fff199";
                                 }else{
                                     $color="";
                                 }
@@ -111,12 +113,12 @@
                                 </td>
                                 <td>{{ $row->schedule }}</td>
                                 <td>{{ $row->absen }}</td>
-                                <td>{{ $row->persentase_absen }} %</td>
+                                <td style="text-align:right">{{ $row->persentase_absen }} %</td>
                                 <td>{{ $row->tanpa_clockout }}</td>
-                                <td>{{ $row->persentase_tanpa_clockout }} %</td>
+                                <td style="text-align:right">{{ $row->persentase_tanpa_clockout }} %</td>
                                 <td>{{ $row->schedule_backup }}</td>
                                 <td>{{ $row->absen_backup }}</td>
-                                <td>{{ $row->persentase_backup }} %</td>
+                                <td style="text-align:right">{{ $row->persentase_backup }} %</td>
                                 <td>{{ @karyawan_bynik($row->leader_pic)->nama }}</td>
                                 <td>{{ $row->need_approval }}</td>
                                 <td>{{ $row->approved }}</td>
@@ -142,21 +144,21 @@
                             }
 
                             if($percent_absen <= 50 ){
-                                $color="background-color:red";
+                                $color="background-color:#ff6f74";
                             }else if($percent_absen >50 && $percent_absen >80 ){
-                                $color="background-color:yellow";
+                                $color="background-color:#fff199";
                             }
                         @endphp
                         <tr style="{{ $color }}">
                             <td colspan=2>Total</td>
                             <td>{{ $total_schedule }}</td>
                             <td>{{ $total_absen }}</td>
-                            <td>{{ $percent_absen }} %</td>
+                            <td style="text-align:right">{{ $percent_absen }} %</td>
                             <td>{{ $total_tidak_clockout }}</td>
-                            <td>{{ $persentase_tidak_clockout }} %</td>
+                            <td style="text-align:right">{{ $persentase_tidak_clockout }} %</td>
                             <td>{{ $schedule_backup }}</td>
                             <td>{{ $absen_backup }}</td>
-                            <td>{{ $percent_backup }} %</td>
+                            <td style="text-align:right">{{ $percent_backup }} %</td>
                             <td></td>
                             <td></td>
                         </tr>

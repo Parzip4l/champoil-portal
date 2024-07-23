@@ -482,7 +482,7 @@
     </div>
 </div>
 
-@if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('client_access', $dataLogin))
+@if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)  )
 <div class="row mb-4 d-flex desktop">
     <div class="col-md-3">
         <div class="card custom-card2">

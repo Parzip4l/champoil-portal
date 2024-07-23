@@ -187,7 +187,17 @@
                 </a>
             </div>
             <div class="item">
-                <a href="#">
+                <a href="{{route('task-management.index')}}">
+                    <div class="icon text-center">
+                        <i class="icon-lg text-white" data-feather="calendar"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Task Management</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
+                <a href="{{route('koperasi-page.index')}}">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="dollar-sign"></i>
                     </div>

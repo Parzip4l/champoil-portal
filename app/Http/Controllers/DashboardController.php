@@ -147,7 +147,7 @@ class DashboardController extends Controller
         $organisasiUser = $company->organisasi;
         // Pengumuman 
         $tanggal_sekarang = now()->format('Y-m-d');
-        $pengumuman = Pengumuman::where('end_date', '>=', $tanggal_sekarang)
+        $pengumuman = Pengumuman::where('company',$company->unit_bisnis)->where('end_date', '>=', $tanggal_sekarang)
                         ->where(function ($query) use ($organisasiUser) {
                             $query->where('tujuan', $organisasiUser)
                                   ->orWhere('tujuan', 'semua');

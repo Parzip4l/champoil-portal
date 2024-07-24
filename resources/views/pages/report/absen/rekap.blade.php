@@ -33,6 +33,22 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
+            <table style="width:100%;paddng:3px">
+                <tr>
+                    <td style="background-color:#ff6f74" width="15"></td>
+                    <td>Danger</td>
+                    <td style="background-color:#fff199" width="15"></td>
+                    <td>Warning</td>
+                    <td style="background-color:#9ecb8c" width="15"></td>
+                    <td>Good</td>
+                    <td style="background-color:green" width="15"></td>
+                    <td>Excelent</td>
+                    <td style="background-color:#2a2af95e" width="15"></td>
+                    <td>On Progress</td>
+                    <td style="background-color:#474747" width="15"></td>
+                    <td>Schedule Not Found</td>
+                </tr>
+            </table>
             <table id="dataTableExample" class="table">
                 <thead>
                 <tr>
@@ -63,13 +79,20 @@
                                                 $color="background-color:#ff6f74";
                                             }else if($row['persentase_absen'.$bln_r] >50 && $row['persentase_absen'.$bln_r] <= 80 ){
                                                 $color="background-color:#fff199";
-                                            }else{
+                                            }else if($row['persentase_absen'.$bln_r] >90 && $row['persentase_absen'.$bln_r] < 100 ){
                                                 $color="background-color:#9ecb8c";
+                                            }else if($row['persentase_absen'.$bln_r] >=100 ){
+                                                $color="background-color:green";
                                             }
 
                                             if(empty($row['persentase_absen'.$bln_r])){
                                                 $color="background-color:#474747";
                                             }
+
+                                            if($row['on_periode'.$bln_r]==1){
+                                                $color="background-color:#2a2af95e";
+                                            }
+                                            
                                         @endphp
                                         <td style="text-align:right;{{$color}}">{{ $row['persentase_absen'.$bln_r] }} %</td>
                                     @endforeach

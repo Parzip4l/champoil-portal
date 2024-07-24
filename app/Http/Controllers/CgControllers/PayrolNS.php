@@ -369,6 +369,8 @@ class PayrolNS extends Controller
                         $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
                     }
 
+                    dd($tidakmasukkerja);
+
                     $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
                         ->select('p_tkerja','p_tlain')
@@ -393,7 +395,7 @@ class PayrolNS extends Controller
 
                     $potonganlain = $tidakmasukkerja + $TotalGP;
                     $montlySalary = $totalGaji + $totalGajiBackup;
-                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions);
+                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions + $potonganAbsen);
                     $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;
                     $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup;
                     $allowenceData = [

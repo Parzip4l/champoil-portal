@@ -121,6 +121,12 @@ class ReportController extends Controller
                     ->whereBetween('tanggal', [$start, $end])
                     ->where('shift','!=','OFF')
                     ->count();
+
+                    if(date('m', strtotime("+1 month")) == date('m',strtotime($bln))){
+                        $row['on_periode'.$bln]=1;
+                    }else{
+                        $row['on_periode'.$bln]=0;
+                    }
                
                     $row['absen'.$bln] = Absen::where('project', $row->id)
                                         ->whereBetween('tanggal', [$start, $end])

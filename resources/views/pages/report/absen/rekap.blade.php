@@ -48,7 +48,7 @@
                     <td style="background-color:#474747" width="15"></td>
                     <td>Schedule Not Found</td>
                 </tr>
-            </table>
+            </table><hr/>
             <table id="dataTableExample" class="table">
                 <thead>
                 <tr>

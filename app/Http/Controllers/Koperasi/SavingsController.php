@@ -25,8 +25,8 @@ class SavingsController extends Controller
         $employee = Employee::where('nik', $code)->first();
 
         $datasaya = Saving::where('employee_id',$code)->get();
-        $saldosaya = Saving::where('employee_id',$code)->select('totalsimpanan')->first();
-
+        $saldosaya = Saving::where('employee_id',$code)->select('totalsimpanan')->orderBy('created_at', 'desc')
+        ->first();
         return view ('pages.koperasi.saving.index', compact('datasaya','employee','saldosaya'));
     }
 

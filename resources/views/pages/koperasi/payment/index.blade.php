@@ -90,7 +90,7 @@
                         <h6>{{ \Carbon\Carbon::parse($data->tanggal_simpan)->translatedFormat('d F Y') }}</h6>
                     </div>
                     <div class="nominal-data align-self-center">
-                        <h3 class="text-primary">Rp {{ number_format($data->jumlah_simpanan, 0, ',', '.') }}</h3>
+                        <h3 class="text-primary">Rp {{ number_format($data->jumlah_pembayaran, 0, ',', '.') }}</h3>
                     </div>
                 </div>
                 @endforeach

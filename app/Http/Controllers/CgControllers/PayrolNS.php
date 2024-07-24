@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
 use App\Koperasi\Loan;
+use App\Koperasi\Saving;
 
 class PayrolNS extends Controller
 {
@@ -162,31 +163,35 @@ class PayrolNS extends Controller
                         $nominalSimpananWajib = $koperasi->iuran;
                     }
 
+                    $saving = Saving::where('employee_id', $nik)->first();
+                    $totalSimpanan = $saving->sum('jumlah_simpanan');
+
                     // Check if the employee has an 'onloan' status
                     if ($anggota->loan_status === 'onloan') {
                         // Retrieve all approved loans for the employee
                         $loans = Loan::where('employee_code', $nik)
                             ->where('status', 'approve')
                             ->get();
-
+                        
                         foreach ($loans as $loan) {
-                            // Retrieve existing loan payments for the current loan
-                            $existingPayments = LoanPayment::where('loan_id', $loan->id)->get();
+                            $sisaHutangSaya =  LoanPayment::where('loan_id', $loan->id)->select('sisahutang')->orderBy('created_at', 'desc')
+                            ->first();
                            
-                            // Calculate the total paid amount from previous payments
-                            $totalPaid = $existingPayments->sum('sisahutang');
-                            
                             // Calculate the remaining amount to be paid
-                            $remainingAmount = $totalPaid - $loan->instalment;
-                            // Record the payment for this loan in the Loan Payment table
-                            $loanPayment = new LoanPayment();
-                            $loanPayment->loan_id = $loan->id;
-                            $loanPayment->tanggal_pembayaran = Carbon::now();
-                            $loanPayment->jumlah_pembayaran = $loan->instalment;
-                            $loanPayment->sisahutang = $remainingAmount;
-
-                            // Save the loan payment record
-                            $loanPayment->save();
+                            if ($sisaHutangSaya) {
+                                // Calculate the remaining amount to be paid
+                                $remainingAmount = $sisaHutangSaya->sisahutang - $loan->instalment;
+                
+                                // Only record the payment if there's remaining debt
+                                if ($sisaHutangSaya->sisahutang > 0) {
+                                    $loanPayment = new LoanPayment();
+                                    $loanPayment->loan_id = $loan->id;
+                                    $loanPayment->tanggal_pembayaran = Carbon::now();
+                                    $loanPayment->jumlah_pembayaran = $loan->instalment;
+                                    $loanPayment->sisahutang = max($remainingAmount, 0); // Ensure sisahutang is not negative
+                                    $loanPayment->save();
+                                }
+                            }
                         }
 
                         // Calculate the total loan deductions
@@ -194,6 +199,13 @@ class PayrolNS extends Controller
                     }
                 }
 
+                $newSaving = new Saving();
+                $newSaving->employee_id = $nik;
+                $newSaving->tanggal_simpan = Carbon::now();
+                $newSaving->jumlah_simpanan = $nominalSimpananWajib;
+                $newSaving->totalsimpanan = $totalSimpanan + $nominalSimpananWajib;
+                $newSaving->save();
+                
                 // Loan deduction
                 $potonganHutang = LoanModel::where('employee_id', $nik)
                     ->where('is_paid', 0)

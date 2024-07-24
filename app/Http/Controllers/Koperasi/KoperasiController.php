@@ -122,9 +122,31 @@ class KoperasiController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        $totalSimpanan = Saving::sum('totalsimpanan');
-        $totalPiutang = LoanPayment::sum('sisahutang');
+        
 
+        $latestSavings = Saving::select('employee_id', 'totalsimpanan')
+                            ->orderBy('created_at', 'desc')
+                            ->distinct('employee_id')
+                            ->get()
+                            ->groupBy('employee_id')
+                            ->map(function ($group) {
+                                // Get the most recent record for each employee_id
+                                return $group->first();
+                            });
+
+        $latestPiutang = LoanPayment::select('loan_id', 'sisahutang')
+                            ->orderBy('created_at', 'desc')
+                            ->distinct('loan_id')
+                            ->get()
+                            ->groupBy('loan_id')
+                            ->map(function ($group) {
+                                // Get the most recent record for each employee_id
+                                return $group->first();
+                            });
+        
+        $totalPiutang = $latestPiutang->sum('sisahutang');
+        // Calculate the total of `totalsimpanan` from the most recent records
+        $totalSimpanan = $latestSavings->sum('totalsimpanan');
         // count anggota
         $anggota = Anggota::where('company', $company->unit_bisnis)
         ->where('member_status', 'active')
@@ -305,11 +327,10 @@ class KoperasiController extends Controller
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
 
-        $pinjamansaya = Loan::where('status','approve')->first();
-        
+        $pinjamansaya = Loan::where('status','approve')->where('employee_code',$code)->first();
         $datasaya = LoanPayment::where('loan_id',$pinjamansaya->id)->get();
-        $saldosaya = LoanPayment::where('loan_id',$pinjamansaya->id)->select('sisahutang')->first();
-
+        $saldosaya = LoanPayment::where('loan_id',$pinjamansaya->id)->select('sisahutang')->orderBy('created_at', 'desc')
+        ->first();
         return view ('pages.koperasi.payment.index', compact('datasaya','employee','saldosaya'));
     }
 }

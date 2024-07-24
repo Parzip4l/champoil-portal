@@ -34,13 +34,16 @@ class AnggotaController extends Controller
         $koperasi = Koperasi::where('company', $company->unit_bisnis)->first();
 
         // Pinjaman Cek
-        $loan = Loan::where('employee_code',$code)->first();
-        $saving = Saving::where('employee_id',$code)->first();
+        $loan = Loan::where('employee_code',$code)->orderBy('created_at', 'desc')
+        ->first();
+        $saving = Saving::where('employee_id',$code)->orderBy('created_at', 'desc')
+        ->first();
         $pinjaman = null;
         // Data Pinjaman Sata
         if ($loan) {
             // Data Pinjaman Sata
-            $pinjaman = LoanPayment::where('loan_id', $loan->id)->first();
+            $pinjaman = LoanPayment::where('loan_id', $loan->id)->orderBy('created_at', 'desc')
+            ->first();
         }
 
         // Cek Member 

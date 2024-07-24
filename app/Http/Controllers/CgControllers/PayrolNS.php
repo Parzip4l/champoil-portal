@@ -44,12 +44,11 @@ class PayrolNS extends Controller
     public function create()
     {
         $today = now();
-        $start_date = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+        $start_date = $today->day >= 20 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
         $end_date = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
 
         $start_date2 = Carbon::parse($start_date)->format('d-m-Y');
         $end_date2 = Carbon::parse($end_date)->format('d-m-Y');
-
         $date_range = [];
         $current_date = $start_date->copy();
 
@@ -357,7 +356,7 @@ class PayrolNS extends Controller
                         ->whereBetween('tanggal', [$startDate, $endDate])
                         ->where('shift', '!=', 'OFF')
                         ->get();
-                    $totalDaysInSchedules = $schedules->count();
+                    $totalDaysInSchedules = $schedules->count() + 1;
                     $tidakmasukkerja = 0;
 
                     if ($totalDaysInSchedules > 0) {

@@ -371,8 +371,9 @@ class PayrolNS extends Controller
 
                     $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
-                        ->select('p_bpjs_ks', 'p_tlain')
+                        ->select('p_tlain')
                         ->get();
+
                     $tunjanganLain = $ProjectAllowances->sum('p_tlain');
                     
                     $projectAllowancesTotal = 0;

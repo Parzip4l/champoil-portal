@@ -154,15 +154,55 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="">
+                                            <a class="dropdown-item d-flex align-items-center" href="" data-bs-target="#SettingsLoan{{$data->id}}" data-bs-toggle="modal">
                                                 <i data-feather="edit" class="icon-sm me-2"></i> <span class="">Edit</span>
                                             </a>
-                                            <a href="" class="dropdown-item d-flex align-items-center">
-                                                <i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span>
+                                            <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                <i data-feather="trash" class="icon-sm me-2"></i>
+                                                <span class="">Delete</span>
                                             </a>
                                         </div>
                                     </div>
                                 </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6 align-self-center">
+                        <h6 class="card-title mb-0">Data Anggota OnLoan</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample23" class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Join Date</th>
+                                <th>Sisa Hutang</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($anggotaOnLoan as $data)
+                            <tr>
+                                @php 
+                                    $employeeName = \App\Employee::where('nik',$data->employee_code)->first();
+                                @endphp
+                                <td>{{$employeeName->nama}}</td>
+                                <td>{{$data->join_date}}</td>
+                                <td>Rp {{ number_format($data->sisahutang, 0, ',', '.') }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -220,6 +260,44 @@
 </div>
 
 <!-- Modal Loan Settings -->
+@foreach ($loansettings as $data)
+<div class="modal fade" id="SettingsLoan{{$data->id}}" tabindex="-1" aria-labelledby="SettingsLoan" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SettingsLoan">Add Loan Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('loan-settings.update', $data->id)}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Min Saving</label>
+                            <input type="number" name="min_saving" class="form-control" placholder="" value="{{$data->min_saving}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Max Saving</label>
+                            <input type="number" name="max_saving" class="form-control" placholder="" value="{{$data->max_saving}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Max Loan</label>
+                            <input type="number" name="max_limit" class="form-control" placholder="" value="{{$data->max_limit}}" required>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Update Settings</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+<!-- End Modal -->
+
+<!-- Update Setting Loan -->
 <div class="modal fade" id="SettingsLoan" tabindex="-1" aria-labelledby="SettingsLoan" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -252,7 +330,6 @@
         </div>
     </div>
 </div>
-<!-- End Modal -->
 
 <!-- Update Setting -->
 @foreach($koperasi as $item)
@@ -345,7 +422,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('company.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('loan-settings.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {
@@ -355,7 +432,7 @@
                     // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
-                            title: 'Company Successfully Deleted',
+                            title: 'Data Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
                             window.location.reload(); // Refresh halaman setelah menutup alert
@@ -363,7 +440,7 @@
                     } else {
                         // Handle error response if needed
                         Swal.fire({
-                            title: 'Company Failed to Delete',
+                            title: 'Data Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });
@@ -371,7 +448,7 @@
                 }).catch((error) => {
                     // Handle fetch error if needed
                     Swal.fire({
-                        title: 'Company Failed to Delete',
+                        title: 'Data Failed to Delete',
                         text: 'An error occurred while deleting data.',
                         icon: 'error',
                     });
@@ -396,7 +473,7 @@
 <script>
     // Inisialisasi DataTable
     $(document).ready(function() {
-        $('#pinjamanPengajuanTable').DataTable();
+        $('#dataTableExample23').DataTable();
     });
 </script>
 

@@ -99,8 +99,37 @@ class LoanSettingController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validate input
+            $request->validate([
+                'min_saving' => 'required|numeric',
+                'max_saving' => 'required|numeric',
+                'max_limit' => 'required|numeric',
+            ]);
+
+            // Check User Login 
+            $code = Auth::user()->employee_code;
+            $company = Employee::where('nik', $code)->first();
+
+            // Find the existing setting by ID
+            $setting = SettingLoan::where('id', $id)->firstOrFail();
+
+            // Update the existing setting record
+            $setting->update([
+                'company' => $company->unit_bisnis,
+                'min_saving' => $request->min_saving,
+                'max_saving' => $request->max_saving,
+                'max_limit' => $request->max_limit,
+            ]);
+
+            // Redirect with success message
+            return redirect()->route('koperasi.index')->with('success', 'Settings updated successfully.');
+        } catch (\Exception $e) {
+            // Handle error
+            return redirect()->back()->with('error', 'Failed to update settings. ' . $e->getMessage());
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -110,6 +139,18 @@ class LoanSettingController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            // Find the existing setting by ID
+            $setting = SettingLoan::where('id', $id)->firstOrFail();
+            
+            // Delete the setting record
+            $setting->delete();
+
+            // Redirect with success message
+            return redirect()->route('koperasi.index')->with('success', 'Settings deleted successfully.');
+        } catch (\Exception $e) {
+            // Handle error
+            return redirect()->back()->with('error', 'Failed to delete settings. ' . $e->getMessage());
+        }
     }
 }

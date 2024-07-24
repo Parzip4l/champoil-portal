@@ -173,6 +173,8 @@ class PayrolNS extends Controller
                             ->where('status', 'approve')
                             ->get();
                         
+                        $allLoansPaidOff = true;
+                        
                         foreach ($loans as $loan) {
                             $sisaHutangSaya =  LoanPayment::where('loan_id', $loan->id)->select('sisahutang')->orderBy('created_at', 'desc')
                             ->first();
@@ -186,14 +188,29 @@ class PayrolNS extends Controller
                                 if ($sisaHutangSaya->sisahutang > 0) {
                                     $loanPayment = new LoanPayment();
                                     $loanPayment->loan_id = $loan->id;
+                                    $loanPayment->employee_code = $anggota->employee_code;
                                     $loanPayment->tanggal_pembayaran = Carbon::now();
                                     $loanPayment->jumlah_pembayaran = $loan->instalment;
                                     $loanPayment->sisahutang = max($remainingAmount, 0); // Ensure sisahutang is not negative
                                     $loanPayment->save();
+
+                                    $anggota->sisahutang = max($remainingAmount, 0);
+                                    $anggota->save();
+                                    
+                                }
+                                if ($remainingAmount > 0) {
+                                    $allLoansPaidOff = false;
                                 }
                             }
                         }
 
+                        if ($allLoansPaidOff) {
+                            $anggota->loan_status = 'noloan';
+                            $anggota->save();
+                        }
+
+                        $anggota->saldosimpanan = $totalSimpanan + $nominalSimpananWajib;
+                        $anggota->save();
                         // Calculate the total loan deductions
                         $loanDeductions = $loans->sum('instalment');
                     }

@@ -147,7 +147,7 @@ class DashboardController extends Controller
         $organisasiUser = $company->organisasi;
         // Pengumuman 
         $tanggal_sekarang = now()->format('Y-m-d');
-        $pengumuman = Pengumuman::where('end_date', '>=', $tanggal_sekarang)
+        $pengumuman = Pengumuman::where('company',$company->unit_bisnis)->where('end_date', '>=', $tanggal_sekarang)
                         ->where(function ($query) use ($organisasiUser) {
                             $query->where('tujuan', $organisasiUser)
                                   ->orWhere('tujuan', 'semua');
@@ -327,8 +327,11 @@ class DashboardController extends Controller
 
         $totalValue = $lastValueF + $lastValue;
         $previusValue = $previousValue + $previousValueF;
-        // $percentageChange = ($totalValue - $previusValue) / $previusValue * 100;
-        $percentageChange=0;
+        if ($previusValue == 0) {
+            $percentageChange = 0; // Or any default value you wish to use
+        } else {
+            $percentageChange = (($totalValue - $previusValue) / $previusValue) * 100;
+        }
 
         // End Payrol Statistik
 

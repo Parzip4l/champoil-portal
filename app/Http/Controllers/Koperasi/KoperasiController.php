@@ -40,8 +40,21 @@ class KoperasiController extends Controller
                         ->where('member_status', 'active')
                         ->count();
         
-        $totalSimpanan = Saving::sum('totalsimpanan');
-
+        $anggotaOnLoan = Anggota::where('company', $company->unit_bisnis)
+                        ->where('member_status', 'active')
+                        ->where('loan_status', 'onloan')
+                        ->get();
+        
+        $latestSavings = Saving::select('employee_id', 'totalsimpanan')
+                        ->orderBy('created_at', 'desc')
+                        ->distinct('employee_id')
+                        ->get()
+                        ->groupBy('employee_id')
+                        ->map(function ($group) {
+                            // Get the most recent record for each employee_id
+                            return $group->first();
+                        });
+        $totalSimpanan = $latestSavings->sum('totalsimpanan');
         //Daftar Pengajuan
         $pinjamanData = Loan::where('company', $company->unit_bisnis)
                         ->where('status','waiting')        
@@ -51,7 +64,7 @@ class KoperasiController extends Controller
         $anggotapending = $anggotaPending->count();
         $pinjaman = $pinjamanData->count();
 
-        return view('pages.app-setting.koperasi.index', compact('koperasi','anggotaPending','anggota','loansettings','pinjamanData','anggotapending','pinjaman','totalSimpanan'));
+        return view('pages.app-setting.koperasi.index', compact('koperasi','anggotaPending','anggota','loansettings','pinjamanData','anggotapending','pinjaman','totalSimpanan','anggotaOnLoan'));
     }
 
     /**

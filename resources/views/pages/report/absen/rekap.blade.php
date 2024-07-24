@@ -79,7 +79,7 @@
                                                 $color="background-color:#ff6f74";
                                             }else if($row['persentase_absen'.$bln_r] >50 && $row['persentase_absen'.$bln_r] <= 80 ){
                                                 $color="background-color:#fff199";
-                                            }else if($row['persentase_absen'.$bln_r] >90 && $row['persentase_absen'.$bln_r] < 100 ){
+                                            }else if($row['persentase_absen'.$bln_r] >80 && $row['persentase_absen'.$bln_r] < 100 ){
                                                 $color="background-color:#9ecb8c";
                                             }else if($row['persentase_absen'.$bln_r] >=100 ){
                                                 $color="background-color:green";

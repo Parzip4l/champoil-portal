@@ -53,7 +53,7 @@
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Year</label>
                         <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
-                        <input type="hidden" name="periode" value="{{$start_date2}} - {{$end_date2}}">
+                        <input type="hidden" name="periode" id="periode" value="{{ $start_date2 }} - {{ $end_date2 }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -182,4 +182,56 @@
             width : 100%!important;
         }
     </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const monthSelect = document.getElementById('month');
+        const yearInput = document.getElementById('year');
+        const periodeInput = document.getElementById('periode');
+
+        const updatePeriode = () => {
+            const month = monthSelect.value;
+            const year = parseInt(yearInput.value);
+            const monthsMap = {
+                "Januari": 1,
+                "Februari": 2,
+                "Maret": 3,
+                "April": 4,
+                "Mei": 5,
+                "Juni": 6,
+                "Juli": 7,
+                "Agustus": 8,
+                "September": 9,
+                "Oktober": 10,
+                "November": 11,
+                "Desember": 12
+            };
+
+            const selectedMonth = monthsMap[month];
+            let startDate = new Date(year, selectedMonth - 1, 21);
+            let endDate = new Date(year, selectedMonth, 20);
+
+            // Adjust endDate if it rolls into the next year
+            if (selectedMonth === 12) {
+                endDate = new Date(year + 1, 0, 20);
+            } else if (selectedMonth === 2) {
+                // Handle February edge case if next month's 20th doesn't exist (like in non-leap years)
+                endDate = new Date(year, selectedMonth, 0); // Last day of February
+                endDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 20);
+            } else {
+                endDate = new Date(year, selectedMonth, 20);
+            }
+
+            const formatDate = (date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                return `${day}-${month}-${date.getFullYear()}`;
+            };
+
+            periodeInput.value = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        };
+
+        monthSelect.addEventListener('change', updatePeriode);
+        updatePeriode(); // Initial call to set default values
+    });
+</script>
 @endpush

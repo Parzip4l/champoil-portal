@@ -31,19 +31,19 @@ class AbsenController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
         $project = Project::all();
-        $client_id= Auth::user()->project_id;
+        $client_id = Auth::user()->project_id;
 
-        // Mendapatkan data organisasi terpilih (jika ada)
+        // Retrieve selected filters from the request
         $selectedOrganization = $request->input('organization');
         $project_id = $request->input('project');
         $periode = $request->input('periode');
 
-        // Menghitung tanggal mulai dan tanggal akhir berdasarkan aturan bisnis
+        // Determine the start and end dates based on business rules
         $today = now();
-        $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
+        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
         $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
-        
-        // Query untuk data absensi
+
+        // Base query for attendance data
         $query = DB::table('users')
             ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
             ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
@@ -52,52 +52,46 @@ class AbsenController extends Controller
             })
             ->where('karyawan.unit_bisnis', $company->unit_bisnis);
 
-        // Memfilter berdasarkan organisasi jika terpilih
+        // Apply organization filter if selected
         if ($selectedOrganization) {
             $query->where('karyawan.organisasi', $selectedOrganization);
         }
 
-        // Mengambil data absensi dari database
-        if(Auth::user()->project_id == NULL){
-            if(!empty($project_id)){
-                $data1 = $query->select('users.*', 'absens.*')
-                            ->join('schedules', function($join) use ($project_id) {
-                                $join->on('karyawan.nik', '=', 'schedules.employee')
-                                    ->where('schedules.project', $project_id)
-                                    ->where('schedules.id', '=', function($query) use ($project_id) {
-                                        $query->select('id')
-                                            ->from('schedules')
-                                            ->whereColumn('employee', 'karyawan.nik')
-                                            ->where('schedules.project', $project_id)
-                                            ->orderBy('id') // Ensure ordering before limiting
-                                            ->limit(1);
-                                    });
-                            })
-                            ->orderBy('users.name')
-                            ->get();
-            }else{
-                $data1 = $query->select('users.*', 'absens.*')
-                    ->orderBy('users.name')
-                    ->get();
+        // Apply project filter
+        if ($client_id === null) {
+            if (!empty($project_id)) {
+                $query->join('schedules', function ($join) use ($project_id) {
+                    $join->on('karyawan.nik', '=', 'schedules.employee')
+                        ->where('schedules.project', $project_id)
+                        ->where('schedules.id', function ($query) use ($project_id) {
+                            $query->select('id')
+                                ->from('schedules')
+                                ->whereColumn('employee', 'karyawan.nik')
+                                ->where('schedules.project', $project_id)
+                                ->orderBy('id') // Ensure ordering before limiting
+                                ->limit(1);
+                        });
+                });
             }
-            
-        }else{
-            $data1 = $query->select('users.*', 'absens.*')
-                        ->join('schedules', function($join) {
-                            $join->on('karyawan.nik', '=', 'schedules.employee')
-                                ->where('schedules.project', Auth::user()->project_id)
-                                ->where('schedules.id', '=', function($query) {
-                                    $query->select('id')
-                                        ->from('schedules')
-                                        ->whereColumn('employee', 'karyawan.nik')
-                                        ->where('schedules.project', Auth::user()->project_id)
-                                        ->limit(1);
-                                });
-                        })
-                ->orderBy('users.name')
-                ->get();
+        } else {
+            $query->join('schedules', function ($join) use ($client_id) {
+                $join->on('karyawan.nik', '=', 'schedules.employee')
+                    ->where('schedules.project', $client_id)
+                    ->where('schedules.id', function ($query) use ($client_id) {
+                        $query->select('id')
+                            ->from('schedules')
+                            ->whereColumn('employee', 'karyawan.nik')
+                            ->where('schedules.project', $client_id)
+                            ->orderBy('id') // Ensure ordering before limiting
+                            ->limit(1);
+                    });
+            });
         }
 
+        // Get the filtered data
+        $data1 = $query->select('users.*', 'absens.*')->orderBy('users.name')->get();
+
+        // Month names for display purposes
         $months = [
             '01' => 'Januari',
             '02' => 'Februari',
@@ -112,10 +106,9 @@ class AbsenController extends Controller
             '11' => 'November',
             '12' => 'Desember',
         ];
-        
 
-        // Mengirim data ke tampilan
-        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization','months','project','client_id'));
+        // Send data to the view
+        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization', 'months', 'project', 'client_id'));
     }
 
     public function indexbackup()
@@ -150,9 +143,14 @@ class AbsenController extends Controller
     public function filterByOrganization(Request $request)
     {
         $selectedOrganization = $request->input('organization');
-        $project = $request->input('project')?$request->input('project'):'';
-        $periode = $request->input('periode')?$request->input('periode'):'';
-        return redirect()->route('absen.index', ['organization' => $selectedOrganization,'project'=>$project,'periode'=>$periode]);
+        $project = $request->input('project') ?? '';
+        $periode = $request->input('periode') ?? '';
+
+        return redirect()->route('absen.index', [
+            'organization' => $selectedOrganization,
+            'project' => $project,
+            'periode' => $periode
+        ]);
     }
 
 

@@ -117,7 +117,7 @@
                                                 <span></span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right text-muted"> {{$deductionData->tidak_absen ?? 0}} Hari</span>
+                                                <span class="text-right text-muted"> {{$deductionData->tidak_masuk_kerja ?? 0}} Hari</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -133,7 +133,15 @@
                                                 <span>Potongan Hutang</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_hutang ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->hutang_koperasi ?? 0, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <span>Iuran Anggota Koperasi</span>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <span class="text-right">Rp. {{ number_format($deductionData->iuran_koperasi ?? 0, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -306,7 +314,7 @@
                             Tidak Absen
                         </span>
                         <span class="text-muted">
-                            {{$deductionData->tidak_absen}} Hari
+                            {{$deductionData->tidak_masuk_kerja}} Hari
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
@@ -319,9 +327,15 @@
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
+                            Iuran Anggota Koperasi
+                        </span>
+                        <span>Rp. {{ number_format($deductionData->iuran_koperasi ?? 0, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
                             Potongan Hutang
                         </span>
-                        <span>Rp. {{ number_format($deductionData->potongan_hutang ?? 0, 0, ',', '.') }}</span>
+                        <span>Rp. {{ number_format($deductionData->hutang_koperasi ?? 0, 0, ',', '.') }}</span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>

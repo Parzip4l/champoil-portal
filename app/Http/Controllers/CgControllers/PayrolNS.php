@@ -15,6 +15,11 @@ use Carbon\Carbon;
 use App\ModelCG\Project;
 use Illuminate\Support\Facades\Auth;
 use App\ModelCG\ProjectDetails;
+use App\Koperasi\LoanPayment;
+use Illuminate\Support\Facades\DB;
+use App\Koperasi\Koperasi;
+use App\Koperasi\Anggota;
+use App\Koperasi\Loan;
 
 class PayrolNS extends Controller
 {
@@ -71,132 +76,195 @@ class PayrolNS extends Controller
     {
         $code = Auth::user()->employee_code;
         $dataLogin = Employee::where('nik', $code)->first();
-        // Validasi request
+
+        // Validate request
         $request->validate([
             'month' => 'required',
             'year' => 'required',
             'periode' => 'required',
             'unit_bisnis' => 'required',
         ]);
-
-        // Pecah Data Periode
+        $month = $request->month;
+        $year = $request->year;
+        $monthsMap = [
+            "Januari" => 1,
+            "Februari" => 2,
+            "Maret" => 3,
+            "April" => 4,
+            "Mei" => 5,
+            "Juni" => 6,
+            "Juli" => 7,
+            "Agustus" => 8,
+            "September" => 9,
+            "Oktober" => 10,
+            "November" => 11,
+            "Desember" => 12
+        ];
+        $monthNumber = $monthsMap[$month] ?? null;
+        $startDate = Carbon::create($year, $monthNumber, 21);
+        if ($monthNumber == 12) {
+            // Handle December case, where end date should be in the next year
+            $endDate = Carbon::create($year + 1, 1, 20);
+        } else {
+            $endDate = Carbon::create($year, $monthNumber + 1, 20);
+        }
+       
+        // Split Periode Data
         $periodeDates = explode(' - ', $request->periode);
-        $startDate = \Carbon\Carbon::createFromFormat('d-m-Y', $periodeDates[0])->format('Y-m-d');
-        $endDate = \Carbon\Carbon::createFromFormat('d-m-Y', $periodeDates[1])->format('Y-m-d');
+        $startDate->format('Y-m-d');
+        $endDate->format('Y-m-d');
 
-        foreach ($request->employee_code as $nik) {
-            // Dapatkan data karyawan
-            $employee = Employee::where('nik', $nik)->first();
-            $jabatan = $employee->jabatan;
+        DB::beginTransaction();
+        try {
+            $employeeCodes = is_array($request->employee_code) ? $request->employee_code : [$request->employee_code];
+            foreach ($employeeCodes as $nik) {
+                // Get employee data
+                $employee = Employee::where('nik', $nik)->first();
+                if (!$employee) {
+                    continue; // Jika karyawan tidak ditemukan, lanjutkan ke karyawan berikutnya
+                }
+                $jabatan = $employee->jabatan;
 
-            // Dapatkan data absen berdasarkan range periode dan nik karyawan
-            $absen = Absen::where('nik', $nik)
-                ->whereBetween('tanggal', [$startDate, $endDate])
-                ->get();
-            $totalWorkingDays = count($absen);
+                // Get attendance data based on the period and employee's NIK
+                $absen = Absen::where('nik', $nik)
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->get();
+                $totalWorkingDays = $absen->count();
 
-            // Deklarasi Variable
-            $totalHari = 0;
-            $totalGaji = 0;
-            $TotalHariBackup = 0;
-            $totalGajiBackup = 0;
-            $allowenceData= [];
-            $deductiondata = [];
-            $totalPotonganHutang = 0;
-            $TotalGP = 0;
-            $thp = 0;
-            $allowenceData = null;
-            $deductionData = null;
-            $montlySalary = 0;
-            $rate_harian = 0;
-            $rate_harianbackup = 0;
-            $potonganAbsen = 0;
+                // Initialize variables
+                $totalHari = 0;
+                $totalGaji = 0;
+                $TotalHariBackup = 0;
+                $totalGajiBackup = 0;
+                $totalPotonganHutang = 0;
+                $TotalGP = 0;
+                $thp = 0;
+                $allowenceData = [];
+                $deductionData = [];
+                $montlySalary = 0;
+                $rate_harian = 0;
+                $rate_harianbackup = 0;
+                $potonganAbsen = 0;
 
-            //Potongan Hutang
-            $potonganHutang = LoanModel::where('employee_id', $nik)
-            ->where('is_paid', 0)
-            ->pluck('installment_amount');
+                // Koperasi Deduction
+                $anggota = Anggota::where('employee_code', $nik)->first();
 
-            $SisaHutangData = LoanModel::where('employee_id', $nik)
-                ->where('is_paid', 0)
-                ->pluck('remaining_amount');
-            
-            $totalPotonganHutang = $potonganHutang->sum();
-            $SisaHutangData1 = $SisaHutangData->sum();
-            
-            $sisahutangTotal = $SisaHutangData1 - $totalPotonganHutang;
+                // Initialize variables for contributions and loan deductions
+                $nominalSimpananWajib = 0;
+                $loanDeductions = 0;
 
-            if ($sisahutangTotal === 0) {
-                // Update data di database
-                LoanModel::where('employee_id', $nik)
+                if ($anggota) {
+                    // Retrieve cooperative membership details
+                    $koperasi = Koperasi::where('company', $dataLogin->unit_bisnis)->first();
+                    
+                    if ($koperasi) {
+                        // Retrieve the mandatory contribution from the Koperasi table
+                        $nominalSimpananWajib = $koperasi->iuran;
+                    }
+
+                    // Check if the employee has an 'onloan' status
+                    if ($anggota->loan_status === 'onloan') {
+                        // Retrieve all approved loans for the employee
+                        $loans = Loan::where('employee_code', $nik)
+                            ->where('status', 'approve')
+                            ->get();
+
+                        foreach ($loans as $loan) {
+                            // Retrieve existing loan payments for the current loan
+                            $existingPayments = LoanPayment::where('loan_id', $loan->id)->get();
+                           
+                            // Calculate the total paid amount from previous payments
+                            $totalPaid = $existingPayments->sum('sisahutang');
+                            
+                            // Calculate the remaining amount to be paid
+                            $remainingAmount = $totalPaid - $loan->instalment;
+                            // Record the payment for this loan in the Loan Payment table
+                            $loanPayment = new LoanPayment();
+                            $loanPayment->loan_id = $loan->id;
+                            $loanPayment->tanggal_pembayaran = Carbon::now();
+                            $loanPayment->jumlah_pembayaran = $loan->instalment;
+                            $loanPayment->sisahutang = $remainingAmount;
+
+                            // Save the loan payment record
+                            $loanPayment->save();
+                        }
+
+                        // Calculate the total loan deductions
+                        $loanDeductions = $loans->sum('instalment');
+                    }
+                }
+
+                // Loan deduction
+                $potonganHutang = LoanModel::where('employee_id', $nik)
                     ->where('is_paid', 0)
-                    ->update(['is_paid' => 1, 'remaining_amount' => 0]);
-            }else{
-                LoanModel::where('employee_id', $nik)
+                    ->pluck('installment_amount');
+                $SisaHutangData = LoanModel::where('employee_id', $nik)
                     ->where('is_paid', 0)
-                    ->update(['is_paid' => 0, 'remaining_amount' => $sisahutangTotal]);
-            }
-            // End Potongan Hutang
+                    ->pluck('remaining_amount');
+                
+                $totalPotonganHutang = $potonganHutang->sum();
+                $SisaHutangData1 = $SisaHutangData->sum();
+                $sisahutangTotal = $SisaHutangData1 - $totalPotonganHutang;
+                
+                if ($sisahutangTotal === 0) {
+                    LoanModel::where('employee_id', $nik)
+                        ->where('is_paid', 0)
+                        ->update(['is_paid' => 1, 'remaining_amount' => 0]);
+                } else {
+                    LoanModel::where('employee_id', $nik)
+                        ->where('is_paid', 0)
+                        ->update(['is_paid' => 0, 'remaining_amount' => $sisahutangTotal]);
+                }
 
-            // Garda Pratama
-            $potonganGP = Gp::where('employee_id', $nik)
-            ->where('is_paid', 0)
-            ->pluck('installment_amount');
-
-            $sisaGp = Gp::where('employee_id', $nik)
-                ->where('is_paid', 0)
-                ->pluck('remaining_amount');
-            
-            $TotalGP = $potonganGP->sum();
-            $SisaGP = $sisaGp->sum();
-            
-            $SistaTotalGP = $SisaGP - $TotalGP;
-
-            if ($SistaTotalGP === 0) {
-                // Update data di database
-                Gp::where('employee_id', $nik)
+                // GP deduction
+                $potonganGP = Gp::where('employee_id', $nik)
                     ->where('is_paid', 0)
-                    ->update(['is_paid' => 1, 'remaining_amount' => 0]);
-            }else{
-                Gp::where('employee_id', $nik)
+                    ->pluck('installment_amount');
+                $sisaGp = Gp::where('employee_id', $nik)
                     ->where('is_paid', 0)
-                    ->update(['is_paid' => 0, 'remaining_amount' => $SistaTotalGP]);
-            }
-            // End Perhitunga GP
+                    ->pluck('remaining_amount');
+                
+                $TotalGP = $potonganGP->sum();
+                $SisaGP = $sisaGp->sum();
+                $SistaTotalGP = $SisaGP - $TotalGP;
+                
+                if ($SistaTotalGP === 0) {
+                    Gp::where('employee_id', $nik)
+                        ->where('is_paid', 0)
+                        ->update(['is_paid' => 1, 'remaining_amount' => 0]);
+                } else {
+                    Gp::where('employee_id', $nik)
+                        ->where('is_paid', 0)
+                        ->update(['is_paid' => 0, 'remaining_amount' => $SistaTotalGP]);
+                }
 
-            // Hitungan Backup
-
-                // Ambil Project Backup
-                $projectBackup = ScheduleBackup::where('employee',$nik)
-                                ->whereBetween('tanggal', [$startDate, $endDate])
-                                ->select('project','employee','man_backup')
-                                ->get();
+                // Backup calculation
+                $projectBackup = ScheduleBackup::where('employee', $nik)
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->select('project', 'employee', 'man_backup')
+                    ->get();
 
                 $backupTotals = [];
-
                 foreach ($projectBackup as $backupData) {
                     $manBackup = $backupData->man_backup;
                     $projectIDBackup = $backupData->project;
                     $totalHariBackupmentah = 0;
-                
-                    // Tentukan Rate Harian
+
+                    // Determine daily rate
                     $schedulesManBackup = Schedule::where('employee', $manBackup)
                         ->whereBetween('tanggal', [$startDate, $endDate])
                         ->where('shift', '!=', 'OFF')
                         ->get();
-                
                     $totalScheduleManBackup = $schedulesManBackup->count();
-                
                     $projectDetailsBackupData = ProjectDetails::where('project_code', $projectIDBackup)
                         ->where('jabatan', $jabatan)
                         ->pluck('tp_bulanan', 'project_code');
-                
+                    
                     $monthlySalaryProject = $projectDetailsBackupData->sum();
                     $rateHarianBackup = round($monthlySalaryProject / $totalScheduleManBackup);
                     $totalHariBackupmentah = 1;
-                    $totalGajiBackupmentah = $totalHariBackupmentah  * $rateHarianBackup;
-                
-                    // Simpan total bayaran untuk setiap project backup dalam array
+                    $totalGajiBackupmentah = $totalHariBackupmentah * $rateHarianBackup;
+
                     if (!isset($backupTotals[$projectIDBackup])) {
                         $backupTotals[$projectIDBackup] = [
                             'ProjectCodeBackup' => 0,
@@ -217,179 +285,127 @@ class PayrolNS extends Controller
                     $totalGajiBackup += $totalGajiBackupmentah;
                     $TotalHariBackup += $totalHariBackupmentah;
                 }
-                // Akhir perhitungan Backup
 
-            // Mengakumulasi jumlah hari dan total gaji dari setiap absensi
-            foreach ($absen as $absensi) {
+                // Accumulate total days and salary from each attendance
+                foreach ($absen as $absensi) {
+                    $tanggalAbsensi = \Carbon\Carbon::createFromFormat('Y-m-d', $absensi->tanggal);
+                    $inPeriode = $tanggalAbsensi->isBetween($startDate, $endDate);
 
-                $tanggalAbsensi = \Carbon\Carbon::createFromFormat('Y-m-d', $absensi->tanggal);
-                $inPeriode = $tanggalAbsensi->isBetween($startDate, $endDate);
-
-                if ($inPeriode) {
-                    // Jika absensi berada dalam periode, tambahkan jumlah hari
-                    $totalHari++;
-                }
-
-                // Ambil ID proyek dari kolom project dan project_backup
-                $projectIds = [$absensi->project];
-                
-                // Dapatkan data project details dan rate harian dari project Backup
-                $rate_harian = 0;
-                if (!empty($projectIds)) {
-                    $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
-                        ->where('jabatan', $jabatan)
-                        ->pluck('tp_bulanan', 'project_code');
-                        
-                        $totalGaji = $projectDetails->sum();
-                        $montlySalary = $projectDetails->sum();
-
-                    $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
-                        ->where('jabatan', $jabatan)
-                        ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
-                        ->get();
-                       
-                    // Initialize variables to store each selected field
-                    $p_gajipokok = 0;
-                    $p_tkerja = 0;
-                    $p_tlain = 0;
-
-                    // Check if the collection is not empty
-                    if ($projectDetailsPPH->isNotEmpty()) {
-                        // Access the values using array keys
-                        $p_gajipokok = $projectDetailsPPH->sum('p_gajipokok');
-                        $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
-                        $p_tlain = $projectDetailsPPH->sum('p_tlain');
+                    if ($inPeriode) {
+                        $totalHari++;
                     }
 
-                    // Calculate the total salary
-                    $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
-                }
+                    $projectIds = [$absensi->project];
+                    $rate_harian = 0;
+                    if (!empty($projectIds)) {
+                        $projectDetails = ProjectDetails::whereIn('project_code', $projectIds)
+                            ->where('jabatan', $jabatan)
+                            ->pluck('tp_bulanan', 'project_code');
+                        $totalGaji = $projectDetails->sum();
+                        $montlySalary = $projectDetails->sum();
+                        
+                        $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
+                            ->where('jabatan', $jabatan)
+                            ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
+                            ->get();
+                            
+                        $p_gajipokok = 0;
+                        $p_tkerja = 0;
+                        $p_tlain = 0;
 
-                // Rate Potongan
-                $rate_potongan  = 0;
-                // cek jumlah schedule
-                $schedules = Schedule::where('employee', $nik)
-                    ->whereBetween('tanggal', [$startDate, $endDate])
-                    ->where('shift', '!=', 'OFF')
-                    ->get();
+                        if ($projectDetailsPPH->isNotEmpty()) {
+                            $p_gajipokok = $projectDetailsPPH->sum('p_gajipokok');
+                            $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
+                            $p_tlain = $projectDetailsPPH->sum('p_tlain');
+                        }
 
-                $totalDaysInSchedules = $schedules->count();
-                $tidakmasukkerja = 0;
-                // Calculate rate_potongan
-                if ($totalDaysInSchedules > 0) {
-                    $rate_potongan = round($totalGaji / $totalDaysInSchedules);
-                }
-                
-                if ($totalHari < $totalDaysInSchedules) {
-                    $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
-                    $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
-                }
-                // End Potongan Daily
+                        $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
+                        
+                    }
 
-                // Allowence 
-                $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
-                    ->where('jabatan', $jabatan)
-                    ->select('p_bpjs_ks', 'p_tlain')
-                    ->get();
+                    $rate_potongan  = 0;
+                    $schedules = Schedule::where('employee', $nik)
+                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->where('shift', '!=', 'OFF')
+                        ->get();
+                    $totalDaysInSchedules = $schedules->count();
+                    $tidakmasukkerja = 0;
 
-                $tunjanganLain = $ProjectAllowances->sum('p_tlain');
+                    if ($totalDaysInSchedules > 0) {
+                        $rate_potongan = round($totalGaji / $totalDaysInSchedules);
+                    }
 
-                $projectAllowancesTotal = 0;
+                    if ($totalHari < $totalDaysInSchedules) {
+                        $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
+                        $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
+                    }
+
+                    $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
+                        ->where('jabatan', $jabatan)
+                        ->select('p_bpjs_ks', 'p_tlain')
+                        ->get();
+                    $tunjanganLain = $ProjectAllowances->sum('p_tlain');
+                    
+                    $projectAllowancesTotal = 0;
                     foreach ($ProjectAllowances as $projectDetailallowence) {
                         $projectAllowancesTotal += array_sum($projectDetailallowence->toArray());
                     }
-                // End Allowence
+                    
+                    $ProjectDeduction = ProjectDetails::whereIn('project_code', $projectIds)
+                        ->where('jabatan', $jabatan)
+                        ->select('p_bpjs_ks')
+                        ->get();
+                        
+                    $projectDeductionTotal = 0;
+                    foreach ($ProjectDeduction as $projectDetailDeduction) {
+                        $projectDeductionTotal += array_sum($projectDetailDeduction->toArray());
+                    }
 
-                // deductions
-                $ProjectDeduction = ProjectDetails::whereIn('project_code', $projectIds)
-                    ->where('jabatan', $jabatan)
-                    ->select('p_bpjstk')
-                    ->get();
+                    $potonganlain = $projectDeductionTotal + $tidakmasukkerja + $TotalGP;
+                    $montlySalary = $totalGaji + $totalGajiBackup + $projectAllowancesTotal;
+                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions);
+                    $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;
+                    $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup;
+                    $allowenceData = [
+                        'tunjangan_lain' => $projectAllowancesTotal,
+                        'allowance_total' => $allowanceTotal,
+                    ];
 
-                $dataPengurangBPJS = ProjectDetails::whereIn('project_code', $projectIds)
-                    ->where('jabatan', $jabatan)
-                    ->pluck('p_bpjstk')
-                    ->first();
-
-                $bpjs_tk = $dataPengurangBPJS;
-
-                $projectDedutionsTotal = 0;
-                foreach ($ProjectDeduction as $projectDetaildeductions) {
-                    $projectDedutionsTotal += array_sum($projectDetaildeductions->toArray());
+                    $deductionData = [
+                        'potongan_absen' => $potonganAbsen,
+                        'potongan_hutang' => $totalPotonganHutang,
+                        'potongan_Gp' => $TotalGP,
+                        'potongan_lain' => $potonganlain,
+                        'tidak_masuk_kerja' => $tidakmasukkerja,
+                        'iuran_koperasi' => $nominalSimpananWajib,
+                        'hutang_koperasi' => $loanDeductions,
+                        'total_deduction' => $totalDeduction,
+                    ];
                 }
-                // End Deductions
-
-                // Perhitungan PPH21
-                $PenghasilanBruto = $gajiPPH + $totalGajiBackup + 61300 - $potonganAbsen;
-                $biayaJabatan = $PenghasilanBruto * 0.05;
-
-                $penghasilanNeto = $PenghasilanBruto - $biayaJabatan;
-                
-                $totalNeto = $penghasilanNeto*12;
-                $dataPTKP = $totalNeto -  54000000;
-                
-                // Penghasilan Kena Pajak Setahun / Disetahunkan
-                $persentasePTKP = 0.05;
-                $dataSetahun = $dataPTKP * $persentasePTKP;
-
-                $totalPPH = $dataSetahun / 12;
-
-                if($totalPPH <= 0) {
-                    $totalPPH = 0;
-                }else{
-                    $totalPPH = $totalPPH;
-                }
-                // End PPH
-                
-                // Masukan data allowence ke json
-                $allowenceData = [
-                    'totalHari' => $totalHari,
-                    'totalHariSchedule' => $totalDaysInSchedules,
-                    'totalHariBackup' => $TotalHariBackup,
-                    'totalGaji' => $totalGaji,
-                    'totalGajiBackup' => $totalGajiBackup,
-                    'rate_harian' => $rate_potongan,
-                    'rate_harian_backup' => $rate_harianbackup,
-                    'tunjangan_lain' => $tunjanganLain,
-                ];
-
-                // Data Deduction   
-                $deductiondata = [
-                    'bpjs_tk' => $bpjs_tk,
-                    'potongan_hutang' => $totalPotonganHutang,
-                    'potongan_absen' => $potonganAbsen,
-                    'tidak_absen' => $tidakmasukkerja,
-                    'potongan_gp' => $TotalGP,
-                    'PPH21' => $totalPPH,
-                    'deductions_total' => $projectDedutionsTotal + $totalPotonganHutang,
-                ];
-                $dataDeduction = $projectDedutionsTotal + $totalPotonganHutang + $TotalGP;
-
-                // THP
-                $pendapatanBersih = $totalGaji + $totalGajiBackup + $tunjanganLain;
-                $thp = $pendapatanBersih - $potonganAbsen - $totalPotonganHutang - $TotalGP - $totalPPH;
-
-                $allowenceData = json_encode($allowenceData);
-                $deductionData = json_encode($deductiondata);
-               
+                $payroll = new Payroll();
+                $payroll->employee_code = $nik;
+                $payroll->periode = $startDate->format('d-m-Y') . ' - ' . $endDate->format('d-m-Y');
+                $payroll->basic_salary = $montlySalary;
+                $payroll->thp = $thp;
+                $payroll->allowences = json_encode($allowenceData);
+                $payroll->deductions = json_encode($deductionData);
+                $payroll->payrol_status = 'Unlocked';
+                $payroll->payslip_status = 'Unpublish';
+                $payroll->run_by = $dataLogin->nama;
+                $payroll->save();
             }
-            // Simpan data ke tabel payroll
-            $payroll = new Payroll();
-            $payroll->employee_code = $nik;
-            $payroll->periode = $request->periode;
-            $payroll->basic_salary = $montlySalary;
-            $payroll->thp = $thp;
-            $payroll->allowences = $allowenceData;
-            $payroll->deductions = $deductionData;
-            $payroll->payrol_status = 'Unlocked';
-            $payroll->payslip_status = 'Unpublish';
-            $payroll->run_by = $dataLogin->nama;
-            $payroll->save();
-        }
 
-        // Redirect atau tampilkan pesan sukses
-        return redirect()->route('payroll-kas.index')->with('success', 'Data payroll berhasil disimpan.');
+            DB::commit();
+
+            return redirect()->route('payroll-kas.index')->with('success', 'Data payroll berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Display the error message
+            return redirect()->route('payroll-kas.index')
+                             ->with('error', 'Terjadi kesalahan saat menyimpan data payroll. Error: ' . $e->getMessage());
+        }
     }
+
 
     public function getEmployees(Request $request) {
         $unitBisnis = $request->input('unit_bisnis');

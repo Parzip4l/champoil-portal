@@ -26,7 +26,12 @@
                         <tbody>
                             @foreach ($dataPayroll as $data)
                             <tr>
-                                <td> <a href="{{route('payroll-kas.show', $data->id)}}">{{ $data->employee_code }} </a></td>
+                                @php 
+                                    // Mengambil nama karyawan berdasarkan employee_code
+                                    $employee = \App\Employee::where('nik', $data->employee_code)->first();
+                                    $employeeName = $employee ? $employee->nama : 'Unknown';
+                                @endphp
+                                <td> <a href="{{route('payroll-kas.show', $data->id)}}">{{ $employeeName }} ({{ $data->employee_code }}) </a></td>
                                 <td> {{ $data->periode }} </td>
                                 <td>{{ 'Rp ' . number_format($data->thp, 0, ',', '.') }}</td>
                             </tr>

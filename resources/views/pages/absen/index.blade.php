@@ -56,9 +56,27 @@
                         <div class="col-md-3">
                             <select name="periode" class="form-control mb-2 select2" id="periode">
                                 <option value="">Periode</option>
-                                @if(bulan())
-                                    @foreach(bulan() as $key=>$value)
-                                        <option value="{{ strtoupper($value).'-'.date('Y') }}">{{ $value }}</option>
+                                @php
+                                    // Current date
+                                    $today = \Carbon\Carbon::now();
+
+                                    // Calculate start and end dates for the period
+                                    $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+                                    $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+
+                                    // Get previous period's dates
+                                    $previousStartDate = $startDate->copy()->subMonth();
+                                    $previousEndDate = $endDate->copy()->subMonth();
+
+                                    // Create periods for dropdown
+                                    $periods = [
+                                        $previousStartDate->format('d M Y') . ' - ' . $previousEndDate->format('d M Y'),
+                                        $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y'),
+                                    ];
+                                @endphp
+                                @if(!empty($periods))
+                                    @foreach($periods as $period)
+                                        <option value="{{ $period }}">{{ $period }}</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -68,7 +86,7 @@
                         </div>
                         
                     
-                </div>
+                    </div>
                 </form>
                 <hr>
                 @endif

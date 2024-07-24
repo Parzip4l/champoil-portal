@@ -371,7 +371,7 @@ class PayrolNS extends Controller
 
                     $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
-                        ->select('p_tlain')
+                        ->select('p_tkerja','p_tlain')
                         ->get();
 
                     $tunjanganLain = $ProjectAllowances->sum('p_tlain');
@@ -392,7 +392,7 @@ class PayrolNS extends Controller
                     }
 
                     $potonganlain = $projectDeductionTotal + $tidakmasukkerja + $TotalGP;
-                    $montlySalary = $totalGaji + $totalGajiBackup + $projectAllowancesTotal;
+                    $montlySalary = $totalGaji + $totalGajiBackup;
                     $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions);
                     $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;
                     $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup;

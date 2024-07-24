@@ -369,8 +369,6 @@ class PayrolNS extends Controller
                         $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
                     }
 
-                    dd($tidakmasukkerja);
-
                     $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
                         ->select('p_tkerja','p_tlain')

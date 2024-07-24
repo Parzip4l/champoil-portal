@@ -382,6 +382,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         /** Report */
         Route::resource('report', App\Http\Controllers\Report\ReportController::class);
         Route::get('report-detail/{id}/{periode}',[App\Http\Controllers\Report\ReportController::class,'show'])->name('report-detail');
+        Route::get('rekap-report', [App\Http\Controllers\Report\ReportController::class,'rekap_report'])->name('rekap-report');
         Route::resource('double', App\Http\Controllers\Report\CheckdoubleController::class);
 
         /** Recruitments */

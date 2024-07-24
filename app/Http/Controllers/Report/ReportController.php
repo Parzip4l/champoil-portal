@@ -100,6 +100,44 @@ class ReportController extends Controller
         return view('pages.report.absen.index',$data);
     }
 
+    public function rekap_report(){
+        $project = Project::all();
+        if($project){
+            foreach($project as $row){
+                $row->persentase_backup=0;
+                $row->persentase_absen=0;
+                $row->persentase_tanpa_clockout = 0;
+                foreach(bulan() as $bln){
+                    $month = strtoupper($bln."-".date('Y'));
+                    $periode_min_1_month = date('m', strtotime("-1 month", strtotime($bln)));
+
+                    // Ambil bulan dari periode yang sudah ditambahkan satu bulan
+                    $bulan = date('m', strtotime($bln));
+
+                    $start = date('Y').'-'.$periode_min_1_month.'-'.'21';
+                    $end = date('Y').'-'.$bulan.'-'.'20';
+
+                    $row['schedule'.$bln] = Schedule::where('project',$row->id)
+                    ->whereBetween('tanggal', [$start, $end])
+                                           ->where('shift','!=','OFF')
+                                           ->count();
+               
+                    $row['absen'.$bln] = Absen::where('project', $row->id)
+                                        ->whereBetween('tanggal', [$start, $end])
+                                        ->count();
+                
+                    if($row['absen'.$bln] > 0 && $row['schedule'.$bln] > 0){
+                        $row['persentase_absen'.$bln] = round(($row['absen'.$bln] / $row['schedule'.$bln]) * 100,2);
+                    }
+                }
+                
+              
+            }
+        }
+        $data['project']=$project;
+        return view('pages.report.absen.rekap',$data);
+    }
+
     
 
     /**

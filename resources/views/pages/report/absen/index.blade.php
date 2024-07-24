@@ -58,7 +58,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-            <a href="javascript:void(0)" class="btn btn-xs btn-warning" style="float:right;text-white">Rekap</a>
+            <a href="{{ route('rekap-report') }}" class="btn btn-xs btn-warning" style="float:right;text-white">Rekap</a>
             <table id="dataTableExample" class="table">
                 <thead>
                 <tr>

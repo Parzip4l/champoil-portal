@@ -27,89 +27,109 @@ class AbsenController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        $code = Auth::user()->employee_code;
-        $company = Employee::where('nik', $code)->first();
-        $project = Project::all();
-        $client_id = Auth::user()->project_id;
+{
+    // Retrieve the authenticated user's employee code
+    $code = Auth::user()->employee_code;
+    $company = Employee::where('nik', $code)->first();
+    $project = Project::all();
+    $client_id = Auth::user()->project_id;
 
-        // Retrieve selected filters from the request
-        $selectedOrganization = $request->input('organization');
-        $project_id = $request->input('project');
-        $periode = $request->input('periode');
+    // Retrieve selected filters from the request
+    $selectedOrganization = $request->input('organization');
+    $project_id = $request->input('project');
+    $periode = $request->input('periode');
+    if ($periode) {
+        // Validate periode format
+        $dates = explode(' - ', $periode);
 
-        // Determine the start and end dates based on business rules
-        $today = now();
-        $startDate = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
-        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+        if (count($dates) === 2) {
+            try {
+                // Create Carbon instances
+                $startDate = \Carbon\Carbon::createFromFormat('d M Y', trim($dates[0]))->startOfDay()->format('Y-m-d');
+                $endDate = \Carbon\Carbon::createFromFormat('d M Y', trim($dates[1]))->endOfDay()->format('Y-m-d');
 
-        // Base query for attendance data
-        $query = DB::table('users')
-            ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
-            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
-                $join->on('absens.nik', '=', 'users.employee_code')
-                    ->whereBetween('absens.tanggal', [$startDate, $endDate]);
-            })
-            ->where('karyawan.unit_bisnis', $company->unit_bisnis);
-
-        // Apply organization filter if selected
-        if ($selectedOrganization) {
-            $query->where('karyawan.organisasi', $selectedOrganization);
-        }
-
-        // Apply project filter
-        if ($client_id === null) {
-            if (!empty($project_id)) {
-                $query->join('schedules', function ($join) use ($project_id) {
-                    $join->on('karyawan.nik', '=', 'schedules.employee')
-                        ->where('schedules.project', $project_id)
-                        ->where('schedules.id', function ($query) use ($project_id) {
-                            $query->select('id')
-                                ->from('schedules')
-                                ->whereColumn('employee', 'karyawan.nik')
-                                ->where('schedules.project', $project_id)
-                                ->orderBy('id') // Ensure ordering before limiting
-                                ->limit(1);
-                        });
-                });
+            } catch (\Exception $e) {
+                // Handle invalid date format
+                return redirect()->back()->with('error', 'Invalid date format. Please use the correct format (d M Y - d M Y).');
             }
         } else {
-            $query->join('schedules', function ($join) use ($client_id) {
+            return redirect()->back()->with('error', 'Invalid periode format. It should be "d M Y - d M Y".');
+        }
+    } else {
+        // Default period if not specified
+        $today = now();
+        $startDate = $today->day >= 21 ? $today->copy()->day(21)->format('Y-m-d') : $today->copy()->subMonth()->day(21)->format('Y-m-d');
+        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20)->format('Y-m-d') : $today->copy()->day(20)->format('Y-m-d');
+    }
+
+    // Base query for attendance data
+    $query = DB::table('users')
+        ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
+        ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
+            $join->on('absens.nik', '=', 'users.employee_code')
+                ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+        })
+        ->where('karyawan.unit_bisnis', $company->unit_bisnis);
+
+    // Apply organization filter if selected
+    if ($selectedOrganization) {
+        $query->where('karyawan.organisasi', $selectedOrganization);
+    }
+
+    // Apply project filter
+    if ($client_id === null) {
+        if (!empty($project_id)) {
+            $query->join('schedules', function ($join) use ($project_id) {
                 $join->on('karyawan.nik', '=', 'schedules.employee')
-                    ->where('schedules.project', $client_id)
-                    ->where('schedules.id', function ($query) use ($client_id) {
+                    ->where('schedules.project', $project_id)
+                    ->where('schedules.id', function ($query) use ($project_id) {
                         $query->select('id')
                             ->from('schedules')
                             ->whereColumn('employee', 'karyawan.nik')
-                            ->where('schedules.project', $client_id)
+                            ->where('schedules.project', $project_id)
                             ->orderBy('id') // Ensure ordering before limiting
                             ->limit(1);
                     });
             });
         }
-
-        // Get the filtered data
-        $data1 = $query->select('users.*', 'absens.*')->orderBy('users.name')->get();
-
-        // Month names for display purposes
-        $months = [
-            '01' => 'Januari',
-            '02' => 'Februari',
-            '03' => 'Maret',
-            '04' => 'April',
-            '05' => 'Mei',
-            '06' => 'Juni',
-            '07' => 'Juli',
-            '08' => 'Agustus',
-            '09' => 'September',
-            '10' => 'Oktober',
-            '11' => 'November',
-            '12' => 'Desember',
-        ];
-
-        // Send data to the view
-        return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization', 'months', 'project', 'client_id'));
+    } else {
+        $query->join('schedules', function ($join) use ($client_id) {
+            $join->on('karyawan.nik', '=', 'schedules.employee')
+                ->where('schedules.project', $client_id)
+                ->where('schedules.id', function ($query) use ($client_id) {
+                    $query->select('id')
+                        ->from('schedules')
+                        ->whereColumn('employee', 'karyawan.nik')
+                        ->where('schedules.project', $client_id)
+                        ->orderBy('id') // Ensure ordering before limiting
+                        ->limit(1);
+                });
+        });
     }
+
+    // Get the filtered data
+    $data1 = $query->select('users.*', 'absens.*')->orderBy('users.name')->get();
+
+    // Month names for display purposes
+    $months = [
+        '01' => 'Januari',
+        '02' => 'Februari',
+        '03' => 'Maret',
+        '04' => 'April',
+        '05' => 'Mei',
+        '06' => 'Juni',
+        '07' => 'Juli',
+        '08' => 'Agustus',
+        '09' => 'September',
+        '10' => 'Oktober',
+        '11' => 'November',
+        '12' => 'Desember',
+    ];
+
+    // Send data to the view
+    return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization', 'months', 'project', 'client_id'));
+}
+
 
     public function indexbackup()
     {

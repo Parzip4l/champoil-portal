@@ -119,8 +119,8 @@ class ReportController extends Controller
 
                     $row['schedule'.$bln] = Schedule::where('project',$row->id)
                     ->whereBetween('tanggal', [$start, $end])
-                                           ->where('shift','!=','OFF')
-                                           ->count();
+                    ->where('shift','!=','OFF')
+                    ->count();
                
                     $row['absen'.$bln] = Absen::where('project', $row->id)
                                         ->whereBetween('tanggal', [$start, $end])

@@ -52,12 +52,26 @@
                         $no=1;
                     @endphp
                         @foreach($project as $row)
+                            
                             <tr>
                                 <td width="5">{{ $no }}</td>
                                 <td>{{ $row->name }}</td>
                                 @if(bulan())
                                     @foreach(bulan() as $bln_r)
-                                        <td>{{ $row['sschedule'.$bln_r] }}<br/>{{ $row['persentase_absen'.$bln_r] }}</td>
+                                        @php 
+                                            if($row['persentase_absen'.$bln_r] <= 50 ){
+                                                $color="background-color:#ff6f74";
+                                            }else if($row['persentase_absen'.$bln_r] >50 && $row['persentase_absen'.$bln_r] <= 80 ){
+                                                $color="background-color:#fff199";
+                                            }else{
+                                                $color="background-color:#9ecb8c";
+                                            }
+
+                                            if(empty($row['persentase_absen'.$bln_r])){
+                                                $color="background-color:#474747";
+                                            }
+                                        @endphp
+                                        <td style="text-align:right;{{$color}}">{{ $row['persentase_absen'.$bln_r] }} %</td>
                                     @endforeach
                                 @endif
                                 

@@ -4,6 +4,10 @@ namespace App\Http\Controllers\CgControllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 use App\ModelCG\Payroll;
 use App\Employee;
 use App\Loan\LoanModel;
@@ -11,16 +15,21 @@ Use App\GardaPratama\Gp;
 use App\Absen;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
-use Carbon\Carbon;
 use App\ModelCG\Project;
-use Illuminate\Support\Facades\Auth;
 use App\ModelCG\ProjectDetails;
 use App\Koperasi\LoanPayment;
-use Illuminate\Support\Facades\DB;
 use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
 use App\Koperasi\Loan;
 use App\Koperasi\Saving;
+
+// TaX
+use App\Pajak\Pajak;
+use App\Pajak\PajakDetails;
+
+// Additional Component
+use App\Component\ComponentMaster;
+use App\Component\ComponentDetails;
 
 class PayrolNS extends Controller
 {
@@ -117,14 +126,26 @@ class PayrolNS extends Controller
         DB::beginTransaction();
         try {
             $employeeCodes = is_array($request->employee_code) ? $request->employee_code : [$request->employee_code];
+            $existingPayrolls = [];
+
             foreach ($employeeCodes as $nik) {
                 // Get employee data
+                $existingPayroll = Payroll::where('employee_code', $nik)
+                ->where('periode', $startDate->format('d-m-Y') . ' - ' . $endDate->format('d-m-Y'))
+                ->first();
+
+                if ($existingPayroll) {
+                    $employee = Employee::where('nik', $nik)->first();
+                    $existingPayrolls[] = $employee->nama;
+                    continue; // Skip saving for this employee
+                }
+
                 $employee = Employee::where('nik', $nik)->first();
                 if (!$employee) {
                     continue; // Jika karyawan tidak ditemukan, lanjutkan ke karyawan berikutnya
                 }
                 $jabatan = $employee->jabatan;
-
+                $taxCode = $employee->tax_code;
                 // Get attendance data based on the period and employee's NIK
                 $absen = Absen::where('nik', $nik)
                     ->whereBetween('tanggal', [$startDate, $endDate])
@@ -145,6 +166,7 @@ class PayrolNS extends Controller
                 $rate_harian = 0;
                 $rate_harianbackup = 0;
                 $potonganAbsen = 0;
+                $totalSimpanan = 0;
 
                 // Koperasi Deduction
                 $anggota = Anggota::where('employee_code', $nik)->first();
@@ -162,7 +184,7 @@ class PayrolNS extends Controller
                         $nominalSimpananWajib = $koperasi->iuran;
                     }
 
-                    $saving = Saving::where('employee_id', $nik)->first();
+                    $saving = Saving::where('employee_id', $nik)->get();
                     $totalSimpanan = $saving->sum('jumlah_simpanan');
 
                     // Check if the employee has an 'onloan' status
@@ -244,6 +266,31 @@ class PayrolNS extends Controller
                         ->update(['is_paid' => 0, 'remaining_amount' => $sisahutangTotal]);
                 }
 
+                // Additional Component
+                $componentDetails  = ComponentDetails::where('employee_code',$nik)->get();
+                $allowanceTotalAdditional=0;
+                $deductionTotalAdditional=0;
+                foreach ($componentDetails as $dataAdditional) {
+                    // Fetch effective date from ComponentMaster using code_master
+                    $componentMaster = ComponentMaster::where('code', $dataAdditional->code_master)->first();
+                
+                    if ($componentMaster) {
+                        $effectiveDate = $componentMaster->effective_date;
+                
+                        // Check if the effective date is today or in the future
+                        if ($effectiveDate >= Carbon::today()) {
+                            $typeData = $dataAdditional->type;
+                
+                            if ($typeData === 'Deductions') {
+                                $deductionTotalAdditional += intval($dataAdditional->nominal);
+                            } elseif ($typeData === 'Allowences') {
+                                $allowanceTotalAdditional += intval($dataAdditional->nominal);
+                            }
+                        }
+                    }
+                }
+                
+                
                 // GP deduction
                 $potonganGP = Gp::where('employee_id', $nik)
                     ->where('is_paid', 0)
@@ -348,6 +395,28 @@ class PayrolNS extends Controller
                         }
 
                         $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
+
+                        $dataPajak = PajakDetails::where('pajak_id', $taxCode)->get();
+                        $matchingPajakDetail = null;
+
+                        foreach ($dataPajak as $pajakDetail) {
+                            if ($gajiPPH >= $pajakDetail->min_bruto && $gajiPPH <= $pajakDetail->max_bruto) {
+                                $matchingPajakDetail = $pajakDetail;
+                                break;
+                            }
+                        }
+
+                        if ($matchingPajakDetail) {
+                            // Extract and convert the persentase to a float
+                            $persentaseStr = $matchingPajakDetail->persentase;
+                            $persentaseFloat = (float) str_replace(',', '.', $persentaseStr);
+
+                            // Calculate the percentage of gajiPPH
+                            $PajakPendapatan = round($gajiPPH * $persentaseFloat);
+                        } else {
+                            // Handle the case where no matching tax detail is found
+                            $PajakPendapatan = 0;
+                        }
                         
                     }
 
@@ -392,12 +461,16 @@ class PayrolNS extends Controller
 
                     $potonganlain = $tidakmasukkerja + $TotalGP;
                     $montlySalary = $totalGaji + $totalGajiBackup;
-                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions + $potonganAbsen);
+                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions + $potonganAbsen + $PajakPendapatan + $deductionTotalAdditional - $allowanceTotalAdditional);
                     $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;
                     $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup;
                     $allowenceData = [
                         'tunjangan_lain' => $projectAllowancesTotal,
                         'allowance_total' => $allowanceTotal,
+                        'totalHariSchedule' => $totalDaysInSchedules,
+                        'totalHari' => $totalWorkingDays,
+                        'totalHariBackup' => $TotalHariBackup,
+                        'totalGajiBackup' => $totalGajiBackup,
                     ];
 
                     $deductionData = [
@@ -405,10 +478,13 @@ class PayrolNS extends Controller
                         'potongan_hutang' => $totalPotonganHutang,
                         'potongan_Gp' => $TotalGP,
                         'potongan_lain' => $potonganlain,
+                        'PPH21' => $PajakPendapatan,
                         'tidak_masuk_kerja' => $tidakmasukkerja,
                         'iuran_koperasi' => $nominalSimpananWajib,
                         'hutang_koperasi' => $loanDeductions,
                         'total_deduction' => $totalDeduction,
+                        'tidak_absen' =>$tidakmasukkerja,
+                        'rate_harian' => $rate_potongan,
                     ];
                 }
                 $payroll = new Payroll();
@@ -416,17 +492,20 @@ class PayrolNS extends Controller
                 $payroll->periode = $startDate->format('d-m-Y') . ' - ' . $endDate->format('d-m-Y');
                 $payroll->basic_salary = $montlySalary;
                 $payroll->thp = $thp;
-                $payroll->allowences = json_encode($allowenceData);
-                $payroll->deductions = json_encode($deductionData);
+                $payroll->allowences = json_encode(array_merge($allowenceData, ['additional_allowances' => $allowanceTotalAdditional]));
+                $payroll->deductions = json_encode(array_merge($deductionData, ['additional_deductions' => $deductionTotalAdditional]));
                 $payroll->payrol_status = 'Unlocked';
                 $payroll->payslip_status = 'Unpublish';
                 $payroll->run_by = $dataLogin->nama;
                 $payroll->save();
             }
-
+            $message='';
             DB::commit();
+            if (!empty($existingPayrolls)) {
+                $message .= ' Namun, data payroll untuk karyawan berikut sudah ada dan tidak disimpan: ' . implode(', ', $existingPayrolls);
+            }   
 
-            return redirect()->route('payroll-kas.index')->with('success', 'Data payroll berhasil disimpan.');
+            return redirect()->route('payroll-kas.index')->with('success', 'Data payroll berhasil disimpan.'. $message);
         } catch (\Exception $e) {
             DB::rollBack();
             // Display the error message

@@ -61,7 +61,6 @@
                         <label for="" class="form-label">Unit Bisnis</label>
                         <select name="unit_bisnis" id="UnitBisnis" class="form-control">
                             <option disabled selected>Pilih Unit Bisnis</option>
-                            <option value="CHAMPOIL">Champoil</option>
                             <option value="Kas">Kas</option>
                         </select>
                     </div>

@@ -65,11 +65,11 @@
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Hutang</label>
-                    <input type="number" id="mess" class="form-control datainput deduction" name="potongan_hutang" placeholder="Rp. " required value="{{$deductions->potongan_hutang}}">
+                    <input type="number" id="mess" class="form-control datainput deduction" name="potongan_hutang" placeholder="Rp. " required value="{{$deductions->hutang_koperasi}}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Garda Pratama</label>
-                    <input type="number" id="potongan_gp" class="form-control datainput deduction" name="potongan_gp" placeholder="Rp. " required value="{{$deductions->potongan_gp}}">
+                    <input type="number" id="potongan_gp" class="form-control datainput deduction" name="potongan_gp" placeholder="Rp. " required value="{{$deductions->potongan_Gp}}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Jumlah Hari Tidak Absen</label>
@@ -77,11 +77,15 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Tidak Absen / Hari</label>
-                    <input type="number" id="rate_harian" class="form-control deduction" name="rate_harian" placeholder="Rp. " required value="{{$allowences->rate_harian}}">
+                    <input type="number" id="rate_harian" class="form-control deduction" name="rate_harian" placeholder="Rp. " required value="{{$deductions->rate_harian}}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Total Potongan Absensi</label>
                     <input type="number" id="potongan_absen" class="form-control deduction" name="potongan_absen" placeholder="Rp. " required value="{{$deductions->potongan_absen}}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="kode_karyawan" class="form-label">Iuran Koperasi</label>
+                    <input type="number" id="potongan_absen" class="form-control deduction" name="potongan_absen" placeholder="Rp. " required value="{{$deductions->iuran_koperasi}}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">PPH 21</label>

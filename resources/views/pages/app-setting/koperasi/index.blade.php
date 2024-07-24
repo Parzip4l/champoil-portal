@@ -213,6 +213,7 @@
     </div>
 </div>
 
+
 <!-- Modal Add Setting -->
 <div class="modal fade" id="KoperasiModal" tabindex="-1" aria-labelledby="KoperasiModal" aria-hidden="true">
     <div class="modal-dialog modal-lg">

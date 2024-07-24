@@ -131,6 +131,7 @@ class ComponentController extends Controller
                     'code_master' => $randomCode,
                     'component_code' => $request->component_code[$i],
                     'component_name' => $componentData->name,
+                    'effective_date' => $request->input('effective_date'),
                     'nominal' => $request->nominal[$i],
                     'type' => $request->input('type'),
                 ]);

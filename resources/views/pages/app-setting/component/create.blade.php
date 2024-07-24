@@ -25,17 +25,6 @@
       <div class="card-body">
         <div class="head-card d-flex justify-content-between mb-3">
             <h6 class="card-title align-self-center mb-0">Assign Additional Component</h6>
-            <div class="tombol-pembantu d-flex">
-                <div class="dropdown"> 
-                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"><i data-feather="upload" class="icon-sm me-2"></i> Import</a>
-                        <a class="dropdown-item d-flex align-items-center me-2"  href="https://truest.co.id/wp-content/uploads/2024/02/Tamplate-Karyawan-1.xlsx"><i data-feather="file-text" class="icon-sm me-2"></i> Download Template</a>
-                    </div>
-                </div>
-            </div>
         </div>
         <form action="{{route('additional-component.store')}}" method="POST">
             @csrf
@@ -51,7 +40,7 @@
                         <div class="col">
                             <div class="form-group mb-3">
                                 <label for="">Type</label>
-                                <select name="type" id="" class="form-control">
+                                <select name="type" id="" class="form-control select2">
                                     <option value="Allowences">Allowences</option>
                                     <option value="Deductions">Deductions</option>
                                 </select>
@@ -59,7 +48,7 @@
                         </div>
                         <div class="col">
                             <div class="form-group mb-3">
-                                <label for="">Effective Date</label>
+                                <label for="">Efektif Sampai Dengan</label>
                                 <input type="date" class="form-control" name="effective_date" required>
                             </div>
                         </div>
@@ -111,24 +100,25 @@
 @endsection
 
 @push('plugin-scripts')
-    <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
+    
     <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
   
 @endpush
 
 @push('custom-scripts')
-    <script src="{{ asset('assets/js/select2.js') }}"></script>
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+    <script src="{{ asset('assets/js/select2.js') }}"></script>
     <script>
         function addProductRow() {
             const employeeTableBody = document.querySelector('#EmployeeTable tbody');
                 const newRow = `
                     <tr>
                         <td>
-                            <select class="js-example-basic-single form-control" name="employee_code[]">
+                            <select class="form-control select2" name="employee_code[]">
                                 @foreach($employees as $karyawan)
                                     <option value="{{ $karyawan->nik ?? 'Tidak Terdaftar' }}">{{ $karyawan->nama ?? 'Tidak Terdaftar' }}</option>
                                 @endforeach

@@ -37,7 +37,7 @@
                                 <th>Member Name</th>
                                 <th>Join Date</th>
                                 <th>Status</th>
-                                <th>Loan Limit</th>
+                                <th>Saldo Simpanan</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -48,7 +48,7 @@
                                 <td>{{$dataAnggota->nama}}</td>
                                 <td>{{$dataAnggota->join_date}}</td>
                                 <td>{{$dataAnggota->member_status}}</td>
-                                <td>{{$dataAnggota->loan_limit}}</td>
+                                <td>Rp {{ number_format($dataAnggota->saldosimpanan, 0, ',', '.') }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

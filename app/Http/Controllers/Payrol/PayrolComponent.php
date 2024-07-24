@@ -59,12 +59,12 @@ class PayrolComponent extends Controller
 
         // Get data components
         $allowence = Component::where('type','Allowences')
-                        ->where('company',$DataCode->unit_bisnis)
+                        ->where('company', $DataCode->unit_bisnis)
                         ->where('is_active','aktif')
                         ->get();
 
         $deduction = Component::where('type','Deductions')
-                        ->where('company',$DataCode->unit_bisnis)
+                        ->where('company', $DataCode->unit_bisnis)
                         ->where('is_active','aktif')
                         ->get();
 

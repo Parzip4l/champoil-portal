@@ -101,7 +101,7 @@
                                                 <span>Tunjangan Lain Lain</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($allowencesData->tunjangan_lain ?? 0, 0, ',', '.') }} </span>
+                                                <span class="text-right">Rp. {{ number_format($allowencesData->additional_allowances ?? 0, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
                                     </td>
@@ -157,7 +157,7 @@
                                                 <span>Potangan Lain Lain</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. 0</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->additional_deductions ?? 0, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                     </td>
@@ -281,7 +281,7 @@
                             Tunjangan Lain-Lain
                         </span>
                         <span>
-                            Rp. 0
+                            Rp. {{ number_format($allowencesData->additional_allowances ?? 0, 0, ',', '.') }}
                         </span>
                     </div>
                 </div>
@@ -293,23 +293,7 @@
                     <h4>Deductions</h4>
                 </div>
                 <div class="card-body">
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            PPH 21
-                        </span>
-                        <span>
-                            Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
-                        <span>
-                            Potongan Diksar
-                        </span>
-                        <span>
-                            Rp. {{ number_format($deductionData->potongan_gp ?? 0, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="details-earning d-flex justify-content-between mb-2">
+                <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Tidak Absen
                         </span>
@@ -327,6 +311,14 @@
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
+                            Potongan Diksar
+                        </span>
+                        <span>
+                            Rp. {{ number_format($deductionData->potongan_gp ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
                             Iuran Anggota Koperasi
                         </span>
                         <span>Rp. {{ number_format($deductionData->iuran_koperasi ?? 0, 0, ',', '.') }}</span>
@@ -339,10 +331,18 @@
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
+                            PPH 21
+                        </span>
+                        <span>
+                            Rp. {{ number_format($deductionData->PPH21 ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="details-earning d-flex justify-content-between mb-2">
+                        <span>
                             Potongan Lain Lain
                         </span>
                         <span>
-                            Rp. 0
+                            Rp. {{ number_format($deductionData->additional_deductions ?? 0, 0, ',', '.') }}
                         </span>
                     </div>
                 </div>

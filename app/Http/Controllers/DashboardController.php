@@ -327,8 +327,11 @@ class DashboardController extends Controller
 
         $totalValue = $lastValueF + $lastValue;
         $previusValue = $previousValue + $previousValueF;
-        // $percentageChange = ($totalValue - $previusValue) / $previusValue * 100;
-        $percentageChange=0;
+        if ($previusValue == 0) {
+            $percentageChange = 0; // Or any default value you wish to use
+        } else {
+            $percentageChange = (($totalValue - $previusValue) / $previusValue) * 100;
+        }
 
         // End Payrol Statistik
 

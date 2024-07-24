@@ -391,7 +391,7 @@ class PayrolNS extends Controller
                         $projectDeductionTotal += array_sum($projectDetailDeduction->toArray());
                     }
 
-                    $potonganlain = $projectDeductionTotal + $tidakmasukkerja + $TotalGP;
+                    $potonganlain = $tidakmasukkerja + $TotalGP;
                     $montlySalary = $totalGaji + $totalGajiBackup;
                     $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions);
                     $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;

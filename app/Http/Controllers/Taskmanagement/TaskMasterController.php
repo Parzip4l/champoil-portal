@@ -220,7 +220,6 @@ class TaskMasterController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-        dd($request->user);
         if (!$company) {
             return redirect()->back()->with('error', 'Company not found for the current user.');
         }

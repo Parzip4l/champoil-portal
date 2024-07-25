@@ -65,7 +65,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group mb-2">
                                 <label class="form-label" for="Due Date">File</label>
-                                <input type="file" class="form-control" name="attachments" required>
+                                <input type="file" class="form-control" name="attachments">
                             </div>
                         </div>
                         <div class="col-md-4 col-12">

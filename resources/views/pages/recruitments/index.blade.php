@@ -26,7 +26,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if($records['records'])
+                            @if(!empty($records['records']))
                                 @php 
                                     $no=1;
                                 @endphp

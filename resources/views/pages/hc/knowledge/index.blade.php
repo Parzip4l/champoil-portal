@@ -34,7 +34,7 @@
                             @foreach ($records as $record)
                             <tr>
                                 <td> {{$nomor++}} </td>
-                                <td> {{ $record->title }} </td>
+                                <td> {!! insert_line_breaks($record->title,90) !!} </td>
                                 <td> <img src="{{ asset('assets/images/pdf.png') }}"> </td>
                                 <td>
                                     <div class="dropdown">

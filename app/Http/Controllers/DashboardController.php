@@ -27,6 +27,12 @@ use App\Pengumuman\Pengumuman;
 Use App\Organisasi\Organisasi;
 use App\News\News;
 
+// Task
+use App\TaskManagement\TaskMaster;
+use App\TaskManagement\Subtask;
+use App\TaskManagement\TaskUser;
+use App\TaskManagement\TaskComment;
+
 class DashboardController extends Controller
 {
     public function index()
@@ -332,8 +338,22 @@ class DashboardController extends Controller
         } else {
             $percentageChange = (($totalValue - $previusValue) / $previusValue) * 100;
         }
-
         // End Payrol Statistik
+        
+
+        // Task Management
+        $currentTaskData = TaskMaster::where('company', $company->unit_bisnis)
+                                        ->whereMonth('created_at', $currentDate->month)
+                                        ->whereYear('created_at', $currentDate->year)
+                                        ->get();
+
+        // Calculate totals for current period
+        $totalTasks = $currentTaskData->count();
+        $completedTasks = $currentTaskData->where('status', 'Completed')->count();
+        $inProgressTasks = $currentTaskData->where('status', 'In Progress')->count();
+        $overdueTasks = $currentTaskData->filter(function ($task) {
+            return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
+        })->count();
 
         $compactVariables = [
             'karyawan', 'alreadyClockIn', 'alreadyClockOut', 'isSameDay', 'datakaryawan', 'logs', 'hariini',
@@ -341,7 +361,7 @@ class DashboardController extends Controller
             'ChartKaryawan', 'kontrakKaryawan', 'karyawanTidakAbsenHariIni', 'managementData', 'frontlineData',
             'managementData2', 'frontlineData2', 'pengumuman', 'news', 'upcomingBirthdays', 'greeting', 'hariini2',
             'DataManagement', 'DataFrontline', 'totalValue', 'percentageChange', 'percentageChangeManagement','percentageChangeFrontline',
-            'percentageChangeAll'
+            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks'
         ];
         
         return view('dashboard', compact(...$compactVariables));

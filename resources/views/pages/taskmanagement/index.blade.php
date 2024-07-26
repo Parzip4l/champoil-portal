@@ -749,7 +749,7 @@ $(document).ready(function(){
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('kategori-pa.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('task-management.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

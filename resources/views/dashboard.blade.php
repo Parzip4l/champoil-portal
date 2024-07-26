@@ -606,7 +606,7 @@
     </div>
 </div>
 @endif
-@if($user->company != 'NOTARIS_ITR')
+@if($user->company == 'NOTARIS_ITR')
 <div class="row">
     <div class="col-md-3 col-6 mb-2">
         <div class="card custom-card2" style="background:#777CF0">

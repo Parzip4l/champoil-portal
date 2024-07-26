@@ -493,6 +493,7 @@
 </div>
 
 @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
+@if($user->company != 'NOTARIS_ITR')
 <div class="row mb-4 d-flex desktop">
     <div class="col-md-3 desktop">
         <div class="card custom-card2">
@@ -605,6 +606,7 @@
         </div>
     </div>
 </div>
+@endif
 @endif
 @if($user->company == 'NOTARIS_ITR')
 <div class="row">

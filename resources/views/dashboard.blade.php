@@ -492,7 +492,8 @@
     </div>
 </div>
 
-@if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)  )
+@if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin))
+@if($user->company != 'NOTARIS_ITR')
 <div class="row mb-4 d-flex desktop">
     <div class="col-md-3 desktop">
         <div class="card custom-card2">
@@ -605,9 +606,66 @@
         </div>
     </div>
 </div>
+@else
+<div class="row">
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#777CF0">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="file-text"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$totalTasks}}</h1>
+                        <p>Total Task</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#44BBF9">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="check-circle"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$completedTasks}}</h1>
+                        <p>Completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#FBB855">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="clock"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$inProgressTasks}}</h1>
+                        <p>In Progress</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-2">
+        <div class="card custom-card2" style="background:#C10000">
+            <div class="card-body text-white">
+                <div class="task-overview-data d-flex">
+                    <i class="icon-xl me-2 mt-1" data-feather="x-circle"></i>
+                    <div class="left-item-overview">
+                        <h1>{{$overdueTasks}}</h1>
+                        <p>Over Due</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endif
 
 <!-- Desktop Wrap -->
+@if($user->company != 'NOTARIS_ITR')
 <div class="header-wrap desktop">
     <div class="row mb-4 desktop d-flex">
         <div class="col-md-4">
@@ -842,6 +900,7 @@
     </div>
     @endif
 </div>
+@endif
 <!-- End Chart Section -->
 <!-- Task -->
 <div class="row mb-6 mobile">

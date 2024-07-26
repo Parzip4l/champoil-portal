@@ -24,6 +24,12 @@
             </li>
             @endif
             @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
+                <li class="nav-item {{ active_class(['employee']) }}">
+                    <a href="{{ url('employee') }}" class="nav-link">
+                        <i class="link-icon" data-feather="file-text"></i>
+                        <span class="link-title">Data Karyawan</span>
+                    </a>
+                </li>
                 <li class="nav-item {{ active_class(['kas']) }}">
                     <a href="{{ url('/kas') }}" class="nav-link">
                         <i class="link-icon" data-feather="users"></i>

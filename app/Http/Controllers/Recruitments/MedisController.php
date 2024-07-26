@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 
+use App\ModelCG\JobApplpicant;
+use App\ModelCG\ApplicantHistory;
+use App\ModelCG\Medical;
+
 class MedisController extends Controller
 {
     /**
@@ -15,25 +19,19 @@ class MedisController extends Controller
      */
     public function index()
     {
-        $client = new Client();
-
-        try {
-            // Make a GET request to the API endpoint
-            $response = $client->get('http://data.cityservice.co.id/cs/public/api/result-medis');
-
-            // Get the JSON response body as a string
-            $body = $response->getBody()->getContents();
-
-            // Decode the JSON string into an associative array
-            $dataApi = json_decode($body, true);
-
-            // Now you can use the $data array which contains the fetched data
-            $data['records']=$dataApi;
-        } catch (\Exception $e) {
-            // Handle any errors that occur during the request
-            $data['records']=[];
+        $data['records']=[];
+        $records = Medical::orderBy('id','desc')->get();
+        if($records){
+            foreach($records as $row){
+                $detail = JobApplpicant::where('id',$row->id_user)->first();
+                if($detail){
+                    $row->detail = $detail;
+                    $data['records'][]=$row;
+                }
+            }
         }
 
+        
 
         return view('pages.recruitments.medis.index',$data);
     }

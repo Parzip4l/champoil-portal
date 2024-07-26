@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+use App\ModelCG\JobApplpicant;
+use App\ModelCG\ApplicantHistory;
+
 class JobAplicantController extends Controller
 {
     /**
@@ -18,26 +21,27 @@ class JobAplicantController extends Controller
      */
     public function index()
     {
-        // Create a new Guzzle client instance
-        $client = new Client();
-
-        try {
-            // Make a GET request to the API endpoint
-            $response = $client->get('http://data.cityservice.co.id/cs/public/api/job-aplicant');
-
-            // Get the JSON response body as a string
-            $body = $response->getBody()->getContents();
-
-            // Decode the JSON string into an associative array
-            $dataApi = json_decode($body, true);
-
-            // Now you can use the $data array which contains the fetched data
-            $data['records']=$dataApi;
-        } catch (\Exception $e) {
-            // Handle any errors that occur during the request
+        if(!empty($_GET['tanggal'])){
+            $tanggal = str_replace(" ","",$_GET['tanggal']  );
+            $explode = explode('to',$tanggal);
+            $start=$explode[0];
+            $end=$explode[1];
+            $data['records'] = JobApplpicant::whereBetween('tanggal', [$start, $end])->orderBy('id','desc')->get();
+            if($data['records']->isNotEmpty()) {
+                foreach($data['records'] as $row) {
+                    $history = ApplicantHistory::where('nik', $row->id)->first(); // Assuming 'nik' is the field to match
+                    if ($history) {
+                        $row->kualifikasi = $history->kualifikasi;
+                    } else {
+                        $row->kualifikasi = null; // or some default value
+                    }
+                }
+            }
+        }else{
             $data['records']=[];
         }
 
+        
 
         return view('pages.recruitments.index',$data);
     }

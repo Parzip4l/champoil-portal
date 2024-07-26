@@ -14,6 +14,19 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
+                    <form method="get" class="mb-3">
+                        <div class="row">
+                            <label for="organization" class="form-label">Filter :</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="tanggal" id="daterange_picker">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </div>
+                        
+                        
+                    </form>
                     <table id="dataTableExample" class="table">
                         <thead>
                             <tr>
@@ -26,33 +39,35 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if(!empty($records['records']))
+                            @if(!empty($records))
                                 @php 
                                     $no=1;
                                 @endphp
-                                @foreach($records['records'] as $row)
+                                @foreach($records as $row)
                                     @php 
-                                    if($row['status']=="Lolos Kualifikasi"){
-                                        $status="success";
-                                    }else{
-                                        $status="danger";
-                                    }
+                                        if($row->kualifikasi=="1"){
+                                            $status="success";
+                                            $text="Lolos Kualifikasi";
+                                        }else{
+                                            $status="danger";
+                                            $text="Tidak Lolos Kualifikasi";
+                                        }
                                     @endphp
                                     <tr>
                                         <td>{{ $no }}</td>
-                                        <td>{{ date('d F Y',strtotime($row['tanggal'])) }}</td>
-                                        <td>{{ $row['nik'] }}</td>
-                                        <td>{{ $row['nama'] }}</td>
+                                        <td>{{ date('d F Y',strtotime($row->tanggal)) }}</td>
+                                        <td>{{ $row->nomor_induk }}</td>
+                                        <td>{{ $row->nama_lengkap }}</td>
                                         <td>
                                             <ol type="1">
-                                                <li>Whatsapp : {{ $row['nomor_wa'] }}</li>
-                                                <li>Usia : {{ $row['usia'] }}</li>
-                                                <li>TB : {{ $row['tb'] }}</li>
-                                                <li>BB : {{ $row['bb'] }}</li>
-                                                <li>BMI : {{ round($row['bmi'],0) }}</li>
+                                                <li>Whatsapp : {{ $row->nomor_wa }}</li>
+                                                <li>Usia : {{ $row->usia }}</li>
+                                                <li>TB : {{ $row->tb }}</li>
+                                                <li>BB : {{ $row->bb }}</li>
+                                                <li>BMI : {{ round($row->bmi,0) }}</li>
                                             </ol>
                                         </td>
-                                        <td><span class="badge bg-{{ $status }}">{{ $row['status'] }}</span></td>
+                                        <td><span class="badge bg-{{ $status }}">{{ $text }}</span></td>
                                     </tr>
                                     @php 
                                         $no++;
@@ -147,5 +162,14 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+        flatpickr("#daterange_picker", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            onClose: function(selectedDates, dateStr, instance) {
+                console.log(dateStr); // Date range in 'Y-m-d to Y-m-d' format
+            }
+        });
 </script>
 @endpush

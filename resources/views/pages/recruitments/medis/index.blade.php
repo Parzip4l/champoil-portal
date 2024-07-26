@@ -37,23 +37,22 @@
                                     <tr>
                                         <td>{{ $no }} </td>
                                         <td>
-                                            {{ $row['nama_lengkap'] }} 
+                                            {{ $row->detail->nama_lengkap }} 
                                         </td>
-                                        <td>{{ $row['nomor_induk'] }}</td>
-                                        <td>{{ date('d F Y',strtotime($row['tanggal'])) }}</td>
+                                        <td>{{ $row->detail->nomor_induk }}</td>
+                                        <td>{{ date('d F Y',strtotime($row->tanggal)) }}</td>
                                         <td>
-                                            Tensi Darah : {{ $row['tensi_darah'] }} <br/>
-                                            Narkoba : {{ $row['narkoba'] }} <br/>
-                                            Hepatitis B ( HBsAg ) : {{ $row['hepatitis_b'] }} <br/>
-                                            Tuberkulosis : {{ $row['tuberkulosis'] }} <br/>
+                                            Tensi Darah : {{ $row->tensi_darah }} <br/>
+                                            Narkoba : {{ $row->narkoba }} <br/>
+                                            Hepatitis B ( HBsAg ) : {{ $row->hepatitis_b }} <br/>
+                                            Tuberkulosis : {{ $row->tuberkulosis }} <br/>
                                         </td>
                                         <td>
-                                            {{ $row['status']}}
-                                            @if($row['status'])
-                                                @if($row['status'] === "Lolos")
-                                                    <i class="fe fe-check-circle fe-16" style="font-size:50px !important; color:green !important;"></i>
+                                            @if($row->status)
+                                                @if($row->status === "Lolos")
+                                                <span class="badge bg-success">{{ $row->status }}</span>
                                                 @else
-                                                    <i class="fe fe-slash fe-16" style="font-size:50px !important; color:red !important;"></i>
+                                                <span class="badge bg-danger">{{ $row->status }}</span>
                                                 @endif
                                             @else
                                                 <a href="#" 

@@ -96,11 +96,15 @@
                         </div>
                         <div class="col">
                             <label for="kode_karyawan" class="form-label">Nomor Telepon</label>
-                            <input id="telepon" class="form-control" name="telepon" value="{{ $record['nomor_wa'] }}" type="number" placeholder="+62862612">
+                            <input id="telepon" class="form-control" name="telepon" value="{{ $record['nomor_wa'] }}" type="text" placeholder="+62862612">
+                        </div>
+                        <div class="col">
+                            <label for="kode_karyawan" class="form-label">Slack ID</label>
+                            <input id="slack_id" class="form-control" name="slack_id" type="text" required>
                         </div>
                         <div class="col">
                             <label for="kode_karyawan" class="form-label">Nomor Telepon Darurat</label>
-                            <input id="telepon" class="form-control" value="{{ $record['nomor_darurat'] }}" name="telepon_darurat" type="number" placeholder="+62862612">
+                            <input id="telepon" class="form-control" value="{{ $record['nomor_darurat'] }}" name="telepon_darurat" type="text" placeholder="+62862612">
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -111,6 +115,7 @@
                                 <option value="Permanent">Tetap</option>
                             </select>
                         </div>
+                        
                         <div class="col-md-6">
                             <label class="form-label">Organisasi</label>
                             <select class=" form-select" data-width="100%" name="organisasi">

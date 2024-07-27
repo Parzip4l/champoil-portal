@@ -28,6 +28,9 @@ use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Setting\Golongan\GolonganModel;
+use App\ModelCG\Penempatan;
+use App\ModelCG\JobApplpicant;
+use App\ModelCG\ApplicantHistory;
 
 class PenempatanController extends Controller
 {
@@ -38,26 +41,31 @@ class PenempatanController extends Controller
      */
     public function index()
     {
-        $client = new Client();
-
-        try {
-            // Make a GET request to the API endpoint
-            $response = $client->get('http://data.cityservice.co.id/cs/public/api/result-test');
-
-            // Get the JSON response body as a string
-            $body = $response->getBody()->getContents();
-
-            // Decode the JSON string into an associative array
-            $dataApi = json_decode($body, true);
-
-            // Now you can use the $data array which contains the fetched data
-            $data['records']=$dataApi;
-        } catch (\Exception $e) {
-            // Handle any errors that occur during the request
-            $data['records']=[];
+        
+        $result=[];
+        // dd($data['records']['records']);
+        $history = ApplicantHistory::where('training',1)->orderBy('id','desc')->get();
+        if($history){
+            foreach($history as $row){
+                $recruitment = JobApplpicant::where('id',$row->nik)->first();
+                $row->nama_lengkap="";
+                $row->recruitment_id="";
+                if(!empty($recruitment)){
+                    $row->nama_lengkap = $recruitment->nama_lengkap;
+                    $row->nomor_induk = $recruitment->nomor_induk;
+                    $row->recruitment_id = $recruitment->id;
+                    
+                }
+                $penempatan = Penempatan::where('id_user',$row->nik)->first();
+                $row->penempatan="";
+                if(!empty($penempatan)){
+                    $row->penempatan = $penempatan;
+                }
+                $result[]=$row;
+            }
         }
 
-        // dd($data['records']['records']);
+        $data['records']=$result;
 
 
         return view('pages.recruitments.penempatan.index',$data);
@@ -70,24 +78,7 @@ class PenempatanController extends Controller
      */
     public function create($id)
     {
-        $client = new Client();
-
-        try {
-            // Make a GET request to the API endpoint
-            $response = $client->get('http://data.cityservice.co.id/cs/public/api/penempatan-detail/'.$id);
-
-            // Get the JSON response body as a string
-            $body = $response->getBody()->getContents();
-
-            // Decode the JSON string into an associative array
-            $dataApi = json_decode($body, true);
-
-            // Now you can use the $data array which contains the fetched data
-            $data['record']=$dataApi;
-        } catch (\Exception $e) {
-            // Handle any errors that occur during the request
-            $data['record']=$e;
-        }
+        $data['record']=JobApplpicant::find($id);
 
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();

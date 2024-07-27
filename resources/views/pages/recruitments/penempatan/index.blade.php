@@ -10,7 +10,7 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Result Medis</h5>
+                <h5 class="mb-0 align-self-center">Penempatan</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -19,22 +19,26 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nama</th>
+                                <th>Nomor Induk</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if(!empty($records['records']))
+                            @if(!empty($records))
                                 @php 
                                     $no=1;
                                 @endphp
-                                @foreach($records['records'] as $row)
+                                @foreach($records as $row)
+                                    @if($row->nama_lengkap)
                                     <tr>
                                         <td>{{ $no }}</td>
-                                        <td>{{ $row['nama_lengkap']}}</td>
+                                        <td>{{ $row->nama_lengkap }}</td>
+                                        <td>{{ $row->nomor_induk }}</td>
                                         <td>
-                                            <a href="{{ route('create-truest',['id'=>$row['id']]) }}" class="btn btn-primary btn-xs">Create Account</a>
+                                            <a href="{{ route('create-truest',['id'=>$row->recruitment_id]) }}" class="btn btn-primary btn-xs">Create Account</a>
                                         </td>
                                     </tr>
+                                    @endif
                                     @php 
                                         $no++;
                                     @endphp

@@ -10,10 +10,23 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Result Medis</h5>
+                <h5 class="mb-0 align-self-center">Result Test</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
+                <form method="get" class="mb-3">
+                        <div class="row">
+                            <label for="organization" class="form-label">Filter :</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="tanggal" id="daterange_picker">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </div>
+                        
+                        
+                    </form>
                     <table id="dataTableExample" class="table">
                         <thead>
                             <tr>
@@ -27,14 +40,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if($records['records'])
+                            @if($records)
                                 @php 
                                     $no=1;
                                 @endphp
-                                @foreach($records['records'] as $row)
+                                @foreach($records as $row)
                                 @php
-                                $score_iq = explode(' / ',$row['score_iq']);
-                                $score_eq = explode(' / ',$row['score_eq']);
+                                $score_iq = explode(' / ',@$row->history->score_iq);
+                                $score_eq = explode(' / ',@$row->history->score_eq);
                                 if($score_eq[0] >= 70){
                                     $label_eq = 'check-circle';
                                     $class_eq='success';
@@ -57,38 +70,38 @@
                                     $class_iq='warning';
                                 }
                                 
-                                if( $row['score_tech'] >= 0 && $row['score_tech'] <= 4 && $row['score_tech'] !=NULL && $row['score_tech'] !=''){
+                                if( $row->history->score_tech >= 0 && $row->history->score_tech <= 4 && $row->history->score_tech !=NULL && $row->history->score_tech !=''){
                                     $label_tech = 'check-circle';
                                     $class_tech ='success';
-                                }else if($row['score_tech'] > 4){
+                                }else if($row->history->score_tech > 4){
                                     $label_tech = 'slash';
                                     $class_tech ='danger';
-                                }else if($row['score_tech']===NULL || $row['score_tech']===''){
+                                }else if($row->history->score_tech===NULL || $row->history->score_tech===''){
                                     $label_tech = 'refresh-cw';
                                     $class_tech='warning';
                                 }
                                 @endphp
                                     <tr>
                                         <td>{{ $no }}</td>
-                                        <td> {{ date('d F Y',strtotime($row['tanggal'])) }}</td>
+                                        <td> {{ date('d F Y',strtotime($row->tanggal)) }}</td>
                                         <td>
-                                            Nama : {{ $row['nama_lengkap'] }}<br/>
-                                            NIK : {{ $row['nomor_induk'] }}<br/>
-                                            Nomor WA : {{ $row['nomor_wa'] }}<br/>
+                                            Nama : {{ $row->nama_lengkap }}<br/>
+                                            NIK : {{ $row->nomor_induk }}<br/>
+                                            Nomor WA : {{ $row->nomor_wa }}<br/>
                                         </td>
                                         <td>{{ $row['jabatan'] }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-outline-{{$class_iq}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $row['score_iq']?$row['score_iq']:'Belum Mengisi'}}">
+                                            <button type="button" class="btn btn-outline-{{$class_iq}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $score_iq[0]?$score_iq[0]:'Belum Mengisi'}}">
                                                 <i data-feather="{{$label_iq }}"></i>
                                             </button>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-outline-{{$class_eq}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $row['score_eq']?$row['score_eq']:'Belum Mengisi' }}">
+                                            <button type="button" class="btn btn-outline-{{$class_eq}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $score_eq[0]?$score_eq[0]:'Belum Mengisi' }}">
                                                 <i data-feather="{{$label_eq }}"></i>
                                             </button>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-outline-{{$class_tech}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $row['score_tech']?$row['score_tech']:'Belum Mengisi' }}">
+                                            <button type="button" class="btn btn-outline-{{$class_tech}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $row->history->score_tech?$row->history->score_tech:'Belum Mengisi' }}">
                                                 <i data-feather="{{$label_tech }}"></i>
                                             </button>
                                         </td>
@@ -185,5 +198,14 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+        flatpickr("#daterange_picker", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            onClose: function(selectedDates, dateStr, instance) {
+                console.log(dateStr); // Date range in 'Y-m-d to Y-m-d' format
+            }
+        });
 </script>
 @endpush

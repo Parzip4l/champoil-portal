@@ -18,36 +18,17 @@ class KasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
 
-        $query = KasManagement::where('company', $employee->unit_bisnis);
-        $dataLogin = json_decode(Auth::user()->permission); 
+        $dataLogin = json_decode(Auth::user()->permission);
 
-        // Check if the user has superadmin access
-        if (in_array('superadmin_access', $dataLogin)) {
-            // If superadmin, allow filtering by office
-            $offices = KasManagement::where('company', $employee->unit_bisnis)
-                                    ->select('office')
-                                    ->distinct()
-                                    ->pluck('office');
+        $datakas = KasManagement::where('company',$employee->unit_bisnis)->where('office',$employee->divisi)->get();
 
-            $selectedOffice = $request->input('office');
-            if ($selectedOffice) {
-                $query->where('office', $selectedOffice);
-            }
-        } else {
-            // Otherwise, filter by the user's office
-            $query->where('office', $employee->divisi);
-        }
-
-        $datakas = $query->get();
-
-        return view('pages.BukuKas.index', compact('datakas', 'offices', 'selectedOffice'));
+        return view('pages.BukuKas.index',compact('datakas'));
     }
-
 
     /**
      * Show the form for creating a new resource.

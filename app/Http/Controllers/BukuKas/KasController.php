@@ -33,7 +33,6 @@ class KasController extends Controller
             $datakas = KasManagement::where('company',$employee->unit_bisnis)->where('office',$employee->divisi)->get();
         }
 
-        dd($dataOffice);
 
         return view('pages.BukuKas.index',compact('datakas'));
     }

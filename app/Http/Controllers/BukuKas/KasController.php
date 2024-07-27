@@ -18,14 +18,22 @@ class KasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
 
         $dataLogin = json_decode(Auth::user()->permission);
 
-        $datakas = KasManagement::where('company',$employee->unit_bisnis)->where('office',$employee->divisi)->get();
+        if($request->has('office'))
+        {
+            $dataOffice = $request->input('office');
+            $datakas = KasManagement::where('company',$employee->unit_bisnis)->where('office',$dataOffice)->get();
+        }else{
+            $datakas = KasManagement::where('company',$employee->unit_bisnis)->where('office',$employee->divisi)->get();
+        }
+
+        dd($dataOffice);
 
         return view('pages.BukuKas.index',compact('datakas'));
     }

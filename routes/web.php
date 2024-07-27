@@ -25,6 +25,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     // Anggota Koperasi
     Route::resource('koperasi-page', App\Http\Controllers\Koperasi\AnggotaController::class);
 
+    // Keuangan Kas
+    Route::resource('buku-kas', App\Http\Controllers\BukuKas\KasController::class);
+
 
     // Garda Pratama
     Route::resource('garda-pratama', App\Http\Controllers\GardaPratama\GpController::class);

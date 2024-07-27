@@ -608,6 +608,8 @@
 </div>
 @endif
 @endif
+
+<!--  -->
 @if($user->company == 'NOTARIS_ITR')
 <div class="row">
     <div class="col-md-3 col-6 mb-2">
@@ -663,7 +665,286 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-2">
+    <div class="col-md-6 mb-4">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Task On Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Progress</th>
+                            <th>Prioritas</th>
+                            <th>Due Date</th>
+                            <th>User</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                            @endphp
+                            @foreach ($TaskOnprogress as $data)
+                                @if ($data->status == "In Progress")
+                                <tr>
+                                    <td><a href="{{route('task-management.index')}}">{{$data->title}}</a></td>
+                                    <td>
+                                        @if($data->progress > 0)
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ $data->progress }}%;" aria-valuenow="{{ $data->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                {{ round($data->progress) }}%
+                                            </div>
+                                        </div>
+                                        @else 
+                                            0%
+                                        @endif 
+                                    </td>
+                                    <td>
+                                        @if($data->priority == 'Low')
+                                            <span class="badge rounded-pill bg-primary">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'Medium')
+                                            <span class="badge rounded-pill bg-warning">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'High')
+                                            <span class="badge rounded-pill bg-danger">{{ $data->priority }}</span>
+                                        @endif
+                                    </td>
+                                    @php
+                                        $formattedDate = \Carbon\Carbon::parse($data->due_date);
+                                    @endphp
+                                    <td>{{$formattedDate->format('D, d M Y')}}</td>
+                                    <td class="d-flex">
+                                        @foreach($data->assignedUsers as $data2)
+                                        <div class="data-user d-flex">
+                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $data2->gambar) }}" alt="{{ $data2->nik }}">
+                                            <div class="tooltips-name">
+                                                <p class="text-muted">{{ $data2->nama }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Task Over Due</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Progress</th>
+                            <th>Prioritas</th>
+                            <th>Due Date</th>
+                            <th>User</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                            @endphp
+                            @foreach ($TaskOnprogress as $data)
+                            @php 
+                                $date = \Carbon\Carbon::parse($data->due_date);
+                            @endphp
+                                @if(\Carbon\Carbon::parse($data->due_date)->isPast())
+                                <tr>
+                                    <td><a href="{{route('task-management.index')}}">{{$data->title}}</a></td>
+                                    <td>
+                                        @if($data->progress > 0)
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ $data->progress }}%;" aria-valuenow="{{ $data->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                {{ round($data->progress) }}%
+                                            </div>
+                                        </div>
+                                        @else 
+                                            0%
+                                        @endif 
+                                    </td>
+                                    <td>
+                                        @if($data->priority == 'Low')
+                                            <span class="badge rounded-pill bg-primary">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'Medium')
+                                            <span class="badge rounded-pill bg-warning">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'High')
+                                            <span class="badge rounded-pill bg-danger">{{ $data->priority }}</span>
+                                        @endif
+                                    </td>
+                                    @php
+                                        $formattedDate = \Carbon\Carbon::parse($data->due_date);
+                                    @endphp
+                                    <td>{{$formattedDate->format('D, d M Y')}}</td>
+                                    <td class="d-flex">
+                                        @foreach($data->assignedUsers as $data2)
+                                        <div class="data-user d-flex">
+                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $data2->gambar) }}" alt="{{ $data2->nik }}">
+                                            <div class="tooltips-name">
+                                                <p class="text-muted">{{ $data2->nama }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Task Completed</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Progress</th>
+                            <th>Prioritas</th>
+                            <th>Due Date</th>
+                            <th>User</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                            @endphp
+                            @foreach ($TaskOnprogress as $data)
+                                @if ($data->status == "Completed")
+                                <tr>
+                                    <td><a href="{{route('task-management.index')}}">{{$data->title}}</a></td>
+                                    <td>
+                                        @if($data->progress > 0)
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ $data->progress }}%;" aria-valuenow="{{ $data->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                {{ round($data->progress) }}%
+                                            </div>
+                                        </div>
+                                        @else 
+                                            0%
+                                        @endif 
+                                    </td>
+                                    <td>
+                                        @if($data->priority == 'Low')
+                                            <span class="badge rounded-pill bg-primary">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'Medium')
+                                            <span class="badge rounded-pill bg-warning">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'High')
+                                            <span class="badge rounded-pill bg-danger">{{ $data->priority }}</span>
+                                        @endif
+                                    </td>
+                                    @php
+                                        $formattedDate = \Carbon\Carbon::parse($data->due_date);
+                                    @endphp
+                                    <td>{{$formattedDate->format('D, d M Y')}}</td>
+                                    <td class="d-flex">
+                                        @foreach($data->assignedUsers as $data2)
+                                        <div class="data-user d-flex">
+                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $data2->gambar) }}" alt="{{ $data2->nik }}">
+                                            <div class="tooltips-name">
+                                                <p class="text-muted">{{ $data2->nama }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Task To Do</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Progress</th>
+                            <th>Prioritas</th>
+                            <th>Due Date</th>
+                            <th>User</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @php 
+                                $no = 1;
+                            @endphp
+                            @foreach ($TaskOnprogress as $data)
+                                @if ($data->status == "TO DO")
+                                <tr>
+                                    <td><a href="{{route('task-management.index')}}">{{$data->title}}</a></td>
+                                    <td>
+                                        @if($data->progress > 0)
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ $data->progress }}%;" aria-valuenow="{{ $data->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                {{ round($data->progress) }}%
+                                            </div>
+                                        </div>
+                                        @else 
+                                            0%
+                                        @endif 
+                                    </td>
+                                    <td>
+                                        @if($data->priority == 'Low')
+                                            <span class="badge rounded-pill bg-primary">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'Medium')
+                                            <span class="badge rounded-pill bg-warning">{{ $data->priority }}</span>
+                                        @elseif($data->priority == 'High')
+                                            <span class="badge rounded-pill bg-danger">{{ $data->priority }}</span>
+                                        @endif
+                                    </td>
+                                    @php
+                                        $formattedDate = \Carbon\Carbon::parse($data->due_date);
+                                    @endphp
+                                    <td>{{$formattedDate->format('D, d M Y')}}</td>
+                                    <td class="d-flex">
+                                        @foreach($data->assignedUsers as $data2)
+                                        <div class="data-user d-flex">
+                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $data2->gambar) }}" alt="{{ $data2->nik }}">
+                                            <div class="tooltips-name">
+                                                <p class="text-muted">{{ $data2->nama }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endif
+<!--  -->
 
 
 <!-- Desktop Wrap -->

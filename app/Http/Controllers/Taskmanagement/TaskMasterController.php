@@ -212,7 +212,6 @@ class TaskMasterController extends Controller
         $employee = Employee::where('nik', $code)->first();
         
         $user = Employee::where('unit_bisnis', $employee->unit_bisnis)->where('resign_status',0)->get();
-
         return view('pages.taskmanagement.create', compact('user'));
     }
 
@@ -239,6 +238,7 @@ class TaskMasterController extends Controller
             $task->description = $request->deskripsi;
             $task->due_date = $request->due_date;
             $task->priority = $request->priority;
+            $task->kategori = $request->kategori;
             $task->company = $company->unit_bisnis;
 
             if ($request->hasFile('attachments')) {
@@ -337,6 +337,7 @@ class TaskMasterController extends Controller
             $task->description = $request->input('deskripsi');
             $task->due_date = $request->input('due_date');
             $task->priority = $request->input('priority');
+            $task->kategori = $request->input('kategori');
 
             // Handle file upload
             if ($request->hasFile('attachments')) {

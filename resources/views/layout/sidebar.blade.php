@@ -236,8 +236,8 @@
                     </li>
                 @endif
                 @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
-                    <li class="nav-item {{ active_class(['kas']) }}">
-                        <a href="{{ url('/kas') }}" class="nav-link">
+                    <li class="nav-item {{ active_class(['buku-kas']) }}">
+                        <a href="{{ route('buku-kas.index') }}" class="nav-link">
                             <i class="link-icon" data-feather="file"></i>
                             <span class="link-title">Laporan Kas</span>
                         </a>

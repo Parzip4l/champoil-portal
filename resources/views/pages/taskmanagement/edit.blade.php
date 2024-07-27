@@ -7,7 +7,12 @@
 @endpush
 
 @section('content')
-
+@php 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+    $feedback = \App\Feedback::where('name', Auth::user()->name)->first();
+    $dataLogin = json_decode(Auth::user()->permission);
+    $userLogin = Auth::user();
+@endphp
 @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -87,6 +92,17 @@
                             <option value="monthly">Monthly</option>
                         </select>
                     </div>
+                    @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
+                    <div class="col">
+                        <div class="form-group mb-2">
+                            <label class="form-label" for="priority">Kategori</label>
+                            <select name="kategori" class="form-control">
+                                <option value="NOTARIS" {{ $task->kategori == 'NOTARIS' ? 'selected' : '' }}>NOTARIS</option>
+                                <option value="PPAT" {{ $task->kategori == 'PPAT' ? 'selected' : '' }}>PPAT</option>
+                            </select>
+                        </div>
+                    </div>
+                    @endif
                     <div class="form-group mb-2">
                         <label class="form-label" for="user">Assign User</label>
                         <div class="custom-select-wrapper">

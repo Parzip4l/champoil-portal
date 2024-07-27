@@ -343,8 +343,6 @@ class DashboardController extends Controller
 
         // Task Management
         $currentTaskData = TaskMaster::where('company', $company->unit_bisnis)
-                                        ->whereMonth('created_at', $currentDate->month)
-                                        ->whereYear('created_at', $currentDate->year)
                                         ->get();
 
         // Calculate totals for current period
@@ -355,13 +353,23 @@ class DashboardController extends Controller
             return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
         })->count();
 
+        $TaskOnprogress = TaskMaster::where('company', $company->unit_bisnis)
+                                        ->get();
+
+        foreach ($TaskOnprogress as $task) {
+            // Get assigned users for the task
+            $task->assignedUsers = TaskUser::where('task_id', $task->id)
+                                            ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
+                                            ->get(['karyawan.nama', 'karyawan.gambar', 'karyawan.nik']);
+        }
+
         $compactVariables = [
             'karyawan', 'alreadyClockIn', 'alreadyClockOut', 'isSameDay', 'datakaryawan', 'logs', 'hariini',
             'asign_test', 'dataRequest', 'pengajuanSchedule', 'dataAbsenByDay', 'DataTotalKehadiran',
             'ChartKaryawan', 'kontrakKaryawan', 'karyawanTidakAbsenHariIni', 'managementData', 'frontlineData',
             'managementData2', 'frontlineData2', 'pengumuman', 'news', 'upcomingBirthdays', 'greeting', 'hariini2',
             'DataManagement', 'DataFrontline', 'totalValue', 'percentageChange', 'percentageChangeManagement','percentageChangeFrontline',
-            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks'
+            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress'
         ];
         
         return view('dashboard', compact(...$compactVariables));

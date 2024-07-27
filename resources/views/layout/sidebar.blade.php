@@ -44,6 +44,12 @@
                         <span class="link-title">Invoice</span>
                     </a>
                 </li>
+                <li class="nav-item {{ active_class(['buku-kas']) }}">
+                    <a href="{{ route('buku-kas.index') }}" class="nav-link">
+                        <i class="link-icon" data-feather="file"></i>
+                        <span class="link-title">Laporan Kas</span>
+                    </a>
+                </li>
                 <li class="nav-item {{ active_class(['kas']) }}">
                     <a href="{{ url('/kas') }}" class="nav-link">
                         <i class="link-icon" data-feather="folder"></i>
@@ -164,6 +170,9 @@
                                 <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">Medis Result</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Training Data</a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('penempatan') }}" class="nav-link {{ active_class(['penempatan']) }}">Penempatan</a>
                             </li>
                         </ul>
@@ -233,14 +242,12 @@
                     </li>
                 @endif
                 @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
-                    @if(in_array('dashboard_access', $dataLogin))
                     <li class="nav-item {{ active_class(['buku-kas']) }}">
                         <a href="{{ route('buku-kas.index') }}" class="nav-link">
                             <i class="link-icon" data-feather="file"></i>
                             <span class="link-title">Laporan Kas</span>
                         </a>
                     </li>
-                    @endif
                 @endif
             @endif
             <!-- End Payrol -->

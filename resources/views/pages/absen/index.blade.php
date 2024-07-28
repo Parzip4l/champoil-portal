@@ -55,7 +55,27 @@
                                 @endif
                             </select>
                         </div>
-                        
+                        <div class="col-md-3">
+                            <select name="periode" class="form-control mb-2 select2" id="periode">
+                                <option value="">Periode</option>
+                                @php
+                                    $today = \Carbon\Carbon::now();
+                                    $startDate2 = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
+                                    $endDate2 = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
+                                    $previousStartDate = $startDate2->copy()->subMonth();
+                                    $previousEndDate = $endDate2->copy()->subMonth();
+                                    $periods = [
+                                        $previousStartDate->format('d M Y') . ' - ' . $previousEndDate->format('d M Y'),
+                                        $startDate2->format('d M Y') . ' - ' . $endDate2->format('d M Y'),
+                                    ];
+                                @endphp
+                                @if(!empty($periods))
+                                    @foreach($periods as $period)
+                                        <option value="{{ $period }}" {{ request('periode') == $period ? 'selected' : '' }}>{{ $period }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>

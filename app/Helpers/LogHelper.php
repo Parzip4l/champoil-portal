@@ -11,7 +11,7 @@ class LogHelper
     {
         $log = new Log();
         $log->user_id = Auth::check() ? Auth::id() : null; // ID user jika ada
-        $log->action = 'null';
+        $log->action = $action;
         $log->description = $description;
         $log->save();
     }

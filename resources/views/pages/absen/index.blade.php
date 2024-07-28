@@ -2,7 +2,7 @@
 
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
- <link href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.bootstrap5.min.css" rel="stylesheet"/>
+  <link href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.bootstrap5.min.css" rel="stylesheet"/>
 @endpush
 
 @section('content')
@@ -12,6 +12,7 @@
     <li class="breadcrumb-item active" aria-current="page">Absensi</li>
   </ol>
 </nav>
+
 @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -23,6 +24,7 @@
         {{ session('error') }}
     </div>
 @endif
+
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
@@ -32,7 +34,7 @@
                     <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalExport">Export Absen</a>
                 </div>
                 @if($client_id==NULL)
-                <form action="{{ route('attendance.filter') }}" method="get" id="filterForm">
+                <form id="filterForm">
                     <div class="row">
                         @csrf
                         <label for="organization" class="form-label">Filter :</label>
@@ -53,34 +55,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <select name="periode" class="form-control mb-2 select2" id="periode">
-                                <option value="">Periode</option>
-                                @php
-                                    // Current date
-                                    $today = \Carbon\Carbon::now();
-
-                                    // Calculate start and end dates for the period
-                                    $startDate2 = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
-                                    $endDate2 = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
-
-                                    // Get previous period's dates
-                                    $previousStartDate = $startDate2->copy()->subMonth();
-                                    $previousEndDate = $endDate2->copy()->subMonth();
-
-                                    // Create periods for dropdown
-                                    $periods = [
-                                        $previousStartDate->format('d M Y') . ' - ' . $previousEndDate->format('d M Y'),
-                                        $startDate2->format('d M Y') . ' - ' . $endDate2->format('d M Y'),
-                                    ];
-                                @endphp
-                                @if(!empty($periods))
-                                    @foreach($periods as $period)
-                                        <option value="{{ $period }}" {{ request('periode') == $period ? 'selected' : '' }}>{{ $period }}</option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
+                        
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>
@@ -98,38 +73,8 @@
                                 @endforeach
                             </tr>
                         </thead>
-                        @php
-                            $previousName = null;
-                        @endphp
-                        @foreach($data1 as $k)
-                            @if($previousName != $k->name)
-                                @php
-                                    $previousName = $k->name;
-                                    $employee = \App\Employee::where('nik', $previousName)->first();
-                                @endphp
-                                <tr>
-                                    <td>
-                                        @if($employee)
-                                            <a href="{{route('absen.details', ['nik' => $previousName])}}">{{ $employee->nama }}</a>
-                                        @else
-                                        <p>Employee Not Found</p>
-                                        @endif
-                                    </td>
-                                    @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
-                                        <td>
-                                            @php
-                                                $absensi = $data1->where('name', $k->name)->where('tanggal', $date->format('Y-m-d'))->first();
-                                            @endphp
-                                            @if($absensi)
-                                                <span class="text-success">{{ $absensi->clock_in }}</span> - <span class="text-danger">{{ $absensi->clock_out }}</span>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                    @endforeach
-                                </tr>
-                            @endif
-                        @endforeach
+                        <tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -142,7 +87,7 @@
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Export Attendence</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Export Attendance</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
@@ -174,12 +119,48 @@
   <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
   <script>
     $(document).ready(function() {
-    var table = $('#dataTableExample1').DataTable( {
-        scrollX:        true,
-        scrollCollapse: true,
-        paging:         true,
-        fixedColumns:   true
-    } );
-} );
+        var table = $('#dataTableExample1').DataTable({
+            scrollX: true,
+            scrollCollapse: true,
+            paging: true,
+            fixedColumns: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route("absen.index") }}',
+                data: function (d) {
+                    d.organization = $('#organizationSelect').val();
+                    d.project = $('#project').val();
+                    d.periode = $('#periode').val();
+                }
+            },
+            columns: [
+                { data: 'nama', name: 'nama' },
+                @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
+                    {
+                        data: 'attendance.absens_{{ $date->format('Ymd') }}', 
+                        name: 'attendance.absens_{{ $date->format('Ymd') }}', 
+                        defaultContent: '-', 
+                        render: function(data, type, row) {
+                            if (data && data.clock_in && data.clock_out) {
+                                return '<span class="text-success">' + data.clock_in + '</span> - <span class="text-danger">' + data.clock_out + '</span>';
+                            } else if (data && data.clock_in) {
+                                return '<span class="text-success">' + data.clock_in + '</span>';
+                            } else if (data && data.clock_out) {
+                                return '<span class="text-danger">' + data.clock_out + '</span>';
+                            } else {
+                                return '-';
+                            }
+                        }
+                    },
+                @endforeach
+            ]
+        });
+
+        $('#filterForm').on('submit', function(e) {
+            e.preventDefault();
+            table.ajax.reload();
+        });
+    });
   </script>
 @endpush

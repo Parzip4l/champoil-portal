@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\AttendenceExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Company\CompanyModel;
+use Yajra\DataTables\Facades\DataTables;
 
 class AbsenController extends Controller
 {
@@ -28,55 +29,59 @@ class AbsenController extends Controller
      */
     public function index(Request $request)
 {
-    // Retrieve the authenticated user's employee code
+    
     $code = Auth::user()->employee_code;
     $company = Employee::where('nik', $code)->first();
     $project = Project::all();
     $client_id = Auth::user()->project_id;
 
-    // Retrieve selected filters from the request
     $selectedOrganization = $request->input('organization');
     $project_id = $request->input('project');
     $periode = $request->input('periode');
+    
+    // Date handling logic
     if ($periode) {
-        // Validate periode format
         $dates = explode(' - ', $periode);
-
+        
         if (count($dates) === 2) {
             try {
-                // Create Carbon instances
                 $startDate = \Carbon\Carbon::createFromFormat('d M Y', trim($dates[0]))->startOfDay()->format('Y-m-d');
                 $endDate = \Carbon\Carbon::createFromFormat('d M Y', trim($dates[1]))->endOfDay()->format('Y-m-d');
-
             } catch (\Exception $e) {
-                // Handle invalid date format
                 return redirect()->back()->with('error', 'Invalid date format. Please use the correct format (d M Y - d M Y).');
             }
         } else {
             return redirect()->back()->with('error', 'Invalid periode format. It should be "d M Y - d M Y".');
         }
     } else {
-        // Default period if not specified
         $today = now();
         $startDate = $today->day >= 21 ? $today->copy()->day(21)->format('Y-m-d') : $today->copy()->subMonth()->day(21)->format('Y-m-d');
         $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20)->format('Y-m-d') : $today->copy()->day(20)->format('Y-m-d');
     }
 
-    // Base query for attendance data
+    // Query building
     $query = DB::table('users')
         ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
         ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
             $join->on('absens.nik', '=', 'users.employee_code')
-                ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+                 ->whereBetween('absens.tanggal', [$startDate, $endDate]);
         })
-        ->where('karyawan.unit_bisnis', $company->unit_bisnis);
+        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+        ->select(
+            'users.id as user_id',
+            'karyawan.nik',
+            'karyawan.nama',
+            'karyawan.organisasi',
+            DB::raw('GROUP_CONCAT(absens.status) as statuses'),
+            DB::raw('GROUP_CONCAT(absens.clock_in) as clock_ins'),
+            DB::raw('GROUP_CONCAT(absens.clock_out) as clock_outs')
+        )
+        ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi');
 
-    // Apply organization filter if selected
     if ($selectedOrganization) {
         $query->where('karyawan.organisasi', $selectedOrganization);
     }
 
-    // Apply project filter
     if ($client_id === null) {
         if (!empty($project_id)) {
             $query->join('schedules', function ($join) use ($project_id) {
@@ -87,7 +92,7 @@ class AbsenController extends Controller
                             ->from('schedules')
                             ->whereColumn('employee', 'karyawan.nik')
                             ->where('schedules.project', $project_id)
-                            ->orderBy('id') // Ensure ordering before limiting
+                            ->orderBy('id')
                             ->limit(1);
                     });
             });
@@ -101,16 +106,40 @@ class AbsenController extends Controller
                         ->from('schedules')
                         ->whereColumn('employee', 'karyawan.nik')
                         ->where('schedules.project', $client_id)
-                        ->orderBy('id') // Ensure ordering before limiting
+                        ->orderBy('id')
                         ->limit(1);
                 });
         });
     }
 
-    // Get the filtered data
-    $data1 = $query->select('users.*', 'absens.*')->orderBy('users.name')->get();
+    // DataTables AJAX request handling
+    if ($request->ajax()) {
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('nama', function($row) {
+                return '<a href="' . route('absen.details', ['nik' => $row->nik]) . '">' . htmlspecialchars($row->nama) . '</a>';
+            })
+            ->addColumn('attendance', function($row) use ($startDate, $endDate) {
+                $attendanceData = [];
+                $clockIns = explode(',', $row->clock_ins);
+                $clockOuts = explode(',', $row->clock_outs);
+    
+                $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+                foreach ($period as $index => $date) {
+                    $clockIn = $clockIns[$index] ?? '';
+                    $clockOut = $clockOuts[$index] ?? '';
+                    $attendanceData['absens_' . $date->format('Ymd')] = [
+                        'clock_in' => $clockIn,
+                        'clock_out' => $clockOut
+                    ];
+                }
+    
+                return $attendanceData;
+            })
+            ->rawColumns(['nama'])
+            ->toJson();
+    }
 
-    // Month names for display purposes
     $months = [
         '01' => 'Januari',
         '02' => 'Februari',
@@ -126,8 +155,7 @@ class AbsenController extends Controller
         '12' => 'Desember',
     ];
 
-    // Send data to the view
-    return view('pages.absen.index', compact('data1', 'endDate', 'startDate', 'selectedOrganization', 'months', 'project', 'client_id'));
+    return view('pages.absen.index', compact('endDate', 'startDate', 'selectedOrganization', 'months', 'project', 'client_id'));
 }
 
 
@@ -162,10 +190,10 @@ class AbsenController extends Controller
 
     public function filterByOrganization(Request $request)
     {
-        $selectedOrganization = $request->input('organization');
-        $project = $request->input('project') ?? '';
-        $periode = $request->input('periode') ?? '';
-
+        $selectedOrganization = $request->input('organization', '');
+        $project = $request->input('project', '');
+        $periode = $request->input('periode', '');
+    
         return redirect()->route('absen.index', [
             'organization' => $selectedOrganization,
             'project' => $project,

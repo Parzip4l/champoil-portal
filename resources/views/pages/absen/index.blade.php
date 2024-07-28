@@ -158,9 +158,9 @@
                 { data: 'nama', name: 'nama' },
                 @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
                     {
-                        data: 'attendance.absens_{{ $date->format('Ymd') }}', 
-                        name: 'attendance.absens_{{ $date->format('Ymd') }}', 
-                        defaultContent: '-', 
+                        data: 'attendance.absens_{{ $date->format('Ymd') }}',
+                        name: 'attendance.absens_{{ $date->format('Ymd') }}',
+                        defaultContent: '-',
                         render: function(data, type, row) {
                             if (data && data.clock_in && data.clock_out) {
                                 return '<span class="text-success">' + data.clock_in + '</span> - <span class="text-danger">' + data.clock_out + '</span>';
@@ -179,8 +179,38 @@
 
         $('#filterForm').on('submit', function(e) {
             e.preventDefault();
-            table.ajax.reload();
+            var previousUrl = window.location.href;
+            updateURL();
+            table.ajax.reload(null, false); // false to keep the pagination position
+
+            // Check if the 'periode' filter has changed
+            var currentUrl = new URL(window.location.href);
+            if (previousUrl !== currentUrl.toString()) {
+                setTimeout(function() {
+                    location.reload(); // Refresh the page if 'periode' filter has changed
+                }, 1000); // Delay to ensure the DataTable has time to reload
+            }
         });
+
+        function updateURL() {
+            var params = {
+                organization: $('#organizationSelect').val(),
+                project: $('#project').val(),
+                periode: $('#periode').val()
+            };
+
+            var newUrl = new URL(window.location.href);
+            Object.keys(params).forEach(function(key) {
+                if (params[key]) {
+                    newUrl.searchParams.set(key, params[key]);
+                } else {
+                    newUrl.searchParams.delete(key);
+                }
+            });
+
+            history.replaceState(null, '', newUrl);
+        }
     });
-  </script>
+</script>
+
 @endpush

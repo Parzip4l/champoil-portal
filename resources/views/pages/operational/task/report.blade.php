@@ -1,275 +1,362 @@
 @extends('layout.master')
 
-@push('plugin-styles')
-  <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
-  <style>
-    .timeline {
-      max-width: 100% !important;
-    }
-
-    th {
-      text-align: center !important;
-      vertical-align: middle;
-    }
-  </style>
-@endpush
-
 @section('content')
-@php 
-    if($proj){
-        $prjk = $proj;
-    }else{
-        $proj = $_GET["project_id"] ?? "";
-    }
-@endphp
-@csrf
 <div class="row">
     <div class="col-md-12">
-        
         <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between">
-                        <h5 class="mb-0 align-self-center">Filter Report </h5>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-3 d-none d-md-block">
+                        <div class="card">
+                            <div class="card-body d-none">
+                                <h6 class="card-title mb-4">Full calendar</h6>
+                                <div id='external-events' class='external-events'>
+                                
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <form class="row g-3">
-                        @if($client==NULL)
-                            <div class="col-auto">
-                                <label for="staticEmail2" class="visually-hidden">Project</label>
-                                <select name="project_id" class="form-control select2">
-                                    <option value="">-- Select Project --</option>
-                                    @if($project)
-                                        @foreach($project as $pr)
-                                            @php
-                                                $selected = ($project_id == $pr->id) ? 'selected' : '';
-                                            @endphp
-                                            <option value="{{ $pr->id }}" {{ $selected }}>{{ $pr->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
+                    
+                    <div class="col-12 col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <h5 class="mb-0 align-self-center">Filter Report</h5>
                             </div>
-                            @endif
-                            <div class="col-auto">
-                                <label for="staticEmail2" class="visually-hidden">Periode</label>
-                                <select name="periode" class="form-control select2">
-                                    <option value="">-- Select Periode --</option>
-                                    @if(bulan())
-                                        @foreach(bulan() as $key=>$value)
-                                            @php
-                                                $selected = ($periode == $value) ? 'selected' : '';
-                                            @endphp
-                                            <option value="{{ $value.'-'.date('Y') }}" {{ $selected }}>{{ $value }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <button type="submit" class="btn btn-primary mb-3">Filter</button>
-                            </div>
-                        </form>
+                        <div class="card-body">
+                            <form class="row g-3">
+                                <div class="col-auto">
+                                    <label for="staticEmail2" class="visually-hidden">Project</label>
+                                    <select name="project_id" class="form-control select2">
+                                        <option value="">-- Select Project -- </option>
+                                        @if($project)
+                                            @foreach($project as $pr)
+                                                @php
+                                                    if($project_id==$pr->id){
+                                                        $selected="selected";
+                                                    }else{
+                                                        $selected="";
+                                                    }
+                                                @endphp
+                                                <option value="{{ $pr->id }}" {{$selected}}>{{ $pr->name }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary mb-3">Filter</button>
+                                </div>
+                            </form>
+                            <div id='fullcalendar'></div>
+                        </div>
+                        </div>
                     </div>
-                </div>                
-            </div>
-        </div>
-        
-        
-    </div>
-</div>
-
-<div class="row mt-3">
-    <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="card-title">
-                    {{ @$detail_project->name }}
-                </h6>
-                <div class="table-responsive">
-                <a href="javascript:void(0)" 
-                   class="btn btn-outline-danger btn-xs mb-3"
-                   id="download"
-                   style="float:right">
-                   <i class="link-icon" data-feather="file-text"></i> Export Pdf
-                </a> 
-                    <table id="dataTableExample" class="table table-bordered table-responsive">
-                        <thead>
-                            <tr>
-                                <th colspan="17" class="text-center">
-                                    {{ @$detail_project->name }}
-                                    
-                                </th>
-                            </tr>
-                            <tr>
-                                <th width="5" rowspan="2">No</th>
-                                <th rowspan="2">Checkpoint</th>
-                                <th rowspan="2">Sub Point</th>
-                                @if(tanggal_bulan(date('Y'),date('m',strtotime($periode))))
-                                    @foreach(tanggal_bulan(date('Y'),date('m',strtotime($periode))) as $tanggal )
-                                        <th rowspan="2">{{ $tanggal }}</th>
-                                    @endforeach
-                                @endif
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if($report)
-                                @foreach($report as $row)
-                                    <tr>
-                                        <td rowspan="{{ $row->jml_sub + 1 }}"></td>
-                                        <td rowspan="{{ $row->jml_sub + 1 }}">{!! insert_line_breaks($row->judul,30) !!}</td>
-                                    </tr>
-                                    @if($row->sub_task)
-                                        @foreach($row->sub_task as $sub)
-                                            <tr>
-                                                <td>{!! insert_line_breaks($sub->task,30) !!}</td>
-                                                @if(tanggal_bulan(date('Y'),date('m',strtotime($periode))))
-                                                    @foreach(tanggal_bulan(date('Y'),date('m',strtotime($periode))) as $tanggal )
-                                                        <td>
-                                                            @if($schedule)
-                                                                @foreach($schedule as $scdl)
-                                                                    <a href="javascript:void(0)" 
-                                                                       onclick="get_detail('{{$sub->id}}','{{ $tanggal }}','{{ $scdl->shift }}','{{ $proj }}')"
-                                                                       class="btn btn-xs btn-outline-primary mr-3">
-                                                                        {{ $scdl->shift }} 
-                                                                    </a>
-                                                                @endforeach
-                                                            @endif
-                                                        </td>
-                                                    @endforeach
-                                                @endif
-                                            </tr> 
-                                        @endforeach
-                                    @endif
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
     </div>
+    
 </div>
-
-<!-- Modal -->
-<div class="modal fade modal-xl" id="detail-patrol" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Detail Patrol</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-          
-              <table id="patrolTable" class="table table-bordered table-responsive">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Task ID</th>
-                        <th>Status</th>
-                        <th>Description</th>
-                        <th>Time</th>
-                        <th>Petugas</th>
-                    </tr>
-                </thead>
-                <tbody id="patrolTableBody">
-                    <!-- Table rows will be dynamically added here -->
-                </tbody>
-            </table>
-                <!-- Modal content will be loaded dynamically via AJAX -->
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End Modal -->
-
 @endsection
 
 @push('plugin-scripts')
-<script src="{{ asset('assets/plugins/moment/moment.min.js') }}"></script>
-<script src="{{ asset('assets/plugins/fullcalendar/index.global.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/moment/moment.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/fullcalendar/index.global.min.js') }}"></script>
+  <script src="{{ asset('assets/js/fullcalendar.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
-<script>
-    // Function to open the detail patrol modal and load content via AJAX
-    var modalBody = $('#detail-patrol .modal-body');
-    var tableBody = document.getElementById("patrolTableBody");
-    tableBody.innerHTML = "";
-    function get_detail(id_task,tanggal, shift, project) {
-        $('#detail-patrol .modal-body #patrolTableBody').empty();
-        $('#detail-patrol').modal('show'); // Show the modal
-        // tableBody.clear();
-        $.ajax({
-            url: '/api/v1/patroli-report-dash',
-            type: 'POST',
-            data: {
-                tanggal: tanggal,
-                shift: shift,
-                project: project,
-                id_task:id_task
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-            },
-            success: function(response) {
-                // Example: Append new content dynamically
-                var dataPatrol = response.data_patrol;
-                for (var i = 0; i < dataPatrol.length; i++) {
-                    var row = `<tr>
-                                    <td>${i+1}</td>
-                                    <td>${dataPatrol[i].task_name}</td>
-                                    <td>${dataPatrol[i].label_status}</td>
-                                    <td>${dataPatrol[i].description}</td>
-                                    <td>${dataPatrol[i].format_tanggal}</td>
-                                    <td>${dataPatrol[i].petugas}</td>
-                                </tr>`;
-                    tableBody.innerHTML += row;
-                }
-                // Handle the response from the server
-            },
-            error: function(xhr, status, error) {
-                console.error("Error: " + error);
-                // Handle any errors
-            }
-        });
+  
+  <script>
+    $(function() {
+
+// sample calendar events data
+
+var Draggable = FullCalendar.Draggable;
+var calendarEl = document.getElementById('fullcalendar');
+var containerEl = document.getElementById('external-events');
+
+var curYear = moment().format('YYYY');
+  var curMonth = moment().format('MM');
+
+  // Calendar Event Source
+  var calendarEvents = {
+    id: 1,
+    backgroundColor: 'rgba(1,104,250, .15)',
+    borderColor: '#0168fa',
+    events: [
+      {
+        id: '1',
+        start: curYear+'-'+curMonth+'-08T08:30:00',
+        end: curYear+'-'+curMonth+'-08T13:00:00',
+        title: 'Google Developers Meetup',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      },{
+        id: '2',
+        start: curYear+'-'+curMonth+'-10T09:00:00',
+        end: curYear+'-'+curMonth+'-10T17:00:00',
+        title: 'Design/Code Review',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      },{
+        id: '3',
+        start: curYear+'-'+curMonth+'-13T12:00:00',
+        end: curYear+'-'+curMonth+'-13T18:00:00',
+        title: 'Lifestyle Conference',
+        description: 'Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi...'
+      },{
+        id: '4',
+        start: curYear+'-'+curMonth+'-15T07:30:00',
+        end: curYear+'-'+curMonth+'-15T15:30:00',
+        title: 'Team Weekly Trip',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      },{
+        id: '5',
+        start: curYear+'-'+curMonth+'-17T10:00:00',
+        end: curYear+'-'+curMonth+'-19T15:00:00',
+        title: 'DJ Festival',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      },{
+        id: '6',
+        start: curYear+'-'+curMonth+'-08T13:00:00',
+        end: curYear+'-'+curMonth+'-08T18:30:00',
+        title: 'Carl Henson\'s Wedding',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      }
+    ]
+  };
+
+  // Birthday Events Source
+  var birthdayEvents = {
+    id: 2,
+    backgroundColor: 'rgba(16,183,89, .25)',
+    borderColor: '#10b759',
+    events: [
+      {
+        id: '7',
+        start: curYear+'-'+curMonth+'-01T18:00:00',
+        end: curYear+'-'+curMonth+'-01T23:30:00',
+        title: 'Jensen Birthday',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      },
+      {
+        id: '8',
+        start: curYear+'-'+curMonth+'-21T15:00:00',
+        end: curYear+'-'+curMonth+'-21T21:00:00',
+        title: 'Carl\'s Birthday',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      },
+      {
+        id: '9',
+        start: curYear+'-'+curMonth+'-23T15:00:00',
+        end: curYear+'-'+curMonth+'-23T21:00:00',
+        title: 'Yaretzi\'s Birthday',
+        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
+      }
+    ]
+  };
+
+
+  var holidayEvents = {
+    id: 3,
+    backgroundColor: 'rgba(241,0,117,.25)',
+    borderColor: '#f10075',
+    events: [
+      {
+        id: '10',
+        start: curYear+'-'+curMonth+'-04',
+        end: curYear+'-'+curMonth+'-06',
+        title: 'Feast Day'
+      },
+      {
+        id: '11',
+        start: curYear+'-'+curMonth+'-26',
+        end: curYear+'-'+curMonth+'-27',
+        title: 'Memorial Day'
+      },
+      {
+        id: '12',
+        start: curYear+'-'+curMonth+'-28',
+        end: curYear+'-'+curMonth+'-29',
+        title: 'Veteran\'s Day'
+      }
+    ]
+  };
+
+  var discoveredEvents = {
+    id: 4,
+    backgroundColor: 'rgba(0,204,204,.25)',
+    borderColor: '#00cccc',
+    events: [
+      {
+        id: '13',
+        start: curYear+'-'+curMonth+'-17T08:00:00',
+        end: curYear+'-'+curMonth+'-18T11:00:00',
+        title: 'Web Design Workshop Seminar'
+      }
+    ]
+  };
+
+  var meetupEvents = {
+    id: 5,
+    backgroundColor: 'rgba(91,71,251,.2)',
+    borderColor: '#5b47fb',
+    events: [
+      {
+        id: '14',
+        start: curYear+'-'+curMonth+'-03',
+        end: curYear+'-'+curMonth+'-05',
+        title: 'UI/UX Meetup Conference'
+      },
+      {
+        id: '15',
+        start: curYear+'-'+curMonth+'-18',
+        end: curYear+'-'+curMonth+'-20',
+        title: 'Angular Conference Meetup'
+      }
+    ]
+  };
+
+
+  var otherEvents = {
+    id: 6,
+    backgroundColor: 'rgba(253,126,20,.25)',
+    borderColor: '#fd7e14',
+    events: [
+      {
+        id: '16',
+        start: curYear+'-'+curMonth+'-06',
+        end: curYear+'-'+curMonth+'-08',
+        title: 'My Rest Day'
+      },
+      {
+        id: '17',
+        start: curYear+'-'+curMonth+'-29',
+        end: curYear+'-'+curMonth+'-31',
+        title: 'My Rest Day'
+      }
+    ]
+  };
+
+new Draggable(containerEl, {
+  itemSelector: '.fc-event',
+  eventData: function(eventEl) {
+    return {
+      title: eventEl.innerText
+    };
+  }
+});
+
+
+// initialize the calendar
+var calendar = new FullCalendar.Calendar(calendarEl, {
+  headerToolbar: {
+    left: "prev,today,next",
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+  },
+  editable: true,
+  droppable: true, // this allows things to be dropped onto the calendar
+  fixedWeekCount: true,
+  // height: 300,
+  initialView: 'dayGridMonth',
+  timeZone: 'UTC',
+  hiddenDays:[],
+  navLinks: 'true',
+  // weekNumbers: true,
+  // weekNumberFormat: {
+  //   week:'numeric',
+  // },
+  dayMaxEvents: 2,
+  events: [],
+  eventSources: [calendarEvents, birthdayEvents, holidayEvents, discoveredEvents, meetupEvents, otherEvents],
+  drop: function(info) {
+      // remove the element from the "Draggable Events" list
+      // info.draggedEl.parentNode.removeChild(info.draggedEl);
+  },
+  eventClick: function(info) {
+    var eventObj = info.event;
+    const date = new Date(eventObj.start);
+    const year = date.getFullYear();
+    let month = (date.getMonth() + 1).toString(); // Months are zero-indexed, so add 1
+    let day = date.getDate().toString();
+
+    // Pad month and day with leading zeros if necessary
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    if (day.length < 2) {
+      day = '0' + day;
     }
 
+    // Combine into the desired format
+    const formattedDate = `${year}-${month}-${day}`;
 
+    
+    fetch('https://hris.truest.co.id/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const reports = data.report;
+      $('#tanggal_report').text(formattedDate);
+      $('#list').empty();
+      // Loop through each report
+      reports.forEach(report => {
+        let reportHTML = 
+            '<ul class="timeline mb-3" style="background:#ffffff !important">'+
+              '<li class="event">'+
+                '<h3 class="title">'+report.judul+'</h3>';
+          
+          if (report.patroli.length > 0) {
+            reportHTML += '<ul class="timeline mt-10">';
+            report.patroli.forEach(patrol => {
+              reportHTML += 
+                '<li class="event mb-15">'+
+                  '<h3 class="title">'+patrol.task+'</h3>';
+                  reportHTML += '<ul class="timeline mt-10">';
+                      patrol.daily.forEach(daily => {
+                        let label_status="";
+                        if(daily.status==0){
+                          label_status="Kondisi Baik";
+                        }else{
+                          label_status="Kondisi Tidak Baik";
+                        }
+                        reportHTML += 
+                          '<li class="event mb-15">'+
+                            '<h3 class="title"> Petugas : '+daily.petugas+'</h3>'+
+                            '<p>Tanggal : '+daily.tanggal+'</p>'+
+                            '<p>Status : '+label_status+'</p>'+
+                            '<p>Keterangan : '+daily.deskripsi+'</p>';
 
-    // Initialize the FullCalendar
-    $(document).ready(function() {
+                            reportHTML +='</li>';
 
-
-
-        $('#download').click(function () {
-            // alert('ok');
-            var project_id = "{{@$_GET['project_id']}}"; // Set your project ID here
-            var periode = "{{@$_GET['periode']}}";; // Set your date here
-
-            // Get CSRF token
-            var token = $('meta[name="csrf-token"]').attr('content');
-
-            // AJAX request to generate and save the PDF
-            $.ajax({
-                url: "api/v1/download-report",
-                type: 'POST',
-                data: {
-                    _token: token,
-                    periode: periode,
-                    project_id: project_id
-                },
-                success: function (response) {
-                    // if (response.path) {
-                    //     window.location.href = response.path; // Redirect to the saved PDF
-                    // } else {
-                    //     alert('Failed to generate PDF');
-                    // }
-                },
-                error: function () {
-                    // alert('Error occurred while generating PDF');
-                }
+                      });
+                  reportHTML += '</ul>';
+                  
+                  reportHTML +='</li>';
             });
-        });
+            reportHTML += '</ul>';
+          }
+
+          reportHTML += 
+              '</li>'+
+            '</ul>';
+          
+          $('#list').append(reportHTML);
+      });
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
     });
-</script>
+  },
+});
+
+calendar.render();
+
+
+});
+
+  </script>
 @endpush

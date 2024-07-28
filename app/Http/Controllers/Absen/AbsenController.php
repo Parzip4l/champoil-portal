@@ -61,22 +61,23 @@ class AbsenController extends Controller
 
     // Query building
     $query = DB::table('users')
-        ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
-        ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
-            $join->on('absens.nik', '=', 'users.employee_code')
-                 ->whereBetween('absens.tanggal', [$startDate, $endDate]);
-        })
-        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-        ->select(
-            'users.id as user_id',
-            'karyawan.nik',
-            'karyawan.nama',
-            'karyawan.organisasi',
-            DB::raw('GROUP_CONCAT(absens.status) as statuses'),
-            DB::raw('GROUP_CONCAT(absens.clock_in) as clock_ins'),
-            DB::raw('GROUP_CONCAT(absens.clock_out) as clock_outs')
-        )
-        ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi');
+    ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
+    ->leftJoin('absens', function($join) use ($startDate, $endDate) {
+        $join->on('absens.nik', '=', 'users.employee_code')
+             ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+    })
+    ->select(
+        'users.id as user_id',
+        'karyawan.nik',
+        'karyawan.nama',
+        'karyawan.organisasi',
+        DB::raw("GROUP_CONCAT(absens.status) as statuses"),
+        DB::raw("GROUP_CONCAT(absens.clock_in) as clock_ins"),
+        DB::raw("GROUP_CONCAT(absens.clock_out) as clock_outs")
+    )
+    ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi')
+    ->orderBy('karyawan.nama'); // Ensure orderBy uses a valid column
+
 
     if ($selectedOrganization) {
         $query->where('karyawan.organisasi', $selectedOrganization);

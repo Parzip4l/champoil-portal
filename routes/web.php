@@ -27,7 +27,8 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
     // Keuangan Kas
     Route::resource('buku-kas', App\Http\Controllers\BukuKas\KasController::class);
-
+    // Customer 
+    Route::resource('customer', App\Http\Controllers\BukuKas\CustomerController::class);
 
     // Garda Pratama
     Route::resource('garda-pratama', App\Http\Controllers\GardaPratama\GpController::class);

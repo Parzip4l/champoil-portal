@@ -32,8 +32,8 @@
                     </a>
                 </li>
                 @endif
-                <li class="nav-item {{ active_class(['kas']) }}">
-                    <a href="{{ url('/kas') }}" class="nav-link">
+                <li class="nav-item {{ active_class(['customer']) }}">
+                    <a href="{{ route('customer.index') }}" class="nav-link">
                         <i class="link-icon" data-feather="users"></i>
                         <span class="link-title">Customer Data</span>
                     </a>

@@ -61,9 +61,9 @@ class AbsenController extends Controller
 
     // Query building
     $query = DB::table('users')
-    ->join('karyawan', 'karyawan.nik', '=', 'users.employee_code')
+    ->join('karyawan', 'karyawan.nik', '=', 'users.name')
     ->leftJoin('absens', function($join) use ($startDate, $endDate) {
-        $join->on('absens.nik', '=', 'users.employee_code')
+        $join->on('absens.nik', '=', 'users.name')
              ->whereBetween('absens.tanggal', [$startDate, $endDate]);
     })
     ->select(

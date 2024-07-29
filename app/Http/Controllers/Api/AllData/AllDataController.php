@@ -219,7 +219,7 @@ class AllDataController extends Controller
                                    
                                    $resp = curl_exec($curl);
                                    curl_close($curl);
-                                   echo $message;
+                                   echo $resp;
                                     // For testing, output the message
                                     // echo $text;
                                 }

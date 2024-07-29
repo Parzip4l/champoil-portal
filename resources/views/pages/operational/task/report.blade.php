@@ -56,6 +56,37 @@
     </div>
     
 </div>
+
+<div class="modal modal-xl" tabindex="-1" id="fullCalModal"> 
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle1">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+        <div class="modal-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Point</th>
+                <th>Deskripsi</th>
+                <th>Photo</th>
+                <th>Petugas</th>
+              </tr>
+            </thead>
+            <tbody id="body_data">
+             
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('plugin-scripts')
@@ -76,52 +107,14 @@ var calendarEl = document.getElementById('fullcalendar');
 var containerEl = document.getElementById('external-events');
 
 var curYear = moment().format('YYYY');
-  var curMonth = moment().format('MM');
+var curMonth = moment().format('MM');
 
   // Calendar Event Source
   var calendarEvents = {
     id: 1,
     backgroundColor: 'rgba(1,104,250, .15)',
     borderColor: '#0168fa',
-    events: [
-      {
-        id: '1',
-        start: curYear+'-'+curMonth+'-08T08:30:00',
-        end: curYear+'-'+curMonth+'-08T13:00:00',
-        title: 'Google Developers Meetup',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      },{
-        id: '2',
-        start: curYear+'-'+curMonth+'-10T09:00:00',
-        end: curYear+'-'+curMonth+'-10T17:00:00',
-        title: 'Design/Code Review',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      },{
-        id: '3',
-        start: curYear+'-'+curMonth+'-13T12:00:00',
-        end: curYear+'-'+curMonth+'-13T18:00:00',
-        title: 'Lifestyle Conference',
-        description: 'Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi...'
-      },{
-        id: '4',
-        start: curYear+'-'+curMonth+'-15T07:30:00',
-        end: curYear+'-'+curMonth+'-15T15:30:00',
-        title: 'Team Weekly Trip',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      },{
-        id: '5',
-        start: curYear+'-'+curMonth+'-17T10:00:00',
-        end: curYear+'-'+curMonth+'-19T15:00:00',
-        title: 'DJ Festival',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      },{
-        id: '6',
-        start: curYear+'-'+curMonth+'-08T13:00:00',
-        end: curYear+'-'+curMonth+'-08T18:30:00',
-        title: 'Carl Henson\'s Wedding',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      }
-    ]
+    events: []
   };
 
   // Birthday Events Source
@@ -129,29 +122,7 @@ var curYear = moment().format('YYYY');
     id: 2,
     backgroundColor: 'rgba(16,183,89, .25)',
     borderColor: '#10b759',
-    events: [
-      {
-        id: '7',
-        start: curYear+'-'+curMonth+'-01T18:00:00',
-        end: curYear+'-'+curMonth+'-01T23:30:00',
-        title: 'Jensen Birthday',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      },
-      {
-        id: '8',
-        start: curYear+'-'+curMonth+'-21T15:00:00',
-        end: curYear+'-'+curMonth+'-21T21:00:00',
-        title: 'Carl\'s Birthday',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      },
-      {
-        id: '9',
-        start: curYear+'-'+curMonth+'-23T15:00:00',
-        end: curYear+'-'+curMonth+'-23T21:00:00',
-        title: 'Yaretzi\'s Birthday',
-        description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-      }
-    ]
+    events: []
   };
 
 
@@ -159,60 +130,21 @@ var curYear = moment().format('YYYY');
     id: 3,
     backgroundColor: 'rgba(241,0,117,.25)',
     borderColor: '#f10075',
-    events: [
-      {
-        id: '10',
-        start: curYear+'-'+curMonth+'-04',
-        end: curYear+'-'+curMonth+'-06',
-        title: 'Feast Day'
-      },
-      {
-        id: '11',
-        start: curYear+'-'+curMonth+'-26',
-        end: curYear+'-'+curMonth+'-27',
-        title: 'Memorial Day'
-      },
-      {
-        id: '12',
-        start: curYear+'-'+curMonth+'-28',
-        end: curYear+'-'+curMonth+'-29',
-        title: 'Veteran\'s Day'
-      }
-    ]
+    events: <?php echo $point ?>
   };
 
   var discoveredEvents = {
     id: 4,
     backgroundColor: 'rgba(0,204,204,.25)',
     borderColor: '#00cccc',
-    events: [
-      {
-        id: '13',
-        start: curYear+'-'+curMonth+'-17T08:00:00',
-        end: curYear+'-'+curMonth+'-18T11:00:00',
-        title: 'Web Design Workshop Seminar'
-      }
-    ]
+    events: <?php echo $point_green ?>
   };
 
   var meetupEvents = {
     id: 5,
     backgroundColor: 'rgba(91,71,251,.2)',
     borderColor: '#5b47fb',
-    events: [
-      {
-        id: '14',
-        start: curYear+'-'+curMonth+'-03',
-        end: curYear+'-'+curMonth+'-05',
-        title: 'UI/UX Meetup Conference'
-      },
-      {
-        id: '15',
-        start: curYear+'-'+curMonth+'-18',
-        end: curYear+'-'+curMonth+'-20',
-        title: 'Angular Conference Meetup'
-      }
-    ]
+    events: []
   };
 
 
@@ -220,20 +152,7 @@ var curYear = moment().format('YYYY');
     id: 6,
     backgroundColor: 'rgba(253,126,20,.25)',
     borderColor: '#fd7e14',
-    events: [
-      {
-        id: '16',
-        start: curYear+'-'+curMonth+'-06',
-        end: curYear+'-'+curMonth+'-08',
-        title: 'My Rest Day'
-      },
-      {
-        id: '17',
-        start: curYear+'-'+curMonth+'-29',
-        end: curYear+'-'+curMonth+'-31',
-        title: 'My Rest Day'
-      }
-    ]
+    events:[]
   };
 
 new Draggable(containerEl, {
@@ -261,10 +180,7 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
   timeZone: 'UTC',
   hiddenDays:[],
   navLinks: 'true',
-  // weekNumbers: true,
-  // weekNumberFormat: {
-  //   week:'numeric',
-  // },
+
   dayMaxEvents: 2,
   events: [],
   eventSources: [calendarEvents, birthdayEvents, holidayEvents, discoveredEvents, meetupEvents, otherEvents],
@@ -291,65 +207,42 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
     const formattedDate = `${year}-${month}-${day}`;
 
     
-    fetch('https://hris.truest.co.id/api/v1/patroli-report-detail/'+eventObj.id+'/'+formattedDate)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      const reports = data.report;
-      $('#tanggal_report').text(formattedDate);
-      $('#list').empty();
-      // Loop through each report
-      reports.forEach(report => {
-        let reportHTML = 
-            '<ul class="timeline mb-3" style="background:#ffffff !important">'+
-              '<li class="event">'+
-                '<h3 class="title">'+report.judul+'</h3>';
-          
-          if (report.patroli.length > 0) {
-            reportHTML += '<ul class="timeline mt-10">';
-            report.patroli.forEach(patrol => {
-              reportHTML += 
-                '<li class="event mb-15">'+
-                  '<h3 class="title">'+patrol.task+'</h3>';
-                  reportHTML += '<ul class="timeline mt-10">';
-                      patrol.daily.forEach(daily => {
-                        let label_status="";
-                        if(daily.status==0){
-                          label_status="Kondisi Baik";
-                        }else{
-                          label_status="Kondisi Tidak Baik";
-                        }
-                        reportHTML += 
-                          '<li class="event mb-15">'+
-                            '<h3 class="title"> Petugas : '+daily.petugas+'</h3>'+
-                            '<p>Tanggal : '+daily.tanggal+'</p>'+
-                            '<p>Status : '+label_status+'</p>'+
-                            '<p>Keterangan : '+daily.deskripsi+'</p>';
+    fetch('/api/v1/patroli-report-detail/' + eventObj.id + '/' + formattedDate)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    const reports = data.report;
+    $('#tanggal_report').text(formattedDate);
+    $('#body_data').empty();
+    let reportHTML = '';
+    let nomor = 0;
 
-                            reportHTML +='</li>';
-
-                      });
-                  reportHTML += '</ul>';
-                  
-                  reportHTML +='</li>';
-            });
-            reportHTML += '</ul>';
-          }
-
-          reportHTML += 
-              '</li>'+
-            '</ul>';
-          
-          $('#list').append(reportHTML);
-      });
-    })
-    .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
+    reports.forEach(report => {
+      nomor += 1;
+      let label_status = report.kondisi == "Baik" ? "Kondisi Baik" : "Kondisi Tidak Baik";
+      reportHTML += '<tr>' +
+                    '<td>' + nomor + '</td>' +
+                    '<td>' + report.point_name + '</td>' +
+                    '<td>' + report.kondisi + '</td>' +
+                    '<td>' + report.photo + '</td>' +
+                    '<td>' + report.petugas + ' ' + report.tanggal + '</td>' +
+                    '</tr>';
     });
+
+    $('#body_data').append(reportHTML);
+  })
+  .catch(error => {
+    console.error('There has been a problem with your fetch operation:', error);
+  });
+
+    $('#modalTitle1').html(eventObj.title);
+    $('#modalBody1').html(eventObj._def.extendedProps.description);
+    $('#eventUrl').attr('href', eventObj.url);
+    $('#fullCalModal').modal("show");
   },
 });
 

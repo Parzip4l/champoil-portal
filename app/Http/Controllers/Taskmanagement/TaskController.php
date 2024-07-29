@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use App\ModelCG\Task;
 use App\ModelCG\List_task;
 use App\ModelCG\Project;
@@ -180,10 +181,13 @@ class TaskController extends Controller
         $data['client']=Auth::user()->project_id;
         $records = Project::all();
         $report = Task::where('project_id',$id_project)->get();
+        $point=[];
+        $point_green=[];
         if(!empty($report)){
             foreach($report as $row){
                 $row->sub_task = List_task::where('id_master',$row->id)->get();
                 $row->jml_sub = List_task::where('id_master',$row->id)->count();
+                
             }
         }
         if(!empty($periode_filter)){
@@ -199,12 +203,37 @@ class TaskController extends Controller
                                     ->select('shift', DB::raw('count(*) as total'))
                                     ->groupBy('shift')
                                     ->get();
+        if(!empty($report)){
+            foreach($this->tanggal_tahun() as $tanggal){
+                foreach($report as $row){
+                    $count = Patroli::where('unix_code',$row->unix_code)->whereDate('created_at',$tanggal)->count();
+                    if($count > 0){
+                        $point_green[]=[
+                            "id"=>$row->id,
+                            "start"=>$tanggal,
+                            "end"=>$tanggal,
+                            "title"=>$row->judul
+                        ];
+                    }else{
+                        $point[]=[
+                            "id"=>$row->id,
+                            "start"=>$tanggal,
+                            "end"=>$tanggal,
+                            "title"=>$row->judul
+                        ];
+                    }
+                    
+                }
+                
+            }
+        }
 
         $data['report']=$report;
-        
         $data['periode'] = date('F',strtotime($periode_filter));
         $data['proj'] = $id_project;
-
+        $data['point']=json_encode($point);
+        $data['point_green']=json_encode($point_green);
+        // dd($data['point']);
         return view('pages.operational.task.report',$data);
     }
 
@@ -239,6 +268,25 @@ class TaskController extends Controller
 
 
         
+    }
+
+    private function tanggal_tahun(){
+        $year = date('Y');
+
+        // Tentukan awal dan akhir tahun
+        $startDate = Carbon::createFromDate($year, 1, 1);
+        $endDate = Carbon::createFromDate($year, 12, 31);
+
+        // Buat periode tanggal dari awal hingga akhir tahun
+        $period = CarbonPeriod::create($startDate, $endDate);
+
+        // Loop melalui periode dan ambil setiap tanggal
+        $dates = [];
+        foreach ($period as $date) {
+            $dates[] = $date->format('Y-m-d'); // Format tanggal sesuai kebutuhan
+        }
+
+        return $dates;
     }
 
     

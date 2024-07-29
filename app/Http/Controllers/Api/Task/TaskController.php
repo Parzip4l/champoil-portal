@@ -95,36 +95,35 @@ class TaskController extends Controller
         return response()->json($records);
     }
 
-    public function report_patroli_detail($id_project,$tanggal){
-        $report = Task::where('project_id',$id_project)->get();
-        
+    public function report_patroli_detail($id,$tanggal){
+        $result=[];
+        $report = Task::where('id',$id)->first();
         if(!empty($report)){
-            foreach($report as $row){
-                $row->patroli = List_task::where('id_master',$row->id)->get();
-                foreach($row->patroli as $det){
-                    $daily = Patroli::where('id_task',$det->id)
-                                            ->whereYear('created_at', date('Y',strtotime($tanggal)))
-                                            ->whereMonth('created_at', date('m',strtotime($tanggal)))
-                                            ->whereDay('created_at',  date('d',strtotime($tanggal)))
-                                            ->get();
-                    if($daily){
-                        foreach($daily as $day){
-                            $arr[]=[
-                                "petugas"=>karyawan_bynik($day->employee_code)->nama,
-                                "tanggal"=>date('d F Y H:i:s',strtotime($day->created_at)),
-                                "kondisi"=>$day->status,
-                                "deskripsi"=>$day->description
-                            ];
-                            $det->daily = $arr;
-                        }
+            $list = List_task::where('id_master',$id)->get();
+            foreach($list as $det){
+                $daily = Patroli::where('id_task',$det->id)
+                                        ->whereYear('created_at', date('Y',strtotime($tanggal)))
+                                        ->whereMonth('created_at', date('m',strtotime($tanggal)))
+                                        ->whereDay('created_at',  date('d',strtotime($tanggal)))
+                                        ->get();
+                if($daily){
+                    foreach($daily as $day){
+                        $result[]=[
+                            "petugas"=>karyawan_bynik($day->employee_code)->nama,
+                            "tanggal"=>date('d F Y H:i:s',strtotime($day->created_at)),
+                            "kondisi"=>$day->status,
+                            "deskripsi"=>$day->description,
+                            "point_name"=>$det->task,
+                            "photo"=>$day->image
+                        ];
                     }
                 }
             }
         }
-
+        
         $data=[
             "tanggal"=>$tanggal,
-            "report"=>$report
+            "report"=>$result
         ];
     
         return response()->json($data);

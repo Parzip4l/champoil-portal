@@ -170,7 +170,7 @@ class AllDataController extends Controller
                             $text = "Selamat Ulang Tahun yang Ke-".$umur.", <@".$row->slack_id."> !";
                             $text .=$record->messages;
 
-                            push_slack_message('https://hooks.slack.com/services/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',$record->messages);
+                           echo  push_slack_message('https://hooks.slack.com/services/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',$record->messages);
                         }
                         
                     }

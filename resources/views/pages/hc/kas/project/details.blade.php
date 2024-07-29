@@ -115,7 +115,13 @@
                                             <label for="" class="form-label">Leader PIC</label>
                                             <select name="leader_pic" class="form-control select2" id="" required>
                                                 @foreach($atasan as $dataAtasan)
-                                                    <option value="{{$dataAtasan->nik}}">{{$dataAtasan->nama}}</option>
+                                                    @php 
+                                                        $check_atasan = "";
+                                                        if($dataAtasan->nik==$project->leader_pic){
+                                                            $check_atasan="checked";
+                                                        }
+                                                    @endphp
+                                                    <option value="{{$dataAtasan->nik}}" {{$check_atasan}}>{{$dataAtasan->nama}}</option>
                                                 @endforeach
                                             </select>
                                                 

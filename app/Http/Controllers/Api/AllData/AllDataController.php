@@ -149,7 +149,7 @@ class AllDataController extends Controller
                 return $birthDate->isToday() || ($birthDate->isAfter($today) && $birthDate->diffInDays($today) <= 7);
             });
 
-            return response()->json(['EmployeeBirthday' => (array)$upcomingBirthdays], 200);
+            return response()->json(['EmployeeBirthday' =>$upcomingBirthdays->values()], 200);
 
             
         } catch (\Exception $e) {

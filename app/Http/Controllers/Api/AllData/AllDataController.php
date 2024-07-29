@@ -180,7 +180,7 @@ class AllDataController extends Controller
                                     
                                     // Example of pushing message to Slack
                                     // Uncomment the following line to actually send the message
-                                   echo  push_slack_message('https://hooks.slack.com/services/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',$text);
+                                   echo  push_slack_message('https://hooks.slack.com/services/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',$text);
                                     
                                     // For testing, output the message
                                     // echo $text;

@@ -94,7 +94,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form id="data_employee">
-        <input type="hidden" name="project" value="{{ $_GET['project_id'] }}">
+        <input type="hidden" name="project" value="{{ @$_GET['project_id'] }}">
         <div class="modal-body">
             <div class="row">
                 <div class="form-group mb-3">

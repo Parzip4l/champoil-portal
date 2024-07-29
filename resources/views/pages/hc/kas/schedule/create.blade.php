@@ -98,6 +98,17 @@
         <div class="modal-body">
             <div class="row">
                 <div class="form-group mb-3">
+                    <label for="name" class="form-label">Pilih Periode</label>
+                    <select class="form-control zindex-fix select2" 
+                            data-width="100%" 
+                            name="periode" 
+                            id="periode">
+                        @foreach(bulan() as $bln)
+                            <option value="{{ strtoupper($bln) }}">{{ strtoupper($bln) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group mb-3">
                     <label for="name" class="form-label">Pilih Karyawan</label>
                     <select class="form-control zindex-fix select2" 
                             data-width="100%" 
@@ -199,78 +210,73 @@
         });
     @endif
 </script>
-<script>
-    // $(document).ready(function() {
-        
-    // } );
-</script>
+
 <script>
 $(function() {
+    var Draggable = FullCalendar.Draggable;
+    var calendarEl = document.getElementById('fullcalendar');
+    var containerEl = document.getElementById('external-events');
 
-// sample calendar events data
-var Draggable = FullCalendar.Draggable;
-var calendarEl = document.getElementById('fullcalendar');
-var containerEl = document.getElementById('external-events');
+    var curYear = moment().format('YYYY');
+    var curMonth = moment().format('MM');
 
-// Calendar Event Source
-var calendarEvents = {
-    id: 1,
-    backgroundColor: 'rgba(1,104,250, .15)',
-    borderColor: '#0168fa',
-    events: <?php echo $shift ?>
-};
+    // Calendar Event Source
+    var calendarEvents = {
+        id: 1,
+        backgroundColor: 'rgba(1,104,250, .15)',
+        borderColor: '#0168fa',
+        events: []
+    };
 
-new Draggable(containerEl, {
-    itemSelector: '.fc-event',
-    eventData: function(eventEl) {
-        return {
-            title: eventEl.innerText
-        };
-    }
-});
+   
 
-// initialize the calendar
-var calendar = new FullCalendar.Calendar(calendarEl, {
-    headerToolbar: {
-        left: "prev,today,next",
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-    },
-    editable: true,
-    droppable: true, // this allows things to be dropped onto the calendar
-    fixedWeekCount: true,
-    initialView: 'timeGridWeek', // Set the initial view to week view
-    timeZone: 'Asia/Jakarta',
-    hiddenDays: [],
-    navLinks: 'true',
-    weekNumbers: true,
-    // weekNumberFormat: {
-    //   week:'numeric',
-    // },
-    dayMaxEvents: 2,
-    events: [],
-    eventSources: [calendarEvents],
-    drop: function(info) {
-        // remove the element from the "Draggable Events" list
-        // info.draggedEl.parentNode.removeChild(info.draggedEl);
-    },
-    eventClick: function(info) {
-        var eventObj = info.event;
-        console.log(info);
-        $('#modalTitle1').html(eventObj.title);
-        $('#modalBody1').html(eventObj._def.extendedProps.description);
-        $('#eventUrl').attr('href', eventObj.url);
-        $('#fullCalModal').modal("show");
-    },
-    dateClick: function(info) {
-        $("#createEventModal").modal("show");
-        console.log(info);
-    },
-    // Optional: Set the initial date to the current week
-    initialDate: moment().startOf('week').format('YYYY-MM-DD')
-});
+    new Draggable(containerEl, {
+        itemSelector: '.fc-event',
+        eventData: function(eventEl) {
+            return {
+                title: eventEl.innerText
+            };
+        }
+    });
 
-calendar.render();
+    // Initialize the calendar
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        headerToolbar: {
+            left: "prev,today,next",
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        editable: true,
+        droppable: true, // This allows things to be dropped onto the calendar
+        fixedWeekCount: true,
+        initialView: 'dayGridMonth',
+        timeZone: 'UTC',
+        hiddenDays: [],
+        navLinks: true,
+        dayMaxEvents: 2,
+        events: [],
+        eventSources: [calendarEvents],
+        drop: function(info) {
+            // Remove the element from the "Draggable Events" list
+            // info.draggedEl.parentNode.removeChild(info.draggedEl);
+        },
+        eventClick: function(info) {
+            var eventObj = info.event;
+            console.log(info);
+            $('#modalTitle1').html(eventObj.title);
+            $('#modalBody1').html(eventObj._def.extendedProps.description);
+            $('#eventUrl').attr('href', eventObj.url);
+            $('#fullCalModal').modal("show");
+        },
+        dateClick: function(info) {
+            $('#modalTitle1').html("Form Schedules");
+            $("#createEventModal").modal("show");
+        },
+        // Set the initial date to the first day of the current month
+        initialDate: moment().startOf('month').format('YYYY-MM-DD')
+    });
+
+    calendar.render();
 });
 
 function handleSelectChange(selectElement) {

@@ -22,6 +22,7 @@ use App\Employee;
 use App\User;
 use App\Pengumuman\Pengumuman;
 use App\News\News;
+use App\ModelCG\Birthday;
 
 class AllDataController extends Controller
 {
@@ -140,18 +141,47 @@ class AllDataController extends Controller
             $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
 
             $birthdays = Employee::where('unit_bisnis', $unitBisnis)
-                     ->select('tanggal_lahir','nama')
+                     ->select('tanggal_lahir','nama','ktp','slack_id')
                      ->get();
                      
             $upcomingBirthdays = $birthdays->filter(function ($employee) use ($today) {
                 $birthDate = Carbon::parse($employee->tanggal_lahir)->setYear($today->year);
                 $employee->usia = Carbon::parse($employee->tanggal_lahir)->age;
+                
                 return $birthDate->isToday() || ($birthDate->isAfter($today) && $birthDate->diffInDays($today) <= 7);
             });
 
-            return response()->json(['EmployeeBirthday' =>$upcomingBirthdays->values()], 200);
+            if(!empty($upcomingBirthdays->values())){
+                foreach($upcomingBirthdays->values() as $row){
+                    $cek = Birthday::where('nik',$row->ktp)->count();
+                    if($cek === 0){
+                        Birthday::insert(['nik'=>$row->ktp]);
+                    }
+                    
+                }
+            }
+
+            if(!empty($upcomingBirthdays->values())){
+                foreach($upcomingBirthdays->values() as $row){
+                    $record = Birthday::where('nik',$row->ktp)->first();
+                    if(!empty($record)){
+                        if(date('d') == date('d',strtotime($row->tanggal_lahir))){
+                            $umur = $row->usia+1;
+                            $text = "Selamat Ulang Tahun yang Ke-".$umur.", <@".$row->slack_id."> !";
+                            $text .=$record->messages;
+
+                            push_slack_message('https://hooks.slack.com/services/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',$record->messages);
+                        }
+                        
+                    }
+                }
+            }
 
             
+            
+
+            return response()->json(['EmployeeBirthday' =>$upcomingBirthdays->values()], 200);
+  
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }

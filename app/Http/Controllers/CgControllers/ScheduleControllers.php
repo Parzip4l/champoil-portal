@@ -116,13 +116,13 @@ class ScheduleControllers extends Controller
                 $detailShift = Shift::where('id',$row->id_shift)->first();
                 foreach($dates as $date){
                     $count = Schedule::where('tanggal',$date)
-                                    ->where('shift',$detailShift->name)
+                                    ->where('shift',@$detailShift->name)
                                     ->count();
                     $data_shift[]=[
                         'id'=>$no,
                         'start'=>$date,
                         'end'=>$date,
-                        'title'=>$detailShift->name.' ('.$count.')'
+                        'title'=>@$detailShift->name.' ('.$count.')'
                     ];
                 }
                 

@@ -114,7 +114,7 @@ class TaskController extends Controller
                             "kondisi"=>$day->status,
                             "deskripsi"=>$day->description,
                             "point_name"=>$det->task,
-                            "photo"=>url('assets'.$day->image)
+                            "photo"=>url($day->image)
                         ];
                     }
                 }

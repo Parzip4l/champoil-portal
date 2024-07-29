@@ -189,7 +189,7 @@ class AllDataController extends Controller
                                                 "type": "section",
                                                 "text": {
                                                     "type": "mrkdwn",
-                                                    "text": "'.str_replace(["\r", "\n"], '', $record->messages).'"
+                                                    "text": "'.$record->messages.'"
                                                 }
                                             }
                                         ]
@@ -197,8 +197,31 @@ class AllDataController extends Controller
                                     
                                     // Example of pushing message to Slack
                                     // Uncomment the following line to actually send the message
-                                    push_slack_message('https://hooks.slack.com/services/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',$message);
-                                
+                                //    echo  push_slack_message('https://hooks.slack.com/services/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',$message);
+                                $url='https://hooks.slack.com/services/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';   
+                                $curl = curl_init($url);
+                                   curl_setopt($curl, CURLOPT_URL, $url);
+                                   curl_setopt($curl, CURLOPT_POST, true);
+                                   curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                                   
+                                   $headers = array(
+                                       "Content-Type: application/json",
+                                   );
+                                   curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+                                   
+                                   
+                                   
+                                   curl_setopt($curl, CURLOPT_POSTFIELDS, $message);
+                                   
+                                   //for debug only!
+                                   curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+                                   curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                                   
+                                   $resp = curl_exec($curl);
+                                   curl_close($curl);
+                                   echo $message;
+                                    // For testing, output the message
+                                    // echo $text;
                                 }
                             }
                         }

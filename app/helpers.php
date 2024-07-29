@@ -133,5 +133,5 @@ function push_slack_message($hook,$msg){
 
     curl_close($ch);
 
-    return $result;
+    return $result."/".$msg;
 }

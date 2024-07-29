@@ -161,23 +161,35 @@ class AllDataController extends Controller
                 }
             }
 
-            if(!empty($upcomingBirthdays->values())){
-                foreach($upcomingBirthdays->values() as $row){
-                    $record = Birthday::where('nik',$row->ktp)->first();
-                    if(!empty($record)){
-                        if(date('d') == date('d',strtotime($row->tanggal_lahir))){
-                            $umur = $row->usia+1;
-                            $text = "Selamat Ulang Tahun yang Ke-".$umur.", <@".$row->slack_id."> !";
-                            $text .=$record->messages;
-                            if(!empty($row->slack_id)){
-                                echo  push_slack_message('https://hooks.slack.com/services/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',$text);
-                            }
-                           
-                        }
+            if (!empty($upcomingBirthdays->values())) {
+                foreach ($upcomingBirthdays->values() as $row) {
+                    // Check if 'ktp' is not equal to a specific value
+                        // Find the birthday record based on 'nik'
+                        $record = Birthday::where('nik', $row->ktp)->first();
                         
-                    }
+                        // Proceed if a record is found
+                        if (!empty($record)) {
+                            // Check if today is the birthday
+                            if (date('d') == date('d', strtotime($row->tanggal_lahir))) {
+                                $umur = $row->usia + 1;
+            
+                                // Check if slack_id and messages are not empty
+                                if (!empty($row->slack_id) && !empty($record->messages)) {
+                                    $text = "Selamat Ulang Tahun yang Ke-" . $umur . ", <@" . $row->slack_id . "> !";
+                                    $text .= $record->messages;
+                                    
+                                    // Example of pushing message to Slack
+                                    // Uncomment the following line to actually send the message
+                                    push_slack_message('https://hooks.slack.com/services/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',$text);
+                                    
+                                    // For testing, output the message
+                                    // echo $text;
+                                }
+                            }
+                        }
                 }
             }
+            
 
             
             

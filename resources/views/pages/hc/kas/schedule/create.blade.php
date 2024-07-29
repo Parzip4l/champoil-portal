@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <hr>
-                        @if($filter_project)
+                        @if(!empty($filter_project))
                         <div class="row">
                             <div class="col-md-3 d-none d-md-block">
                                 <div class="card">

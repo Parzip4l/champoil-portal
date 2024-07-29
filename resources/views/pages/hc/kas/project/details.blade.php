@@ -118,7 +118,7 @@
                                                     @php 
                                                         $check_atasan = "";
                                                         if($dataAtasan->nik==$project->leader_pic){
-                                                            $check_atasan="checked";
+                                                            $check_atasan="selected";
                                                         }
                                                     @endphp
                                                     <option value="{{$dataAtasan->nik}}" {{$check_atasan}}>{{$dataAtasan->nama}}</option>

@@ -112,26 +112,28 @@ function push_notif_wa($data,$token,$instance,$nomor,$url){
     }
 }
 
-function push_slack_message($hook,$msg){
-  $webhookUrl = $hook; // Ganti dengan Webhook URL Anda
+function push_slack_message($url,$message){
 
-    $payload = json_encode(['text' => $msg]);
-
-    $ch = curl_init($webhookUrl);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $result = curl_exec($ch);
-
-    if (curl_errno($ch)) {
-        echo 'Error:' . curl_error($ch);
-    }
-
-    curl_close($ch);
-
-    return $result."/".$msg;
+      // Use the url you got earlier
+  $curl = curl_init($url);
+  curl_setopt($curl, CURLOPT_URL, $url);
+  curl_setopt($curl, CURLOPT_POST, true);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  
+  $headers = array(
+      "Content-Type: application/json",
+  );
+  curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+  
+  
+  
+  curl_setopt($curl, CURLOPT_POSTFIELDS, $message);
+  
+  //for debug only!
+  curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+  curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+  
+  $resp = curl_exec($curl);
+  curl_close($curl);
+  return $resp;
 }

@@ -171,19 +171,34 @@ class AllDataController extends Controller
                         if (!empty($record)) {
                             // Check if today is the birthday
                             if (date('d') == date('d', strtotime($row->tanggal_lahir))) {
-                                $umur = $row->usia + 1;
+                                $umur = $row->usia;
             
                                 // Check if slack_id and messages are not empty
                                 if (!empty($row->slack_id) && !empty($record->messages)) {
-                                    $text = "Selamat Ulang Tahun yang Ke-" . $umur . ", <@" . $row->slack_id . "> !";
-                                    $text .= $record->messages;
+                                
+                                    $message ='{
+                                        "blocks": [
+                                            {
+                                                "type": "section",
+                                                "text": {
+                                                    "type": "mrkdwn",
+                                                    "text": "Selamat Ulang Tahun yang Ke-' . $umur . ', <@' . $row->slack_id . '>!"
+                                                }
+                                            },
+                                            {
+                                                "type": "section",
+                                                "text": {
+                                                    "type": "mrkdwn",
+                                                    "text": "'.str_replace(["\r", "\n"], '', $record->messages).'"
+                                                }
+                                            }
+                                        ]
+                                    }';
                                     
                                     // Example of pushing message to Slack
                                     // Uncomment the following line to actually send the message
-                                   echo  push_slack_message('https://hooks.slack.com/services/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',$text);
-                                    
-                                    // For testing, output the message
-                                    // echo $text;
+                                    push_slack_message('https://hooks.slack.com/services/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',$message);
+                                
                                 }
                             }
                         }

@@ -182,6 +182,7 @@ class TaskController extends Controller
         $records = Project::all();
         $report = Task::where('project_id',$id_project)->get();
         $point=[];
+        $btn_download=[];
         $point_green=[];
         if(!empty($report)){
             foreach($report as $row){
@@ -214,6 +215,7 @@ class TaskController extends Controller
                             "end"=>$tanggal,
                             "title"=>$row->judul
                         ];
+                        
                     }else{
                         $point[]=[
                             "id"=>$row->id,
@@ -224,7 +226,12 @@ class TaskController extends Controller
                     }
                     
                 }
-                
+                $btn_download[]=[
+                    "id"=>$row->id,
+                    "start"=>$tanggal,
+                    "end"=>$tanggal,
+                    "title"=>"Download File"
+                ];
             }
         }
 
@@ -233,6 +240,7 @@ class TaskController extends Controller
         $data['proj'] = $id_project;
         $data['point']=json_encode($point);
         $data['point_green']=json_encode($point_green);
+        $data['btn_download']=json_encode($btn_download);
         // dd($data['point']);
         return view('pages.operational.task.report',$data);
     }

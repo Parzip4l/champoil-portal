@@ -136,7 +136,7 @@
                                                        id="shift-{{$row_shift->id}}" 
                                                        value="{{$row_shift->id}}"
                                                        {{$checked}}>
-                                                <label class="form-check-label" for="shift-{{$row_shift->id}}">{{$row_shift->name}}</label><br/>
+                                                <label class="form-check-label" for="shift-{{$row_shift->id}}">{{$row_shift->code}}</label><br/>
                                                
                                             @endforeach
                                         @endif

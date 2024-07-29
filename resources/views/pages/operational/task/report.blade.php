@@ -228,8 +228,8 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
                     '<td>' + nomor + '</td>' +
                     '<td>' + report.point_name + '</td>' +
                     '<td>' + report.kondisi + '</td>' +
-                    '<td>' + report.photo + '</td>' +
-                    '<td>' + report.petugas + ' ' + report.tanggal + '</td>' +
+                    '<td><img src=' + report.photo + '></td>' +
+                    '<td>' + report.petugas + '<br/> ' + report.tanggal + '</td>' +
                     '</tr>';
     });
 

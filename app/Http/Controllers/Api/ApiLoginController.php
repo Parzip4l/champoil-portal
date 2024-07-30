@@ -512,7 +512,7 @@ class ApiLoginController extends Controller
 
             // Authenticate the user based on the token
             $user = Auth::guard('api')->user();
-            if ($user) {
+            if (!empty($user)) {
                 $employeeCode = $user->employee_code;
 
                 // Ensure employeeCode is not null before accessing the database

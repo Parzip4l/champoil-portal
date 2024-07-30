@@ -59,58 +59,54 @@
     <div class="header-card-folder mb-2 d-flex justify-content-between mt-2">
         <h5>Recent Files</h5>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card custom-card2">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="dataTableExample" class="table">
-                            <thead>
-                                <tr>
-                                    <th>File Name</th>
-                                    <th>Folder</th>
-                                    <th>Upload By</th>
-                                    <th>Upload Date</th>
-                                    <th>Download</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($recentFile as $data)
-                                @php 
-                                    $karyawan = \App\Employee::where('nik',$data->uploader)->first();
-                                    $folder = \App\Document\FolderModel::where('id', $data->folder_id)->first();
-                                @endphp
-                                <tr>
-                                    <td>{{$data->name}}</td> 
-                                    <td>{{$folder->name}}</td> 
-                                    <td>{{$karyawan->nama}}</td>
-                                    <td>{{$data->created_at->format('d M Y')}}</td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <a class="dropdown-item d-flex align-items-center" href="{{route('file.download', $data->id)}}">
-                                                    <i data-feather="download-cloud" class="icon-sm me-2"></i> <span class="">Download</span>
-                                                </a>
-                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialogFiles('{{ $data->id }}')">
-                                                    <i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span>
-                                                </a>
-                                            </div>
+    <div class="col-md-12">
+        <div class="card custom-card2">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Folder</th>
+                                <th>Upload By</th>
+                                <th>Upload Date</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($recentFile as $data)
+                            @php 
+                                $karyawan = \App\Employee::where('nik',$data->uploader)->first();
+                                $folder = \App\Document\FolderModel::where('id', $data->folder_id)->first();
+                            @endphp
+                            <tr>
+                                <td>{{$data->name}}</td> 
+                                <td>{{$folder->name}}</td> 
+                                <td>{{$karyawan->nama}}</td>
+                                <td>{{$data->created_at->format('d M Y')}}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item d-flex align-items-center" href="{{route('file.download', $data->id)}}">
+                                                <i data-feather="download-cloud" class="icon-sm me-2"></i> <span class="">Download</span>
+                                            </a>
+                                            <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialogFiles('{{ $data->id }}')">
+                                                <i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span>
+                                            </a>
                                         </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    
-    
 </div>
 <!-- Modal -->
  

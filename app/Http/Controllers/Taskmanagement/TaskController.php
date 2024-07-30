@@ -226,12 +226,7 @@ class TaskController extends Controller
                     }
                     
                 }
-                $btn_download[]=[
-                    "id"=>$row->id,
-                    "start"=>$tanggal,
-                    "end"=>$tanggal,
-                    "title"=>"Download File"
-                ];
+                
             }
         }
 

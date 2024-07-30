@@ -189,7 +189,7 @@ class AllDataController extends Controller
                                                 "type": "section",
                                                 "text": {
                                                     "type": "mrkdwn",
-                                                    "text": "'.$record->messages.'"
+                                                    "text": "'.str_replace(["\r", "\n"], '', $record->messages).'"
                                                 }
                                             }
                                         ]
@@ -198,7 +198,7 @@ class AllDataController extends Controller
                                     // Example of pushing message to Slack
                                     // Uncomment the following line to actually send the message
                                 //    echo  push_slack_message('https://hooks.slack.com/services/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',$message);
-                                $url='https://hooks.slack.com/services/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';   
+                                $url='https://hooks.slack.com/services/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';   
                                 $curl = curl_init($url);
                                    curl_setopt($curl, CURLOPT_URL, $url);
                                    curl_setopt($curl, CURLOPT_POST, true);

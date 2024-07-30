@@ -13,6 +13,7 @@ use App\Absen\RequestAbsen;
 use App\Backup\AbsenBackup;
 use App\User;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Exports\AttendenceExport;
@@ -28,97 +29,97 @@ class AbsenController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        $code = Auth::user()->employee_code;
-        $company = Employee::where('nik', $code)->first();
-        $project = Project::all();
-        $client_id = Auth::user()->project_id;
-        
-        $today = now();
-        $startDate = $today->copy()->day(21)->format('Y-m-d');
-        $endDate = $today->copy()->addMonth()->day(20)->format('Y-m-d');
-        // Date handling logic
-        
-
-        // Query building
-        $query = DB::table('users')
-    ->join('karyawan', 'karyawan.nik', '=', 'users.name')
-    ->leftJoin('absens', function($join) use ($startDate, $endDate) {
-        $join->on('absens.nik', '=', 'users.name')
-             ->whereBetween('absens.tanggal', [$startDate, $endDate]);
-    })
-    ->select(
-        'users.id as user_id',
-        'karyawan.nik',
-        'karyawan.nama',
-        'karyawan.organisasi',
-        'karyawan.unit_bisnis',
-        DB::raw("GROUP_CONCAT(absens.status) as statuses"),
-        DB::raw("GROUP_CONCAT(absens.clock_in) as clock_ins"),
-        DB::raw("GROUP_CONCAT(absens.clock_out) as clock_outs")
-    )
-    ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-    ->where('karyawan.resign_status', '0')
-    ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi', 'karyawan.unit_bisnis')
-    ->orderBy('karyawan.nama');
-
-// DataTables AJAX request handling
-if ($request->ajax()) {
-    $dataTable = DataTables::of($query)
-        ->addIndexColumn()
-        ->editColumn('nama', function($row) {
-            return '<a href="' . route('absen.details', ['nik' => $row->nik]) . '">' . htmlspecialchars($row->nama) . '</a>';
+{
+    $code = Auth::user()->employee_code;
+    $company = Employee::where('nik', $code)->first();
+    $project = Project::all();
+    $client_id = Auth::user()->project_id;
+    
+    $today = now();
+    $startDate = Carbon::parse($today->copy()->day(21)->format('Y-m-d'));
+    $endDate = Carbon::parse($today->copy()->addMonth()->day(20)->format('Y-m-d'));
+    
+    $query = DB::table('users')
+        ->join('karyawan', 'karyawan.nik', '=', 'users.name')
+        ->leftJoin('absens', function($join) use ($startDate, $endDate) {
+            $join->on('absens.nik', '=', 'users.name')
+                 ->whereBetween('absens.tanggal', [$startDate, $endDate]);
         })
-        ->addColumn('attendance', function($row) use ($startDate, $endDate) {
-            $attendanceData = [];
-            $clockIns = explode(',', $row->clock_ins);
-            $clockOuts = explode(',', $row->clock_outs);
+        ->select(
+            'users.id as user_id',
+            'karyawan.nik',
+            'karyawan.nama',
+            'karyawan.organisasi',
+            'karyawan.unit_bisnis',
+            DB::raw("GROUP_CONCAT(absens.tanggal ORDER BY absens.tanggal) as dates"),
+            DB::raw("GROUP_CONCAT(absens.status ORDER BY absens.tanggal) as statuses"),
+            DB::raw("GROUP_CONCAT(absens.clock_in ORDER BY absens.tanggal) as clock_ins"),
+            DB::raw("GROUP_CONCAT(absens.clock_out ORDER BY absens.tanggal) as clock_outs")
+        )
+        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+        ->where('karyawan.resign_status', '0')
+        ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi', 'karyawan.unit_bisnis')
+        ->orderBy('karyawan.nama');
 
-            $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
-            foreach ($period as $index => $date) {
-                $clockIn = $clockIns[$index] ?? '';
-                $clockOut = $clockOuts[$index] ?? '';
-                $attendanceData['absens_' . $date->format('Ymd')] = [
-                    'clock_in' => $clockIn,
-                    'clock_out' => $clockOut
-                ];
-            }
+    if ($request->ajax()) {
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('nama', function($row) {
+                return '<a href="' . route('absen.details', ['nik' => $row->nik]) . '">' . htmlspecialchars($row->nama) . '</a>';
+            })
+            ->addColumn('attendance', function($row) use ($startDate, $endDate) {
+                $attendanceData = [];
+                $dates = explode(',', $row->dates);
+                $clockIns = explode(',', $row->clock_ins);
+                $clockOuts = explode(',', $row->clock_outs);
+                
+                $dateIndexMap = array_flip($dates);
 
-            return $attendanceData;
-        })
-        ->filter(function ($query) use ($request) {
-            if ($request->has('search') && $request->search['value'] !== '') {
-                $search = strtolower($request->search['value']);
-                $query->where(function($query) use ($search) {
+                foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
+                    $formattedDate = $date->format('Y-m-d');
+                    if (isset($dateIndexMap[$formattedDate])) {
+                        $index = $dateIndexMap[$formattedDate];
+                        $clockIn = $clockIns[$index] ?? '-';
+                        $clockOut = $clockOuts[$index] ?? '-';
+                    } else {
+                        $clockIn = $clockOut = '-';
+                    }
+                    $attendanceData['absens_' . $date->format('Ymd')] = [
+                        'clock_in' => $clockIn,
+                        'clock_out' => $clockOut
+                    ];
+                }
+
+                return $attendanceData;
+            })
+            ->filter(function ($query) use ($request) {
+                if ($request->has('search') && $request->search['value'] !== '') {
+                    $search = strtolower($request->search['value']);
                     $query->where(DB::raw('LOWER(karyawan.nama)'), 'LIKE', "%{$search}%");
-                    // Add more fields here if needed
-                });
-            }
-        })
-        ->rawColumns(['nama'])
-        ->toJson();
+                }
+            })
+            ->rawColumns(['nama'])
+            ->toJson();
+    }
 
-    return $dataTable;
+    $months = [
+        '01' => 'Januari',
+        '02' => 'Februari',
+        '03' => 'Maret',
+        '04' => 'April',
+        '05' => 'Mei',
+        '06' => 'Juni',
+        '07' => 'Juli',
+        '08' => 'Agustus',
+        '09' => 'September',
+        '10' => 'Oktober',
+        '11' => 'November',
+        '12' => 'Desember',
+    ];
+
+    return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id'));
 }
 
-$months = [
-    '01' => 'Januari',
-    '02' => 'Februari',
-    '03' => 'Maret',
-    '04' => 'April',
-    '05' => 'Mei',
-    '06' => 'Juni',
-    '07' => 'Juli',
-    '08' => 'Agustus',
-    '09' => 'September',
-    '10' => 'Oktober',
-    '11' => 'November',
-    '12' => 'Desember',
-];
-
-return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id'));
-
-    }
 
 
     public function indexbackup()

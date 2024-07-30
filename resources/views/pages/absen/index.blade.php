@@ -58,7 +58,6 @@
 @endpush
 
 @push('custom-scripts')
-<script src="{{ asset('assets/js/data-table.js') }}"></script>
 <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -66,29 +65,31 @@ $(document).ready(function() {
         scrollX: true,
         scrollCollapse: true,
         paging: true,
-        fixedColumns: true,
+        fixedColumns: {
+            left: 1
+        },
         processing: true,
         serverSide: true,
         ajax: {
             url: '{{ route("absen.index") }}',
             data: function (d) {
-                // You can add additional parameters here if needed
+                // Additional parameters can be added here if needed
             }
         },
         columns: [
-            { data: 'nama', name: 'nama' },
+            { data: 'nama', name: 'nama', render: function(data, type, row) {
+                return '<a href="' + row.absen_details_url + '">' + data + '</a>';
+            }},
             @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
-                {
+                { 
                     data: 'attendance.absens_{{ $date->format('Ymd') }}',
                     name: 'attendance.absens_{{ $date->format('Ymd') }}',
                     defaultContent: '-',
                     render: function(data, type, row) {
-                        if (data && data.clock_in && data.clock_out) {
-                            return '<span class="text-success">' + data.clock_in + '</span> - <span class="text-danger">' + data.clock_out + '</span>';
-                        } else if (data && data.clock_in) {
-                            return '<span class="text-success">' + data.clock_in + '</span>';
-                        } else if (data && data.clock_out) {
-                            return '<span class="text-danger">' + data.clock_out + '</span>';
+                        if (data) {
+                            var clockIn = data.clock_in || '-';
+                            var clockOut = data.clock_out || '-';
+                            return '<span class="text-success">' + clockIn + '</span> - <span class="text-danger">' + clockOut + '</span>';
                         } else {
                             return '-';
                         }
@@ -98,5 +99,6 @@ $(document).ready(function() {
         ]
     });
 });
+
 </script>
 @endpush

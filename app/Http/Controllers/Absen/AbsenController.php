@@ -13,6 +13,7 @@ use App\Absen\RequestAbsen;
 use App\Backup\AbsenBackup;
 use App\User;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Exports\AttendenceExport;
@@ -29,91 +30,37 @@ class AbsenController extends Controller
      */
     public function index(Request $request)
 {
-    
     $code = Auth::user()->employee_code;
     $company = Employee::where('nik', $code)->first();
     $project = Project::all();
     $client_id = Auth::user()->project_id;
-
-    $selectedOrganization = $request->input('organization');
-    $project_id = $request->input('project');
-    $periode = $request->input('periode');
     
-    // Date handling logic
-    if ($periode) {
-        $dates = explode(' - ', $periode);
-        
-        if (count($dates) === 2) {
-            try {
-                $startDate = \Carbon\Carbon::createFromFormat('d M Y', trim($dates[0]))->startOfDay()->format('Y-m-d');
-                $endDate = \Carbon\Carbon::createFromFormat('d M Y', trim($dates[1]))->endOfDay()->format('Y-m-d');
-            } catch (\Exception $e) {
-                return redirect()->back()->with('error', 'Invalid date format. Please use the correct format (d M Y - d M Y).');
-            }
-        } else {
-            return redirect()->back()->with('error', 'Invalid periode format. It should be "d M Y - d M Y".');
-        }
-    } else {
-        $today = now();
-        $startDate = $today->day >= 21 ? $today->copy()->day(21)->format('Y-m-d') : $today->copy()->subMonth()->day(21)->format('Y-m-d');
-        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20)->format('Y-m-d') : $today->copy()->day(20)->format('Y-m-d');
-    }
-
-    // Query building
+    $today = now();
+    $startDate = Carbon::parse($today->copy()->day(21)->format('Y-m-d'));
+    $endDate = Carbon::parse($today->copy()->addMonth()->day(20)->format('Y-m-d'));
+    
     $query = DB::table('users')
-    ->join('karyawan', 'karyawan.nik', '=', 'users.name')
-    ->leftJoin('absens', function($join) use ($startDate, $endDate) {
-        $join->on('absens.nik', '=', 'users.name')
-             ->whereBetween('absens.tanggal', [$startDate, $endDate]);
-    })
-    ->select(
-        'users.id as user_id',
-        'karyawan.nik',
-        'karyawan.nama',
-        'karyawan.organisasi',
-        DB::raw("GROUP_CONCAT(absens.status) as statuses"),
-        DB::raw("GROUP_CONCAT(absens.clock_in) as clock_ins"),
-        DB::raw("GROUP_CONCAT(absens.clock_out) as clock_outs")
-    )
-    ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi')
-    ->orderBy('karyawan.nama'); // Ensure orderBy uses a valid column
+        ->join('karyawan', 'karyawan.nik', '=', 'users.name')
+        ->leftJoin('absens', function($join) use ($startDate, $endDate) {
+            $join->on('absens.nik', '=', 'users.name')
+                 ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+        })
+        ->select(
+            'users.id as user_id',
+            'karyawan.nik',
+            'karyawan.nama',
+            'karyawan.organisasi',
+            'karyawan.unit_bisnis',
+            DB::raw("GROUP_CONCAT(absens.tanggal ORDER BY absens.tanggal) as dates"),
+            DB::raw("GROUP_CONCAT(absens.status ORDER BY absens.tanggal) as statuses"),
+            DB::raw("GROUP_CONCAT(absens.clock_in ORDER BY absens.tanggal) as clock_ins"),
+            DB::raw("GROUP_CONCAT(absens.clock_out ORDER BY absens.tanggal) as clock_outs")
+        )
+        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+        ->where('karyawan.resign_status', '0')
+        ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi', 'karyawan.unit_bisnis')
+        ->orderBy('karyawan.nama');
 
-
-    if ($selectedOrganization) {
-        $query->where('karyawan.organisasi', $selectedOrganization);
-    }
-
-    if ($client_id === null) {
-        if (!empty($project_id)) {
-            $query->join('schedules', function ($join) use ($project_id) {
-                $join->on('karyawan.nik', '=', 'schedules.employee')
-                    ->where('schedules.project', $project_id)
-                    ->where('schedules.id', function ($query) use ($project_id) {
-                        $query->select('id')
-                            ->from('schedules')
-                            ->whereColumn('employee', 'karyawan.nik')
-                            ->where('schedules.project', $project_id)
-                            ->orderBy('id')
-                            ->limit(1);
-                    });
-            });
-        }
-    } else {
-        $query->join('schedules', function ($join) use ($client_id) {
-            $join->on('karyawan.nik', '=', 'schedules.employee')
-                ->where('schedules.project', $client_id)
-                ->where('schedules.id', function ($query) use ($client_id) {
-                    $query->select('id')
-                        ->from('schedules')
-                        ->whereColumn('employee', 'karyawan.nik')
-                        ->where('schedules.project', $client_id)
-                        ->orderBy('id')
-                        ->limit(1);
-                });
-        });
-    }
-
-    // DataTables AJAX request handling
     if ($request->ajax()) {
         return DataTables::of($query)
             ->addIndexColumn()
@@ -122,20 +69,34 @@ class AbsenController extends Controller
             })
             ->addColumn('attendance', function($row) use ($startDate, $endDate) {
                 $attendanceData = [];
+                $dates = explode(',', $row->dates);
                 $clockIns = explode(',', $row->clock_ins);
                 $clockOuts = explode(',', $row->clock_outs);
-    
-                $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
-                foreach ($period as $index => $date) {
-                    $clockIn = $clockIns[$index] ?? '';
-                    $clockOut = $clockOuts[$index] ?? '';
+                
+                $dateIndexMap = array_flip($dates);
+
+                foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
+                    $formattedDate = $date->format('Y-m-d');
+                    if (isset($dateIndexMap[$formattedDate])) {
+                        $index = $dateIndexMap[$formattedDate];
+                        $clockIn = $clockIns[$index] ?? '-';
+                        $clockOut = $clockOuts[$index] ?? '-';
+                    } else {
+                        $clockIn = $clockOut = '-';
+                    }
                     $attendanceData['absens_' . $date->format('Ymd')] = [
                         'clock_in' => $clockIn,
                         'clock_out' => $clockOut
                     ];
                 }
-    
+
                 return $attendanceData;
+            })
+            ->filter(function ($query) use ($request) {
+                if ($request->has('search') && $request->search['value'] !== '') {
+                    $search = strtolower($request->search['value']);
+                    $query->where(DB::raw('LOWER(karyawan.nama)'), 'LIKE', "%{$search}%");
+                }
             })
             ->rawColumns(['nama'])
             ->toJson();
@@ -156,8 +117,9 @@ class AbsenController extends Controller
         '12' => 'Desember',
     ];
 
-    return view('pages.absen.index', compact('endDate', 'startDate', 'selectedOrganization', 'months', 'project', 'client_id'));
+    return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id'));
 }
+
 
 
     public function indexbackup()

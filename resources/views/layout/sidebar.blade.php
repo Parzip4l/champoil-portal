@@ -50,12 +50,6 @@
                         <span class="link-title">Laporan Kas</span>
                     </a>
                 </li>
-                <li class="nav-item {{ active_class(['folders']) }}">
-                    <a href="{{ route('folders.index') }}" class="nav-link">
-                        <i class="link-icon" data-feather="folder"></i>
-                        <span class="link-title">Document Controls</span>
-                    </a>
-                </li>
             @endif
 
             <!-- Employee Data -->
@@ -251,6 +245,12 @@
                 <a href="{{ route('knowledge_base.index') }}" class="nav-link">
                     <i class="link-icon" data-feather="book-open"></i>
                     <span class="link-title">LMS</span>
+                </a>
+            </li>
+            <li class="nav-item {{ active_class(['folders']) }}">
+                <a href="{{ route('folders.index') }}" class="nav-link">
+                    <i class="link-icon" data-feather="folder"></i>
+                    <span class="link-title">Document Controls</span>
                 </a>
             </li>
             <li class="nav-item {{ active_class(['']) }}">

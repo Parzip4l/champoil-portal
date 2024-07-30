@@ -38,8 +38,8 @@
                         <span class="link-title">Customer Data</span>
                     </a>
                 </li>
-                <li class="nav-item {{ active_class(['kas']) }}">
-                    <a href="{{ url('/kas') }}" class="nav-link">
+                <li class="nav-item {{ active_class(['invoice']) }}">
+                    <a href="{{ route('invoice.index') }}" class="nav-link">
                         <i class="link-icon" data-feather="file-text"></i>
                         <span class="link-title">Invoice</span>
                     </a>

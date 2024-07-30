@@ -268,6 +268,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // Organisasi Routes
     Route::resource('organisasi', App\Http\Controllers\Organisasi\OrganisasiController::class);
 
+    // Data Invoice
+    Route::resource('invoice', App\Http\Controllers\Invoice\InvoiceController::class);
+    Route::get('/invoices/{id}/print', [App\Http\Controllers\Invoice\InvoiceController::class, 'print'])->name('invoice.print');
+
+
     // Pengumuman Routes
     Route::resource('pengumuman', App\Http\Controllers\Pengumuman\PengumumanController::class);
         Route::get('pengumuman/{id}/download', [App\Http\Controllers\Pengumuman\PengumumanController::class, 'downloadAttachment'])->name('pengumuman.download');

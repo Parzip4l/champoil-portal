@@ -46,7 +46,7 @@ class TaskMasterController extends Controller
         // Check if user has superadmin_access or similar role
         if (in_array('superadmin_access', $userRoles) || in_array('am_access', $userRoles) || in_array('client_access', $userRoles)) {
             // Fetch all tasks for users with the access role
-            $taskData = TaskMaster::where('company', $employee->unit_bisnis)->get();
+            $taskData = TaskMaster::where('company', $employee->unit_bisnis)->orderBy('created_at', 'desc')->get();
         } else {
             // Get the IDs of tasks assigned to the current user
             $assignedTaskIds = TaskUser::where('nik', $code)->pluck('task_id');
@@ -54,6 +54,7 @@ class TaskMasterController extends Controller
             // Fetch all tasks that are assigned to the current user
             $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
                                 ->where('company', $employee->unit_bisnis)
+                                ->orderBy('created_at', 'desc')
                                 ->get();
         }
 

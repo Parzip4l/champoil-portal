@@ -158,12 +158,6 @@ class DocumentController extends Controller
     {
         try {
             $file = FileModel::findOrFail($id);
-            dd($file);
-            // Delete file from storage if exists
-            if (Storage::exists($file->path)) {
-                Storage::delete($file->path);
-            }
-
             // Delete file from database
             $file->delete();
 

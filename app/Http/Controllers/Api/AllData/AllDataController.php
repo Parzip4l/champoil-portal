@@ -50,7 +50,11 @@ class AllDataController extends Controller
                                     ->orWhere('tujuan', 'semua');
                             })
                             ->get();
-
+            if(!empty($pengumuman)){
+                foreach($pengumuman as $row){
+                    $row->attachments = asset($row->attachments);
+                }
+            }
             return response()->json(['dataPengumuman' => $pengumuman], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);

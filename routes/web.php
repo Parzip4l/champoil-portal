@@ -275,6 +275,15 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // News
     Route::resource('news', App\Http\Controllers\News\NewsController::class);
 
+    // Document
+    Route::get('/folders', [App\Http\Controllers\Document\DocumentController::class, 'indexFolder'])->name('folders.index');
+    Route::get('/folders/{folder}', [App\Http\Controllers\Document\DocumentController::class, 'showFolder'])->name('folders.show');
+    Route::post('/folders', [App\Http\Controllers\Document\DocumentController::class, 'storeFolder'])->name('folders.store');
+    Route::post('/files/{folderId}', [App\Http\Controllers\Document\DocumentController::class, 'storeFiles'])->name('files.store');
+    Route::put('folders/{id}', [App\Http\Controllers\Document\DocumentController::class, 'updateFolder'])->name('folders.update');
+    Route::delete('folders/{id}', [App\Http\Controllers\Document\DocumentController::class, 'deleteFolder'])->name('folders.delete');
+    Route::delete('files-delete/{id}', [App\Http\Controllers\Document\DocumentController::class, 'deleteFile'])->name('files.delete');
+    Route::get('file/download/{id}', [App\Http\Controllers\Document\DocumentController::class, 'download'])->name('file.download');
     // App Setting
     Route::resource('setting', App\Http\Controllers\Setting\SettingController::class);
     Route::get('version', [App\Http\Controllers\Setting\SettingController::class, 'apps_version'])->name('version');

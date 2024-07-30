@@ -50,8 +50,8 @@
                         <span class="link-title">Laporan Kas</span>
                     </a>
                 </li>
-                <li class="nav-item {{ active_class(['kas']) }}">
-                    <a href="{{ url('/kas') }}" class="nav-link">
+                <li class="nav-item {{ active_class(['folders']) }}">
+                    <a href="{{ route('folders.index') }}" class="nav-link">
                         <i class="link-icon" data-feather="folder"></i>
                         <span class="link-title">Document Controls</span>
                     </a>

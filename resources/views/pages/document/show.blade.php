@@ -71,7 +71,7 @@
                                 $folder = \App\Document\FolderModel::where('id', $data->folder_id)->first();
                             @endphp
                             <tr>
-                                <td>{{$data->id}}</td> 
+                                <td>{{$data->name}}</td> 
                                 <td>{{$karyawan->nama}}</td>
                                 <td>{{$data->created_at->format('d M Y')}}</td>
                                 <td>

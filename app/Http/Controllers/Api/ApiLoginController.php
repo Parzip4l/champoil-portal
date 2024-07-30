@@ -504,76 +504,75 @@ class ApiLoginController extends Controller
     }
 
 
-    public function payslipuser(Request $request){
-    try {
-        // Retrieve the token from the request
-        $token = $request->bearerToken();
+    public function payslipuser(Request $request)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
 
-        // Authenticate the user based on the token
-        $user = Auth::guard('api')->user();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            if ($user) {
+                $employeeCode = $user->employee_code;
 
-        if ($user) {
-            $employeeCode = $user->employee_code;
+                // Ensure employeeCode is not null before accessing the database
+                if ($employeeCode) {
+                    $cacheKey = 'payslips:' . $employeeCode;
 
-            // Ensure employeeCode is not null before accessing the database
-            if ($employeeCode) {
-                $cacheKey = 'payslips:' . $employeeCode;
-
-                // Check if data is already in cache
-                $cachedData = Cache::get($cacheKey);
-                if ($cachedData) {
-                    return response()->json(['payslips' => $cachedData]);
-                }
-
-                $dataKaryawan = Employee::where('nik', $employeeCode)->first();
-
-                if ($dataKaryawan) {
-                    $karyawan = $dataKaryawan->toArray();
-
-                    if ($karyawan['organisasi'] === 'Management Leaders') {
-                        $payslips = Payroll::where('employee_code', $employeeCode)
-                            ->where('payslip_status', 'Published')
-                            ->paginate(10); // Adjust the pagination limit as needed
-                    } else {
-                        $unit_bisnis = $dataKaryawan->unit_bisnis;
-                        if ($unit_bisnis === 'Kas') {
-                            $payslips = Payroll::where('employee_code', $employeeCode)
-                                ->where('payslip_status', 'Published')
-                                ->paginate(10); // Adjust the pagination limit as needed
-                        } else {
-                            $payslips = Payrollns::where('employee_code', $employeeCode)
-                                ->where('payslip_status', 'Published')
-                                ->paginate(10); // Adjust the pagination limit as needed
-                        }
+                    // Check if data is already in cache
+                    $cachedData = Cache::get($cacheKey);
+                    if ($cachedData) {
+                        return response()->json(['payslips' => $cachedData]);
                     }
 
-                    // Modify the response to return JSON data
-                    $payslipsData = $payslips->toArray();
+                    $dataKaryawan = Employee::where('nik', $employeeCode)->first();
 
-                    // Store data in cache for future requests
-                    Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
+                    if ($dataKaryawan) {
+                        $karyawan = json_decode($dataKaryawan, true);
 
-                    return response()->json([
-                        'payslips' => $payslips->items(),
-                        'current_page' => $payslips->currentPage(),
-                        'per_page' => $payslips->perPage(),
-                        'total' => $payslips->total(),
-                    ]);
+                        if ($karyawan['organisasi'] === 'Management Leaders') {
+                            $payslips = Payrol::where('employee_code', $employeeCode)
+                                ->where('payslip_status', 'Published')
+                                ->get();
+                        } else {
+                            $unit_bisnis = $dataKaryawan->unit_bisnis;
+                            if ($unit_bisnis == 'Kas') {
+                                $payslips = Payroll::where('employee_code', $employeeCode)
+                                            ->where('payslip_status', 'Published')
+                                            ->get();
+                            } else {
+                                $payslips = Payrollns::where('employee_code', $employeeCode)
+                                            ->where('payslip_status', 'Published')
+                                            ->get();
+                            }
+                        }
+
+                        // Modify the response to return JSON data
+                        $payslipsData = $payslips->toArray();
+
+                        // Store data in cache for future requests
+                        Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
+
+                        return response()->json([
+                            'payslips' => $payslips->items(),
+                            'current_page' => $payslips->currentPage(),
+                            'per_page' => $payslips->perPage(),
+                            'total' => $payslips->total(),
+                        ]);
+                    } else {
+                        return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
+                    }
                 } else {
-                    return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
+                    return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
                 }
             } else {
-                return response()->json(['error' => 'Properti "employee_code" tidak ditemukan pada pengguna.'], 400);
+                return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
             }
-        } else {
-            return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
+        } catch (\Exception $e) {
+            // Handle general errors
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }
-    } catch (\Exception $e) {
-        // Handle general errors
-        return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
     }
-}
-
 
     // Details Payslip
     public function PayslipDetails(Request $request, $id)

@@ -52,7 +52,7 @@ class AllDataController extends Controller
                             ->get();
             if(!empty($pengumuman)){
                 foreach($pengumuman as $row){
-                    $row->attachments = url($row->attachments);
+                    $row->attachments = asset($row->attachments);
                 }
             }
             return response()->json(['dataPengumuman' => $pengumuman], 200);

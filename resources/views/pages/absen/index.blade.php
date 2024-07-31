@@ -12,6 +12,11 @@
     <li class="breadcrumb-item active" aria-current="page">Absensi</li>
   </ol>
 </nav>
+@php 
+    $user = Auth::user(); 
+    $employeeDetails = \App\Employee::where('nik', Auth::user()->employee_code)->first(); 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+@endphp
 
 @if(session('success'))
 <div class="alert alert-success">
@@ -24,14 +29,56 @@
     {{ session('error') }}
 </div>
 @endif
-
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
+            <div class="card-header">
+                <h5>Filter</h5>
+            </div>
             <div class="card-body">
-                <div class="head-card d-flex justify-content-between mb-3">
-                    <h6 class="card-title align-self-center mb-0">Employees Attendance</h6>
-                </div>
+                <form id="filter-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="organisasi" class="form-label">Organisasi</label>
+                            <select name="organisasi" id="organisasi" class="form-control select2">
+                                <option value="ALL">ALL</option>
+                                @foreach($organisasi as $dataorg)
+                                <option value="{{ $dataorg->name }}">{{ $dataorg->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if($employee->unit_bisnis === 'Kas')
+                        <div class="col-md-4">
+                            <label for="project" class="form-label">Project</label>
+                            <select name="project" id="project" class="form-control select2">
+                                <option value="ALL">ALL</option>
+                                @foreach($project as $dataproject)
+                                <option value="{{ $dataproject->id }}">{{ $dataproject->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+                        <div class="col-md-4">
+                            <label for="periode" class="form-label">Periode</label>
+                            <select name="periode" id="periode" class="form-control">
+                                @foreach($months as $key => $range)
+                                    <option value="{{ $key }}">{{ $range }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h6 class="">Employees Attendance</h6>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
                     <table id="dataTableExample1" class="table table-striped nowrap" width="100%">
                         <thead>
@@ -73,7 +120,9 @@ $(document).ready(function() {
         ajax: {
             url: '{{ route("absen.index") }}',
             data: function (d) {
-                // Additional parameters can be added here if needed
+                d.organisasi = $('#organisasi').val();
+                d.project = $('#project').val();
+                d.periode = $('#periode').val();
             }
         },
         columns: [
@@ -97,6 +146,9 @@ $(document).ready(function() {
                 },
             @endforeach
         ]
+    });
+    $('#filter-form select').change(function() {
+        table.draw();
     });
 });
 

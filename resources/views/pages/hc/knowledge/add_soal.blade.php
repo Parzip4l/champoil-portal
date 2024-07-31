@@ -188,7 +188,8 @@
             </div>
             
             <a href="javascript:void(0)" id="add_quesnioer_list" class="btn btn-outline-warning">Add Quessioner</a>
-            <button type="submit" id="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" id="submit" class="btn btn-primary">Submit</button> 
+            <div class="text-muted" style="float:right"> Total : <span class="text-muted" id="jml_test" >{{ $count_soal }}</span></div>
         </form>
       </div>
     </div>
@@ -259,6 +260,9 @@
     $(document).ready(function() {
         $('#add_quesnioer_list').click(function() {
             var count = $("#list_queessioner #list_soal").length;
+            var jml_soal = parseFloat($('#jml_test').text());
+            var calculate = jml_soal + 1;
+            $('#jml_test').text(calculate);
             var no = count +1;
             var newRow = '<div id="list_soal"><div class="mb-3">'+
                     '<label class="form-label" for="basic-default-fullname">Quessioner</label>'+

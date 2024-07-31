@@ -27,7 +27,6 @@
                     <input type="text" class="form-control" name="lokasi">
                     <label for="" class="form-label">Tanggal</label>
                     <input type="date" class="form-control" name="tanggal">
-                    
                 </div>
             </div>
             <div class="col-md-6">
@@ -39,8 +38,6 @@
                 </div>
             </div>
         </div>
-        
-        
             <div class="table-responsive">
                     <table id="dataTableExample" class="table">
                         <thead>

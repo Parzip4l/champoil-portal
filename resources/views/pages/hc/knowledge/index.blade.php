@@ -23,6 +23,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Judul</th>
+                                <th>Soal</th>
                                 <th>File</th>
                                 <th>Action</th>
                             </tr>
@@ -35,6 +36,7 @@
                             <tr>
                                 <td> {{$nomor++}} </td>
                                 <td> {!! insert_line_breaks($record->title,90) !!} </td>
+                                <td> {{ $record->count_soal }}</td>
                                 <td> <img src="{{ asset('assets/images/pdf.png') }}"> </td>
                                 <td>
                                     <div class="dropdown">

@@ -576,52 +576,66 @@ class ApiLoginController extends Controller
 
     // Details Payslip
     public function PayslipDetails(Request $request, $id)
-    {
-        $token = $request->bearerToken();
+{
+    $token = $request->bearerToken();
 
-        // Authenticate the user based on the token
-        $user = Auth::guard('api')->user();
-        $organisasi = Employee::where('nik', $user->employee_code)
-            ->select('organisasi', 'unit_bisnis')
-            ->first();
+    // Authenticate the user based on the token
+    $user = Auth::guard('api')->user();
+    $organisasi = Employee::where('nik', $user->employee_code)
+        ->select('organisasi', 'unit_bisnis')
+        ->first();
 
-        try {
-            if ($organisasi->unit_bisnis === 'Kas') {
-                if ($organisasi->organisasi === 'Management Leaders') {
-                    $payslip = Payrol::findOrFail($id);
-                } else {
-                    $payslip = Payroll::findOrFail($id);
-                }
+    try {
+        if ($organisasi->unit_bisnis === 'Kas') {
+            if ($organisasi->organisasi === 'Management Leaders') {
+                $payslip = Payrol::findOrFail($id);
             } else {
-                if ($organisasi->organisasi === 'Management Leaders') {
-                    $payslip = Payrol::findOrFail($id);
-                } else {
-                    $payslip = Payrollns::findOrFail($id);
-                }
+                $payslip = Payroll::findOrFail($id);
             }
-
-            // Decode the JSON fields
-            $allowances = json_decode($payslip->allowances, true);
-            $deductions = json_decode($payslip->deductions, true);
-
-            // Replace IDs with component names
-            $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
-            $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
-
-            // Update the payslip object with the new data
-            $payslip->allowances = json_encode($allowances);
-            $payslip->deductions = json_encode($deductions);
-
-            // Return the payslip data as JSON
-            return response()->json(['data' => $payslip], 200);
-        } catch (ModelNotFoundException $e) {
-            // Handle case when the entity is not found
-            return response()->json(['error' => 'Data payslip tidak ditemukan.'], 404);
-        } catch (\Exception $e) {
-            // Handle general errors
-            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        } else {
+            if ($organisasi->organisasi === 'Management Leaders') {
+                $payslip = Payrol::findOrFail($id);
+            } else {
+                $payslip = Payrollns::findOrFail($id);
+            }
         }
+
+        // Decode the JSON fields
+        $allowances = json_decode($payslip->allowances, true);
+        $deductions = json_decode($payslip->deductions, true);
+
+        // Convert the decoded JSON into arrays
+        $allowancesArray = [];
+        foreach ($allowances['data'] as $key => $value) {
+            $allowancesArray[] = ['name' => $key, 'amount' => $value[0]];
+        }
+        $allowancesArray[] = ['name' => 'total_allowance', 'amount' => $allowances['total_allowance']];
+
+        $deductionsArray = [];
+        foreach ($deductions['data'] as $key => $value) {
+            $deductionsArray[] = ['name' => $key, 'amount' => $value[0]];
+        }
+        $deductionsArray[] = ['name' => 'total_deduction', 'amount' => $deductions['total_deduction']];
+
+        // Replace IDs with component names
+        $allowances = $this->replaceComponentIdsWithNames($allowancesArray, 'allowance');
+        $deductions = $this->replaceComponentIdsWithNames($deductionsArray, 'deduction');
+
+        // Update the payslip object with the new data
+        $payslip->allowances = json_encode($allowances);
+        $payslip->deductions = json_encode($deductions);
+
+        // Return the payslip data as JSON
+        return response()->json(['data' => $payslip], 200);
+    } catch (ModelNotFoundException $e) {
+        // Handle case when the entity is not found
+        return response()->json(['error' => 'Data payslip tidak ditemukan.'], 404);
+    } catch (\Exception $e) {
+        // Handle general errors
+        return response()->json(['error' => 'Terjadi kesalahan.'], 500);
     }
+}
+
 
     private function replaceComponentIdsWithNames($components, $type)
 {

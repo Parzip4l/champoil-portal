@@ -168,7 +168,12 @@ class InvoiceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $invoiceData = InvoiceModel::findOrFail($id);
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $customer = CustomerManagement::where('company',$company->unit_bisnis)->get();
+
+        return view('pages.invoice.edit', compact('invoiceData', 'customer'));
     }
 
     /**
@@ -180,8 +185,37 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'items' => 'required|array',
+        ]);
+
+        $invoice = InvoiceModel::findOrFail($id);
+
+        try {
+            // Check if items are present in the request
+            $items = $request->input('items', []);
+            
+            // Calculate the total
+            $total = array_sum(array_column($items, 'subtotal'));
+
+            // Add the total to the details array
+            $details = $items;
+            $details['total'] = $total;
+
+            // Update only items and total in the invoice
+            $invoice->details = json_encode($details);
+            $invoice->updated_by = Auth::user()->employee_code; // Track who updated (optional)
+            $invoice->save();
+
+            return redirect()->route('invoice.index')->with('success', 'Invoice items updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error updating invoice items: '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'There was an error updating the invoice items. Please try again.'.$e->getMessage());
+        }
     }
+
+
 
     /**
      * Remove the specified resource from storage.

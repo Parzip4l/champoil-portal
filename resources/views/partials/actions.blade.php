@@ -3,6 +3,9 @@
         <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
     </button>
     <div class="dropdown-menu" aria-labelledby="customDropdownMenuButton">
+        <a class="dropdown-item d-flex align-items-center" href="#" onclick="editInvoice('{{ $row->id }}'); return false;">
+            <i data-feather="printer" class="icon-sm me-2"></i> <span>Edit</span>
+        </a>
         <a class="dropdown-item d-flex align-items-center" href="#" onclick="viewInvoice('{{ $row->id }}'); return false;">
             <i data-feather="eye" class="icon-sm me-2"></i> <span>View</span>
         </a>

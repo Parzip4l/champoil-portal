@@ -95,5 +95,10 @@ $(document).ready(function() {
         // Open a new window for printing
         window.open('/invoices/' + id + '/print', '_blank');
     }
+
+    function editInvoice(id)
+    {
+        window.open('/invoice/' + id + '/edit');
+    }
 </script>
 @endpush

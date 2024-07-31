@@ -98,7 +98,7 @@ $(document).ready(function() {
 
     function editInvoice(id)
     {
-        window.open('/invoice/' + id + '/edit');
+        window.location.href = '/invoice/' + id + '/edit';
     }
 </script>
 @endpush

@@ -24,22 +24,31 @@
                 @method('PUT')
                 
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="mb-3">
                             <label for="client" class="form-label">Client</label>
                             <input type="text" class="form-control" id="client" name="client" value="{{ $invoiceData->client }}" readonly>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="mb-3">
                             <label for="date" class="form-label">Date</label>
                             <input type="date" class="form-control" id="date" name="date" value="{{ $invoiceData->date }}" readonly>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="mb-3">
                             <label for="due_date" class="form-label">Due Date</label>
                             <input type="date" class="form-control" id="due_date" name="due_date" value="{{ $invoiceData->due_date }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Update Status</label>
+                            <select name="status" class="form-control" id="status">
+                                <option value="0" {{ $invoiceData->status == 0 ? 'selected' : '' }}>Belum Lunas</option>
+                                <option value="1" {{ $invoiceData->status == 1 ? 'selected' : '' }}>Lunas</option>
+                            </select>
                         </div>
                     </div>
                 </div>

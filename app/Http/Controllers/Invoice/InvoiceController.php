@@ -204,6 +204,7 @@ class InvoiceController extends Controller
 
             // Update only items and total in the invoice
             $invoice->details = json_encode($details);
+            $invoice->status = $request->input('status');
             $invoice->updated_by = Auth::user()->employee_code; // Track who updated (optional)
             $invoice->save();
 

@@ -586,40 +586,20 @@ class ApiLoginController extends Controller
         ->first();
 
     try {
-        if ($organisasi->unit_bisnis === 'Kas') {
-            if ($organisasi->organisasi === 'Management Leaders') {
-                $payslip = Payrol::findOrFail($id);
-            } else {
-                $payslip = Payroll::findOrFail($id);
-            }
+        // Determine the correct model to use based on the unit_bisnis and organisasi
+        if (strtolower($organisasi->unit_bisnis) === 'kas') {
+            $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payroll::findOrFail($id);
         } else {
-            if ($organisasi->organisasi === 'Management Leaders') {
-                $payslip = Payrol::findOrFail($id);
-            } else {
-                $payslip = Payrollns::findOrFail($id);
-            }
+            $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payrollns::findOrFail($id);
         }
-
+        
         // Decode the JSON fields
         $allowances = json_decode($payslip->allowances, true);
         $deductions = json_decode($payslip->deductions, true);
 
-        // Convert the decoded JSON into arrays
-        $allowancesArray = [];
-        foreach ($allowances['data'] as $key => $value) {
-            $allowancesArray[] = ['name' => $key, 'amount' => $value[0]];
-        }
-        $allowancesArray[] = ['name' => 'total_allowance', 'amount' => $allowances['total_allowance']];
-
-        $deductionsArray = [];
-        foreach ($deductions['data'] as $key => $value) {
-            $deductionsArray[] = ['name' => $key, 'amount' => $value[0]];
-        }
-        $deductionsArray[] = ['name' => 'total_deduction', 'amount' => $deductions['total_deduction']];
-
         // Replace IDs with component names
-        $allowances = $this->replaceComponentIdsWithNames($allowancesArray, 'allowance');
-        $deductions = $this->replaceComponentIdsWithNames($deductionsArray, 'deduction');
+        $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
+        $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
 
         // Update the payslip object with the new data
         $payslip->allowances = json_encode($allowances);
@@ -636,16 +616,17 @@ class ApiLoginController extends Controller
     }
 }
 
-
-    private function replaceComponentIdsWithNames($components, $type)
+private function replaceComponentIdsWithNames($components, $type)
 {
     if (!isset($components['data'])) {
         return $components;
     }
 
+    // Extract component IDs from the data
     $componentIds = array_keys($components['data']);
     $componentDetails = Component::whereIn('id', $componentIds)->get();
 
+    // Create a map of ID to name for easy lookup
     $componentMap = [];
     foreach ($componentDetails as $detail) {
         $componentMap[$detail->id] = $detail->name;
@@ -659,11 +640,10 @@ class ApiLoginController extends Controller
         $newComponents['total_deduction'] = $components['total_deduction'];
     }
 
+    // Replace each component ID with its name
     foreach ($components['data'] as $id => $values) {
         $componentName = $componentMap[$id] ?? 'komponen tidak ditemukan';
-        foreach ($values as $value) {
-            $newComponents['data'][$componentName][] = $value;
-        }
+        $newComponents['data'][$componentName] = $values;
     }
 
     return $newComponents;

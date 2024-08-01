@@ -149,6 +149,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('task-management', App\Http\Controllers\Taskmanagement\TaskMasterController::class);
     Route::get('task-management/{id}/download', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'downloadAttachment'])->name('task.download');
     Route::get('subtask/{id}/download', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'downloadAttachmentSubtask'])->name('subtask.download');
+    Route::put('/status/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'masterStatus'])->name('status.update');
     Route::post('/subtasks', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeSubtask'])->name('subtasks.store');
         // Subtask Status
         Route::post('/subtask/update-status/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'updateStatus'])->name('update-status.subtask');

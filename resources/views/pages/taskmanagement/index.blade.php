@@ -111,8 +111,8 @@
                  <div class="row">
                     <div class="col-md-6">
                         <div class="mb-4">
-                            <button class="btn btn-success" id="filterAll">All Task</button>
-                            <button class="btn btn-primary" id="filterMyTasks">My Tasks</button>
+                            <button class="btn btn-sm btn-light" id="filterAll">All Task</button>
+                            <button class="btn btn-sm btn-light" id="filterMyTasks">My Tasks</button>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -133,7 +133,7 @@
                                     <th>Status</th>
                                     <th>Subtask</th>
                                     <th>Due Date</th>
-                                    <th>User</th>
+                                    <th>Team</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -162,7 +162,15 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge rounded-pill {{ $badgeClass }}">{{ $status }}</span>
+                                    <form action="{{ route('status.update', $data->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <select name="status" class="form-select rounded-pill" style="width: 150px; padding: 5px 15px; font-size: 12px;" onchange="this.form.submit()">
+                                            <option value="Pending" {{ $data->status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="In Progress" {{ $data->status == 'In Progress' ? 'selected' : '' }}>In Progress</option>
+                                            <option value="Completed" {{ $data->status == 'Completed' ? 'selected' : '' }}>Completed</option>
+                                        </select>
+                                    </form>
                                     </td>
                                     <td>
                                         <a href="" data-bs-toggle="modal" data-bs-target="#subtaskModalDetails{{ $data->id }}">

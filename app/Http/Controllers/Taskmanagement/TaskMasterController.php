@@ -660,4 +660,20 @@ class TaskMasterController extends Controller
         }
         return response()->json(['success' => false], 404);
     }
+
+    public function masterStatus(Request $request, $id)
+    {
+        // Validate the status input
+        $request->validate([
+            'status' => 'required|string|in:Pending,In Progress,Completed',
+        ]);
+
+        // Find the record by id and update the status
+        $data = TaskMaster::findOrFail($id);
+        $data->status = $request->input('status');
+        $data->save();
+
+        // Redirect back or to a specific page
+        return back()->with('success', 'Status updated successfully!');
+    }
 }

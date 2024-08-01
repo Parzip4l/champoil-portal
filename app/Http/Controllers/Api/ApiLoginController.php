@@ -610,14 +610,14 @@ class ApiLoginController extends Controller
             $component_name = DB::table('components')->where('id',$key)->first();
             $allowancesArray[] = ['name' => strtoupper($component_name->name), 'amount' => $value[0]];
         }
-        $allowancesArray[] = ['name' => 'total_allowance', 'amount' => $allowances['total_allowance']];
+        $allowancesArray[] = ['name' => 'TOTAL ALLOWANCE', 'amount' => $allowances['total_allowance']];
 
         $deductionsArray = [];
         foreach ($deductions['data'] as $key => $value) {
             $component_name = DB::table('components')->where('id',$key)->first();
             $deductionsArray[] = ['name' => strtoupper($component_name->name), 'amount' => $value[0]];
         }
-        $deductionsArray[] = ['name' => 'total_deduction', 'amount' => $deductions['total_deduction']];
+        $deductionsArray[] = ['name' => 'TOTAL DEDUCTION', 'amount' => $deductions['total_deduction']];
 
         // Replace IDs with component names
         $allowances = $this->replaceComponentIdsWithNames($allowancesArray, 'allowance');

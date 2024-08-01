@@ -38,20 +38,17 @@ class AbsenController extends Controller
         $client_id = Auth::user()->project_id;
         $organisasi = Organisasi::where('company',$company->unit_bisnis)->get();
         $periode = $request->input('periode');
-        $today = now();
-        $startDate = Carbon::parse($today->copy()->day(21)->format('Y-m-d'));
-        $endDate = Carbon::parse($today->copy()->addMonth()->day(20)->format('Y-m-d'));
 
-        $filterStartDate = $startDate;
-        $filterEndDate = $endDate;
-        if ($request->periode) {
-            $dates = explode(' - ', $request->periode);
-            if (count($dates) === 2) {
-                $filterStartDate = Carbon::createFromFormat('Y-m-d', $dates[0])->startOfDay();
-                $filterEndDate = Carbon::createFromFormat('Y-m-d', $dates[1])->endOfDay();
-            }
-            
+        $today = now();
+        if ($today->day < 21) {
+            $startDate = Carbon::create($today->year, $today->month, 21)->subMonth();
+            $endDate = Carbon::create($today->year, $today->month, 20);
+        } else {
+            // Jika hari ini adalah tanggal 21 atau setelahnya, kita berada di periode saat ini
+            $startDate = Carbon::create($today->year, $today->month, 21);
+            $endDate = Carbon::create($today->year, $today->month, 20)->addMonth();
         }
+
         $query = DB::table('users')
             ->join('karyawan', 'karyawan.nik', '=', 'users.name')
             ->leftJoin('absens', function($join) use ($startDate, $endDate) {

@@ -121,7 +121,7 @@
                         <h5 class="mt-4">Attendance Record {{ \Carbon\Carbon::now()->format('F Y') }}</h5>
                         <div class="row mt-3">
                             <div class="col-md-4 mb-3">
-                                <div class="card">
+                                <div class="card custom-card2">
                                     <div class="card-header">
                                         <h5>Present</h5>
                                     </div>
@@ -144,7 +144,7 @@
                                 </div>
                             </div>
                             <div class="col-md-8 mb-3">
-                                <div class="card">
+                                <div class="card custom-card2">
                                     <div class="card-header">
                                         <h5>Not Present</h5>
                                     </div>
@@ -244,7 +244,7 @@
                                                     <td>{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->status }}</td>
                                                     @if(in_array('superadmin_access', $dataLogin) || in_array('hc_access', $dataLogin))
                                                     <td>
-                                                        <a href="#" class="btn btn-sm btn-warning"
+                                                        <a href="#" class="btn btn-sm btn-warning text-white"
                                                             data-bs-toggle="modal" data-bs-target="#editModal"
                                                             data-date="{{ $currentDate->format('Y-m-d') }}"
                                                             data-clock-in="{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_in }}"
@@ -276,7 +276,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card">
+                                <div class="card custom-card2">
                                     <div class="card-header">
                                         <h5>Request Attendence History</h5>
                                     </div>

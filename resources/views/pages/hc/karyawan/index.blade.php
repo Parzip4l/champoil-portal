@@ -24,7 +24,7 @@
         <div class="card-header">
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-0">Employees</h6>
+                    <h6 class="card-title align-self-center mb-0">Data Karyawan</h6>
                 </div>
                 <div class="tombol-pembantu d-flex">
                     <div class="dropdown"> 
@@ -43,83 +43,20 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-            <table id="dataTableExample" class="table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nama</th>
-                    <th>Kode Karyawan</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Organisasi</th>
-                    <th>Jabatan</th>
-                    <th>Status Karyawan</th>
-                    <th>Aksi</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @php 
-                        $no = 1;
-                    @endphp
-                    @foreach ($karyawan as $data)
-                <tr>
-                    <td>{{ $no++ }}</td>
-                    <td><a href="{{ route('employee.show', $data->id) }}">{{ $data->nama }}</a></td>
-                    <td>{{ $data->nik }}</td>
-                    <td>{{ $data->jenis_kelamin }}</td>
-                    <td>{{ $data->organisasi }}</td>
-                    <td>{{ $data->jabatan }}</td>
-                    <td><span class="@if($data->status_kontrak == 'Permanent') badge rounded-pill bg-primary @else badge rounded-pill bg-success @endif">{{ $data->status_kontrak }}</span></td>
-                    <td>
-                        <div class="dropdown"> 
-                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.edit', ['employee' => $data->nik]) }}"><i data-feather="git-branch" class="icon-sm me-2"></i> <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="{{ route('employee.show', $data->id) }}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">View Detail</span></a>
-                                <a href="#" class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#resign-{{ $data->id }}">
-                                    <i data-feather="user-x" class="icon-sm me-2"></i> <span class="">Resign</span>
-                                </a>
-                                <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                                    @csrf @method('DELETE') 
-                                    <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                        <i data-feather="trash" class="icon-sm me-2"></i>
-                                        <span class="">Delete</span>
-                                    </a>
-                                </form>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <div class="modal fade" id="resign-{{ $data->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Resign</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="{{route('employee.resign')}}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="hidden" name="id" value="{{ $data->id }}">
-                                    <div class="row">
-                                        <div class="col-md-12 mb-2">
-                                            <label for="" class="form-label">Reason</label>
-                                            <textarea class="form-control" id="reason" name="reason"></textarea>
-                                        </div>
-                                        
-                                        <div class="col-md-12 mt-2">
-                                            <button class="btn btn-primary w-100" type="submit">Submit</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-                </tbody>
-            </table>
+                <table id="dataTableExample" class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nama</th>
+                            <th>Kode Karyawan</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Organisasi</th>
+                            <th>Jabatan</th>
+                            <th>Status Karyawan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
@@ -151,7 +88,6 @@
 @endpush
 
 @push('custom-scripts')
-  <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
     function showDeleteDataDialog(id) {
@@ -216,5 +152,34 @@
             text: '{{ session('error') }}',
         });
     @endif
+</script>
+<script>
+    $(document).ready(function() {
+    $('#dataTableExample').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('employee.index') }}",
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'nama', name: 'nama' },
+            { data: 'nik', name: 'nik' },
+            { data: 'jenis_kelamin', name: 'jenis_kelamin' },
+            { data: 'organisasi', name: 'organisasi' },
+            { data: 'jabatan', name: 'jabatan' },
+            { data: 'status_kontrak', name: 'status_kontrak' },
+            { data: 'action', name: 'action', orderable: false, searchable: false },
+        ],
+        columnDefs: [
+            {
+                targets: 0,
+                render: function(data, type, full, meta) {
+                    return meta.row + 1; // Return the row number
+                }
+            }
+        ],
+        order: [[1, 'asc']]
+    });
+});
+
 </script>
 @endpush

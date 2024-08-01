@@ -28,6 +28,7 @@ use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Setting\Golongan\GolonganModel;
+use Yajra\DataTables\Facades\DataTables;
 
 class EmployeeController extends Controller
 {
@@ -36,37 +37,45 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
         
-        if(Auth::user()->project_id == NULL){
-            $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
-            ->where('resign_status',0)
-            ->get();
-        }else{
-            $karyawan = Employee::select('karyawan.*')
-                            ->where('unit_bisnis', $company->unit_bisnis)
-                            ->join('schedules', function($join) {
-                                $join->on('karyawan.nik', '=', 'schedules.employee')
-                                    ->where('schedules.project', Auth::user()->project_id)
-                                    ->where('schedules.id', '=', function($query) {
-                                        $query->select('id')
-                                            ->from('schedules')
-                                            ->whereColumn('employee', 'karyawan.nik')
-                                            ->where('schedules.project', Auth::user()->project_id)
-                                            ->limit(1);
-                                    });
-                            })
-                            ->where('resign_status', 0)
-                            ->get();
+        if ($request->ajax()) {
+            if (Auth::user()->project_id == NULL) {
+                $query = Employee::where('unit_bisnis', $company->unit_bisnis)
+                                ->where('resign_status', 0);
+            } else {
+                $query = Employee::select('karyawan.*')
+                                ->where('unit_bisnis', $company->unit_bisnis)
+                                ->join('schedules', function($join) {
+                                    $join->on('karyawan.nik', '=', 'schedules.employee')
+                                        ->where('schedules.project', Auth::user()->project_id)
+                                        ->where('schedules.id', '=', function($query) {
+                                            $query->select('id')
+                                                ->from('schedules')
+                                                ->whereColumn('employee', 'karyawan.nik')
+                                                ->where('schedules.project', Auth::user()->project_id)
+                                                ->limit(1);
+                                        });
+                                })
+                                ->where('resign_status', 0);
+            }
 
+            return DataTables::of($query)
+                ->addColumn('action', function($data) {
+                    return view('partials.action-employee', compact('data'));
+                })
+                ->editColumn('status_kontrak', function ($data) {
+                    $badgeClass = $data->status_kontrak == 'Permanent' ? 'bg-primary' : 'bg-success';
+                    return '<span class="badge rounded-pill ' . $badgeClass . '">' . $data->status_kontrak . '</span>';
+                })
+                ->rawColumns(['action', 'status_kontrak'])
+                ->make(true);
         }
-        
-        
-        
-        return view('pages.hc.karyawan.index', compact('karyawan'));
+
+        return view('pages.hc.karyawan.index');
     }
 
     public function ApiEmployee(Request $request)

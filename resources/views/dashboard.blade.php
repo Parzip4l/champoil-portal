@@ -968,7 +968,7 @@
                         @endphp
                         <div class="employee-item d-flex mb-2">
                             <div class="photo-profile2 me-2 align-self-center">
-                                <img src="{{ asset('images/' . $birthdaydata->gambar) }}" alt="">
+                                <img src="{{ asset('images/' . ($birthdaydata->gambar ?? '3135715.png')) }}" alt="">
                             </div>
                             <div class="detail-item-employee-wrap align-self-center">
                                 <div class="detail-employee ">
@@ -1000,7 +1000,7 @@
                         @foreach($kontrakKaryawan as $DataKontrak)
                         <div class="employee-item d-flex mb-2">
                             <div class="photo-profile me-2">
-                                <img src="{{ asset('images/' . $DataKontrak->gambar) }}" alt="">
+                                <img src="{{ asset('images/' . ($DataKontrak->gambar ?? '3135715.png')) }}" alt="">
                             </div>
                             <div class="detail-item-employee-wrap align-self-center">
                                 <div class="detail-employee ">
@@ -1064,7 +1064,7 @@
                         @foreach($karyawanTidakAbsenHariIni as $alpha)
                         <div class="employee-item d-flex mb-2">
                             <div class="photo-profile me-2">
-                                <img src="{{ asset('images/' . $alpha->gambar) }}" alt="">
+                                <img src="{{ asset('images/' . ($alpha->gambar ?? '3135715.png' )) }}" alt="">
                             </div>
                             <div class="detail-item-employee-wrap align-self-center">
                                 <div class="detail-employee ">

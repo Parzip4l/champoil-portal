@@ -191,7 +191,7 @@
                                     <td class="d-flex">
                                         @foreach($data->assignedUsers as $user)
                                         <div class="data-user d-flex">
-                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . $user->gambar) }}" alt="{{ $user->nik }}">
+                                            <img class="wd-30 ht-30 rounded-circle image-task" src="{{ asset('images/' . ($user->gambar ?? '3135715.png')) }}" alt="{{ $user->nik }}">
                                             <div class="tooltips-name">
                                                 <p class="text-muted">{{ $user->nama }}</p>
                                             </div>

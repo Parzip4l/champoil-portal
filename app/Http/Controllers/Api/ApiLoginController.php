@@ -576,78 +576,82 @@ class ApiLoginController extends Controller
 
     // Details Payslip
     public function PayslipDetails(Request $request, $id)
-{
-    $token = $request->bearerToken();
+    {
+        $token = $request->bearerToken();
 
-    // Authenticate the user based on the token
-    $user = Auth::guard('api')->user();
-    $organisasi = Employee::where('nik', $user->employee_code)
-        ->select('organisasi', 'unit_bisnis')
-        ->first();
+        // Authenticate the user based on the token
+        $user = Auth::guard('api')->user();
+        $organisasi = Employee::where('nik', $user->employee_code)
+            ->select('organisasi', 'unit_bisnis')
+            ->first();
 
-    try {
-        // Determine the correct model to use based on the unit_bisnis and organisasi
-        if (strtolower($organisasi->unit_bisnis) === 'kas') {
-            $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payroll::findOrFail($id);
-        } else {
-            $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payrollns::findOrFail($id);
+        try {
+            // Determine the correct model to use based on the unit_bisnis and organisasi
+            if (strtolower($organisasi->unit_bisnis) === 'kas') {
+                $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payroll::findOrFail($id);
+            } else {
+                $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payrollns::findOrFail($id);
+            }
+            
+            // Decode the JSON fields
+            $allowances = json_decode($payslip->allowances, true);
+            $deductions = json_decode($payslip->deductions, true);
+
+            // Replace IDs with component names
+            $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
+            $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
+
+            // Update the payslip object with the new data
+            $payslip->allowances = json_encode($allowances);
+            $payslip->deductions = json_encode($deductions);
+
+            // Return the payslip data as JSON
+            return response()->json(['data' => $payslip], 200);
+        } catch (ModelNotFoundException $e) {
+            // Handle case when the entity is not found
+            return response()->json(['error' => 'Data payslip tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            // Handle general errors
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
         }
-        
-        // Decode the JSON fields
-        $allowances = json_decode($payslip->allowances, true);
-        $deductions = json_decode($payslip->deductions, true);
-
-        // Replace IDs with component names
-        $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
-        $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
-
-        // Update the payslip object with the new data
-        $payslip->allowances = json_encode($allowances);
-        $payslip->deductions = json_encode($deductions);
-
-        // Return the payslip data as JSON
-        return response()->json(['data' => $payslip], 200);
-    } catch (ModelNotFoundException $e) {
-        // Handle case when the entity is not found
-        return response()->json(['error' => 'Data payslip tidak ditemukan.'], 404);
-    } catch (\Exception $e) {
-        // Handle general errors
-        return response()->json(['error' => 'Terjadi kesalahan.'], 500);
-    }
-}
-
-private function replaceComponentIdsWithNames($components, $type)
-{
-    if (!isset($components['data'])) {
-        return $components;
     }
 
-    // Extract component IDs from the data
-    $componentIds = array_keys($components['data']);
-    $componentDetails = Component::whereIn('id', $componentIds)->get();
+    private function replaceComponentIdsWithNames($components, $type)
+    {
+        $componentIds = array_keys($components['data']);
+        $componentDetails = Component::whereIn('id', $componentIds)->get();
 
-    // Create a map of ID to name for easy lookup
-    $componentMap = [];
-    foreach ($componentDetails as $detail) {
-        $componentMap[$detail->id] = $detail->name;
-    }
+        // Create a map of ID to name for easy lookup
+        $componentMap = [];
+        foreach ($componentDetails as $detail) {
+            $componentMap[$detail->id] = $detail->name;
+        }
 
-    $newComponents = ['data' => []];
-    if ($type === 'allowance' && isset($components['total_allowance'])) {
-        $newComponents['total_allowance'] = $components['total_allowance'];
-    }
-    if ($type === 'deduction' && isset($components['total_deduction'])) {
-        $newComponents['total_deduction'] = $components['total_deduction'];
-    }
+        $newComponents = [];
+        foreach ($components['data'] as $id => $values) {
+            $componentName = $componentMap[$id] ?? 'komponen tidak ditemukan';
+            $newComponents[] = [
+                'name' => $componentName,
+                'amount' => $values[0]  // Assuming only one value per component
+            ];
+        }
 
-    // Replace each component ID with its name
-    foreach ($components['data'] as $id => $values) {
-        $componentName = $componentMap[$id] ?? 'komponen tidak ditemukan';
-        $newComponents['data'][$componentName] = $values;
-    }
+        // If the type is allowance or deduction, add total amount
+        if ($type === 'allowance' && isset($components['total_allowance'])) {
+            $newComponents[] = [
+                'name' => 'total_allowance',
+                'amount' => $components['total_allowance']
+            ];
+        }
+        if ($type === 'deduction' && isset($components['total_deduction'])) {
+            $newComponents[] = [
+                'name' => 'total_deduction',
+                'amount' => $components['total_deduction']
+            ];
+        }
 
-    return $newComponents;
-}
+        return $newComponents;
+    }
     
 
     // Get Employee Details

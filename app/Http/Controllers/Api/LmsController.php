@@ -38,7 +38,7 @@ class LmsController extends Controller
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
         $result=[];
-        $dataLearning = Knowledge::all();
+        $dataLearning = Knowledge::where('id',90)->get();
         if($dataLearning){
             foreach($dataLearning as $row){
                 if(!empty($row->url_video) || !empty($row->file_name)){

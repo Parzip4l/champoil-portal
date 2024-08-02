@@ -153,7 +153,7 @@ class AllDataController extends Controller
                 $birthDate = Carbon::parse($employee->tanggal_lahir)->setYear($today->year);
                 $employee->usia = Carbon::parse($employee->tanggal_lahir)->age;
                 
-                return $birthDate->isToday() || ($birthDate->isAfter($today) && $birthDate->diffInDays($today) <= 7);
+                return $birthDate->isToday() || ($birthDate->isAfter($today) && $birthDate->diffInDays($today) <= 1);
             });
 
             if(!empty($upcomingBirthdays->values())){

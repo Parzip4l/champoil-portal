@@ -37,10 +37,17 @@ class LmsController extends Controller
         $token = $request->bearerToken();
         // Authenticate the user based on the token
         $user = Auth::guard('api')->user();
-
+        $result=[];
         $dataLearning = Knowledge::all();
+        if($dataLearning){
+            foreach($dataLearning as $row){
+                if(!empty($row->url_video) || !empty($row->file_name){
+                    $result[]=$row;
+                }
+            }
+        }
 
-        return response()->json(['dataLearning' => $dataLearning], 200);
+        return response()->json(['dataLearning' => $result], 200);
     }
 
     public function ReadTest($id, Request $request)

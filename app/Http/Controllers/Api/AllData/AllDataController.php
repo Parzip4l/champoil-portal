@@ -49,6 +49,7 @@ class AllDataController extends Controller
                                 $query->where('tujuan', $organisasiUser)
                                     ->orWhere('tujuan', 'semua');
                             })
+                            ->where('company',$unitBisnis)
                             ->get();
             if(!empty($pengumuman)){
                 foreach($pengumuman as $row){

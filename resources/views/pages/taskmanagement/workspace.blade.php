@@ -25,105 +25,73 @@
         {{ session('error') }}
     </div>
 @endif
-<div class="row mb-2">
-    <div class="top-mobile-wrap d-flex justify-content-between">
-        <div class="greeting-wrap">
-            <h4>Hi, {{$employee->nama}}!</h4>
-            <h6>{{$greeting}}</h6>
-        </div>
-        <div class="create-new-task mobile">
-            <a href="{{route('task-management.create')}}" class="btn btn-primary"><i class="icon-sm" data-feather="plus"></i></a>
-        </div>
-    </div>
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @foreach($breadcrumb as $bcFolder)
+            @if ($loop->last)
+                <li class="breadcrumb-item active" aria-current="page">{{ $bcFolder->name }}</li>
+            @else
+                <li class="breadcrumb-item"><a href="{{ $bcFolder->url }}">{{ $bcFolder->name }}</a></li>
+            @endif
+        @endforeach
+    </ol>
+</nav>
+<div class="col-md-4 mb-2">
+    <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWorkspace"><i data-feather="plus" class="icon-sm me-2"></i>Sub Folder</a>
 </div>
-<div class="row mb-4">
-    <h4 class="mobile mb-2 mt-4">Task Overview</h4>
-    <div class="col-md-3 col-6 mb-2">
-        <div class="card custom-card2" style="background:#777CF0">
-            <div class="card-body text-white">
-                <div class="task-overview-data d-flex">
-                    <i class="icon-xl me-2 mt-1" data-feather="file-text"></i>
-                    <div class="left-item-overview">
-                        <h1>{{$totalTasks }}</h1>
-                        <p>Total Task</p>
-                    </div>
-                </div>
+<div class="modal fade" id="ModalWorkspace" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Buat Sub Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-6 mb-2">
-        <div class="card custom-card2" style="background:#44BBF9">
-            <div class="card-body text-white">
-                <div class="task-overview-data d-flex">
-                    <i class="icon-xl me-2 mt-1" data-feather="check-circle"></i>
-                    <div class="left-item-overview">
-                        <h1>{{$completedTasks}}</h1>
-                        <p>Completed</p>
+            <div class="modal-body">
+                <form action="{{ route('workspace.store') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group mb-3">
+                        <label for="Judul" class="form-label">Workspace Name</label>
+                        <input type="text" name="name" class="form-control" required>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-6 mb-2">
-        <div class="card custom-card2" style="background:#FBB855">
-            <div class="card-body text-white">
-                <div class="task-overview-data d-flex">
-                    <i class="icon-xl me-2 mt-1" data-feather="clock"></i>
-                    <div class="left-item-overview">
-                        <h1>{{$inProgressTasks}}</h1>
-                        <p>In Progress</p>
+                    <div class="form-group mb-3">
+                        <label for="Judul" class="form-label">Workspace Visibility</label>
+                        <select name="visibility" class="form-control" id="">
+                            <option value="1">Public</option>
+                            <option value="0">Private</option>
+                        </select>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-6 mb-2">
-        <div class="card custom-card2" style="background:#C10000">
-            <div class="card-body text-white">
-                <div class="task-overview-data d-flex">
-                    <i class="icon-xl me-2 mt-1" data-feather="x-circle"></i>
-                    <div class="left-item-overview">
-                        <h1>{{$overdueTasks}}</h1>
-                        <p>Over Due</p>
-                    </div>
-                </div>
+                    <input type="hidden" name="parent_id" value="{{$folder->id}}">
+                    <button type="submit" class="btn btn-primary w-100">Buat Sub Workspace</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-<div class="col-md-4 mb-2 desktop">
-    <a href="" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWorkspace"><i data-feather="plus" class="icon-sm me-2"></i>Create Workspace</a>
-</div>
-<hr class="desktop">
-<div class="header-card-folder desktop mb-2 d-flex justify-content-between desktop">
-    <h5 class="align-self-center desktop">Workspace</h5>
-    <form action="{{ route('task-management.index') }}" method="GET" class="desktop">
-        <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search workspace..." value="{{ request('search') }}">
-            <button class="btn btn-primary" type="submit"><i data-feather="search" class="icon-sm me-2"></i>Search</button>
-        </div>
-    </form>
-</div>
-<div class="row desktop">
-@foreach($folders as $folder)
+<div class="row">
+@foreach($folder->subWorkspace as $folderData)
     <div class="col-md-3 mb-4">
         <div class="card custom-card2">
+            @php
+                $owner = \App\Employee::where('nik',$folderData->owner)->first();
+            @endphp
             <div class="card-body d-flex justify-content-between">
                 <div class="folder">
-                    <a href="{{ route('workspace.show', $folder->id) }}" class="d-flex">
+                    <a href="{{ route('workspace.show', $folderData->id) }}" class="d-flex">
                         <i data-feather="folder" class="icon-xl me-2"></i>
-                        <p class="text-muted align-self-center ">{{ $folder->name }}</p>
+                        <p class="text-muted align-self-center">{{ $folderData->name }} <br>{{$owner->nama}}</p>
                     </a>
+                    
                 </div>
                 <div class="dropdown">
                     <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ModalFolder{{ $folder->id }}">
+                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#ModalFolder{{ $folderData->id }}">
                             <i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Rename</span>
                         </a>
-                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="WorkspaceDelete('{{ $folder->id }}')">
+                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="WorkspaceDelete('{{ $folderData->id }}')">
                             <i data-feather="trash" class="icon-sm me-2"></i> <span class="">Delete</span>
                         </a>
                     </div>
@@ -131,10 +99,9 @@
             </div>
             <div class="card-footer">
                 <div class="details-folder d-flex justify-content-between">
-                    <p class="text-muted">{{ $fileCounts[$folder->id] ?? 0 }} Task</p>
                     <p class="text-muted">
                         @if ($folder->visibility == 1) 
-                            Public Workspace 
+                            Public Workspace  
                         @else 
                             Private Workspace
                         @endif
@@ -154,7 +121,7 @@
                     <h6 class="card-title align-self-center mb-0">All Task</h6>
                 </div>
                 <div class="tombol-pembantu d-flex">
-                    <a href="{{route('task-management.create')}}" class="btn btn-primary">Create Task</a>
+                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#TaskModal">Create Task</a>
                 </div>
             </div>
         </div>
@@ -261,13 +228,10 @@
                                                     <i data-feather="edit-2" class="icon-sm me-2"></i>
                                                     <span>Edit</span>  
                                                 </a>
-                                                <form action="{{ route('asset.destroy', $data->id) }}" method="POST" id="delete_contact" class="contactdelete"> 
-                                                    @csrf @method('DELETE') 
-                                                    <a class="dropdown-item d-flex align-items-center" href="#" onClick="Workspace('{{ $data->id }}')">
-                                                        <i data-feather="trash" class="icon-sm me-2"></i>
-                                                        <span>Delete</span>
-                                                    </a>
-                                                </form>
+                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                    <i data-feather="trash" class="icon-sm me-2"></i>
+                                                    <span>Delete</span>
+                                                </a>
                                             </div>
                                         </div>
                                     </td>
@@ -283,7 +247,84 @@
     </div>
   </div>
 </div>
-
+<div class="modal fade" id="TaskModal" tabindex="-1" role="dialog" aria-labelledby="TaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TaskModalLabel">Create Task</h5>
+            </div>
+            <div class="modal-body">
+            <form action="{{route('task-management.store')}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group mb-2">
+                        <label class="form-label" for="Judul">Judul Task</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="form-label" for="Deskripsi">Deksripsi</label>
+                        <textarea name="deskripsi" class="form-control" id=""></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-12">
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="Due Date">Due Date</label>
+                                <input type="date" class="form-control" name="due_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="Due Date">File</label>
+                                <input type="file" class="form-control" name="attachments">
+                                <input type="hidden" name="workspace" value="{{$folder->id}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="Due Date">Prioritas</label>
+                                <select name="priority" class="form-control" id="">
+                                    <option value="High"><span class="badge rounded-pill bg-danger">High</span></option>
+                                    <option value="Medium"><span class="badge rounded-pill bg-warning">Medium</span></option>
+                                    <option value="Low"><span class="badge rounded-pill bg-success">Low</span></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    @if($employee && $employee->unit_bisnis == 'NOTARIS_ITR')
+                    <div class="form-group mb-2">
+                        <label class="form-label" for="Deskripsi">Kategori</label>
+                        <div class="custom-select-wrapper">
+                            <select name="kategori" class="form-control">
+                                <option value="None">None</option>
+                                <option value="NOTARIS">NOTARIS</option>
+                                <option value="PPAT">PPAT</option>
+                            </select>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="form-group mb-2">
+                        <label class="form-label" for="Assign User">Assign User</label><br>
+                        <div class="dropdown-checkbox">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" tabindex="0">
+                                Select Users
+                            </button>
+                            <div class="dropdown-checkbox-content">
+                                <input type="text" placeholder="Search..." id="userSearch">
+                                @foreach ($userData as $data)
+                                <label>
+                                    <input type="checkbox" name="user[]" value="{{$data->nik}}"> {{$data->nama}}
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <button class="btn btn-primary w-100" type="submit">Simpan Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Add Subtaks -->
 <div class="modal fade" id="subtaskModal" tabindex="-1" role="dialog" aria-labelledby="subtaskModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -409,7 +450,7 @@
 @endforeach
 
 <!-- Workspace Modal -->
-<div class="modal fade" id="ModalWorkspace" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="ModalPengumuman" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -422,13 +463,6 @@
                     <div class="form-group mb-3">
                         <label for="Judul" class="form-label">Workspace Name</label>
                         <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="Judul" class="form-label">Workspace Visibility</label>
-                        <select name="visibility" class="form-control" id="">
-                            <option value="1">Public</option>
-                            <option value="0">Private</option>
-                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Buat Workspace Baru</button>
                 </form>
@@ -597,178 +631,6 @@
         </div>
     </div>
 @endforeach
-
-<!-- Mobile View -->
-@php 
-    $user = Auth::user(); 
-    $employeeDetails = \App\Employee::where('nik', Auth::user()->employee_code)->first(); 
-    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
-@endphp
-<div class="row mobile mb-2">
-    <div class="col-md-12 grid-margin stretch-card">
-       
-    </div>
-</div>
-
-<!-- \Filter Data -->
-<div class="row mobile">
-    <div class="col-md-12">
-    <h4 class="mobile mb-2 mt-4">Filter Task</h4>
-        <div class="tombol-mobile-task-wrap d-flex mb-4">
-            <a class="dropdown-item filter-btn me-2 text-center mb-2" data-status="All" style="background:#204498;">All</a>
-            <a class="dropdown-item filter-btn me-2 text-center mb-2" style="background:#7E85F9;" data-status="Low">Low</a>
-            <a class="dropdown-item filter-btn me-2 text-center mb-2" style="background:#FCB040;" data-status="Medium">Medium</a>
-            <a class="dropdown-item filter-btn me-2 text-center mb-2" style="background:#C10000;" data-status="High">High</a>
-        </div>
-    </div>
-</div>
-
-<div class="row mobile">
-    <div class="col-md-12 grid-margin stretch-card">
-        <div id="taskCarousel" class="owl-carousel owl-theme owl-basic">
-            @foreach ($groupedTasks as $status => $tasks)
-                @foreach ($tasks as $task)
-                    @if($task->status !== 'Completed')
-                        <div class="card custom-card2 task-data" data-status="{{ $task->priority }}">
-                            <div class="card-body {{ strtolower($task->priority) }}">
-                                <div class="header-data-wrap d-flex justify-content-between">
-                                    <div class="priority-data mb-3">
-                                        @if($task->priority == 'Low')
-                                            <span class="badge rounded-pill bg-primary">{{ $task->priority }}</span>
-                                        @elseif($task->priority == 'Medium')
-                                            <span class="badge rounded-pill bg-warning">{{ $task->priority }}</span>
-                                        @elseif($task->priority == 'High')
-                                            <span class="badge rounded-pill bg-danger">{{ $task->priority }}</span>
-                                        @endif
-                                    </div>
-                                    <div class="status">
-                                        <a href="" data-bs-toggle="modal" data-bs-target="#ModalDetails{{$task->id}}" class="details-mobile"><i class="icon-lg" data-feather="arrow-up-right"></i></a>
-                                    </div>
-                                </div>
-                                @php
-                                    $date = \Carbon\Carbon::parse($task->due_date);
-                                @endphp
-                                <h3 class="two-lines">{{ $task->title }}</h3>
-                                <p class="text-muted mt-2">{{ $date->format('D, d M Y') }}</p>
-                                <p class="mt-2">Task Completed : <a href="" data-bs-toggle="modal" data-bs-target="#subtaskModalDetails{{ $task->id }}">
-                                    @if($task->total_subtasks > 0)
-                                        {{ $task->completed_subtasks }}/{{ $task->total_subtasks }}
-                                    @else
-                                        0/0
-                                    @endif
-                                    </a>
-                                </p>
-                                <p class="text-muted mt-2">Progress</p>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ $task->progress }}%;" aria-valuenow="{{ $task->progress }}" aria-valuemin="0" aria-valuemax="100">
-                                        {{ round($task->progress) }}%
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="footer-data-wrap">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="assigned-users d-flex">
-                                                @foreach ($task->assignedUsers->take(2) as $index => $user)
-                                                    <img src="{{ asset('images/' . $user->gambar) }}" class="avatar-small" alt="{{ $user->nama }}">
-                                                @endforeach
-                                                @if ($task->assignedUsers->count() > 2)
-                                                    <h5 class="additional-users align-self-center text-muted">+{{ $task->assignedUsers->count() - 2 }}</h5>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-8 align-self-center">
-                                            <div class="meta-data d-flex">
-                                                <div class="comment-meta d-flex me-2">
-                                                    <i class="me-2 icon-md align-self-center" data-feather="message-square"></i><p class="align-self-center">{{$task->commentCount}}</p>
-                                                </div>
-                                                <div class="remaining-time d-flex">
-                                                    <i class="me-2 icon-md align-self-center" data-feather="clock"></i>
-                                                    @if($task->remaining_days > 0)
-                                                        <p>{{ $task->remaining_days }} Days</p>
-                                                    @elseif($task->remaining_days == 0)
-                                                        <p class="text-warning">Due Today</p> 
-                                                    @else
-                                                        <p class="text-danger">Late {{ abs($task->remaining_days) }} Days</p>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                @endforeach
-            @endforeach
-        </div>
-    </div>
-</div>
-<div class="row mobile pb-6">
-    <div class="title-mobile mobile d-flex justify-content-between mb-2">
-        <h4 class="mobile mb-2 mt-4">Completed Task</h4>
-        <a href="" class="mb-2 mt-4 align-self-center">View All Task</a>
-    </div>
-    @foreach ($groupedTasks as $status => $tasks)
-            @foreach ($tasks as $task)
-                @if($task->status == 'Completed')
-                <div class="col-md-12 mb-2">
-                    <div class="card custom-card2">
-                        <div class="card-body">
-                            <div class="item-completed">
-                                <a href="{{route('task-management.show', $task->id)}}">
-                                    <div class="title-wrap-data-complete d-flex justify-content-between">
-                                        <div class="title-data-mobile">
-                                            <h5 class="mb-1">{{$task->title}}</h5>
-                                            <p class="text-muted">{{$task->updated_at->format('D, d M Y')}}</p>
-                                        </div>
-                                        <div class="progress">
-                                            <div class="priority-data mb-3">
-                                                <span class="badge rounded-pill bg-success">{{ $task->status }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <div class="assigned-users d-flex">
-                                            @foreach ($task->assignedUsers->take(2) as $index => $user)
-                                                <img src="{{ asset('images/' . $user->gambar) }}" class="avatar-small" alt="{{ $user->nama }}">
-                                            @endforeach
-                                            @if ($task->assignedUsers->count() > 2)
-                                                <h5 class="additional-users align-self-center text-muted">+{{ $task->assignedUsers->count() - 2 }}</h5>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-6 align-self-center">
-                                        <div class="meta-data d-flex" style="justify-content:flex-end">
-                                            <div class="comment-meta d-flex me-2">
-                                                <i class="me-2 icon-md align-self-center" data-feather="message-square"></i><p class="align-self-center">{{$task->commentCount}}</p>
-                                            </div>
-                                            <div class="remaining-time d-flex">
-                                                <i class="me-2 icon-md align-self-center" data-feather="clock"></i>
-                                                @if($task->remaining_days > 0)
-                                                    <p>{{ $task->remaining_days }} Days</p>
-                                                @elseif($task->remaining_days == 0)
-                                                    <p class="text-warning">Due Today</p> 
-                                                @else
-                                                    <p class="text-danger">Late {{ abs($task->remaining_days) }} Days</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>       
-                </div>
-            @endif
-        @endforeach
-    @endforeach 
-</div>
-    
-<!-- End Mobile View -->
 @endsection
 
 @push('plugin-scripts')
@@ -784,54 +646,54 @@
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script src="{{ asset('assets/js/select2.js') }}"></script>
   <script>
-$(document).ready(function(){
-  $(".owl-carousel").owlCarousel({
-      items: 1.3, // Number of items to display
-      loop: true, // Loop through items
-      margin: 10, // Margin between items
-      nav: false, // Show next/prev buttons
-      dots: false, // Show dots navigation
-      autoplay: false, 
-      responsive: {
-          0: {
-              items: 1.3
-          },
-          600: {
-              items: 2
-          },
-          1000: {
-              items: 3
-          }
-      }
-  });
+    $(document).ready(function(){
+        $(".owl-carousel").owlCarousel({
+            items: 1.3, // Number of items to display
+            loop: true, // Loop through items
+            margin: 10, // Margin between items
+            nav: false, // Show next/prev buttons
+            dots: false, // Show dots navigation
+            autoplay: false, 
+            responsive: {
+                0: {
+                    items: 1.3
+                },
+                600: {
+                    items: 2
+                },
+                1000: {
+                    items: 3
+                }
+            }
+        });
 
-  // Filter functionality
-  $('.filter-btn').click(function() {
-      var status = $(this).attr('data-status');
-      $('.filter-btn').removeClass('active');
-      $(this).addClass('active');
-      filterProjects(status);
-  });
+        // Filter functionality
+        $('.filter-btn').click(function() {
+            var status = $(this).attr('data-status');
+            $('.filter-btn').removeClass('active');
+            $(this).addClass('active');
+            filterProjects(status);
+        });
 
-  function filterProjects(status) {
-      $('.item').each(function() {
-          if ($(this).attr('data-status') === status || status === 'All') {
-              $(this).show();
-          } else {
-              $(this).hide();
-          }
-      });
+        function filterProjects(status) {
+            $('.item').each(function() {
+                if ($(this).attr('data-status') === status || status === 'All') {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
 
-      // Reinitialize Owl Carousel after filtering
-      $(".owl-carousel").trigger('refresh.owl.carousel');
-  }
-});
-</script>
+            // Reinitialize Owl Carousel after filtering
+            $(".owl-carousel").trigger('refresh.owl.carousel');
+        }
+    });
+    </script>
   <script>
-    function Workspace(id) {
+    function showDeleteDataDialog(id) {
         Swal.fire({
             title: 'Hapus Data',
-            text: 'Anda Yakin Akan Menghapus Data Ini?',
+            text: 'Anda Yakin Akan Menghapus Data Ini?w',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Delete',
@@ -873,62 +735,6 @@ $(document).ready(function(){
             }
         });
     }
-    </script>
-    <script>
-    function WorkspaceDelete(id) {
-    Swal.fire({
-        title: 'Hapus Data',
-        text: 'Anda Yakin Akan Menghapus Data Ini?, Semua data akan ikut terhapus',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Delete',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Perform the delete action here (e.g., send a request to delete the data)
-            // Using the passed ID as a parameter in the delete route URL
-            const deleteUrl = "{{ route('workspace.destroy', ':id') }}".replace(':id', id);
-            fetch(deleteUrl, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                },
-            }).then((response) => {
-                // Log response status for debugging
-                console.log('Response Status:', response.status);
-                return response.json().then((data) => {
-                    // Log response data for debugging
-                    console.log('Response Data:', data);
-
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Data Successfully Deleted',
-                            icon: 'success',
-                        }).then(() => {
-                            window.location.reload(); // Refresh page after closing alert
-                        });
-                    } else {
-                        // Handle error response
-                        Swal.fire({
-                            title: 'Data Failed to Delete',
-                            text: data.message || 'An error occurred while deleting data.',
-                            icon: 'error',
-                        });
-                    }
-                });
-            }).catch((error) => {
-                // Handle fetch error
-                console.error('Fetch Error:', error);
-                Swal.fire({
-                    title: 'Data Failed to Delete',
-                    text: 'An error occurred while deleting data.',
-                    icon: 'error',
-                });
-            });
-        }
-    });
-}
-
     </script>
   <script>
     @if(session('success'))
@@ -1183,18 +989,124 @@ document.getElementById('filterMyTasks').addEventListener('click', function() {
 });
 </script>
 <script>
-    document.getElementById('search').addEventListener('keyup', function() {
-        let query = this.value;
-
-        fetch(`{{ route('task-management.index') }}?search=${query}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('folder-list').innerHTML = data;
+    $(document).ready(function() {
+      $('#taskForm').on('submit', function(event) {
+        event.preventDefault();
+        const selectedUsers = [];
+        $('input[name="users"]:checked').each(function() {
+          selectedUsers.push($(this).val());
         });
+        // Do something with the selected users
+        console.log(selectedUsers);
+      });
     });
-</script>
-@endpush
+  </script>
+  <style>
+        .dropdown-checkbox {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-checkbox-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .dropdown-checkbox-content label {
+            color: black;
+            padding: 5px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-checkbox-content label:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown-checkbox:hover .dropdown-checkbox-content {
+            display: block;
+        }
+
+        .dropdown-checkbox button {
+            width: 100%;
+        }
+
+        .dropdown-checkbox-content input[type="text"] {
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#userSearch').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('.dropdown-checkbox-content label').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+    <script>
+        function WorkspaceDelete(id) {
+    Swal.fire({
+        title: 'Hapus Data',
+        text: 'Anda Yakin Akan Menghapus Data Ini?, Semua data akan ikut terhapus',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Perform the delete action here (e.g., send a request to delete the data)
+            // Using the passed ID as a parameter in the delete route URL
+            const deleteUrl = "{{ route('workspace.destroy', ':id') }}".replace(':id', id);
+            fetch(deleteUrl, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+            }).then((response) => {
+                // Log response status for debugging
+                console.log('Response Status:', response.status);
+                return response.json().then((data) => {
+                    // Log response data for debugging
+                    console.log('Response Data:', data);
+
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Data Successfully Deleted',
+                            icon: 'success',
+                        }).then(() => {
+                            window.location.reload(); // Refresh page after closing alert
+                        });
+                    } else {
+                        // Handle error response
+                        Swal.fire({
+                            title: 'Data Failed to Delete',
+                            text: data.message || 'An error occurred while deleting data.',
+                            icon: 'error',
+                        });
+                    }
+                });
+            }).catch((error) => {
+                // Handle fetch error
+                console.error('Fetch Error:', error);
+                Swal.fire({
+                    title: 'Data Failed to Delete',
+                    text: 'An error occurred while deleting data.',
+                    icon: 'error',
+                });
+            });
+        }
+    });
+} 
+    </script>
+    @endpush

@@ -16,15 +16,32 @@ use App\TaskManagement\TaskMaster;
 use App\TaskManagement\Subtask;
 use App\TaskManagement\TaskUser;
 use App\TaskManagement\TaskComment;
+use App\TaskManagement\Workspace;
 use App\Employee;
 
 class TaskMasterController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
-        $userRoles = json_decode(Auth::user()->permission);  // Assuming roles are stored in a way you can access them
+        $userRoles = json_decode(Auth::user()->permission);
+
+        $query = Workspace::where('company', $employee->unit_bisnis)
+                  ->where('parent_id', null)
+                  ->where(function($q) use ($code) {
+                      $q->where('visibility', 1)
+                        ->orWhere(function($q2) use ($code) {
+                            $q2->where('visibility', 0)
+                               ->where('owner', $code);
+                        });
+                  });
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $folders = $query->get();
 
         $today = now();
         $hour = $today->hour;
@@ -42,6 +59,10 @@ class TaskMasterController extends Controller
 
         // Initialize $assignedTaskIds as null
         $assignedTaskIds = null;
+        $fileCounts = [];
+        foreach ($folders as $folder) {
+            $fileCounts[$folder->id] = TaskMaster::where('workspace', $folder->id)->count();
+        }
         
         // Check if user has superadmin_access or similar role
         if (in_array('superadmin_access', $userRoles) || in_array('am_access', $userRoles) || in_array('client_access', $userRoles)) {
@@ -168,7 +189,7 @@ class TaskMasterController extends Controller
         return view('pages.taskmanagement.index', compact(
             'taskData', 'subtask', 'groupedTasks', 'user', 'mentionUsers',
             'totalTasks', 'completedTasks', 'inProgressTasks', 'overdueTasks',
-            'totalTasksPercentage', 'completedTasksPercentage', 'inProgressTasksPercentage', 'overdueTasksPercentage','greeting'
+            'totalTasksPercentage', 'completedTasksPercentage', 'inProgressTasksPercentage', 'overdueTasksPercentage','greeting','folders','fileCounts'
         ));
     }
 
@@ -241,6 +262,7 @@ class TaskMasterController extends Controller
             $task->priority = $request->priority;
             $task->kategori = $request->kategori;
             $task->company = $company->unit_bisnis;
+            $task->workspace = $request->workspace;
 
             if ($request->hasFile('attachments')) {
                 $file = $request->file('attachments');
@@ -287,7 +309,7 @@ class TaskMasterController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('task-management.index')->with('success', 'Task berhasil dibuat');
+            return redirect()->back()->with('success', 'Task berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -435,7 +457,7 @@ class TaskMasterController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('task-management.index')->with('success', 'Subtask berhasil dibuat');
+            return redirect()->back()->with('success', 'Subtask berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -676,4 +698,134 @@ class TaskMasterController extends Controller
         // Redirect back or to a specific page
         return back()->with('success', 'Status updated successfully!');
     }
+
+    public function storeWorkspace(Request $request)
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable',
+        ]);
+
+        Workspace::create([
+            'name' => $request->name,
+            'parent_id' => $request->parent_id,
+            'visibility' => $request->visibility,
+            'company' => $company->unit_bisnis,
+            'owner' => $code
+        ]);
+
+        return redirect()->back()->with('success', 'Folder berhasil Dibuat');;
+    }
+
+    public function showWorkspace(Workspace $folder)
+    {
+        // Fetch the employee data
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $userRoles = json_decode(Auth::user()->permission);
+        // Fetch all tasks associated with the given workspace
+        if (in_array('superadmin_access', $userRoles) || in_array('am_access', $userRoles) || in_array('client_access', $userRoles)) {
+            // Fetch all tasks for users with the access role
+            $taskData = TaskMaster::where('company', $employee->unit_bisnis)->where('workspace',$folder->id)->orderBy('created_at', 'desc')->get();
+        } else {
+            // Get the IDs of tasks assigned to the current user
+            $assignedTaskIds = TaskUser::where('nik', $code)->pluck('task_id');
+            
+            // Fetch all tasks that are assigned to the current user
+            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $employee->unit_bisnis)
+                                ->where('workspace',$folder->id)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+        }
+
+        // Get breadcrumb trail for navigation
+        $breadcrumb = $folder->getBreadcrumb();
+
+        // Process each task
+        foreach ($taskData as $task) {
+            // Fetch and count subtasks
+            $task->subtasks = Subtask::where('task_id', $task->id)->get();
+            $task->total_subtasks = $task->subtasks->count();
+            $task->completed_subtasks = $task->subtasks->where('status', 'Completed')->count();
+
+            // Calculate progress percentage
+            $task->progress = $task->total_subtasks > 0
+                ? ($task->completed_subtasks / $task->total_subtasks) * 100
+                : 0;
+
+            // Get assigned users for the task
+            $task->assignedUsers = TaskUser::where('task_id', $task->id)
+                                        ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
+                                        ->get(['karyawan.nama', 'karyawan.gambar', 'karyawan.nik']);
+
+            // Get comments
+            $task->comments = TaskComment::where('task_id', $task->id)
+                                        ->join('karyawan', 'task_comment.nik', '=', 'karyawan.nik')
+                                        ->get(['task_comment.*', 'karyawan.nama as commenter_name', 'karyawan.gambar as commenter_photo']);
+            // Comment count
+            $task->commentCount = TaskComment::where('task_id', $task->id)->count();
+            
+            // Calculate remaining days for task completion
+            $task->remaining_days = Carbon::now()->diffInDays(Carbon::parse($task->due_date), false);
+        }
+
+        // Group tasks by status for better presentation
+        $groupedTasks = $taskData->groupBy('status');
+
+        // Fetch employees for the current business unit
+        $user = Employee::where('unit_bisnis', $employee->unit_bisnis)->where('resign_status', 0)->get();
+        $userData = Employee::where('unit_bisnis', $employee->unit_bisnis)->where('resign_status', 0)->get();
+
+        // Return the view with the required data
+        return view('pages.taskmanagement.workspace', compact('folder', 'breadcrumb', 'taskData', 'groupedTasks', 'user','userData'));
+    }
+
+    public function destroyWorkspace($id)
+    {
+        $workspace = Workspace::find($id);
+        $currentUserCode = Auth::user()->employee_code;
+
+        if ($workspace) {
+            // Check if the current user is the owner of the workspace
+            if ($workspace->owner != $currentUserCode) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You do not have permission to delete this workspace'
+                ], 403);
+            }
+
+            // Fetch all related task masters first
+            $taskMasters = TaskMaster::where('workspace', $id)->get();
+
+            foreach ($taskMasters as $taskMaster) {
+                // Delete related subtasks, task users, and task comments
+                Subtask::where('task_id', $taskMaster->id)->delete();
+                TaskUser::where('task_id', $taskMaster->id)->delete();
+                TaskComment::where('task_id', $taskMaster->id)->delete();
+
+                // Delete the task master
+                $taskMaster->delete();
+            }
+
+            // Delete the workspace
+            $workspace->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Workspace and related data deleted successfully'
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Workspace not found'
+        ], 404);
+    }
+
+
+
 }

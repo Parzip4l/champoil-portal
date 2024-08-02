@@ -145,6 +145,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/task_edit/{id}', [App\Http\Controllers\ops\TaskgController::class, 'edit'])->name('task_edit');
     Route::post('/save-task-item', [App\Http\Controllers\ops\TaskgController::class, 'save_item'])->name('save-task-item');
     Route::post('/save_data', [App\Http\Controllers\ops\TaskgController::class, 'store'])->name('save_data');
+
     // Task V2
     Route::resource('task-management', App\Http\Controllers\Taskmanagement\TaskMasterController::class);
     Route::get('task-management/{id}/download', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'downloadAttachment'])->name('task.download');
@@ -161,7 +162,10 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
         Route::post('/subtasks/{id}/stop', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'stopTracking'])->name('subtasks.stop');
         // Komentar
         Route::post('/tasks/{id}/comments', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeKomen'])->name('tasks.comments.store');
-
+        // Workspace
+        Route::post('/workspace', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeWorkspace'])->name('workspace.store');
+        Route::get('task-management/workspace/{folder}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'showWorkspace'])->name('workspace.show');
+        Route::delete('workspace/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'destroyWorkspace'])->name('workspace.destroy');
     // Emergency 
     Route::group(['prefix' => 'emergency'], function(){
         Route::resource('emergency-data', App\Http\Controllers\Emergency\EmergencyController::class);

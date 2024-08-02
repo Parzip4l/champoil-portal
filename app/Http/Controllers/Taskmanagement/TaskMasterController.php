@@ -826,6 +826,29 @@ class TaskMasterController extends Controller
         ], 404);
     }
 
+    public function mapReport($id)
+    {
+        $MasterTask = TaskMaster::find($id); // Use find() for a single record
+        if (!$MasterTask) {
+            return redirect()->back()->with('error', 'TaskMaster not found');
+        }
 
+        // Fetch all subtasks related to this TaskMaster
+        $subtasks = Subtask::where('task_id', $id)->get();
+        $data['records'] = [];
+
+        foreach ($subtasks as $row) {
+            $data['records'][] = [
+                'lat_start' => $row->latitude_start,
+                'lng_start' => $row->longitude_start,
+                'lat_end' => $row->latitude_end,
+                'lng_end' => $row->longitude_end,
+                'popup_start' => $row->title . ' - Start Time: ' . $row->time_start,
+                'popup_end' => $row->title . ' - End Time: ' . $row->time_end
+            ];
+        }
+
+        return view('pages.Taskmanagement.mapreport', $data);
+    }
 
 }

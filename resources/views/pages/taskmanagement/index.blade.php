@@ -512,6 +512,9 @@
                                 <h6 class="text-muted align-self-center" style="width:100px;">Attachments</h6>
                                 <a href="{{route('task.download',$data->id)}}"><i class="me-2 icon-lg" data-feather="download-cloud"></i>Download</a>
                             </div>
+                            <div class="item-details d-flex mb-3">
+                                <a href="{{route('task.reportmap', $data->id)}}" class="btn btn-sm btn-primary">Task Report</a>
+                            </div>
                         </div>
                         <div class="col-md-8">
                             <div class="komen-wrap">

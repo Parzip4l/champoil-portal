@@ -166,6 +166,8 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
         Route::post('/workspace', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'storeWorkspace'])->name('workspace.store');
         Route::get('task-management/workspace/{folder}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'showWorkspace'])->name('workspace.show');
         Route::delete('workspace/{id}', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'destroyWorkspace'])->name('workspace.destroy');
+        // Report
+        Route::get('task-management/{id}/report', [App\Http\Controllers\Taskmanagement\TaskMasterController::class, 'mapReport'])->name('task.reportmap');
     // Emergency 
     Route::group(['prefix' => 'emergency'], function(){
         Route::resource('emergency-data', App\Http\Controllers\Emergency\EmergencyController::class);

@@ -848,7 +848,7 @@ class TaskMasterController extends Controller
             ];
         }
 
-        return view('pages.Taskmanagement.mapreport', $data);
+        return view('pages.taskmanagement.mapreport', $data);
     }
 
 }

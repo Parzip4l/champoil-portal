@@ -45,47 +45,48 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
-        // Initialize Feather icons
-        feather.replace();
+    // Initialize Feather icons
+    feather.replace();
 
-        var map = L.map('map').setView([-6.200, 106.816], 5);
+    var map = L.map('map').setView([-6.200, 106.816], 5);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-        var locationsJson = '<?php echo json_encode($records) ?>';
-        var locations = JSON.parse(locationsJson);
+    var locationsJson = '<?php echo json_encode($records) ?>';
+    var locations = JSON.parse(locationsJson);
 
-        // Define custom icons using Feather icons
-        var startIcon = L.divIcon({
-            className: 'leaflet-div-icon-start',
-            html: '<i data-feather="map-pin" class="start"></i>', // Feather icon for start
-            iconSize: [24, 24]
-        });
+    // Define custom icons using Feather icons
+    var startIcon = L.divIcon({
+        className: 'leaflet-div-icon-start',
+        html: '<i data-feather="map-pin" class="start"></i>', // Feather icon for start
+        iconSize: [24, 24]
+    });
 
-        var endIcon = L.divIcon({
-            className: 'leaflet-div-icon-end',
-            html: '<i data-feather="flag" class="end"></i>', // Feather icon for end
-            iconSize: [24, 24]
-        });
+    var endIcon = L.divIcon({
+        className: 'leaflet-div-icon-end',
+        html: '<i data-feather="flag" class="end"></i>', // Feather icon for end
+        iconSize: [24, 24]
+    });
 
-        locations.forEach(function(location) {
-            // Add start marker with popup showing start time
-            L.marker([location.lat_start, location.lng_start], { icon: startIcon })
-                .addTo(map)
-                .bindPopup(location.popup_start); // Popup for start point
+    locations.forEach(function(location) {
+        // Add start marker with popup showing start time
+        L.marker([location.lat_start, location.lng_start], { icon: startIcon })
+            .addTo(map)
+            .bindPopup(location.popup_start); // Popup for start point
 
-            // Add end marker with popup showing end time
-            L.marker([location.lat_end, location.lng_end], { icon: endIcon })
-                .addTo(map)
-                .bindPopup(location.popup_end); // Popup for end point
+        // Add end marker with popup showing end time
+        L.marker([location.lat_end, location.lng_end], { icon: endIcon })
+            .addTo(map)
+            .bindPopup(location.popup_end); // Popup for end point
 
-            // Add a line between start and end points
-            L.polyline([
-                [location.lat_start, location.lng_start],
-                [location.lat_end, location.lng_end]
-            ], { color: 'blue' }).addTo(map);
-        });
-    </script>
+        // Add a line between start and end points
+        L.polyline([
+            [location.lat_start, location.lng_start],
+            [location.lat_end, location.lng_end]
+        ], { color: 'red', weight: 3 }).addTo(map); // Ensure color and weight are set
+    });
+</script>
+
 @endpush

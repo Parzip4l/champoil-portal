@@ -158,7 +158,7 @@ class LmsController extends Controller
 
         $result =[
             "module"=>$test,
-            "durasi_test"=>$test->durasi,
+            "durasi_test"=>@$test->durasi,
             "soal"=>$data['soal']
         ];
 

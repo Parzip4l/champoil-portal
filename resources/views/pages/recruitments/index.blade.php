@@ -52,6 +52,12 @@
                                             $status="danger";
                                             $text="Tidak Lolos Kualifikasi";
                                         }
+
+                                        $height = $row->tb / 100; // Assuming height is given in centimeters, convert it to meters
+                                        // Calculate BMI
+                                        $bmi = $row->bb / ($height * $height);
+
+                                        
                                     @endphp
                                     <tr>
                                         <td>{{ $no }}</td>
@@ -64,7 +70,7 @@
                                                 <li>Usia : {{ $row->usia }}</li>
                                                 <li>TB : {{ $row->tb }}</li>
                                                 <li>BB : {{ $row->bb }}</li>
-                                                <li>BMI : {{ round($row->bmi,0) }}</li>
+                                                <li>BMI : {{ round($bmi,0) }}</li>
                                             </ol>
                                         </td>
                                         <td><span class="badge bg-{{ $status }}">{{ $text }}</span></td>

@@ -35,6 +35,42 @@ class JobAplicantController extends Controller
                     } else {
                         $row->kualifikasi = null; // or some default value
                     }
+
+                    if($row->jenis_kelamin=="Pria"){
+                        if($row->tb < 167){
+                            $row->lolos_tb ="Tidak Lolos";
+                        }else{
+                            $row->lolos_tb ="Lolos";
+                        }
+
+                        if($row->tb < 19){
+                            $row->lolos_usia ="Tidak Lolos";
+                        }else{
+                            $row->lolos_usia ="Lolos";
+                        }
+
+                        $height = $row->tb / 100;
+                        $bmi = $row->bb / ($height * $height);
+                        $bmi_round = round($bmi,1);
+                        if($bmi_round >= 18.5 && $bmi_round <= 27.5){
+                            $row->lolos_bmi = "Lolos";
+                        }else{
+                            $row->lolos_bmi = "Tidak Lolos";
+                        }
+                        
+                        if($row->tb < 19){
+                            $row->lolos_usia ="Tidak Lolos";
+                        }else{
+                            $row->lolos_usia ="Lolos";
+                        }
+
+                    }else{
+                        if($row->tb < 167){
+                            $row->lolos_tb ="Tidak Lolos";
+                        }else{
+                            $row->lolos_tb ="Lolos";
+                        }
+                    }
                 }
             }
         }else{

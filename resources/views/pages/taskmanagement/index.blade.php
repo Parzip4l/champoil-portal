@@ -104,7 +104,7 @@
         </div>
     </form>
 </div>
-<div class="row desktop">
+<div class="row">
 @foreach($folders as $folder)
     <div class="col-md-3 mb-4">
         <div class="card custom-card2">

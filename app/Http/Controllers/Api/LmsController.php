@@ -41,7 +41,7 @@ class LmsController extends Controller
         $dataLearning = Knowledge::all();
         if($dataLearning){
             foreach($dataLearning as $row){
-                if(!empty($row->url_video) || !empty($row->file_name){
+                if(!empty($row->url_video) || !empty($row->file_name)){
                     $result[]=$row;
                 }
             }

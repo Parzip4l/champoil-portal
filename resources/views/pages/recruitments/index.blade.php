@@ -67,10 +67,10 @@
                                         <td>
                                             <ol type="1">
                                                 <li>Whatsapp : {{ $row->nomor_wa }}</li>
-                                                <li>Usia : {{ $row->usia }}</li>
-                                                <li>TB : {{ $row->tb }}</li>
+                                                <li>Usia : {{ $row->usia }} {!! $row->lolos_usia !!}</li>
+                                                <li>TB : {{ $row->tb }} {!! $row->lolos_tb !!}</li>
                                                 <li>BB : {{ $row->bb }}</li>
-                                                <li>BMI : {{ round($bmi,0) }}</li>
+                                                <li>BMI : {{ round($bmi,0) }} {!! $row->lolos_bmi !!}</li>
                                             </ol>
                                         </td>
                                         <td><span class="badge bg-{{ $status }}">{{ $text }}</span></td>

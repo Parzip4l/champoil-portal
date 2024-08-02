@@ -38,37 +38,47 @@ class JobAplicantController extends Controller
 
                     if($row->jenis_kelamin=="Pria"){
                         if($row->tb < 167){
-                            $row->lolos_tb ="Tidak Lolos";
+                            $row->lolos_tb ="<span  style='color:red'><i class='link-icon' data-feather='x'></i></span>";
                         }else{
-                            $row->lolos_tb ="Lolos";
+                            $row->lolos_tb ="<span style='color:green'><i class='link-icon' data-feather='check'></i></span>";
                         }
 
-                        if($row->tb < 19){
-                            $row->lolos_usia ="Tidak Lolos";
+                        if($row->usia < 19 || $row->usia > 40){
+                            $row->lolos_usia ="<span  style='color:red'><i class='link-icon' data-feather='x'></i></span>";
                         }else{
-                            $row->lolos_usia ="Lolos";
+                            $row->lolos_usia ="<span  style='color:green'><i class='link-icon' data-feather='check'></i></span>";
+                        }
+
+                        $height = $row->tb / 100;
+                        $bmi = $row->bb / ($height * $height);
+                        $bmi_round = round($bmi,1);
+                        if($bmi_round >= 18.5 && $bmi_round <= 30){
+                            $row->lolos_bmi = "<span  style='color:green'><i class='link-icon' data-feather='check'></i></span>";
+                        }else{
+                            $row->lolos_bmi = "<span  style='color:red'><i class='link-icon' data-feather='x'></i></span>";
+                        }
+                        
+
+                    }else{
+                        if($row->tb < 167){
+                            $row->lolos_tb ="<span  style='color:red'><i class='link-icon' data-feather='x'></i></span>";
+                        }else{
+                            $row->lolos_tb ="<span  style='color:green'><i class='link-icon' data-feather='check'></i></span>";
+                        }
+
+                        if($row->usia < 19 || $row->usia > 40){
+                            $row->lolos_usia ="<span  style='color:red'><i class='link-icon' data-feather='x'></i></span>";
+                        }else{
+                            $row->lolos_usia ="<span  style='color:green'><i class='link-icon' data-feather='check'></i></span>";
                         }
 
                         $height = $row->tb / 100;
                         $bmi = $row->bb / ($height * $height);
                         $bmi_round = round($bmi,1);
                         if($bmi_round >= 18.5 && $bmi_round <= 27.5){
-                            $row->lolos_bmi = "Lolos";
+                            $row->lolos_bmi = "<span  style='color:green'><i class='link-icon' data-feather='check'></i></span>";
                         }else{
-                            $row->lolos_bmi = "Tidak Lolos";
-                        }
-                        
-                        if($row->tb < 19){
-                            $row->lolos_usia ="Tidak Lolos";
-                        }else{
-                            $row->lolos_usia ="Lolos";
-                        }
-
-                    }else{
-                        if($row->tb < 167){
-                            $row->lolos_tb ="Tidak Lolos";
-                        }else{
-                            $row->lolos_tb ="Lolos";
+                            $row->lolos_bmi = "<span  style='color:red'><i class='link-icon' data-feather='x'></i></span>";
                         }
                     }
                 }

@@ -224,47 +224,36 @@
     $('#loading-backdrop').hide();
     $(document).ready(function() {
         $("#submit-form").on('click', function(e) {
-            $('#loading-backdrop').show();
-            e.preventDefault();
+            e.preventDefault(); // Prevent the default form submission
 
+            $('#loading-backdrop').show(); // Show loading backdrop (if you have one)
+
+            // Create a FormData object from the form
             let formElement = document.getElementById("dataForm");
             let formData = new FormData(formElement);
 
+            // Send POST request using Axios
             axios.post('https://data.cityservice.co.id/cs/public/api/save-permintaan-client', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Add CSRF token
                 }
             })
             .then(function(response) {
+                // Handle success
                 console.log(response.data);
-                $('#loading-backdrop').hide();
+                $('#loading-backdrop').hide(); // Hide loading backdrop
                 alert('Data has been saved successfully!');
             })
             .catch(function(error) {
+                // Handle error
                 console.error(error);
-                $('#loading-backdrop').hide();
+                $('#loading-backdrop').hide(); // Hide loading backdrop
                 alert('An error occurred. Please try again.');
             });
         });
-    });  
+    });
 
-</script>
-<script>
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('success') }}',
-        });
-    @endif
-
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: '{{ session('error') }}',
-        });
-    @endif
 </script>
 <script>
         flatpickr("#daterange_picker", {

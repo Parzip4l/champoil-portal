@@ -436,7 +436,7 @@
                 </h2>
                 <div id="resign" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#resign">
                 <div class="accordion-body">
-                    <table class="table" id="dataTableExample">
+                    <table class="table permintaan_client" id="dataTableExample">
                         <thead>
                           <tr>
                             <th>#</th>
@@ -447,20 +447,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                            @if($resign30days)
-                                @foreach($resign30days as $row)
-                                    <tr>
-                                        <td></td>
-                                        <td>{{ $row->nama }}</td>
-                                        <td>{{ $row->ktp }}</td>
-                                        <td>{{ date('d F Y',strtotime($row->join_date)) }}</td>
-                                        <td>{{ date('d F Y',strtotime($row->created_at)) }}</td>
-                                        
-                                    </tr>
-                                @endforeach
-                            @endif
                             
-                          
                         </tbody>
                     </table>
                 </div>
@@ -762,6 +749,19 @@
 
         $.each(response.data.turn_over.result, function(key, value) {
             $('#'+key).text(value);
+        });
+
+
+        $.each(response.data.permintaan_client, function(key, value) {
+            $('.permintaan_client tbody').append(
+                '<tr>'+
+                '<td></td>'+
+                '<td>'+value['nama_lengkap']+'</td>'+
+                '<td>'+value['nomor_induk']+'</td>'+
+                '<td></td>'+
+                '<td>'+value['client_name']+'</td>'+
+                '</tr>'
+            );
         });
 
 

@@ -131,11 +131,11 @@
                                                         <div class="row">
                                                             <div class="col-md-12 mb-2">
                                                                 <label for="" class="form-label">Files Upload</label>
-                                                                <input type="file" name="bukti_tulis" class="form-control" required="required">
+                                                                <input type="file" name="bukti_tulis" id="bukti_tulis" class="form-control" required="required">
                                                             </div>
                                                             <div class="col-md-12 mb-2">
                                                                 <label for="" class="form-label">Client Name</label>
-                                                                <input type="text" name="client_name" class="form-control" required="required">
+                                                                <input type="text" name="client_name" id="client_name" class="form-control" required="required">
                                                             </div>
                                                             <div class="col-md-12 mt-2">
                                                                 <button class="btn btn-primary w-100" id="submit-form" type="button">Simpan Data</button>

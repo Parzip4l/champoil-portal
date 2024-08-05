@@ -444,7 +444,7 @@
     $('#loading-backdrop').show();
     axios.get('https://data.cityservice.co.id/cs/public/api/card-data', {
         params: {
-            ID: ""
+            tanggal:"{{ @$_GET['tanggal'] }}"
         }
     })
     .then(function (response) {

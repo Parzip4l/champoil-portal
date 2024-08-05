@@ -20,6 +20,7 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+
         $data=[];
         $result=[];
         $records = EmployeeResign::all();

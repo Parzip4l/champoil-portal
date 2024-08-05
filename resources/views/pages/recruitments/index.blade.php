@@ -128,6 +128,7 @@
                                                         method="POST"
                                                         enctype="multipart/form-data">
                                                         @csrf
+                                                        <input type="hidden" name="user_id" value="{{$row->id}}">
                                                         <div class="row">
                                                             <div class="col-md-12 mb-2">
                                                                 <label for="" class="form-label">Files Upload</label>

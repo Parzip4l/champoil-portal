@@ -3,9 +3,40 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <style>
+    .backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
 @endpush
 
 @section('content')
+<div id="loading-backdrop" class="backdrop">
+    <div class="spinner"></div>
+</div>
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
@@ -410,6 +441,7 @@
 <script src="{{ asset('assets/js/data-table.js') }}"></script>
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
 <script>
+    $('#loading-backdrop').show();
     axios.get('https://data.cityservice.co.id/cs/public/api/card-data', {
         params: {
             ID: ""
@@ -915,6 +947,7 @@
     })
     .finally(function () {
         // always executed
+        $('#loading-backdrop').hide();
     });
 
 </script>

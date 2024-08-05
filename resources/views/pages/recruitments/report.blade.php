@@ -410,7 +410,7 @@
 <script src="{{ asset('assets/js/data-table.js') }}"></script>
 <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
 <script>
-    axios.get('http://data.cityservice.co.id/cs/public/api/card-data', {
+    axios.get('https://data.cityservice.co.id/cs/public/api/card-data', {
         params: {
             ID: ""
         }

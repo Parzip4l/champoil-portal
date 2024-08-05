@@ -125,10 +125,11 @@
                                                 <div class="modal-body">
                                                     <form
                                                         id="dataForm"
+                                                        action="{{route('save-permintaan-client')}}"
                                                         method="POST"
                                                         enctype="multipart/form-data">
                                                         @csrf
-                                                        <input type="hidden" name="user_id" id="user_id" value="{{$row->id}}">
+                                                        <input type="hidden" name="user_id" id="user_id" class="form-control" value="{{ $row->id }}">
                                                         <div class="row">
                                                             <div class="col-md-12 mb-2">
                                                                 <label for="" class="form-label">Files Upload</label>
@@ -139,7 +140,7 @@
                                                                 <input type="text" name="client_name" id="client_name" class="form-control" required="required">
                                                             </div>
                                                             <div class="col-md-12 mt-2">
-                                                                <button class="btn btn-primary w-100" id="submit-form" type="button">Simpan Data</button>
+                                                                <button class="btn btn-primary w-100" id="submit-form" type="submit">Simpan Data</button>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -225,37 +226,33 @@
     $('#loading-backdrop').hide();
     $(document).ready(function() {
         $("#submit-form").on('click', function(e) {
-            e.preventDefault(); // Prevent the default form submission
+            
+            $('#loading-backdrop').show();
+            e.preventDefault();
 
-            $('#loading-backdrop').show(); // Show loading backdrop (if you have one)
-
-            // Create a FormData object from the form
             let formElement = document.getElementById("dataForm");
             let formData = new FormData(formElement);
 
-            // Send POST request using Axios
             axios.post('https://data.cityservice.co.id/cs/public/api/save-permintaan-client', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Add CSRF token
+                    'Content-Type': 'multipart/form-data'
                 }
             })
             .then(function(response) {
-                // Handle success
                 console.log(response.data);
-                $('#loading-backdrop').hide(); // Hide loading backdrop
+                $('#loading-backdrop').hide();
                 alert('Data has been saved successfully!');
             })
             .catch(function(error) {
-                // Handle error
                 console.error(error);
-                $('#loading-backdrop').hide(); // Hide loading backdrop
+                $('#loading-backdrop').hide();
                 alert('An error occurred. Please try again.');
             });
         });
-    });
+    });  
 
 </script>
+
 <script>
         flatpickr("#daterange_picker", {
             mode: "range",

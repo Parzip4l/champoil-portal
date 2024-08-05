@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 use App\ModelCG\JobApplpicant;
+use App\ModelCG\KehadiranTraining;
 use App\ModelCG\ApplicantHistory;
 
 class JobAplicantController extends Controller
@@ -110,7 +111,24 @@ class JobAplicantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the incoming request
+        $request->validate([
+            'bukti_tulis' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx',
+            'client_name'=>'required',
+            'user_id'=>'required'
+        ]);
+
+        $data=$request->all();
+        // Handle file upload
+        if ($request->hasFile('bukti_tulis')) {
+            $file = $request->file('bukti_tulis');
+            $path = $file->store('uploads', 'public');
+
+            // Save file path or other data to the database
+            // Example: YourModel::create(['file_path' => $path]);
+            KehadiranTraining::insert(['bukti_tulis' => $path,'client_name'=>$request->input('client_name'),'user_id'=>$data['user_id']]);
+            return redirect()->route('job-aplicant')->with('success', 'Data Patrol Successfully Added');
+        }
     }
 
     /**

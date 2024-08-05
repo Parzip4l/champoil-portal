@@ -244,7 +244,7 @@ $(function() {
         headerToolbar: {
             left: "prev,today,next",
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+            right: false
         },
         editable: true,
         droppable: true, // This allows things to be dropped onto the calendar

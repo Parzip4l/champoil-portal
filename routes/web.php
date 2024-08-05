@@ -411,12 +411,15 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('double', App\Http\Controllers\Report\CheckdoubleController::class);
 
         /** Recruitments */
+        Route::get('dashboard-recruitment',[App\Http\Controllers\Recruitments\DashboardController::class, 'index'])->name('dashboard-recruitment');
         Route::resource('job-aplicant', App\Http\Controllers\Recruitments\JobAplicantController::class);
         Route::get('/job-aplicant', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'index'])->name('job-aplicant');
         Route::get('/medis', [App\Http\Controllers\Recruitments\MedisController::class, 'index'])->name('medis');
         Route::get('/test', [App\Http\Controllers\Recruitments\TestController::class, 'index'])->name('test');
         Route::get('/penempatan', [App\Http\Controllers\Recruitments\PenempatanController::class, 'index'])->name('penempatan');
         Route::get('/create-truest/{id}', [App\Http\Controllers\Recruitments\PenempatanController::class, 'create'])->name('create-truest');
+        
+        
         Route::get('/map', [App\Http\Controllers\Map::class, 'index'])->name('map');
         Route::post('/map-domisili', [App\Http\Controllers\Map::class, 'update_domisili'])->name('map-domisili');
         Route::get('/map-frontline', [App\Http\Controllers\Map::class, 'map_frontline'])->name('map-frontline');

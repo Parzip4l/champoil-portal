@@ -414,6 +414,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::get('dashboard-recruitment',[App\Http\Controllers\Recruitments\DashboardController::class, 'index'])->name('dashboard-recruitment');
         Route::resource('job-aplicant', App\Http\Controllers\Recruitments\JobAplicantController::class);
         Route::get('/job-aplicant', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'index'])->name('job-aplicant');
+        Route::post('/save-permintaan-client', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'store'])->name('save-permintaan-client');
         Route::get('/medis', [App\Http\Controllers\Recruitments\MedisController::class, 'index'])->name('medis');
         Route::get('/test', [App\Http\Controllers\Recruitments\TestController::class, 'index'])->name('test');
         Route::get('/penempatan', [App\Http\Controllers\Recruitments\PenempatanController::class, 'index'])->name('penempatan');

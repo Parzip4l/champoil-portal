@@ -125,20 +125,22 @@
                                                 <div class="modal-body">
                                                     <form
                                                         id="dataForm"
+                                                        action="{{route('save-permintaan-client')}}"
                                                         method="POST"
                                                         enctype="multipart/form-data">
                                                         @csrf
+                                                        <input type="hidden" name="user_id" id="user_id" class="form-control" value="{{ $row->id }}">
                                                         <div class="row">
                                                             <div class="col-md-12 mb-2">
                                                                 <label for="" class="form-label">Files Upload</label>
-                                                                <input type="file" name="bukti_tulis" class="form-control" required="required">
+                                                                <input type="file" name="bukti_tulis" id="bukti_tulis" class="form-control" required="required">
                                                             </div>
                                                             <div class="col-md-12 mb-2">
                                                                 <label for="" class="form-label">Client Name</label>
-                                                                <input type="text" name="client_name" class="form-control" required="required">
+                                                                <input type="text" name="client_name" id="client_name" class="form-control" required="required">
                                                             </div>
                                                             <div class="col-md-12 mt-2">
-                                                                <button class="btn btn-primary w-100" id="submit-form" type="button">Simpan Data</button>
+                                                                <button class="btn btn-primary w-100" id="submit-form" type="submit">Simpan Data</button>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -224,6 +226,7 @@
     $('#loading-backdrop').hide();
     $(document).ready(function() {
         $("#submit-form").on('click', function(e) {
+            
             $('#loading-backdrop').show();
             e.preventDefault();
 
@@ -249,23 +252,7 @@
     });  
 
 </script>
-<script>
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('success') }}',
-        });
-    @endif
 
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: '{{ session('error') }}',
-        });
-    @endif
-</script>
 <script>
         flatpickr("#daterange_picker", {
             mode: "range",

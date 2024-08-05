@@ -422,6 +422,38 @@
                 </div>
             </div>
         </div>
+        <div class="accordion mb-4" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#resign" 
+                        aria-expanded="true" 
+                        aria-controls="collapseOne">
+                    {{ strtoupper('Client request') }}
+                </button>
+                </h2>
+                <div id="resign" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#resign">
+                <div class="accordion-body">
+                    <table class="table permintaan_client" id="dataTableExample">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>NAME</th>
+                            <th>NIK</th>
+                            <th>DOKUMEN</th>
+                            <th>CLIENT NAME</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -525,7 +557,7 @@
         );
         $('#total_app_to_training').text((qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita) + ' (' + calculatePercentage((qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita),total_pelamar) + '%)');
         
-        var turnOverData = JSON.parse(response.data.chart_turn_over);
+        var turnOverData = response.data.chart_turn_over;
         var colors = {
             primary        : "#6571ff",
             secondary      : "#7987a1",
@@ -549,7 +581,7 @@
             },
             {
                 name: 'Melekat',
-                data: turnOverData.Melekat_
+                data: turnOverData.Melekat
             },
             {
                 name: 'Mutasi Project',
@@ -717,6 +749,19 @@
 
         $.each(response.data.turn_over.result, function(key, value) {
             $('#'+key).text(value);
+        });
+
+
+        $.each(response.data.permintaan_client, function(key, value) {
+            $('.permintaan_client tbody').append(
+                '<tr>'+
+                '<td></td>'+
+                '<td>'+value['nama_lengkap']+'</td>'+
+                '<td>'+value['nomor_induk']+'</td>'+
+                '<td></td>'+
+                '<td>'+value['client_name']+'</td>'+
+                '</tr>'
+            );
         });
 
 

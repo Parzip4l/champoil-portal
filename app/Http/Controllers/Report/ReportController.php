@@ -101,7 +101,7 @@ class ReportController extends Controller
     }
 
     public function rekap_report(){
-        $project = Project::all();
+        $project = Project::where('deleted_at',NULL)->get();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;

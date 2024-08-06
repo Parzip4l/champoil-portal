@@ -318,28 +318,29 @@ class PayrolNS extends Controller
                     ->whereBetween('tanggal', [$startDate, $endDate])
                     ->select('project', 'employee', 'man_backup')
                     ->get();
-
+                // dd($projectBackup);
                 $backupTotals = [];
                 foreach ($projectBackup as $backupData) {
                     $manBackup = $backupData->man_backup;
                     $projectIDBackup = $backupData->project;
                     $totalHariBackupmentah = 0;
-
+                    $man_backup_jabatan = Employee::where('nik',$manBackup)->first();
                     // Determine daily rate
                     $schedulesManBackup = Schedule::where('employee', $manBackup)
-                        ->whereBetween('tanggal', [$startDate, $endDate])
+                        ->whereBetween('tanggal', [date('Y-m-d',strtotime($startDate)), date('Y-m-d',strtotime($endDate))])
                         ->where('shift', '!=', 'OFF')
                         ->get();
                     $totalScheduleManBackup = $schedulesManBackup->count();
+                    $jabatanManbackup = 
                     $projectDetailsBackupData = ProjectDetails::where('project_code', $projectIDBackup)
-                        ->where('jabatan', $jabatan)
+                        ->where('jabatan', $man_backup_jabatan->jabatan)
                         ->pluck('tp_bulanan', 'project_code');
                     
                     $monthlySalaryProject = $projectDetailsBackupData->sum();
                     $rateHarianBackup = round($monthlySalaryProject / $totalScheduleManBackup);
                     $totalHariBackupmentah = 1;
                     $totalGajiBackupmentah = $totalHariBackupmentah * $rateHarianBackup;
-
+                    
                     if (!isset($backupTotals[$projectIDBackup])) {
                         $backupTotals[$projectIDBackup] = [
                             'ProjectCodeBackup' => 0,
@@ -370,6 +371,23 @@ class PayrolNS extends Controller
                         $totalHari++;
                     }
 
+                    $rate_potongan  = 0;
+                    $schedules = Schedule::where('employee', $nik)
+                        ->whereBetween('tanggal', [date('Y-m-d',strtotime($startDate)), date('Y-m-d',strtotime($endDate))])
+                        ->where('shift', '!=', 'OFF')
+                        ->get();
+                    $totalDaysInSchedules = $schedules->count() + 1;
+                    $tidakmasukkerja = 0;
+
+                    if ($totalDaysInSchedules > 0) {
+                        $rate_potongan = round($totalGaji / $totalDaysInSchedules);
+                    }
+
+                    if ($totalHari < $totalDaysInSchedules) {
+                        $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
+                        $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
+                    }
+
                     $projectIds = [$absensi->project];
                     $rate_harian = 0;
                     if (!empty($projectIds)) {
@@ -395,7 +413,7 @@ class PayrolNS extends Controller
                             $p_tlain = $projectDetailsPPH->sum('p_tlain');
                         }
 
-                        $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain + $p_tkes + 61300;
+                        $gajiPPH = ($p_gajipokok + $p_tkerja + $p_tlain + $p_tkes + 61300 - $potonganAbsen) + $totalGajiBackup;
 
                         $dataPajak = PajakDetails::where('pajak_id', $taxCode)->get();
                         $matchingPajakDetail = null;
@@ -414,6 +432,8 @@ class PayrolNS extends Controller
 
                             // Calculate the percentage of gajiPPH
                             $PajakPendapatan = round($gajiPPH * $persentaseFloat);
+
+                            // $PajakPendapatan = $gajiPPH;
                         } else {
                             // Handle the case where no matching tax detail is found
                             $PajakPendapatan = 0;
@@ -421,22 +441,7 @@ class PayrolNS extends Controller
                         
                     }
 
-                    $rate_potongan  = 0;
-                    $schedules = Schedule::where('employee', $nik)
-                        ->whereBetween('tanggal', [$startDate, $endDate])
-                        ->where('shift', '!=', 'OFF')
-                        ->get();
-                    $totalDaysInSchedules = $schedules->count() + 1;
-                    $tidakmasukkerja = 0;
-
-                    if ($totalDaysInSchedules > 0) {
-                        $rate_potongan = round($totalGaji / $totalDaysInSchedules);
-                    }
-
-                    if ($totalHari < $totalDaysInSchedules) {
-                        $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
-                        $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
-                    }
+                    
 
                     $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
@@ -488,6 +493,8 @@ class PayrolNS extends Controller
                         'rate_harian' => $rate_potongan,
                     ];
                 }
+
+                
                 $payroll = new Payroll();
                 $payroll->employee_code = $nik;
                 $payroll->periode = $startDate->format('d-m-Y') . ' - ' . $endDate->format('d-m-Y');

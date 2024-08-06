@@ -77,7 +77,7 @@
                                     <td>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Basic Salary {{ $deductionData->PPH21 }}</span>
+                                                <span>Basic Salary</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
                                                 <span class="text-right mb-4">Rp. {{ number_format($payroll->basic_salary ?? 0, 0, ',', '.') }} </span>

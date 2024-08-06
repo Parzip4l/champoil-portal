@@ -144,7 +144,7 @@
                 @endif
             @endif
             <!-- Reqruitment -->
-            @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin) || in_array('bd_access', $dataLogin) || in_array('hr_frontline', $dataLogin))
                 @if($employee && $employee->unit_bisnis == 'Kas')
                 <li class="nav-item {{ active_class(['']) }}">
                     <a class="nav-link" data-bs-toggle="collapse" href="#reqruitment" role="button" aria-expanded="{{ is_active_route(['product-category']) }}" aria-controls="reqruitment">

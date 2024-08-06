@@ -381,7 +381,7 @@ class PayrolNS extends Controller
                         
                         $projectDetailsPPH = ProjectDetails::whereIn('project_code', $projectIds)
                             ->where('jabatan', $jabatan)
-                            ->select('p_gajipokok', 'p_tkerja', 'p_tlain')
+                            ->select('p_gajipokok', 'p_tkerja', 'p_tlain','p_bpjs_ks')
                             ->get();
                             
                         $p_gajipokok = 0;
@@ -391,10 +391,11 @@ class PayrolNS extends Controller
                         if ($projectDetailsPPH->isNotEmpty()) {
                             $p_gajipokok = $projectDetailsPPH->sum('p_gajipokok');
                             $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
+                            $p_tkes = $projectDetailsPPH->sum('p_bpjs_ks');
                             $p_tlain = $projectDetailsPPH->sum('p_tlain');
                         }
 
-                        $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain;
+                        $gajiPPH = $p_gajipokok + $p_tkerja + $p_tlain + $p_tkes + 61300;
 
                         $dataPajak = PajakDetails::where('pajak_id', $taxCode)->get();
                         $matchingPajakDetail = null;

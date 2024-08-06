@@ -6,6 +6,7 @@
 @endpush
 
 @section('content')
+
 <div class="row desktop">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
@@ -76,7 +77,7 @@
                                     <td>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Basic Salary</span>
+                                                <span>Basic Salary {{ $deductionData->PPH21 }}</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
                                                 <span class="text-right mb-4">Rp. {{ number_format($payroll->basic_salary ?? 0, 0, ',', '.') }} </span>

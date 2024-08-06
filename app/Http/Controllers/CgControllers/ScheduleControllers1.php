@@ -8,13 +8,17 @@ use App\ModelCG\Schedule;
 use App\ModelCG\Shift;
 use App\Employee;
 use App\ModelCG\Project;
+use App\ModelCG\ProjectRelations;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ScheduleImport;
 use App\Exports\ScheduleExport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ScheduleControllers extends Controller
 {
@@ -46,6 +50,7 @@ class ScheduleControllers extends Controller
             $schedulesByProject = $get_data->get();
         }
 
+
         return view('pages.hc.kas.schedule.index', compact('schedulesByProject', 'currentYear', 'selectedPeriod'));
     }
 
@@ -56,7 +61,7 @@ class ScheduleControllers extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $today = now();
         $start_date = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
@@ -79,11 +84,53 @@ class ScheduleControllers extends Controller
         $employeeCode = auth()->user()->employee_code;
         $employee = Employee::where('nik', $employeeCode)->first();
         $unit_bisnis = $employee->unit_bisnis;
-        $employee = Employee::where('unit_bisnis', $unit_bisnis)->get();
+        $employee = Employee::where('unit_bisnis', $unit_bisnis)
+                            ->whereIn('organisasi',['Frontline Officer','FRONTLINE OFFICER'])
+                            ->get();
         $project = Project::all();
 
         $current_month = $today->format('F');
         $current_year = $today->format('Y'); 
+
+        $year = date('Y'); // Tahun yang diinginkan
+        $startDate = Carbon::createFromDate($year, 1, 1); // Tanggal mulai
+        $endDate = Carbon::createFromDate($year, 12, 31); // Tanggal akhir
+
+        $period = CarbonPeriod::create($startDate, $endDate); // Membuat periode
+
+        $dates = [];
+        foreach ($period as $date) {
+            $dates[] = $date->format('Y-m-d'); // Format tanggal sesuai kebutuhan
+        }
+
+        
+
+        if($request->input('project_id')){
+        $shift = ProjectRelations::where('id_project',$request->input('project_id'))
+                                 ->get();
+        $data_shift=[];
+        }
+        if($shift){
+            $no=1;
+            foreach($shift as $row){
+                $detailShift = Shift::where('id',$row->id_shift)->first();
+                foreach($dates as $date){
+                    $count = Schedule::where('tanggal',$date)
+                                    ->where('shift',@$detailShift->name)
+                                    ->count();
+                    $data_shift[]=[
+                        'id'=>$no,
+                        'start'=>$date,
+                        'end'=>$date,
+                        'title'=>@$detailShift->name.' ('.$count.')'
+                    ];
+                }
+                
+                $no++;
+            }
+        }
+
+
 
         return view('pages.hc.kas.schedule.create', [
             'dates_for_form' => $dates_for_form,
@@ -93,6 +140,8 @@ class ScheduleControllers extends Controller
             'project' => $project,
             'current_month' => $current_month,
             'current_year' => $current_year,
+            'shift'=>json_encode($data_shift),
+            'filter_project'=>$request->input('project_id')
         ]);
     }
 
@@ -124,6 +173,57 @@ class ScheduleControllers extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
         }
+    }
+
+    public function readExcel(Request $request){
+        
+       
+            $request->validate([
+                'csv_file' => 'required|mimes:xlsx,csv,txt',
+            ]);
+            $data = $request->file('csv_file');
+
+            $namaFIle = $data->getClientOriginalName();
+            $data->move('ScheduleImport', $namaFIle);
+
+
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(public_path('ScheduleImport/'.$namaFIle));
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+            $periode = Carbon::now()->addMonth()->format('F-Y');
+            $data = [
+                'records' => $sheetData,
+                'file_name' => $namaFIle,
+                'periode'=>$periode
+            ];
+            return view('pages.hc.kas.schedule.preview',$data);
+        
+    }
+
+    public function post_data_schedule(Request $request){
+        
+            $data=$request->all();
+            if(!empty($data['schedule_code'])){
+                $no=0;
+                foreach($data['schedule_code'] as $row){
+                    $insert=[
+                        "schedule_code"=>$data['schedule_code'][$no],
+                        "project"=>$data['project'][$no],
+                        "employee"=>$data['employee'][$no],
+                        "tanggal"=>$data['tanggal'][$no],
+                        "shift"=>$data['shift'][$no],
+                        "periode"=>$data['periode'][$no],
+                        "created_at"=>date('Y-m-d H:i:s')
+                    ];
+
+                    
+                    Schedule::insert($insert);
+                    $no++;
+                }
+            }
+            // dd($data);
+            return redirect()->route('schedule.index')->with('success', 'Import berhasil!');
+       
+        
     }
 
     public function exportSchedule() 

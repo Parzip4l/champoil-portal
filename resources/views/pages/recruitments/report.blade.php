@@ -55,7 +55,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div class="accordion mb-4" id="accordionExample">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
@@ -66,14 +66,14 @@
                 <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
                         <div class="row">
-                            <div class="col-md-3 desktop mb-4">
+                            <div class="col-md-4 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>Job Applicant</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_applicant"></h2>
+                                            <h4 id="total_applicant"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="applicant">
@@ -82,28 +82,28 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 desktop mb-4">
+                            <div class="col-md-4 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>Qualicatioins</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_qualifikasi"></h2>
+                                            <h4 id="total_qualifikasi"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="qualification">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 desktop mb-4">
+                            <div class="col-md-4 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>IQ Test</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_iq"></h2>
+                                            <h4 id="total_iq"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="iq_test">
@@ -111,42 +111,75 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-3 desktop mb-4">
+                            <div class="col-md-4 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>EQ Test</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_eq"></h2>
+                                            <h4 id="total_eq"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="eq_test">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 desktop mb-4">
+                            <div class="col-md-4 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>Value Test</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_value"></h2>
+                                            <h4 id="total_value"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="value_test">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 desktop mb-4">
+                            
+                            <div class="col-md-4 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Applicant To Training</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <h4 id="total_app_to_training"></h4>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="app_training">
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+    <div class="accordion mb-4" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Show Card Data
+                </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-md-12 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>Medical Test</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_medic"></h2>
+                                            <h4 id="total_medic"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="medic_test">
@@ -154,31 +187,17 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-3 desktop mb-4">
+                            <div class="col-md-12 desktop mb-4">
                                 <div class="card custom-card2">
                                     <div class="card-body">
                                         <div class="title-card">
                                             <h6>Training</h6>
                                         </div>
                                         <div class="count mt-2">
-                                            <h2 id="total_training"></h2>
+                                            <h4 id="total_training"></h4>
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex" id="training">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Applicant To Training</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <h2 id="total_app_to_training"></h2>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="app_training">
                                     </div>
                                 </div>
                             </div>
@@ -188,6 +207,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="col-md-12">
+        
         <div class="accordion mb-4" id="accordionExample">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
@@ -497,8 +519,8 @@
 
 
         $('#applicant').append(
-                '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px">' + pelamar.pelamar_pria + ' (' + calculatePercentage(pelamar.pelamar_pria, total_pelamar) + '% )' +
-                '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px">' + pelamar.pelamar_wanita + ' (' + calculatePercentage(pelamar.pelamar_wanita, total_pelamar) + '% )'
+                '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px">' + pelamar.pelamar_pria + ' (' + calculatePercentage(pelamar.pelamar_pria, total_pelamar) + '% )' +
+                '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px">' + pelamar.pelamar_wanita + ' (' + calculatePercentage(pelamar.pelamar_wanita, total_pelamar) + '% )'
             );
 
         $('#total_applicant').text(total_pelamar);
@@ -509,15 +531,15 @@
        
 
         $('#qualification').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + qualifikasi.lolos_pria + ' (' + calculatePercentage(qualifikasi.lolos_pria, qualifikasi.total_lolos) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + qualifikasi.lolos_wanita + ' (' + calculatePercentage(qualifikasi.lolos_wanita, qualifikasi.total_lolos) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + qualifikasi.lolos_pria + ' (' + calculatePercentage(qualifikasi.lolos_pria, qualifikasi.total_lolos) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + qualifikasi.lolos_wanita + ' (' + calculatePercentage(qualifikasi.lolos_wanita, qualifikasi.total_lolos) + '% )'
         );
 
         $('#total_qualifikasi').text(qualifikasi.total_lolos + ' (' + calculatePercentage(qualifikasi.total_lolos, total_pelamar) + '%)');
 
         $('#iq_test').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + qualifikasi.iq_lolos_pria + ' (' + calculatePercentage(qualifikasi.iq_lolos_pria, iq_total) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + qualifikasi.iq_lolos_wanita + ' (' + calculatePercentage(qualifikasi.iq_lolos_wanita,iq_total) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + qualifikasi.iq_lolos_pria + ' (' + calculatePercentage(qualifikasi.iq_lolos_pria, iq_total) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + qualifikasi.iq_lolos_wanita + ' (' + calculatePercentage(qualifikasi.iq_lolos_wanita,iq_total) + '% )'
         );
 
         $('#total_iq').text(iq_total + ' (' + calculatePercentage(iq_total, qualifikasi.total_lolos) + '%)');
@@ -525,8 +547,8 @@
         var eq_total = qualifikasi.eq_lolos_pria + qualifikasi.eq_lolos_wanita;
 
         $('#eq_test').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + qualifikasi.eq_lolos_pria + ' (' + calculatePercentage(qualifikasi.eq_lolos_pria, eq_total) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + qualifikasi.eq_lolos_wanita + ' (' + calculatePercentage(qualifikasi.eq_lolos_wanita,eq_total) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + qualifikasi.eq_lolos_pria + ' (' + calculatePercentage(qualifikasi.eq_lolos_pria, eq_total) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + qualifikasi.eq_lolos_wanita + ' (' + calculatePercentage(qualifikasi.eq_lolos_wanita,eq_total) + '% )'
         );
 
         $('#total_eq').text(eq_total + ' (' + calculatePercentage(eq_total, iq_total) + '%)');
@@ -534,28 +556,28 @@
         var total_value = qualifikasi.tech_lolos_pria + qualifikasi.tech_lolos_wanita;
 
         $('#value_test').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + qualifikasi.tech_lolos_pria + ' (' + calculatePercentage(qualifikasi.tech_lolos_pria, total_value) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + qualifikasi.tech_lolos_wanita + ' (' + calculatePercentage(qualifikasi.tech_lolos_wanita,total_value) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + qualifikasi.tech_lolos_pria + ' (' + calculatePercentage(qualifikasi.tech_lolos_pria, total_value) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + qualifikasi.tech_lolos_wanita + ' (' + calculatePercentage(qualifikasi.tech_lolos_wanita,total_value) + '% )'
         );
         $('#total_value').text(total_value + ' (' + calculatePercentage(total_value, eq_total) + '%)');
 
         $('#medic_test').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + medical.lolos_pria + ' (' + calculatePercentage(medical.lolos_pria, medical.total_lolos) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + medical.lolos_wanita + ' (' + calculatePercentage(medical.lolos_wanita,medical.total_lolos) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + medical.lolos_pria + ' (' + calculatePercentage(medical.lolos_pria, medical.total_lolos) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + medical.lolos_wanita + ' (' + calculatePercentage(medical.lolos_wanita,medical.total_lolos) + '% )'
         );
         $('#total_medic').text(medical.total_lolos + ' (' + calculatePercentage(medical.total_lolos, total_value) + '%)');
 
         $('#training').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + qualifikasi.training_lolos_pria + ' (' + calculatePercentage(qualifikasi.training_lolos_pria, (qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita)) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + qualifikasi.training_lolos_wanita + ' (' + calculatePercentage(qualifikasi.training_lolos_wanita,(qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita)) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + medical.training_lolos_pria + ' (' + calculatePercentage(medical.training_lolos_pria, (medical.training_lolos_pria + medical.training_lolos_wanita)) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + medical.training_lolos_wanita + ' (' + calculatePercentage(medical.training_lolos_wanita,(medical.training_lolos_pria + medical.training_lolos_wanita)) + '% )'
         );
-        $('#total_training').text((qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita) + ' (' + calculatePercentage((qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita), medical.total_lolos) + '%)');
+        $('#total_training').text((medical.training_lolos_pria + medical.training_lolos_wanita) + ' (' + calculatePercentage((medical.training_lolos_pria + medical.training_lolos_wanita), medical.total_lolos) + '%)');
 
         $('#app_training').append(
-            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:20px"> ' + qualifikasi.training_lolos_pria + ' (' + calculatePercentage(qualifikasi.training_lolos_pria,total_pelamar) + '% )' +
-            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:20px"> ' + qualifikasi.training_lolos_wanita + ' (' + calculatePercentage(qualifikasi.training_lolos_wanita,total_pelamar) + '% )'
+            '<img src="' + '{{ asset("images/male.png") }}' + '" style="width:15px"> ' + qualifikasi.training_lolos_pria + ' (' + calculatePercentage(qualifikasi.training_lolos_pria,total_pelamar) + '% )' +
+            '<img src="' + '{{ asset("images/female.png") }}' + '" style="width:15px"> ' + qualifikasi.training_lolos_wanita + ' (' + calculatePercentage(qualifikasi.training_lolos_wanita,total_pelamar) + '% )'
         );
-        $('#total_app_to_training').text((qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita) + ' (' + calculatePercentage((qualifikasi.training_lolos_pria + qualifikasi.training_lolos_wanita),total_pelamar) + '%)');
+        $('#total_app_to_training').text((medical.training_lolos_pria + medical.training_lolos_wanita) + ' (' + calculatePercentage((medical.training_lolos_pria + medical.training_lolos_wanita),total_pelamar) + '%)');
         
         var turnOverData = response.data.chart_turn_over;
         var colors = {

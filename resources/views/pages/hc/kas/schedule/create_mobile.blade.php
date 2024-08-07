@@ -1,19 +1,5 @@
 @extends('layout.master')
-<style>
-.select2-container {
-    z-index: 10000; /* Atur sesuai kebutuhan */
-}
 
-.select2-container--open {
-    z-index: 10000; /* Atur sesuai kebutuhan */
-}
-
-/* Optional: Atur z-index dari elemen yang menghalangi */
-.zindex-fix {
-    position: relative; /* Pastikan elemen ini berada di atas elemen lain */
-    z-index: 1000; /* Atur sesuai kebutuhan */
-}
-</style>
 @push('plugin-styles')
     <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
@@ -39,15 +25,17 @@
                                                 id="" 
                                                 class="form-control"
                                                 onchange="handleSelectChange(this)">
+                                            @if(!empty($project))
                                             @foreach($project as $projectd)
                                                 @php 
                                                     $selected="";
-                                                    if($_GET['project_id']==$projectd->id){
+                                                    if(@$_GET['project_id']==$projectd->id){
                                                         $selected="selected";
                                                     }
                                                 @endphp
-                                                <option value="{{$projectd->id}}" {{$selected}}>{{$projectd->name}}</option>
+                                                <option value="{{@$projectd->id}}" {{$selected}}>{{$projectd->name}}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         
                                 </div>
@@ -62,7 +50,7 @@
                                     @foreach(bulan() as $bln)
                                         @php 
                                             $selected="";
-                                            if($_GET['periode']==strtoupper($bln)){
+                                            if(@$_GET['periode']==strtoupper($bln)){
                                                 $selected="selected";
                                             }
                                         @endphp
@@ -74,21 +62,25 @@
                         <hr>
                         @if(!empty($filter_project))
                         <div class="row">
-                            <div class="col-md-3 d-none d-md-block">
-                                <div class="card">
-                                    <div class="card-body d-none">
-                                        <h6 class="card-title mb-4">Full calendar</h6>
-                                        <div id='external-events' class='external-events'>
-                                        
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-3 d-none d-md-block">
+                                        <div class="card">
+                                            <div class="card-body d-none">
+                                                <h6 class="card-title mb-4">Full calendar</h6>
+                                                <div id='external-events' class='external-events'>
+                                                
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-12">
-                                <div class="card">
-                                <div class="card-body">
-                                    <div id='fullcalendar'></div>
-                                </div>
+                                    <div class="col-12 col-md-12">
+                                        <div class="card">
+                                        <div class="card-body">
+                                            <div id='fullcalendar'></div>
+                                        </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -132,7 +124,31 @@
       <form id="data_employee">
         <input type="hidden" name="project" value="{{ @$_GET['project_id'] }}">
         <div class="modal-body">
-            
+            <select name="shift" class="form-control">
+                @if($data_shift)
+                    @foreach($data_shift as $shift_p)
+                        <option value="{{ $shift_p['code'] }}">{{ $shift_p['title'] }}</option>
+                    @endforeach
+                @endif
+            </select>
+            @if($employee_proj)
+            @php 
+                $no=1;
+            @endphp
+                @foreach($employee_proj as $emp)
+                
+                <div class="form-check">
+                {{ $no }}.
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        {{$emp->nama}}
+                    </label>
+                </div>
+                @php 
+                    $no++;
+                @endphp
+                @endforeach
+            @endif
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -225,70 +241,86 @@
 
 <script>
 $(function() {
-    var Draggable = FullCalendar.Draggable;
-    var calendarEl = document.getElementById('fullcalendar');
-    var containerEl = document.getElementById('external-events');
+    // sample calendar events data
 
-    var curYear = moment().format('YYYY');
-    var curMonth = moment().format('MM');
+  var Draggable = FullCalendar.Draggable;
+  var calendarEl = document.getElementById('fullcalendar');
+  var containerEl = document.getElementById('external-events');
 
-    // Calendar Event Source
-    var calendarEvents = {
-        id: 1,
-        backgroundColor: 'rgba(1,104,250, .15)',
-        borderColor: '#0168fa',
-        events: []
-    };
+  var curYear = moment().format('YYYY');
+  var curMonth = moment().format('MM');
 
-   
+  // Calendar Event Source
+  var calendarEvents = {
+    id: 1,
+    backgroundColor: 'rgba(1,104,250, .15)',
+    borderColor: '#0168fa',
+    events: []
+  };
 
-    new Draggable(containerEl, {
-        itemSelector: '.fc-event',
-        eventData: function(eventEl) {
-            return {
-                title: eventEl.innerText
-            };
-        }
-    });
+  // Birthday Events Source
+  var birthdayEvents = {
+    id: 2,
+    backgroundColor: 'rgba(16,183,89, .25)',
+    borderColor: '#10b759',
+    events: []
+  };
 
-    // Initialize the calendar
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        headerToolbar: {
-            left: "prev,today,next",
-            center: 'title',
-            right: false
-        },
-        editable: true,
-        droppable: true, // This allows things to be dropped onto the calendar
-        fixedWeekCount: true,
-        initialView: 'dayGridMonth',
-        timeZone: 'UTC',
-        hiddenDays: [],
-        navLinks: true,
-        dayMaxEvents: 2,
-        events: [],
-        eventSources: [calendarEvents],
-        drop: function(info) {
-            // Remove the element from the "Draggable Events" list
-            // info.draggedEl.parentNode.removeChild(info.draggedEl);
-        },
-        eventClick: function(info) {
-            var eventObj = info.event;
-            console.log(info);
-            $('#modalTitle1').html(eventObj.title);
-            $('#modalBody1').html(eventObj._def.extendedProps.description);
-            $('#eventUrl').attr('href', eventObj.url);
-            $('#fullCalModal').modal("show");
-        },
-        dateClick: function(info) {
-            $('#modalTitle1').html("Form Schedules");
-            $("#createEventModal").modal("show");
-        },
-        // Set the initial date to the first day of the current month
-        initialDate: moment().startOf('month').format('YYYY-MM-DD')
-    });
 
-    calendar.render();
+  new Draggable(containerEl, {
+    itemSelector: '.fc-event',
+    eventData: function(eventEl) {
+      return {
+        title: eventEl.innerText
+      };
+    }
+  });
+
+
+  // initialize the calendar
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+      left: "prev,today,next",
+      center: 'title',
+      right: ''
+    },
+    editable: true,
+    droppable: true, // this allows things to be dropped onto the calendar
+    fixedWeekCount: true,
+    // height: 300,
+    initialView: 'dayGridMonth',
+    timeZone: 'UTC',
+    hiddenDays:[],
+    navLinks: 'true',
+    // weekNumbers: true,
+    // weekNumberFormat: {
+    //   week:'numeric',
+    // },
+    dayMaxEvents: 2,
+    events: [],
+    eventSources: [calendarEvents, birthdayEvents],
+    drop: function(info) {
+        // remove the element from the "Draggable Events" list
+        // info.draggedEl.parentNode.removeChild(info.draggedEl);
+    },
+    eventClick: function(info) {
+      var eventObj = info.event;
+      $('#modalTitle1').html(eventObj.title);
+      $('#modalBody1').html(eventObj._def.extendedProps.description);
+      $('#eventUrl').attr('href',eventObj.url);
+      $('#fullCalModal').modal("show");
+    },
+    dateClick: function(info) {
+        var eventObj = info.event;
+        $('#modalTitle1').html(info.dateStr);
+    //   $('#modalBody1').html(eventObj._def.extendedProps.description);
+    //   $('#eventUrl').attr('href',eventObj.url);
+      $("#createEventModal").modal("show");
+      console.log(info);
+    },
+  });
+
+  calendar.render();
 });
 
 function handleSelectChange(selectElement) {

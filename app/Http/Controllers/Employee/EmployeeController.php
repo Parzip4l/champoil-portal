@@ -41,7 +41,21 @@ class EmployeeController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
+        $data['jenis_kelamin'] = Employee::selectRaw('jenis_kelamin, COUNT(*) as total')
+                                ->groupBy('jenis_kelamin')
+                                ->get();
+        $data['sertifikasi'] = Employee::selectRaw('sertifikasi, COUNT(*) as total')
+                                ->where('sertifikasi','!=',NULL)
+                                ->where('sertifikasi','!=','')
+                                ->groupBy('sertifikasi')
+                                ->get();
+        $data['jabatan'] = Employee::selectRaw('jabatan, COUNT(*) as total')
+                                ->where('jabatan','!=',NULL)
+                                ->where('jabatan','!=','')
+                                ->groupBy('jabatan')
+                                ->get();
         
+        // dd($request->input('jenis_kelamin'));
         if ($request->ajax()) {
             if (Auth::user()->project_id == NULL) {
                 $query = Employee::where('unit_bisnis', $company->unit_bisnis)
@@ -61,6 +75,30 @@ class EmployeeController extends Controller
                                         });
                                 })
                                 ->where('resign_status', 0);
+                
+            }
+
+            if(!empty($request->input('jenis_kelamin'))){
+                $query->where('jenis_kelamin',$request->input('jenis_kelamin'));
+            }
+
+            if(!empty($request->input('sertifikasi'))){
+                $query->where('sertifikasi',$request->input('sertifikasi'));
+            }
+
+            if(!empty($request->input('jabatan'))){
+                $query->where('jabatan',$request->input('jabatan'));
+            }
+
+            if(!empty($request->input('bpjs'))){
+                if($request->input('bpjs')==0){
+                    $query->leftJoin('payrolinfos','payrolinfos.employee_code','=','karyawan.nik');
+                    $query->whereIn('payrolinfos.bpjs_tk',[NULL,0]);
+                }else{
+                    $query->leftJoin('payrolinfos','payrolinfos.employee_code','=','karyawan.nik');
+                    $query->whereNotIn('payrolinfos.bpjs_tk',[NULL,0]);
+                }
+                
             }
 
             return DataTables::of($query)
@@ -75,7 +113,7 @@ class EmployeeController extends Controller
                 ->make(true);
         }
 
-        return view('pages.hc.karyawan.index');
+        return view('pages.hc.karyawan.index',$data);
     }
 
     public function ApiEmployee(Request $request)

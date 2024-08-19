@@ -18,6 +18,12 @@
         {{ session('error') }}
     </div>
 @endif
+
+@php 
+    $user = Auth::user();
+    $dataLogin = json_decode(Auth::user()->permission); 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+@endphp
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">
@@ -25,6 +31,7 @@
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
                     <h6 class="card-title align-self-center mb-0">Data Karyawan</h6>
+                    
                 </div>
                 <div class="tombol-pembantu d-flex">
                     <div class="dropdown"> 
@@ -42,6 +49,55 @@
             </div>
         </div>
         <div class="card-body">
+            @if($employee && $employee->unit_bisnis == 'Kas')
+                <form class='mb-3' method="GET">
+                    <div class="row">
+                        @csrf
+                        <div class="col-md-2">
+                            <select name="jenis_kelamin" class="form-control mb-2 select2" id="jenis_kelamin">
+                                <option value="">Jenis Kelamin</option>
+                                @if($jenis_kelamin)
+                                    @foreach($jenis_kelamin as $jk)
+                                        <option value="{{ $jk->jenis_kelamin }}">{{ $jk->jenis_kelamin }}</option>
+                                    @endforeach
+                                @endif
+
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sertifikasi" class="form-control mb-2 select2" id="sertifikasi">
+                                <option value="">Sertifikasi</option>
+                                @if($sertifikasi)
+                                    @foreach($sertifikasi as $row_sertifikasi)
+                                        <option value="{{ $row_sertifikasi->sertifikasi }}">{{ $row_sertifikasi->sertifikasi }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="bpjs" class="form-control mb-2 select2" id="bpjs">
+                                <option value="">BPJS</option>
+                                <option value="1">Terdaftar</option>
+                                <option value="0">Belum Terdaftar</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="jabatan" class="form-control mb-2 select2" id="jabatan">
+                                <option value="">Jabatan</option>
+                                @if($jabatan)
+                                    @foreach($jabatan as $row_jabatan)
+                                        <option value="{{ $row_jabatan->jabatan }}">{{ $row_jabatan->jabatan }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                        <button type="button" class="btn btn-primary" id='search'>Filter</button>
+                        </div>
+                        
+                    </div>  
+                </form>
+            @endif
             <div class="table-responsive">
                 <table id="dataTableExample" class="table">
                     <thead>
@@ -154,32 +210,53 @@
     @endif
 </script>
 <script>
-    $(document).ready(function() {
-    $('#dataTableExample').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('employee.index') }}",
-        columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'nama', name: 'nama' },
-            { data: 'nik', name: 'nik' },
-            { data: 'jenis_kelamin', name: 'jenis_kelamin' },
-            { data: 'organisasi', name: 'organisasi' },
-            { data: 'jabatan', name: 'jabatan' },
-            { data: 'status_kontrak', name: 'status_kontrak' },
-            { data: 'action', name: 'action', orderable: false, searchable: false },
-        ],
-        columnDefs: [
-            {
-                targets: 0,
-                render: function(data, type, full, meta) {
-                    return meta.row + 1; // Return the row number
-                }
-            }
-        ],
-        order: [[1, 'asc']]
+    let jenis_kelamin = "";
+    let sertifikasi = "";
+    let bpjs = "";
+    let jabatan = "";
+
+    document.getElementById('search').addEventListener('click', function () {
+        jenis_kelamin = $("#jenis_kelamin").val();
+        sertifikasi = $("#sertifikasi").val();
+        bpjs = $("#bpjs").val();
+        jabatan = $("#jabatan").val();
+
+        // Reload the DataTable with the updated jenis_kelamin parameter
+        $('#dataTableExample').DataTable().ajax.url("{{ route('employee.index') }}?jenis_kelamin=" + jenis_kelamin +"&sertifikasi=" + sertifikasi +"&bpjs=" + bpjs +"&jabatan=" + jabatan).load();
     });
-});
+
+    $(document).ready(function() {
+        $('#dataTableExample').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('employee.index') }}",
+                data: function (d) {
+                    d.jenis_kelamin = jenis_kelamin; // Pass the jenis_kelamin parameter
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'nama', name: 'nama' },
+                { data: 'nik', name: 'nik' },
+                { data: 'jenis_kelamin', name: 'jenis_kelamin' },
+                { data: 'organisasi', name: 'organisasi' },
+                { data: 'jabatan', name: 'jabatan' },
+                { data: 'status_kontrak', name: 'status_kontrak' },
+                { data: 'action', name: 'action', orderable: false, searchable: false },
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return meta.row + 1; // Return the row number
+                    }
+                }
+            ],
+            order: [[1, 'asc']]
+        });
+    });
+
 
 </script>
 @endpush

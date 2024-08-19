@@ -18,7 +18,7 @@
     <li class="breadcrumb-item"><a href="#">Karyawan</a></li>
     <li class="breadcrumb-item active" aria-current="page">Tambah Karyawan</li>
   </ol>
-</nav>
+</nav> 
 @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}

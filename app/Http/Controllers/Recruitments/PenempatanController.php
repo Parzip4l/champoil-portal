@@ -65,7 +65,17 @@ class PenempatanController extends Controller
             }
         }
 
-        $data['records']=$result;
+        $return=[];
+        if($result){
+            foreach($result as $row){
+                $cek = Employee::where('nik',$row->nomor_induk)->count();
+                if($cek == 0){
+                    $return[]=$row;
+                }
+            }
+        }
+
+        $data['records']=$return;
 
 
         return view('pages.recruitments.penempatan.index',$data);

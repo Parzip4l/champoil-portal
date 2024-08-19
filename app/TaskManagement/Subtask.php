@@ -33,4 +33,9 @@ class Subtask extends Model
             $model->id = (string) \Illuminate\Support\Str::uuid();
         });
     }
+
+    public function task()
+    {
+        return $this->belongsTo(TaskMaster::class, 'task_id');
+    }
 }

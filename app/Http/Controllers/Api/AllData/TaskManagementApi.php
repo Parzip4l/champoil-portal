@@ -42,6 +42,19 @@ class TaskManagementApi extends Controller
             // Get the IDs of tasks assigned to the current user
             $assignedTaskIds = TaskUser::where('nik', $employeeCode)->pluck('task_id');
 
+            // Apply filtering based on request parameters if provided
+            if ($request->has('priority')) {
+                return $this->filterByPriority($request, $request->input('priority'));
+            }
+
+            if ($request->has('progress')) {
+                return $this->filterByProgress($request, $request->input('progress'));
+            }
+
+            if ($request->has('query')) {
+                return $this->searchTasks($request);
+            }
+
             // Fetch all tasks that are assigned to the current user
             $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
                                 ->where('company', $unitBisnis)
@@ -134,6 +147,7 @@ class TaskManagementApi extends Controller
             $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
             $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
             $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
+            
             return response()->json([
                 'taskData' => $taskData,
                 'subtask' => $subtask,
@@ -151,6 +165,7 @@ class TaskManagementApi extends Controller
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+
 
     // Detail
     public function show($taskId)
@@ -742,5 +757,178 @@ class TaskManagementApi extends Controller
         return response()->json(['success' => 'Comment added.'], 200);
     }
 
+    // Subtask Running
+    public function getRunningSubtasks(Request $request)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = Auth::guard('api')->user();
+        
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        
+            $employeeCode = $user->name;
+        
+            // Fetch running subtasks for the current user (tracking started but not ended)
+            $runningSubtasks = Subtask::whereHas('task', function ($query) use ($employeeCode) {
+                // Ensure the task is assigned to the current user in the task_user table
+                $query->whereHas('assignedUsers', function ($subQuery) use ($employeeCode) {
+                    $subQuery->where('nik', $employeeCode);
+                });
+            })
+            ->whereNotNull('time_start')
+            ->whereNull('time_end')
+            ->get();
+        
+            if ($runningSubtasks->isEmpty()) {
+                return response()->json(['message' => 'No running subtasks found.'], 404);
+            }
+        
+            // Calculate the duration for each subtask
+            $runningSubtasks->transform(function ($subtask) {
+                $startTime = \Carbon\Carbon::parse($subtask->time_start);
+                $currentTime = \Carbon\Carbon::now();
+        
+                // Calculate the difference in hours, minutes, and seconds
+                $duration = $currentTime->diff($startTime);
+        
+                // Format the duration as H:i:s
+                $formattedDuration = sprintf('%02d:%02d:%02d', $duration->h, $duration->i, $duration->s);
+        
+                // Add the formatted duration to the subtask object
+                $subtask->duration = $formattedDuration;
+        
+                return $subtask;
+            });
+        
+            return response()->json(['runningSubtasks' => $runningSubtasks], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+        
+    }
+
+    // Filter 
+    public function filterByPriority(Request $request, $priority)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $employeeCode = $user->name;
+            $employee = Employee::where('nik', $employeeCode)->first();
+
+            if (!$employee) {
+                return response()->json(['error' => 'Employee not found'], 404);
+            }
+
+            $unitBisnis = $employee->unit_bisnis;
+            $assignedTaskIds = TaskUser::where('nik', $employeeCode)->pluck('task_id');
+
+            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $unitBisnis)
+                                ->where('priority', $priority) // Filter by priority
+                                ->get();
+
+            return response()->json($taskData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function filterByProgress(Request $request, $progressStatus)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $employeeCode = $user->name;
+            $employee = Employee::where('nik', $employeeCode)->first();
+
+            if (!$employee) {
+                return response()->json(['error' => 'Employee not found'], 404);
+            }
+
+            $unitBisnis = $employee->unit_bisnis;
+            $assignedTaskIds = TaskUser::where('nik', $employeeCode)->pluck('task_id');
+
+            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $unitBisnis)
+                                ->where('status', $progressStatus) // Filter by progress status
+                                ->get();
+
+            return response()->json($taskData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function searchTasks(Request $request)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $employeeCode = $user->name;
+            $employee = Employee::where('nik', $employeeCode)->first();
+
+            if (!$employee) {
+                return response()->json(['error' => 'Employee not found'], 404);
+            }
+
+            $unitBisnis = $employee->unit_bisnis;
+            $assignedTaskIds = TaskUser::where('nik', $employeeCode)->pluck('task_id');
+
+            $query = $request->input('query');
+            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $unitBisnis)
+                                ->where(function ($queryBuilder) use ($query) {
+                                    $queryBuilder->where('title', 'LIKE', "%{$query}%")
+                                                ->orWhere('description', 'LIKE', "%{$query}%");
+                                })
+                                ->get();
+
+            return response()->json($taskData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function completeSubtask($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Cari subtask berdasarkan ID
+            $subtask = TaskMaster::find($id);
+            if (!$subtask) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Subtask not found'], 404);
+            }
+
+            // Update status menjadi "Completed"
+            $subtask->status = 'Completed';
+            $subtask->save();
+
+            // Commit transaksi
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Subtask completed successfully'], 200);
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'An error occurred', 'error' => $e->getMessage()], 500);
+        }
+    }
     
 }

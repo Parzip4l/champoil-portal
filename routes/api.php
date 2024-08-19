@@ -54,12 +54,18 @@ Route::prefix('v1')->group(function () {
             Route::delete('subtask-delete/{id}', [TaskManagementApi::class, 'deleteSubtask']);
             Route::put('/subtasks/{id}/status', [TaskManagementApi::class, 'updateStatus']);
             Route::get('/subtasks/{id}/download-attachment', [TaskManagementApi::class, 'downloadAttachmentSubtask']);
+            Route::put('subtask/complete/{id}', [TaskManagementApi::class, 'completeSubtask']);
             // tracking
             Route::post('/subtasks/{id}/start-tracking', [TaskManagementApi::class, 'startTracking']);
             Route::post('/subtasks/{id}/pause', [TaskManagementApi::class, 'pauseTracking'])->name('subtasks.pause');
             Route::post('/subtasks/{id}/resume', [TaskManagementApi::class, 'resumeTracking'])->name('subtasks.resume');
             Route::post('/subtasks/{id}/stop-tracking', [TaskManagementApi::class, 'stopTracking']);
-
+            Route::get('/running-task', [TaskManagementApi::class, 'getRunningSubtasks']);
+            // Filter
+            Route::get('/tasks/filter/priority/{priority}', [TaskManagementApi::class, 'filterByPriority'])->name('tasks.filterByPriority');
+            Route::get('/tasks/filter/progress/{progress}', [TaskManagementApi::class, 'filterByProgress'])->name('tasks.filterByProgress');
+            Route::get('/tasks-data/search', [TaskManagementApi::class, 'searchTasks'])->name('tasks.searchTasks');
+            
 
     /**
      * Referal

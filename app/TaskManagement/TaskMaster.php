@@ -31,4 +31,9 @@ class TaskMaster extends Model
 
     // Nonaktifkan incrementing karena UUID tidak menggunakan auto-increment
     public $incrementing = false;
+
+    public function assignedUsers()
+    {
+        return $this->hasMany(TaskUser::class, 'task_id');
+    }
 }

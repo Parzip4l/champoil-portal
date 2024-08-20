@@ -45,24 +45,16 @@ class PenempatanController extends Controller
         
         $result=[];
         // dd($data['records']['records']);
-        $history = ApplicantHistory::where('training',1)->orderBy('id','desc')->get();
+        $history = JobApplpicant::all();
         if($history){
             foreach($history as $row){
-                $recruitment = JobApplpicant::where('id',$row->nik)->first();
-                $row->nama_lengkap="";
-                $row->recruitment_id="";
-                if(!empty($recruitment)){
-                    $row->nama_lengkap = $recruitment->nama_lengkap;
-                    $row->nomor_induk = $recruitment->nomor_induk;
-                    $row->recruitment_id = $recruitment->id;
-                    
-                }
                 $penempatan = AbsensiTraining::where('user_id',$row->nik)->where('status','H')->first();
                 $row->penempatan="";
                 if(!empty($penempatan)){
                     $row->penempatan = $penempatan;
+                    $result[]=$row;
                 }
-                $result[]=$row;
+                
             }
         }
 

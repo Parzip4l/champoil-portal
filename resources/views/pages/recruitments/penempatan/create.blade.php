@@ -119,17 +119,15 @@
                         <div class="col-md-6">
                             <label class="form-label">Organisasi</label>
                             <select class=" form-select" data-width="100%" name="organisasi">
-                                @foreach($organisasi as $organisasi)
-                                    <option value="{{$organisasi->name}}">{{$organisasi->name}}</option>
-                                @endforeach
+                                
+                                <option value="FRONTLINE OFFICER">FRONTLINE OFFICER</option>
+                                
                             </select>
                         </div>
                         <div class="col">
                             <label class="form-label">Golongan</label>
                             <select class="form-select" data-width="100%" name="level">
-                                @foreach($golongan as $dataGolongan)
-                                    <option value="{{$dataGolongan->name}}">{{$dataGolongan->name}}</option>
-                                @endforeach
+                                    <option value="Kemitraan">Kemitraan</option>
                             </select>
                         </div>
                     </div>
@@ -140,7 +138,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Tanggal Berakhir</label>
-                            <input type="date" class="form-control" name="berakhirkontrak">
+                            <input type="date" class="form-control" value="{{ date('Y-m-d', strtotime('+1 year')) }}" name="berakhirkontrak">
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -166,37 +164,33 @@
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Pendidikan Terakhir</label>
-                            <select class=" form-select" data-width="100%" name="pendidikan_terakhir" required>
-                                <option value="SD">SD</option>
-                                <option value="SMP">SMP</option>
-                                <option value="SMA">SMA</option>
-                                <option value="DIPLOMA">DIPLOMA</option>
-                                <option value="SARJANA">SARJANA</option>
-                                <option value="MAGISTER">MAGISTER</option>
-                                <option value="DOKTOR">DOKTOR</option>
-                                <option value="OTHERS">OTHERS</option>
-                            </select>
+                            <input type="text" class="form-control" name="pendidikan_terakhir" value="{{ $record['pendidikan_terakhir'] }}">
                         </div>
                         <div class="col">
                             <label class="form-label">Jurusan</label>
-                            <input type="text" name="jurusan" class="form-control" required>
+                            <input type="text" name="jurusan" class="form-control" value="{{ $record['jurusan'] }}" required>
                         </div>
                     </div>
                     @if($employee->unit_bisnis === 'Kas')
                     <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Sertifikasi</label>
-                            <select class=" form-select" data-width="100%" name="sertifikasi" required>
-                                <option value="TIDAK ADA">TIDAK ADA</option>
-                                <option value="GADA PRATAMA">GADA PRATAMA</option>
-                                <option value="GADA MADYA">GADA MADYA</option>
-                                <option value="GADA UTAMA">GADA UTAMA</option>
-                                <option value="LAINNYA">LAINNYA</option>
+                            <select class="form-select" data-width="100%" name="sertifikasi" required>
+                                
+                                @foreach($sertifikasi as $key=>$val)
+                                    @php 
+                                        $selected="";
+                                        if($val === $record['sertifikat_gp']){
+                                            $selected="selected";
+                                        }
+                                    @endphp
+                                    <option value="{{ $val }}" {{$selected}}>{{ $val }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col">
                             <label class="form-label">Expired Date</label>
-                            <input type="date" name="expired_sertifikasi" class="form-control" required>
+                            <input type="date" name="expired_sertifikasi" value="{{ $record['tanggal_berlaku_kta'] }}" class="form-control" required>
                         </div>
                     </div>
                     @endif

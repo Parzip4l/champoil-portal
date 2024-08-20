@@ -31,6 +31,7 @@ use App\Setting\Golongan\GolonganModel;
 use App\ModelCG\Penempatan;
 use App\ModelCG\JobApplpicant;
 use App\ModelCG\ApplicantHistory;
+use App\ModelCG\AbsensiTraining;
 
 class PenempatanController extends Controller
 {
@@ -56,7 +57,7 @@ class PenempatanController extends Controller
                     $row->recruitment_id = $recruitment->id;
                     
                 }
-                $penempatan = Penempatan::where('id_user',$row->nik)->first();
+                $penempatan = AbsensiTraining::where('user_id',$row->nik)->where('status','H')->first();
                 $row->penempatan="";
                 if(!empty($penempatan)){
                     $row->penempatan = $penempatan;
@@ -97,6 +98,7 @@ class PenempatanController extends Controller
         $data['organisasi'] = Organisasi::where('company', $company->unit_bisnis)->get();
         $data['project'] = Project::all();
         $data['golongan'] = GolonganModel::where('company', $company->unit_bisnis)->get();
+        $data['sertifikasi']=['TIDAK ADA','GADA PRATAMA','GADA MADYA','GADA UTAMA','LAINNYA'];
         return view('pages.recruitments.penempatan.create',$data);
     }
 

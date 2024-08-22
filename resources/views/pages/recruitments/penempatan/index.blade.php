@@ -35,7 +35,7 @@
                                         <td>{{ $row->nama_lengkap }}</td>
                                         <td>{{ $row->nomor_induk }}</td>
                                         <td>
-                                            <a href="{{ route('create-truest',['id'=>$row->recruitment_id]) }}" class="btn btn-primary btn-xs">Create Account</a>
+                                            <a href="{{ route('create-truest',['id'=>$row->id]) }}" class="btn btn-primary btn-xs">Create Account</a>
                                         </td>
                                     </tr>
                                     @endif

@@ -48,13 +48,12 @@ class PenempatanController extends Controller
         $history = JobApplpicant::all();
         if($history){
             foreach($history as $row){
-                $penempatan = AbsensiTraining::where('user_id',$row->nik)->where('status','H')->first();
+                $penempatan = AbsensiTraining::where('user_id',$row->id)->where('status','H')->first();
                 $row->penempatan="";
                 if(!empty($penempatan)){
                     $row->penempatan = $penempatan;
                     $result[]=$row;
                 }
-                
             }
         }
 

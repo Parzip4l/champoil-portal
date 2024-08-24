@@ -428,6 +428,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         /** DMAIC */
         Route::get('/dmaic-report', [App\Http\Controllers\DMAIC\ReportController::class, 'index'])->name('dmaic-report');
 
+        // voice of frontline 
+        Route::resource('voice', App\Http\Controllers\CgControllers\VoiceControllers::class);
+
     });
 
     // Data Performace Appraisal

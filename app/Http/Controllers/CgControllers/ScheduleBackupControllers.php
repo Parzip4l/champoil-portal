@@ -59,8 +59,20 @@ class ScheduleBackupControllers extends Controller
             $employees = Employee::whereIn('nik', $employeesWithShift)
                 ->where('unit_bisnis', 'Kas')
                 ->get();
+
+            $bko = Employee::where('unit_bisnis', 'Kas')->whereIN('organisasi',['FRONTLINE OFFICER','Frontline Officer'])->get();
+
+            $data_bko=[];
+            foreach($bko as $row){
+                $check = Schedules::where('employee',$rok->nik)->where('tanggal',$tanggal)->count();
+                if($check==0){
+                    $data_bko[]=$row;
+                }
+            }
+
+            $mergedEmployees = $employees->merge($data_bko);
     
-            return response()->json(['employees' => $employees]);
+            return response()->json(['employees' => $mergedEmployees]);
         } catch (\Exception $e) {
             // Log the exception
             \Log::error($e);

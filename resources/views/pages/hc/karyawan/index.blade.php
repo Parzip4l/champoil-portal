@@ -215,14 +215,22 @@
     let bpjs = "";
     let jabatan = "";
 
-    document.getElementById('search').addEventListener('click', function () {
-        jenis_kelamin = $("#jenis_kelamin").val();
-        sertifikasi = $("#sertifikasi").val();
-        bpjs = $("#bpjs").val();
-        jabatan = $("#jabatan").val();
+    $(document).ready(function() {
+        $('#search').on('click', function () {
+            const jenis_kelamin = $("#jenis_kelamin").val();
+            const sertifikasi = $("#sertifikasi").val();
+            const bpjs = $("#bpjs").val();
+            const jabatan = $("#jabatan").val();
+            const baseUrl = window.location.origin;
 
-        // Reload the DataTable with the updated jenis_kelamin parameter
-        $('#dataTableExample').DataTable().ajax.url("{{ route('employee.index') }}?jenis_kelamin=" + jenis_kelamin +"&sertifikasi=" + sertifikasi +"&bpjs=" + bpjs +"&jabatan=" + jabatan).load();
+            // Reload the DataTable with the updated parameters
+            $('#dataTableExample').DataTable().ajax.url(
+        baseUrl + "/employee?jenis_kelamin=" + jenis_kelamin +
+        "&sertifikasi=" + sertifikasi +
+        "&bpjs=" + bpjs +
+        "&jabatan=" + jabatan
+    ).load();
+        });
     });
 
     $(document).ready(function() {

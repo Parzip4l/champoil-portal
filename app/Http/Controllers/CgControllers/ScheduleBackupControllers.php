@@ -64,7 +64,7 @@ class ScheduleBackupControllers extends Controller
 
             $data_bko=[];
             foreach($bko as $row){
-                $check = Schedules::where('employee',$rok->nik)->where('tanggal',$tanggal)->count();
+                $check = Schedule::where('employee',$rok->nik)->where('tanggal',$tanggal)->count();
                 if($check==0){
                     $data_bko[]=$row;
                 }

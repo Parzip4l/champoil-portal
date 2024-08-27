@@ -24,52 +24,57 @@ class TaskManagementApi extends Controller
     public function index(Request $request)
     {
         try {
-            // Retrieve the token from the request and authenticate the user based on the token
             $user = Auth::guard('api')->user();
             
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
-
+    
             $employeeCode = $user->name;
             $employee = Employee::where('nik', $employeeCode)->first();
-
+    
             if (!$employee) {
                 return response()->json(['error' => 'Employee not found'], 404);
             }
-
+    
             $unitBisnis = $employee->unit_bisnis;
-            // Get the IDs of tasks assigned to the current user
             $assignedTaskIds = TaskUser::where('nik', $employeeCode)->pluck('task_id');
-
-            // Apply filtering based on request parameters if provided
+    
+            // Base query
+            $taskQuery = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $unitBisnis);
+    
+            // Apply filters
             if ($request->has('priority')) {
-                return $this->filterByPriority($request, $request->input('priority'));
+                $taskQuery->where('priority', $request->input('priority'));
             }
-
+    
             if ($request->has('progress')) {
-                return $this->filterByProgress($request, $request->input('progress'));
+                $taskQuery->where('status', $request->input('progress'));
             }
-
+    
             if ($request->has('query')) {
-                return $this->searchTasks($request);
+                $query = $request->input('query');
+                $taskQuery->where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('title', 'LIKE', "%{$query}%")
+                                ->orWhere('description', 'LIKE', "%{$query}%");
+                });
             }
-
-            // Fetch all tasks that are assigned to the current user
-            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
-                                ->where('company', $unitBisnis)
-                                ->get();
-
+    
+            // Fetch the filtered data
+            $taskData = $taskQuery->get();
+    
             foreach ($taskData as $task) {
+                // Process subtasks, progress, assigned users, comments, and tracking as before
                 $task->subtasks = Subtask::where('task_id', $task->id)->get();
                 $task->total_subtasks = $task->subtasks->count();
                 $task->completed_subtasks = $task->subtasks->where('status', 'Completed')->count();
-
+    
                 // Calculate progress percentage
                 $task->progress = $task->total_subtasks > 0
                     ? ($task->completed_subtasks / $task->total_subtasks) * 100
                     : 0;
-
+    
                 // Get assigned users for the task
                 $task->assignedUsers = TaskUser::where('task_id', $task->id)
                                                 ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')
@@ -82,89 +87,29 @@ class TaskManagementApi extends Controller
                 // Comment count
                 $task->commentCount = TaskComment::where('task_id', $task->id)->count();
                 $task->remaining_days = Carbon::now()->diffInDays(Carbon::parse($task->due_date), false);
-
+    
                 // Tracking Start
                 $activeTrackingSubtasks = $task->subtasks->filter(function ($subtask) {
                     return $subtask->time_start && $subtask->latitude_start && is_null($subtask->time_end);
                 });
-        
+    
                 if ($activeTrackingSubtasks->count() > 1) {
                     $task->activeTrackingError = 'There are multiple active tracking subtasks. Only one should be active.';
                 } elseif ($activeTrackingSubtasks->count() == 0) {
                     $task->activeTrackingError = 'No active tracking subtasks found.';
                 } else {
-                    // Get the single active tracking subtask
                     $activeTrackingSubtask = $activeTrackingSubtasks->first();
-        
-                    // Calculate the duration for which the tracking has been active
                     $activeTrackingSubtask->tracking_duration = Carbon::parse($activeTrackingSubtask->time_start)->diffForHumans();
-        
-                    // Include the active tracking subtask in the task data
                     $task->activeTrackingSubtask = $activeTrackingSubtask;
                 }
             }
-
-            $groupedTasks = $taskData->groupBy('status');
-            $subtask = Subtask::all();
-            $mentionUsers = Employee::select('nik', 'nama')->get();
-
-            // Only calculate and fetch tasks for current and previous periods
-            $currentDate = Carbon::now();
-            
-            // Calculate statistics for assigned tasks only
-            $currentTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
-                                        ->where('company', $unitBisnis)
-                                        ->whereMonth('created_at', $currentDate->month)
-                                        ->whereYear('created_at', $currentDate->year)
-                                        ->get();
-
-            // Calculate totals for current period
-            $totalTasks = $currentTaskData->count();
-            $completedTasks = $currentTaskData->where('status', 'Completed')->count();
-            $inProgressTasks = $currentTaskData->where('status', 'In Progress')->count();
-            $overdueTasks = $currentTaskData->filter(function ($task) {
-                return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
-            })->count();
-
-            // Fetch tasks for previous period
-            $previousDate = $currentDate->copy()->subMonth();
-            $previousTaskData = TaskMaster::whereIn('id', $assignedTaskIds)
-                                        ->where('company', $unitBisnis)
-                                        ->whereMonth('created_at', $previousDate->month)
-                                        ->whereYear('created_at', $previousDate->year)
-                                        ->get();
-
-            // Calculate totals for previous period
-            $previousTotalTasks = $previousTaskData->count();
-            $previousCompletedTasks = $previousTaskData->where('status', 'Completed')->count();
-            $previousInProgressTasks = $previousTaskData->where('status', 'In Progress')->count();
-            $previousOverdueTasks = $previousTaskData->filter(function ($task) {
-                return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
-            })->count();
-
-            // Calculate percentages
-            $totalTasksPercentage = $previousTotalTasks > 0 ? (($totalTasks - $previousTotalTasks) / $previousTotalTasks) * 100 : 0;
-            $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
-            $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
-            $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
-            
-            return response()->json([
-                'taskData' => $taskData,
-                'subtask' => $subtask,
-                'groupedTasks' => $groupedTasks,
-                'totalTasks' => $totalTasks,
-                'completedTasks' => $completedTasks,
-                'inProgressTasks' => $inProgressTasks,
-                'overdueTasks' => $overdueTasks,
-                'totalTasksPercentage' => $totalTasksPercentage,
-                'completedTasksPercentage' => $completedTasksPercentage,
-                'inProgressTasksPercentage' => $inProgressTasksPercentage,
-                'overdueTasksPercentage' => $overdueTasksPercentage,
-            ]);
+    
+            return response()->json($taskData);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+    
 
 
     // Detail

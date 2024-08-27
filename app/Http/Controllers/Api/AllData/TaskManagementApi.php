@@ -24,57 +24,52 @@ class TaskManagementApi extends Controller
     public function index(Request $request)
     {
         try {
+            // Retrieve the token from the request and authenticate the user based on the token
             $user = Auth::guard('api')->user();
             
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
-    
+
             $employeeCode = $user->name;
             $employee = Employee::where('nik', $employeeCode)->first();
-    
+
             if (!$employee) {
                 return response()->json(['error' => 'Employee not found'], 404);
             }
-    
+
             $unitBisnis = $employee->unit_bisnis;
+            // Get the IDs of tasks assigned to the current user
             $assignedTaskIds = TaskUser::where('nik', $employeeCode)->pluck('task_id');
-    
-            // Base query
-            $taskQuery = TaskMaster::whereIn('id', $assignedTaskIds)
-                                ->where('company', $unitBisnis);
-    
-            // Apply filters
+
+            // Apply filtering based on request parameters if provided
             if ($request->has('priority')) {
-                $taskQuery->where('priority', $request->input('priority'));
+                return $this->filterByPriority($request, $request->input('priority'));
             }
-    
+
             if ($request->has('progress')) {
-                $taskQuery->where('status', $request->input('progress'));
+                return $this->filterByProgress($request, $request->input('progress'));
             }
-    
+
             if ($request->has('query')) {
-                $query = $request->input('query');
-                $taskQuery->where(function ($queryBuilder) use ($query) {
-                    $queryBuilder->where('title', 'LIKE', "%{$query}%")
-                                ->orWhere('description', 'LIKE', "%{$query}%");
-                });
+                return $this->searchTasks($request);
             }
-    
-            // Fetch the filtered data
-            $taskData = $taskQuery->get();
-    
+
+            // Fetch all tasks that are assigned to the current user
+            $taskData = TaskMaster::whereIn('id', $assignedTaskIds)
+                                ->where('company', $unitBisnis)
+                                ->get();
+
             foreach ($taskData as $task) {
-                // Process subtasks, progress, assigned users, comments, and tracking as before
                 $task->subtasks = Subtask::where('task_id', $task->id)->get();
                 $task->total_subtasks = $task->subtasks->count();
                 $task->completed_subtasks = $task->subtasks->where('status', 'Completed')->count();
-    
+
                 // Calculate progress percentage
                 $task->progress = $task->total_subtasks > 0
                     ? ($task->completed_subtasks / $task->total_subtasks) * 100
                     : 0;
-    
+
                 // Get assigned users for the task
                 $task->assignedUsers = TaskUser::where('task_id', $task->id)
                                                 ->join('karyawan', 'task_user.nik', '=', 'karyawan.nik')

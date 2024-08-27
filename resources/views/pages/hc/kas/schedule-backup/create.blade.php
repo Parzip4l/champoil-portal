@@ -38,7 +38,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power</label>
-                                    <select class="form-control employee" data-width="100%" name="employee[]" id="employee" required>
+                                    <select class="form-control employee select2" data-width="100%" name="employee[]" id="employee" required>
                                         <option disabled selected>Select Employee</option>
                                     </select>
                                 </div>
@@ -46,7 +46,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Project</label>
-                                    <select class="form-control project" data-width="100%" name="project[]" id="projectSelect" required>
+                                    <select class="form-control project select2" data-width="100%" name="project[]" id="projectSelect" required>
                                         <option disabled selected>Select Project</option>
                                         @foreach($project as $project)
                                             <option value="{{$project->id}}">{{$project->name}}</option>
@@ -65,7 +65,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Man Power Replace</label>
-                                    <select class="form-control replaceemployee" data-width="100%" name="manpower[]" id="manpowerSelect" required>
+                                    <select class="form-control replaceemployee select2" data-width="100%" name="manpower[]" id="manpowerSelect" required>
                                         <option disabled selected>Select Man Power</option>
                                     </select>
                                 </div>

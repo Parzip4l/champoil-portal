@@ -406,7 +406,7 @@ class TaskManagementApi extends Controller
             // Update task status
             $taskData = TaskMaster::find($request->task_id);
 
-            if ($taskData->status == 'Completed') {
+            if ($taskData && $taskData->status == 'Completed') {
                 $taskData->status = 'In Progress'; // Correct status change
                 $taskData->save();
             }

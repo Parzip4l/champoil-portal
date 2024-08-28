@@ -12,7 +12,7 @@ class Subtask extends Model
     use LogsActivity;
     protected $table = 'task_subtasks';
 
-    protected $fillable = ['task_id', 'title', 'description', 'due_date', 'progress'];
+    protected $fillable = ['task_id', 'title', 'description', 'due_date', 'progress','status'];
 
 
     // Tentukan bahwa primary key adalah UUID

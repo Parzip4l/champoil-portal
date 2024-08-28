@@ -1237,6 +1237,7 @@ class ApiLoginController extends Controller
             }else{
                 $requestAbsen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                    ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                   ->where('requests_attendence.aprrove_status', 'Pending')
                                    ->select('requests_attendence.*','karyawan.nama','karyawan.unit_bisnis')
                                    ->orderBy('requests_attendence.tanggal', 'desc')
                                    ->limit(50)

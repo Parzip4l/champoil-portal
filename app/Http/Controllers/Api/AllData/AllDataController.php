@@ -126,7 +126,7 @@ class AllDataController extends Controller
             if (!$berita) {
                 return response()->json(['error' => 'Berita tidak ditemukan'], 404);
             }
-
+            $berita->featuredimage = url('images/featuredimage/' . $berita->featuredimage);
             return response()->json(['dataBerita' => $berita], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);

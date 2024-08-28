@@ -910,7 +910,7 @@ class TaskManagementApi extends Controller
 
         try {
             // Cari subtask berdasarkan ID
-            $subtask = TaskMaster::find($id);
+            $subtask = Subtask::find($id);
             if (!$subtask) {
                 DB::rollBack();
                 return response()->json(['success' => false, 'message' => 'Subtask not found'], 404);

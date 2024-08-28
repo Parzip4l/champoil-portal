@@ -42,6 +42,7 @@ Route::prefix('v1')->group(function () {
     // Task Management
         // Task Master
         Route::get('/task-management', [TaskManagementApi::class, 'index']);
+        Route::get('task-management/all', [TaskManagementApi::class, 'allTask']);
         Route::get('tasks/{id}', [TaskManagementApi::class, 'show']);
         Route::post('/create-master-task', [TaskManagementApi::class, 'store']);
         Route::put('tasks-update/{id}', [TaskManagementApi::class, 'update']);

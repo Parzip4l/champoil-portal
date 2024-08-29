@@ -29,6 +29,8 @@ use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Setting\Golongan\GolonganModel;
 use Yajra\DataTables\Facades\DataTables;
+use App\Mail\NewEmployee;
+use Illuminate\Support\Facades\Mail;
 
 class EmployeeController extends Controller
 {
@@ -291,7 +293,7 @@ Email: ".$request->email."
 Password: ".$request->password;
 
             push_notif_wa($html,'','',$request->telepon,'');
-
+            Mail::to($request->email)->send(new NewEmployee($data));
             DB::commit();
             return redirect()->route('employee.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }catch (ValidationException $exception) {

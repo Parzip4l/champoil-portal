@@ -106,8 +106,8 @@
             font-size:10px;
         }
         
-        .companylogo {
-            width : 30%;
+        img.companylogo {
+            max-width : 30%;
         }
     </style>
 </head>

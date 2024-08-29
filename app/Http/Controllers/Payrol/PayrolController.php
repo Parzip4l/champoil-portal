@@ -241,7 +241,7 @@ class PayrolController extends Controller
             $pdf->save($pdfPath);
 
             // Send the email with the payslip PDF attachment
-            // Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
+            Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
             // Commit the transaction
             DB::commit();
 

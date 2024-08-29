@@ -22,7 +22,7 @@
 
     <p>Welcome aboard and we look forward to working with you!</p>
 
-    <p>Please Download Your Apps </p>
+    <p>Please Download Our Mandatory Employee App </p>
     <ul>
         <li><strong>Android : https://play.google.com/store/apps/details?id=co.id.truest.truest</strong></li>
         <li><strong>Ios : </strong>https://apps.apple.com/idn/app/truest/id6476389232?platform=iphone</li>

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payslip</title>
+    <style>
+        .companylogo {
+            width : 30%;
+        }
+    </style>
 </head>
 <body>
     @php
@@ -12,7 +17,7 @@
     <table align="center" width="100%" cellspacing="0" cellpadding="0" border="0">
         <tr>
             <td align="center" style="background-color: #f9f9f9; padding: 20px;">
-            <img src="{{ asset('assets/images/company/' . $company->logo) }}" alt="Company Logo">
+            <img src="{{ asset('assets/images/company/' . $company->logo) }}" alt="Company Logo" class="companylogo">
                 <h2>Payslip</h2>
             </td>
         </tr>

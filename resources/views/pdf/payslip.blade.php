@@ -106,6 +106,9 @@
             font-size:10px;
         }
         
+        .companylogo {
+            width : 30%;
+        }
     </style>
 </head>
 <body>
@@ -117,7 +120,7 @@
     @endphp
     <div class="container">
         <div class="header">
-            <img src="{{ asset('assets/images/company/' . $company->logo) }}" alt="Company Logo">
+            <img src="{{ asset('assets/images/company/' . $company->logo) }}" alt="Company Logo" class="companylogo">
             <h1>{{ $company->company_name }}</h1>
             <div class="confidential">*CONFIDENTIAL</div>
         </div>

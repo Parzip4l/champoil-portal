@@ -155,6 +155,10 @@
             <tbody>
                 <tr>
                     <td>
+                        <div class="data-details">
+                            <span class="text-title left">Basic Salary</span>
+                            <span class="text-title">:  Rp {{number_format($payroll->basic_salary, 0, ',', '.')}} </span>
+                        </div>
                         @foreach($dataArray['data'] as $id => $value)
                             <div class="data-details">
                                 <span class="text-title left">{{ \App\Payrol\Component::where('id', $id)->value('name') ?? 'Name not found' }}</span>

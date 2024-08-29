@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use PDF;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+
 
 // Model
 use App\Employee;
@@ -20,9 +25,11 @@ use App\Pajak\Pajak;
 use App\Pajak\PajakDetails;
 use Illuminate\Support\Facades\DB;
 Use App\Activities\Log;
+use App\Mail\PayslipEmail;
 
 use App\Imports\PayrollImport;
 use Maatwebsite\Excel\Facades\Excel;
+
 
 
 class PayrolController extends Controller
@@ -220,7 +227,21 @@ class PayrolController extends Controller
                     $payroll->save();
                 }
             }
-           
+
+            $directory = storage_path('app/public/payslips/');
+            $pdfPath = $directory . 'payslip_' . $employee->nik . '.pdf';
+
+            // Check if the directory exists, and create it if not
+            if (!File::exists($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            // Generate the PDF and save it to the specified path
+            $pdf = PDF::loadView('pdf.payslip', compact('payroll', 'employee'));
+            $pdf->save($pdfPath);
+
+            // Send the email with the payslip PDF attachment
+            // Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
             // Commit the transaction
             DB::commit();
 
@@ -231,7 +252,7 @@ class PayrolController extends Controller
             // Log the error
             \Log::error('Error creating payroll: ' . $e->getMessage());
             // Redirect back with error message
-            return redirect()->back()->with(['error' => 'Error creating payroll. Please try again.']);
+            return redirect()->back()->with(['error' => 'Error creating payroll. Please try again.'. $e->getMessage()]);
         }
     }
 

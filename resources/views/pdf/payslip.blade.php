@@ -114,7 +114,7 @@
 </head>
 <body>
     @php
-        $employee = \App\Employee::where('nik', $employee->nik)->first();
+        $employee = \App\Employee::where('nik', $payroll->employee_code)->first();
         $dataArray = json_decode($payroll->allowances, true);
         $datadeduction = json_decode($payroll->deductions, true);
         $company = \App\Company\CompanyModel::where('company_name', $employee->unit_bisnis)->first();
@@ -125,7 +125,6 @@
             <h1>{{ $company->company_name }}</h1>
             <div class="confidential">*CONFIDENTIAL</div>
         </div>
-        
         <table class="info-table">
             <tr>
                 <td>Payroll Period</td>

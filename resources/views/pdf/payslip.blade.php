@@ -107,7 +107,8 @@
         }
         
         img.companylogo {
-            max-width : 30%;
+            max-width : 10%;
+            margin-bottom : 20px;
         }
     </style>
 </head>

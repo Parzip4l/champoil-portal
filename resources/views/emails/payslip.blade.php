@@ -6,7 +6,7 @@
     <title>Payslip</title>
     <style>
         img.companylogo {
-            max-width : 20%;
+            max-width : 10%;
         }
     </style>
 </head>

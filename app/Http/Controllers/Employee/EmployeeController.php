@@ -293,7 +293,6 @@ Email: ".$request->email."
 Password: ".$request->password;
 
             push_notif_wa($html,'','',$request->telepon,'');
-            Mail::to($request->email)->send(new NewEmployee($data));
             DB::commit();
             return redirect()->route('employee.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }catch (ValidationException $exception) {

@@ -136,6 +136,8 @@ class PayrolController extends Controller
         $bulan = $request->input('month');
         $tahun = $request->input('year');
 
+        $pdfPaths = []; // Array to hold the paths of the generated PDFs
+
         try {
             // Begin database transaction
             DB::beginTransaction();
@@ -225,23 +227,32 @@ class PayrolController extends Controller
                     $payroll->unit_bisnis = $unit_bisnis;
                     $payroll->run_by = $employee->nama;
                     $payroll->save();
+
+                    // Save PDF path for each employee
+                    $directory = storage_path('app/public/payslips/');
+                    if (!File::exists($directory)) {
+                        File::makeDirectory($directory, 0755, true);
+                    }
+
+                    $pdfPath = $directory . 'payslip_' . $code . '.pdf';
+                    $pdf = PDF::loadView('pdf.payslip', compact('payroll', 'employee'));
+                    $pdf->save($pdfPath);
+
+                    $pdfPaths[$code] = $pdfPath; // Store the path in the array
                 }
             }
 
-            $directory = storage_path('app/public/payslips/');
-            $pdfPath = $directory . 'payslip_' . $employee->nik . '.pdf';
-
-            // Check if the directory exists, and create it if not
-            if (!File::exists($directory)) {
-                File::makeDirectory($directory, 0755, true);
+            // Send the email with the payslip PDF attachment to each user
+            foreach ($employeeCodes as $code) {
+                $employee = Employee::where('nik', $code)->first();
+                if ($employee) {
+                    $pdfPath = $pdfPaths[$code] ?? null;
+                    if ($pdfPath) {
+                        Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
+                    }
+                }
             }
 
-            // Generate the PDF and save it to the specified path
-            $pdf = PDF::loadView('pdf.payslip', compact('payroll', 'employee'));
-            $pdf->save($pdfPath);
-
-            // Send the email with the payslip PDF attachment
-            Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
             // Commit the transaction
             DB::commit();
 
@@ -252,9 +263,10 @@ class PayrolController extends Controller
             // Log the error
             \Log::error('Error creating payroll: ' . $e->getMessage());
             // Redirect back with error message
-            return redirect()->back()->with(['error' => 'Error creating payroll. Please try again.'. $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Error creating payroll. Please try again.' . $e->getMessage()]);
         }
     }
+
 
     public function storens(Request $request)
     {

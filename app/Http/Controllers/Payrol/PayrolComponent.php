@@ -230,8 +230,15 @@ class PayrolComponent extends Controller
         }
 
         // Ambil semua komponen yang aktif untuk Allowences dan Deductions
-        $allActiveAllowences = Component::where('type', 'Allowences')->where('is_active', 'aktif')->get();
-        $allActiveDeductions = Component::where('type', 'Deductions')->where('is_active', 'aktif')->get();
+        $allActiveAllowences = Component::where('type', 'Allowences')
+            ->where('is_active', 'aktif')
+            ->where('company', $DataCode->unit_bisnis)
+            ->get();
+            
+        $allActiveDeductions = Component::where('type', 'Deductions')
+            ->where('is_active', 'aktif')
+            ->where('company', $DataCode->unit_bisnis)
+            ->get();
 
         // Ambil ID komponen yang sudah ada di PayrolCM untuk Allowences dan Deductions
         $existingAllowanceIds = collect(json_decode($data->allowances, true)['data'])->keys()->toArray();
@@ -375,6 +382,21 @@ class PayrolComponent extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            // Temukan data payroll component berdasarkan ID
+            $payrolComponent = PayrolCM::findOrFail($id);
+
+            // Hapus data payroll component
+            $payrolComponent->delete();
+
+            // Redirect dengan pesan sukses
+            return redirect()->route('payrol-component.index')->with(['success' => 'Data Berhasil Dihapus!']);
+        } catch (\Exception $e) {
+            // Log the error message
+            \Log::error('Error deleting payroll component: ' . $e->getMessage());
+
+            // Redirect back with error message
+            return redirect()->back()->with(['error' => 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.']);
+        }
     }
 }

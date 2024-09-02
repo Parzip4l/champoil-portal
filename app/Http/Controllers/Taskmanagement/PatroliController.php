@@ -194,10 +194,28 @@ class PatroliController extends Controller
     }
 
     public function analityc(){
-        $data=[];
+        $data = [];
+        $values = [];
+        $year = 2024; // Ganti dengan tahun yang diinginkan
+        $month = 9;   // Ganti dengan bulan yang diinginkan (1-12)
 
-        return view('pages.operational.patroli.analityc',$data);
+        // Mendapatkan jumlah hari dalam bulan tersebut
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        // Menyimpan semua tanggal dalam satu bulan
+        $dates = [];
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dates[] = date('Y-m-d', strtotime("$year-$month-$day"));
+            $values[] = [10, 20]; // Assuming you want to store the same values for each date
+        }
+
+        // Menambahkan tanggal ke array $data untuk dikirim ke view
+        $data['dates'] = json_encode($dates);
+        $data['values'] = json_encode($values);
+
+        return view('pages.operational.patroli.analityc', $data);
     }
+
 
     public function preview_test(Request $request){
 

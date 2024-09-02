@@ -59,8 +59,6 @@ class PenempatanController extends Controller
             }
         }
 
-        
-
         $return=[];
         if($result){
             foreach($result as $row){
@@ -70,8 +68,6 @@ class PenempatanController extends Controller
                 }
             }
         }
-
-    
 
         $data['records']=$return;
 

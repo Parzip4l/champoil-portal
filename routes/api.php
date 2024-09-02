@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 use App\Http\Controllers\Api\ApiLoginController;
 use App\Http\Controllers\Api\LmsController;
 use App\Http\Controllers\Api\Patroli\PatroliController;
@@ -125,9 +126,12 @@ Route::prefix('v1')->group(function () {
     Route::post('/post-patroli', [PatroliController::class, 'patroli_save']);
     Route::post('/patroli-report-dash', [PatroliController::class, 'report_patrol']);
     Route::get('/patroli-detail/{id}', [PatroliController::class, 'detail']);
+    Route::get('/report-patroli-project', [PatroliController::class, 'report_patroli']);
     Route::get('/patroli-list', [PatroliController::class, 'list']);
+    Route::get('/export-report', [PatroliController::class, 'export_report']);
 
     Route::post('/download-report', [PatroliController::class, 'download_report']);
+    Route::post('/save-chart-image', [PatroliController::class, 'saveChartImage']);
 
 
 

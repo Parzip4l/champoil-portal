@@ -145,7 +145,7 @@ class ScheduleControllers extends Controller
                         'id'=>$no,
                         'start'=>$date,
                         'end'=>$date,
-                        'code'=>$detailShift->code,
+                        'code'=>@$detailShift->code,
                         'title'=>@$detailShift->name
                     ];
                 // }

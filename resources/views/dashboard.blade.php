@@ -276,6 +276,16 @@
                     </div>
                 </a>
             </div>
+            <div class="item">
+                <a href="javascript:void(0)" id="voice">
+                    <div class="icon text-center">
+                        <i class="icon-lg text-white" data-feather="message-square"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Voice</p>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </div>

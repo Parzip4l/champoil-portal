@@ -135,6 +135,9 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/checklist/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'checklist_task'])->name('checklist');
     Route::post('/checklist/{id}', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'post_code'])->name('checklist.post');
     Route::post('/save_patroli', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'store'])->name('save_patroli');
+    Route::get('/analityc', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'analityc'])->name('analityc');
+
+    Route::get('/preview_test', [App\Http\Controllers\Taskmanagement\PatroliController::class, 'preview_test'])->name('preview_test');
     
     // Feedback
     Route::post('/users/feedback', 'DashboardController@StoreFeedback')->name('feedback.store');

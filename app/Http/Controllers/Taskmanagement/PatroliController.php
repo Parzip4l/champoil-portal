@@ -11,6 +11,8 @@ use App\ModelCG\Absen;
 use App\ModelCG\Temuan;
 use App\Employee;
 use App\ModelCG\Project;
+use App\ModelCG\Shift;
+use App\ModelCG\ProjectRelations;
 use PDF;
 use Illuminate\Support\Facades\Auth;
 
@@ -151,9 +153,7 @@ class PatroliController extends Controller
 
         $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
         $distance = round($earthRadius * $c); 
-
         return $distance;
     }
 
@@ -192,5 +192,48 @@ class PatroliController extends Controller
         return response()->json($data);
         
     }
+
+    public function analityc(){
+        $data=[];
+
+        return view('pages.operational.patroli.analityc',$data);
+    }
+
+    public function preview_test(Request $request){
+
+        $project = Project::find($request->input('project'));
+        // $explode = explode('-', $request->input('periode'));
+        // $kalender = tanggal_bulan($explode[1], date('m', strtotime($explode[0])));
+        $tasks = Task::where('project_id', $request->input('project'))->get();
+        $jumlah_task = count($tasks);
+        $project_relations = [];
+        if($project){
+            $project_relations = ProjectRelations::where('id_project',$project->id)->get();
+            if($project_relations){
+                foreach ($project_relations as $row) {
+                   $row->shift = Shift::where('id',$row->id_shift)->first();
+                }
+            }
+        }
+
+
+        //create pdf
+
+
+        $data = [
+            'title' => 'Patrolis Analytic',
+            'project' => strtoupper($project->name),
+            'success' => true,
+            // 'return' => $tasks,
+            'jumlah_task' => $jumlah_task,
+            'jumlah_patrol_pershift' => 3,
+            'shift' => $project_relations
+        ];
+        
+
+        return view('pages.operational.task.pdf_template',$data);
+     
+    }
+    
 }
 

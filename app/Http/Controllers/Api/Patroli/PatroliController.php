@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use Carbon\Carbon;
-
+use Carbon\CarbonPeriod;
 use App\ModelCG\Task;
 use App\ModelCG\List_task;
 use App\ModelCG\Patroli;
@@ -27,6 +27,7 @@ use App\ModelCG\Project;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class PatroliController extends Controller
 {
@@ -232,7 +233,7 @@ class PatroliController extends Controller
         return response()->json($return);
     }
 
-    public function download_report(Request $request){
+    public function download_report(){
         // Initialize PhpSpreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -316,5 +317,145 @@ class PatroliController extends Controller
         return response()->json(['message' => 'Excel file saved successfully', 'path' => $filePath]);
     }
 
+
+    public function report_patroli(Request $request){
+        $user = $request->user('api');
+
+        $project = $request->input('project_id');
+        
+
+        $periode_filter = $request->input('periode')?$request->input('periode'):'';
+
+        $data['detail_project'] = Project::find($project);
+        
+        $data['project']=Project::all();
+        $data['project_id']=$project;
+        $data['client']=$project;
+        $records = Project::all();
+        $report = Task::where('project_id',$project)->get();
+        $point=[];
+        $btn_download=[];
+        $point_green=[];
+        if(!empty($report)){
+            foreach($report as $row){
+                $row->sub_task = List_task::where('id_master',$row->id)->get();
+                $row->jml_sub = List_task::where('id_master',$row->id)->count();
+                
+            }
+        }
+        if(!empty($periode_filter)){
+            $periode = strtoupper($periode_filter);
+        }else{
+            $periode = Carbon::now()->addMonth()->format('F-Y');
+        }
+
+        
+        $data['schedule'] = Schedule::where('periode', strtoupper($periode))
+                                    ->where('project', $project)
+                                    ->where('shift','!=','OFF')
+                                    ->select('shift', DB::raw('count(*) as total'))
+                                    ->groupBy('shift')
+                                    ->get();
+        if(!empty($report)){
+            foreach($this->tanggal_tahun() as $tanggal){
+                foreach($report as $row){
+                    $count = Patroli::where('unix_code',$row->unix_code)->whereDate('created_at',$tanggal)->count();
+                    if($count > 0){
+                        $point_green[]=[
+                            "id"=>$row->id,
+                            "start"=>$tanggal,
+                            "end"=>$tanggal,
+                            "title"=>$row->judul
+                        ];
+                        
+                    }else{
+                        $point[]=[
+                            "id"=>$row->id,
+                            "start"=>$tanggal,
+                            "end"=>$tanggal,
+                            "title"=>$row->judul
+                        ];
+                    }
+                    
+                }
+                
+            }
+        }
+
+        $data['report']=$report;
+        $data['periode'] = date('F',strtotime($periode_filter));
+        $data['proj'] = $project;
+        $data['point']=$point;
+        $data['point_green']=$point_green;
+        $data['btn_download']=json_encode($btn_download);
+        return response()->json($data);
+    }
+
+    private function tanggal_tahun(){
+        $year = date('Y');
+
+        // Tentukan awal dan akhir tahun
+        $startDate = Carbon::createFromDate($year, 1, 1);
+        $endDate = Carbon::createFromDate($year, 12, 31);
+
+        // Buat periode tanggal dari awal hingga akhir tahun
+        $period = CarbonPeriod::create($startDate, $endDate);
+
+        // Loop melalui periode dan ambil setiap tanggal
+        $dates = [];
+        foreach ($period as $date) {
+            $dates[] = $date->format('Y-m-d'); // Format tanggal sesuai kebutuhan
+        }
+
+        return $dates;
+    }
+
+    public function export_report(){
+        $data = [
+            'title' => 'hjhj',
+            'project' => 'Stella',
+            'shift' => '',
+            'jumlah_task' => ''
+            // Add more data as needed
+        ];
+    
+        $pdf = PDF::loadView('pages.operational.task.pdf_template', $data); // Pass the data array to the Blade view
+    
+        // Define the path where the PDF should be saved
+        $filePath = public_path('patroli/sample.pdf');
+        
+        // Save the PDF to the specified path
+        $pdf->save($filePath);
+    
+        // Optionally, return a response or redirect
+        return response()->json(['message' => 'PDF saved successfully', 'path' => $filePath]);
+    }
+
+    public function saveChartImage(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'image' => 'required|string', // Image is expected to be a base64 encoded string
+        ]);
+
+        // Extract the base64 encoded image string
+        $imageData = $request->input('image');
+
+        // Remove the prefix (e.g., "data:image/png;base64,") from the string
+        $imageData = str_replace('data:image/png;base64,', '', $imageData);
+        $imageData = str_replace(' ', '+', $imageData);
+
+        // Decode the base64 string
+        $image = base64_decode($imageData);
+
+        // Define the path where the image will be saved
+        $filePath = public_path('patroli/chart_image.png');
+
+        // Save the decoded image to the file path
+        File::put($filePath, $image);
+
+        // Return a response indicating success
+        return response()->json(['success' => true, 'path' => $filePath]);
+    }
     
 }

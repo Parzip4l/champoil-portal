@@ -22,13 +22,13 @@
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">
         <div class="card-header">
-            <div class="head-card d-flex justify-content-between">
+            <div class="head-card justify-content-between">
                 <div class="header-title align-self-center">
                     <h6 class="card-title align-self-center mb-2">Report Absensi</h6>
                     <form>
                         <div class="row">
                             @csrf
-                            <div class="col-md-10">
+                            <div class="col-md-5">
                                 <select name="periode" class="form-control mb-2 select2" id="periode" required>
                                     <option value="">Periode</option>
                                     @if(bulan())
@@ -44,6 +44,10 @@
                                         @endforeach
                                     @endif
                                 </select>
+                                
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" name="tanggal" id="daterange_picker">
                             </div>
                             <div class="col-md-2">
                             <button type="button" class="btn btn-primary" id='search'>Filter</button>
@@ -215,7 +219,8 @@
     document.getElementById('search').addEventListener('click', function () {
         // Add your button click logic here
         var periode = $('#periode').val();
-        window.location.href = '?periode=' +periode ;
+        var tanggal = $('#daterange_picker').val();
+        window.location.href = '?periode=' +periode+'&tanggal='+tanggal ;
     });
     
     @if(session('success'))
@@ -233,5 +238,12 @@
             text: '{{ session('error') }}',
         });
     @endif
+    flatpickr("#daterange_picker", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            onClose: function(selectedDates, dateStr, instance) {
+                console.log(dateStr); // Date range in 'Y-m-d to Y-m-d' format
+            }
+        });
 </script>
 @endpush

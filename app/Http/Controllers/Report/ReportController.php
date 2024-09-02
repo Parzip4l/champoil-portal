@@ -40,6 +40,14 @@ class ReportController extends Controller
             
         }
 
+        if(!empty($request->input('tanggal'))){
+            $tanggal = $request->input('tanggal');
+            $explode = explode(' to ',$tanggal);
+            $start=$explode[0];
+            $end=$explode[1];
+           
+        }
+
         $project = Project::where('deleted_at',NULL)->get();
         if($project){
             foreach($project as $row){

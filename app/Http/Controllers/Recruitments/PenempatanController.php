@@ -50,9 +50,11 @@ class PenempatanController extends Controller
         if($history){
             foreach($history as $row){
                 $penempatan = AbsensiTraining::where('user_id',$row->id)->where('status','H')->first();
-                
-                    $row->penempatan = $penempatan;
-                    $result[]=$row;
+                    if(!empty($penempatan)){
+                        $row->penempatan = $penempatan;
+                        $result[]=$row;
+                    }
+                    
                 
             }
         }

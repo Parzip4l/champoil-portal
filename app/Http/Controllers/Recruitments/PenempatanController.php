@@ -45,15 +45,14 @@ class PenempatanController extends Controller
         
         $result=[];
         // dd($data['records']['records']);
-        $history = JobApplpicant::all();
+        $history = JobApplpicant::limit(100)->orderBy('id','DESC');
         if($history){
             foreach($history as $row){
                 $penempatan = AbsensiTraining::where('user_id',$row->id)->where('status','H')->first();
-                $row->penempatan="";
-                if(!empty($penempatan)){
+                
                     $row->penempatan = $penempatan;
                     $result[]=$row;
-                }
+                
             }
         }
 

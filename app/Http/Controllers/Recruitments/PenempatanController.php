@@ -45,7 +45,8 @@ class PenempatanController extends Controller
         
         $result=[];
         // dd($data['records']['records']);
-        $history = JobApplpicant::limit(100)->orderBy('id','DESC');
+        $history = JobApplpicant::limit(100)->orderBy('id','ASC');
+        dd($history);
         if($history){
             foreach($history as $row){
                 $penempatan = AbsensiTraining::where('user_id',$row->id)->where('status','H')->first();

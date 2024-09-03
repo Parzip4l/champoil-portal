@@ -209,6 +209,10 @@ class PatroliController extends Controller
             $values[] = [10, 20]; // Assuming you want to store the same values for each date
         }
 
+        
+
+
+
         // Menambahkan tanggal ke array $data untuk dikirim ke view
         $data['dates'] = json_encode($dates);
         $data['values'] = json_encode($values);

@@ -83,9 +83,105 @@
                                 </div>
                                 <div class="col-auto">
                                   <!-- <a href="javascript:void(0)" class="btn btn-primary" onclick="handleDownload()">Download</a> -->
-                                  <a href="{{ route('analityc') }}" class="btn btn-primary">View Analityc</a>
+                                  <a href="javascript:void(0)" id="printButton" class="btn btn-primary">Print Analityc</a>
                                 </div>
                             </form>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body" id="printSection">
+                        <div class="row">
+                            <div class="col-md-3 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Jumlah Titik Patroli</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <h2 id="jml_point">9</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="value_test">
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Jumlah Shift</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <h2 id="jml_shift">3</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="app_training">
+                                    <br/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Jumlah Patroli per-shift</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <h2 id="total_patrol_per_shift">3</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="patrol_per_shift">
+                                        Patroli dilaksanakan 3x per-titik
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Total Patroli per-bulan</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <h2 id="total_patrol_per_month">3</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="patrol_per_month">
+                                        Patroli yang harus dilaksanakan
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-7 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Statistik Per-bulan</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <div id="chart" width="400" height="500"></div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="monthly_stats">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 desktop mb-4">
+                                <div class="card custom-card2">
+                                    <div class="card-body">
+                                        <div class="title-card">
+                                            <h6>Persentase Patroli</h6>
+                                        </div>
+                                        <div class="count mt-2">
+                                            <div id="data_source" width="400" height="500"></div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex" id="patrol_percentage">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                             <div id='fullcalendar'></div>
                         </div>
                         </div>
@@ -132,6 +228,7 @@
 @push('plugin-scripts')
   <script src="{{ asset('assets/plugins/moment/moment.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/fullcalendar/index.global.min.js') }}"></script>
+  <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
   <!-- <script src="{{ asset('assets/js/fullcalendar.js') }}"></script> -->
 @endpush
 
@@ -172,10 +269,15 @@ document.getElementById('form-filter').addEventListener('submit', function(e) {
     .then(response => {
         point = response.data.point || [];
         point2 = response.data.point_green || [];
-       
+        var total = ((response.data.jml_point*response.data.jml_shift)*3)*response.data.jumlah_hari;
         
         // Initialize or update FullCalendar here
-        updateCalendar(point,point2);  
+        updateCalendar(point,point2);
+        analityc(project_id,response.data,total);
+        $("#jml_shift").text(response.data.jml_shift);
+        $("#jml_point").text(response.data.jml_point);
+        
+        $("#total_patrol_per_month").text(total);
     })
     .catch(error => {
         console.error('Error:', error.response ? error.response.data : error.message);
@@ -319,6 +421,103 @@ function updateCalendar(point,point2){
         calendar.render();
 
 }
+
+function analityc(project,data,total){
+    var donutOptions = {
+        series: [data.patroli_ok,total-data.patroli_ok],
+        chart: {
+            type: 'donut',
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    labels: {
+                        show: true,
+                        total: {
+                            showAlways: true,
+                            show: true
+                        }
+                    }
+                }
+            }
+        },
+        labels: ["Patroli Komplit", "Patroli Tidak Komplit"],
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    width: 280
+                },
+                colors:["#0cb3ddb3","#ff0000b3"],
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    };
+
+    var donutChart = new ApexCharts(document.querySelector("#data_source"), donutOptions);
+    donutChart.render();
+
+
+    var options = {
+        chart: {
+        type: 'bar',
+        height: 900,  // Set the height to 900px
+        stacked: true,
+        stackType: '100%',  // Optional: stack bars to 100% height (remove this if you don't want 100% stacking)
+    },
+    series: [{
+        name: 'Shift I Komplit',
+        data: [20, 40, 25, 10, 12,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22]
+        },
+        {
+        name: 'Shift I Tidak Komplit',
+        data: [34, 40, 25, 10, 12,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22]
+        },
+        {
+        name: 'Shift II Komplit',
+        data: [20, 40, 25, 10, 12,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22]
+        },
+        {
+        name: 'Shift II Tidak Komplit',
+        data: [20, 40, 25, 10, 12,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22,44, 55, 41, 67, 22]
+        }
+    ],
+    xaxis: {
+        categories: JSON.parse(data.dates)
+    },
+    plotOptions: {
+        bar: {
+        horizontal: true,
+        dataLabels: {
+            position: 'center' // centers data labels
+        },
+        }
+    },
+    dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+        return (val.toFixed(1)) + " %";
+        },
+        style: {
+        colors: ['#fff']
+        }
+    },
+    colors: ['#74c0fc', '#c68080', '#96f2d7', '#c68080'], // Custom colors for each series
+    legend: {
+        position: 'top',
+        horizontalAlign: 'left'
+    },
+    tooltip: {
+        shared: true,
+        intersect: false
+    }
+    }
+
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+    chart.render();
+}
 </script>
 
 <script>
@@ -339,5 +538,25 @@ function updateCalendar(point,point2){
       }
     });
   }
+
+  document.getElementById('printButton').addEventListener('click', function() {
+    // Get the content of the section to print
+    var printContent = document.getElementById('printSection').innerHTML;
+
+    // Store the original content of the document
+    var originalContent = document.body.innerHTML;
+
+    // Replace the body's content with the content to print
+    document.body.innerHTML = printContent;
+
+    // Trigger the print dialog
+    window.print();
+
+    // Restore the original content after printing
+    document.body.innerHTML = originalContent;
+
+    // Optionally, restore the event listeners or reload the page if necessary
+    location.reload(); // Optional: reload the page to restore everything
+});
 </script>
 @endpush

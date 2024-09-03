@@ -24,6 +24,7 @@ use App\ModelCG\Status_patrol;
 use App\ModelCG\Schedule;
 use App\Employee;
 use App\ModelCG\Project;
+use App\ModelCG\ProjectRelations;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
@@ -331,8 +332,13 @@ class PatroliController extends Controller
         $data['project']=Project::all();
         $data['project_id']=$project;
         $data['client']=$project;
+
+
         $records = Project::all();
         $report = Task::where('project_id',$project)->get();
+        $jml_point = Task::where('project_id',$project)->count();
+        $jml_shift = ProjectRelations::where('id_project',$project)->whereNotIn('id_shift',[13,60])->count();
+
         $point=[];
         $btn_download=[];
         $point_green=[];
@@ -356,6 +362,8 @@ class PatroliController extends Controller
                                     ->select('shift', DB::raw('count(*) as total'))
                                     ->groupBy('shift')
                                     ->get();
+        $patroli_ok=0;
+        $patroli_nnot=0;
         if(!empty($report)){
             foreach($this->tanggal_tahun() as $tanggal){
                 foreach($report as $row){
@@ -367,7 +375,7 @@ class PatroliController extends Controller
                             "end"=>$tanggal,
                             "title"=>$row->judul
                         ];
-                        
+                        $patroli_ok +=$count;
                     }else{
                         $point[]=[
                             "id"=>$row->id,
@@ -381,6 +389,33 @@ class PatroliController extends Controller
                 
             }
         }
+
+        
+        $values = [];
+        $year = 2024; // Ganti dengan tahun yang diinginkan
+        $month = 9;   // Ganti dengan bulan yang diinginkan (1-12)
+
+        // Mendapatkan jumlah hari dalam bulan tersebut
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        // Menyimpan semua tanggal dalam satu bulan
+        $dates = [];
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dates[] = date('Y-m-d', strtotime("$year-$month-$day"));
+            $values[] = [10, 20]; // Assuming you want to store the same values for each date
+        }
+
+        
+
+
+
+        // Menambahkan tanggal ke array $data untuk dikirim ke view
+        $data['dates'] = json_encode($dates);
+        $data['values'] = json_encode($values);
+        $data['jml_shift']=$jml_shift;
+        $data['jml_point']=$jml_point;
+        $data['patroli_ok']=$patroli_ok;
+        $data['jumlah_hari']=count($values);
 
         $data['report']=$report;
         $data['periode'] = date('F',strtotime($periode_filter));

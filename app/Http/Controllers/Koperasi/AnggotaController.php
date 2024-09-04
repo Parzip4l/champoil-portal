@@ -10,11 +10,14 @@ use App\Koperasi\Loan;
 use App\Koperasi\Saving;
 use App\Koperasi\LoanPayment;
 use App\Employee;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Slack;
+use App\ModelCG\Schedule;
+use App\Absen;
 
 
 class AnggotaController extends Controller
@@ -32,6 +35,34 @@ class AnggotaController extends Controller
 
         $employee = Employee::where('nik', $code)->with('payrolinfo')->first();
         $koperasi = Koperasi::where('company', $company->unit_bisnis)->first();
+        $today = now();
+        $start_date = $today->day >= 21 ? $today->copy()->subMonth()->day(21) : $today->copy()->subMonths(2)->day(21);
+        $end_date = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(20);
+
+        // Persayaratan Cek 
+        $isMemberForThreeMonths = Anggota::where('employee_code', $code)
+                    ->where('company', $company->unit_bisnis)
+                    ->where('member_status', 'active')
+                    ->where('join_date', '<=', now()->subMonths(3))
+                    ->exists();
+
+        // Check if the user is not currently on loan
+        $hasNoOutstandingLoan = Anggota::where('employee_code', $code)
+                            ->where('loan_status', 'noloan')
+                            ->exists();
+
+        $scheduleDays = Schedule::where('employee', $code)
+                ->whereBetween('tanggal', [$start_date, $end_date])
+                ->where('shift', '<>', 'OFF')
+                ->count();
+
+        $attendanceDays = Absen::where('nik', $code)
+                ->whereBetween('tanggal', [$start_date, $end_date])
+                ->count();
+                
+
+        $hadFullAttendance = $attendanceDays === $scheduleDays-1;
+        $canApplyForLoan = $isMemberForThreeMonths && $hasNoOutstandingLoan  && $hadFullAttendance;
 
         // Pinjaman Cek
         $loan = Loan::where('employee_code',$code)->orderBy('created_at', 'desc')
@@ -48,7 +79,7 @@ class AnggotaController extends Controller
 
         // Cek Member 
         $datasaya = Anggota::where('employee_code',$company->nik)->first();
-        return view ('pages.koperasi.index', compact('datasaya','employee','koperasi','loan','pinjaman','saving'));
+        return view ('pages.koperasi.index', compact('datasaya','employee','koperasi','loan','pinjaman','saving','canApplyForLoan', 'isMemberForThreeMonths', 'hasNoOutstandingLoan', 'hadFullAttendance'));
     }
 
     /**

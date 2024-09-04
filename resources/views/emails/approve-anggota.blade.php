@@ -17,6 +17,16 @@
             text-align: center;
             display: inline-flex;
         }
+
+        @media(max-width:675px){
+            img.companylogo {
+            max-width:25%;
+            }
+
+            img.LogoPlaystore {
+                max-width:20%;
+            }
+        }
     </style>
 </head>
 @php 
@@ -25,7 +35,6 @@
         $Appstore = 'appstore.png';
 @endphp
 <body>
-    {{$Appstore}}
     <table align="center" width="100%" cellspacing="0" cellpadding="0" border="0">
         <tr>
             <td align="center" style="background-color: #f9f9f9; padding: 20px;">

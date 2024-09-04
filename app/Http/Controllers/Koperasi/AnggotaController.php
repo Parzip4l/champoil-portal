@@ -19,6 +19,7 @@ use App\Slack;
 use App\ModelCG\Schedule;
 use App\Absen;
 use App\Mail\Koperasi\PengajuanAnggota;
+use App\Mail\Koperasi\PengajuanAnggotaReject;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -305,6 +306,7 @@ TRUEST Team```';
                     foreach($records as $row){
                         push_notif_wa($html,'','',$row->telepon,'');
                     }
+                    Mail::to($employee->email)->send(new PengajuanAnggotaReject($employee));
 
         return redirect()->back()->with('success', 'Data has been update');
     }

@@ -165,7 +165,7 @@
                     </div>
                     
                     <div class="button-pinjaman mt-2">
-                        <a href="{{ $canApplyForLoan ? url('pengajuan-pinjaman') : '#' }}" class="btn btn-primary w-100" {{ $canApplyForLoan ? '' : 'disabled' }}>Apply for a Loan</a>
+                    <a href="{{url('pengajuan-pinjaman')}}" class="btn btn-primary w-100" >Apply for a Loan</a>
                     </div>
                 </div>
                 @elseif($loan->status == 'waiting')

@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PengajuanPinjaman extends Mailable
+class PengajuanAnggotaReject extends Mailable
 {
     use Queueable, SerializesModels;
     public $employee;
@@ -30,8 +30,8 @@ class PengajuanPinjaman extends Mailable
      */
     public function build()
     {
-        return $this->subject('Membership Loan Approved')
-                    ->view('emails.approve-loan')
+        return $this->subject('Membership Rejected')
+                    ->view('emails.reject-anggota')
                     ->with([
                         'employeeName' => strtoupper($this->employee->nama),
                         'employee' => $this->employee,

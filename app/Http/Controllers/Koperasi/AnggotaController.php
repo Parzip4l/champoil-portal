@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 use App\Slack;
 use App\ModelCG\Schedule;
 use App\Absen;
+use App\Mail\Koperasi\PengajuanAnggota;
+use Illuminate\Support\Facades\Mail;
 
 
 class AnggotaController extends Controller
@@ -261,7 +263,8 @@ TRUEST Team```';
             foreach($records as $row){
                 push_notif_wa($html,'','',$row->telepon,'');
             }
-            
+
+            Mail::to($employee->email)->send(new PengajuanAnggota($employee));
         
             // Commit transaksi jika semua operasi berhasil
             DB::commit();

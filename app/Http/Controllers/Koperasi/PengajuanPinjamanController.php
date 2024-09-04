@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Mail\Koperasi\PengajuanPinjaman;
+use App\Mail\Koperasi\PengajuanPinjamanReject;
+use Illuminate\Support\Facades\Mail;
 
 class PengajuanPinjamanController extends Controller
 {
@@ -172,6 +175,7 @@ TRUEST Team```';
         foreach($records as $row){
             push_notif_wa($html,'','',$row->telepon,'');
         }
+        Mail::to($employee->email)->send(new PengajuanPinjaman($employee));
 
         return redirect()->back()->with('success', 'Data has been update');
     }
@@ -204,7 +208,7 @@ TRUEST Team```';
         foreach($records as $row){
             push_notif_wa($html,'','',$row->telepon,'');
         }
-
+        Mail::to($employee->email)->send(new PengajuanPinjamanReject($employee));
         return redirect()->back()->with('success', 'Data has been update');
     }
 

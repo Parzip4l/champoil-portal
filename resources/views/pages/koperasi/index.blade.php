@@ -146,23 +146,26 @@
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>
                         <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                            <img src="{{ url($isMemberForThreeMonths ? 'assets/images/logo/ceklis.png' : 'assets/images/logo/cakra.png') }}" alt="" style="max-width: 100%; width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Tidak Dalam Masa Cicilan Pinjaman Sebelumnya.</p>
                         <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                            <img src="{{ url($hasNoOutstandingLoan ? 'assets/images/logo/ceklis.png' : 'assets/images/logo/cakra.png') }}" alt="" style="max-width: 100%; width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Absensi Periode Sebelumnya 100% Kehadiran.</p>
                         <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/cakra.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                            <img src="{{ url($hadFullAttendance ? 'assets/images/logo/ceklis.png' : 'assets/images/logo/cakra.png') }}" alt="" style="max-width: 100%; width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="button-pinjaman mt-2">
-                        <a href="{{url('pengajuan-pinjaman')}}" class="btn btn-primary w-100" >Apply for a Loan</a>
+                    <a href="{{url('pengajuan-pinjaman')}}" class="btn btn-primary w-100" >Apply for a Loan</a>
                     </div>
                 </div>
                 @elseif($loan->status == 'waiting')
@@ -195,26 +198,30 @@
                 @elseif($loan->status == 'rejected')
                 <div class="persyaratan-pinjaman-wrap mt-4 mb-4">
                     <h5 class="mb-3">Loan Terms :</h5>
+                    
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Merupakan Anggota Koperasi dengan minimal 3 Bulan.</p>
                         <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                            <img src="{{ url($isMemberForThreeMonths ? 'assets/images/logo/ceklis.png' : 'assets/images/logo/cakra.png') }}" alt="" style="max-width: 100%; width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Tidak Dalam Masa Cicilan Pinjaman Sebelumnya.</p>
                         <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/ceklis.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                            <img src="{{ url($hasNoOutstandingLoan ? 'assets/images/logo/ceklis.png' : 'assets/images/logo/cakra.png') }}" alt="" style="max-width: 100%; width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="item-pesyratan d-flex justify-content-between mb-2">
                         <p style="width: 70%">Absensi Periode Sebelumnya 100% Kehadiran.</p>
                         <div class="icon-syarat align-self-center">
-                            <img src="{{ url('assets/images/logo/cakra.png') }}" alt="" style="max-width : 100%; width : 100%;">
+                            <img src="{{ url($hadFullAttendance ? 'assets/images/logo/ceklis.png' : 'assets/images/logo/cakra.png') }}" alt="" style="max-width: 100%; width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="button-pinjaman mt-2">
-                        <a href="{{url('pengajuan-pinjaman')}}" class="btn btn-primary w-100" >Re Apply Loan</a>
+                        <a href="{{ $canApplyForLoan ? url('pengajuan-pinjaman') : '#' }}" class="btn btn-primary w-100" {{ $canApplyForLoan ? '' : 'disabled' }}>Re Apply Loan</a>
                     </div>
                 </div>
                 @endif

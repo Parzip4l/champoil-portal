@@ -155,10 +155,6 @@ class TaskManagementApi extends Controller
                 'completedTasks' => $completedTasks,
                 'inProgressTasks' => $inProgressTasks,
                 'overdueTasks' => $overdueTasks,
-                'totalTasksPercentage' => $totalTasksPercentage,
-                'completedTasksPercentage' => $completedTasksPercentage,
-                'inProgressTasksPercentage' => $inProgressTasksPercentage,
-                'overdueTasksPercentage' => $overdueTasksPercentage,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);

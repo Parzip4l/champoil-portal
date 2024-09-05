@@ -146,12 +146,6 @@ class TaskManagementApi extends Controller
             $previousOverdueTasks = $previousTaskData->filter(function ($task) {
                 return Carbon::parse($task->due_date)->isPast() && $task->status !== 'Completed';
             })->count();
-
-            // Calculate percentages
-            $totalTasksPercentage = $previousTotalTasks > 0 ? (($totalTasks - $previousTotalTasks) / $previousTotalTasks) * 100 : 0;
-            $completedTasksPercentage = $previousCompletedTasks > 0 ? (($completedTasks - $previousCompletedTasks) / $previousCompletedTasks) * 100 : 0;
-            $inProgressTasksPercentage = $previousInProgressTasks > 0 ? (($inProgressTasks - $previousInProgressTasks) / $previousInProgressTasks) * 100 : 0;
-            $overdueTasksPercentage = $previousOverdueTasks > 0 ? (($overdueTasks - $previousOverdueTasks) / $previousOverdueTasks) * 100 : 0;
             
             return response()->json([
                 'taskData' => $taskData,

@@ -35,14 +35,15 @@
 @endpush
 
 @section('content')
+
+<div class="row">
 <div id="loading-backdrop" class="backdrop">
     <div class="spinner"></div>
 </div>
-<div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Job Applicant</h5>
+                <h5 class="mb-0 align-self-center">Job Applicant </h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -92,7 +93,7 @@
                     render: function(data, type, row, meta) {
                         return meta.row + 1; // Return row index + 1 for 1-based index
                     }
-                }, // Use 'null' to auto-generate row number
+                }, 
                 {
                     data: 'tanggal',
                     title: 'Tanggal Melamar',
@@ -106,8 +107,8 @@
                 { data: 'nama', title: 'Nama Lengkap', render: function(data, type, row) {
                     var genderIcon = row.jenis_kelamin === 'Pria' ? 
                         '<img src="https://hris.truest.co.id/images/male.png" style="width:25px">' : 
-                        '<img src="https://hris.truest.co.id/images/female.png" style="width:25px">'; // Use female image for non-PRIA
-                    return `${genderIcon} ${data}`; // Combine icon with name
+                        '<img src="https://hris.truest.co.id/images/female.png" style="width:25px">';
+                    return `${genderIcon} ${data}`; 
                 }},
                 { data: 'nomor_wa', title: 'Detail', render: function(data, type, row) {
                     return `

@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Analytics\EmployeeAnalytics;
 use App\Http\Controllers\Api\AllData\AllDataController;
 use App\Http\Controllers\Api\Schedules\ScheduleController;
 use App\Http\Controllers\Api\AllData\TaskManagementApi;
+use App\Http\Controllers\Api\KoperasiApi\AllKoperasiController;
 
 Route::prefix('v1')->group(function () {
 
@@ -67,7 +68,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/tasks/filter/priority/{priority}', [TaskManagementApi::class, 'filterByPriority'])->name('tasks.filterByPriority');
             Route::get('/tasks/filter/progress/{progress}', [TaskManagementApi::class, 'filterByProgress'])->name('tasks.filterByProgress');
             Route::get('/tasks-data/search', [TaskManagementApi::class, 'searchTasks'])->name('tasks.searchTasks');
-            
+
+    // Koperasi
+    Route::get('/koperasi-page', [AllKoperasiController::class, 'index']);
+    Route::get('/koperasi-terms', [AllKoperasiController::class, 'terms']);
+    Route::post('/anggota-join', [AllKoperasiController::class, 'keanggotaan']); 
 
     /**
      * Referal

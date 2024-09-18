@@ -40,77 +40,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if($records)
-                                @php 
-                                    $no=1;
-                                @endphp
-                                @foreach($records as $row)
-                                @php
-                                $score_iq = explode(' / ',@$row->history->score_iq);
-                                $score_eq = explode(' / ',@$row->history->score_eq);
-                                if($score_eq[0] >= 70){
-                                    $label_eq = 'check-circle';
-                                    $class_eq='success';
-                                }else if($score_eq[0] > 0 && $score_eq[0] < 70){
-                                    $label_eq = 'slash';
-                                    $class_eq='danger';
-                                }else if(empty($score_eq[0]) || $score_eq[0]==NULL || $score_eq[0]==''){
-                                    $label_eq = 'refresh-cw';
-                                    $class_eq='warning';
-                                }
-                                
-                                if($score_iq[0] >= 700){
-                                    $label_iq = 'check-circle';
-                                    $class_iq ='success';
-                                }else if($score_iq[0] > 0 && $score_iq[0] < 700){
-                                    $label_iq = 'slash';
-                                    $class_iq ='danger';
-                                }else if(empty($score_iq[0]) || $score_iq[0]==NULL || $score_iq[0]==''){
-                                    $label_iq = 'refresh-cw';
-                                    $class_iq='warning';
-                                }
-                                
-                                if( $row->history->score_tech >= 0 && $row->history->score_tech <= 4 && $row->history->score_tech !=NULL && $row->history->score_tech !=''){
-                                    $label_tech = 'check-circle';
-                                    $class_tech ='success';
-                                }else if($row->history->score_tech > 4){
-                                    $label_tech = 'slash';
-                                    $class_tech ='danger';
-                                }else if($row->history->score_tech===NULL || $row->history->score_tech===''){
-                                    $label_tech = 'refresh-cw';
-                                    $class_tech='warning';
-                                }
-                                @endphp
-                                    <tr>
-                                        <td>{{ $no }}</td>
-                                        <td> {{ date('d F Y',strtotime($row->tanggal)) }}</td>
-                                        <td>
-                                            Nama : {{ $row->nama_lengkap }}<br/>
-                                            NIK : {{ $row->nomor_induk }}<br/>
-                                            Nomor WA : {{ $row->nomor_wa }}<br/>
-                                        </td>
-                                        <td>{{ $row['jabatan'] }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-outline-{{$class_iq}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $score_iq[0]?$score_iq[0]:'Belum Mengisi'}}">
-                                                <i data-feather="{{$label_iq }}"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-outline-{{$class_eq}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $score_eq[0]?$score_eq[0]:'Belum Mengisi' }}">
-                                                <i data-feather="{{$label_eq }}"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-outline-{{$class_tech}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $row->history->score_tech?$row->history->score_tech:'Belum Mengisi' }}">
-                                                <i data-feather="{{$label_tech }}"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    @php 
-                                        $no++;
-                                    @endphp
-                                @endforeach
-                            @endif
+                           
                         </tbody>
                         
                     </table>

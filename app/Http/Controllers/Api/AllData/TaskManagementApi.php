@@ -404,10 +404,6 @@ class TaskManagementApi extends Controller
                 // Mendapatkan ekstensi file
                 $extension = $file->getClientOriginalExtension();
             
-                // Mengecek apakah file adalah PDF atau JPG
-                if (!in_array($extension, ['pdf', 'jpg', 'zip', 'rar'])) {
-                    return response()->json(['error' => 'Hanya file PDF, JPG, ZIP, dan RAR yang diizinkan.'], 422);
-                }
             
                 // Jika file adalah PDF atau JPG maka simpan
                 $path = $file->store('public/files');
@@ -803,71 +799,51 @@ class TaskManagementApi extends Controller
 
     
     public function stopTracking(Request $request, $id)
-    {
-        try {
-            // Find the subtask
-            $subtask = Subtask::findOrFail($id);
+{
+    try {
+        $user = Auth::guard('api')->user();
+        // Find the subtask
+        $subtask = Subtask::findOrFail($id);
 
-            // Check if tracking is paused and handle pause time
-            $pauseDuration = 0;
-            if ($subtask->pause_start) {
-                $pauseDuration = Carbon::parse($subtask->pause_start)->diffInMinutes(Carbon::now());
-            }
-
-            // Update subtask with end time and location
-            $subtask->latitude_end = $request->input('latitude_end');
-            $subtask->longitude_end = $request->input('longitude_end');
-            $subtask->time_end = Carbon::now();
-            $subtask->status = 'Completed';
-            $subtask->save();
-
-            // Calculate the total duration
-            $startTime = Carbon::parse($subtask->time_start);
-            $endTime = Carbon::parse($subtask->time_end);
-            $totalDuration = $startTime->diffInMinutes($endTime) - $pauseDuration; // Subtract pause duration
-
-            // Find the parent task
-            $task = TaskMaster::find($subtask->task_id);
-
-            if ($task) {
-                // Calculate subtasks status
-                $totalSubtasks = Subtask::where('task_id', $task->id)->count();
-                $completedSubtasks = Subtask::where('task_id', $task->id)
-                                            ->where('status', 'Completed')
-                                            ->count();
-                
-                if ($totalSubtasks === 0) {
-                    $task->status = 'TO DO';
-                } elseif ($completedSubtasks === 0) {
-                    $task->status = 'TO DO';
-                } elseif ($completedSubtasks < $totalSubtasks) {
-                    $task->status = 'In Progress';
-                } else {
-                    $task->status = 'Completed';
-                }
-
-                // Update task progress
-                $task->progress = ($totalSubtasks > 0) ? round(($completedSubtasks / $totalSubtasks) * 100) : 0;
-                $task->save();
-            }
-
-            // Return response with tracking details
-            return response()->json([
-                'success' => 'Tracking stopped.',
-                'tracking_duration' => $totalDuration . ' minutes', // Duration
-                'start_location' => [
-                    'latitude' => $subtask->latitude_start,
-                    'longitude' => $subtask->longitude_start
-                ],
-                'end_location' => [
-                    'latitude' => $subtask->latitude_end,
-                    'longitude' => $subtask->longitude_end
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        // Check if tracking is paused and handle pause time
+        $pauseDuration = 0;
+        if ($subtask->pause_start && $subtask->pause_end) {
+            // Calculate the pause duration in minutes
+            $pauseStart = Carbon::parse($subtask->pause_start);
+            $pauseEnd = Carbon::parse($subtask->pause_end);
+            $pauseDuration = $pauseStart->diffInMinutes($pauseEnd);
         }
+
+        // Update subtask with end time and location
+        $subtask->latitude_end = $request->input('latitude_start');
+        $subtask->longitude_end = $request->input('longitude_start');
+        $subtask->time_end = Carbon::now();
+        $subtask->status = 'Completed';
+        $subtask->save();
+
+        // Calculate the total duration
+        $startTime = Carbon::parse($subtask->time_start);
+        $endTime = Carbon::parse($subtask->time_end);
+        $totalDuration = $startTime->diffInMinutes($endTime) - $pauseDuration; // Subtract pause duration
+
+        // Return response with tracking details
+        return response()->json([
+            'success' => 'Tracking stopped.',
+            'tracking_duration' => $totalDuration . ' minutes', // Duration
+            'start_location' => [
+                'latitude' => $subtask->latitude_start,
+                'longitude' => $subtask->longitude_start
+            ],
+            'end_location' => [
+                'latitude' => $subtask->latitude_end,
+                'longitude' => $subtask->longitude_end
+            ]
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
     }
+}
+
 
 
     //Komentar

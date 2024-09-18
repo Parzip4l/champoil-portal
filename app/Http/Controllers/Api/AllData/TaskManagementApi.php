@@ -745,6 +745,7 @@ class TaskManagementApi extends Controller
         $subtask = Subtask::findOrFail($id);
         $subtask->latitude_start = $request->input('latitude_start');
         $subtask->longitude_start = $request->input('longitude_start');
+        $subtask->status = 'In Progress';
         $subtask->time_start = Carbon::now();
         $subtask->save();
     

@@ -10,7 +10,7 @@
 @push('style')
 <style>
         #map {
-            height: 600px;
+            height: 650px;
         }
         .leaflet-div-icon {
             background: none;
@@ -95,7 +95,7 @@
             ],
             createMarker: function() { return null; }, // Remove default markers
             lineOptions: {
-                styles: [{ color: 'red', weight: 5 }]
+                styles: [{ color: 'blue', weight: 5 }]
             },
             show: false, // Hide the control UI
             addWaypoints: false
@@ -113,7 +113,8 @@
             var distance = (summary.totalDistance / 1000).toFixed(2); 
 
             // Update end marker popup with distance information
-            endMarker.bindPopup(location.popup_end + '<br>Jarak Tempuh: ' + distance + ' Km').openPopup();
+            endMarker.bindPopup(location.popup_end + '<br>Jarak Tempuh: ' + distance + ' Km' + 
+            '<br>Total Waktu: ' + location.time_diff).openPopup();
         });
     });
 </script>

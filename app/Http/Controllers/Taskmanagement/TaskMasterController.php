@@ -838,16 +838,21 @@ class TaskMasterController extends Controller
         $data['records'] = [];
 
         foreach ($subtasks as $row) {
+            $time_start = Carbon::parse($row->time_start);
+            $time_end = Carbon::parse($row->time_end);
+            $time_diff = $time_start->diffForHumans($time_end, true);
+
             $data['records'][] = [
                 'lat_start' => $row->latitude_start,
                 'lng_start' => $row->longitude_start,
                 'lat_end' => $row->latitude_end,
                 'lng_end' => $row->longitude_end,
                 'popup_start' => $row->title . ' - Start Time: ' . $row->time_start,
-                'popup_end' => $row->title . ' - End Time: ' . $row->time_end
+                'popup_end' => $row->title . ' - End Time: ' . $row->time_end,
+                'time_diff' => $time_diff 
             ];
         }
-
+        
         return view('pages.taskmanagement.mapreport', $data);
     }
 

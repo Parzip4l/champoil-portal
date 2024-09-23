@@ -71,8 +71,11 @@ Route::prefix('v1')->group(function () {
 
     // Koperasi
     Route::get('/koperasi-page', [AllKoperasiController::class, 'index']);
-    Route::get('/koperasi-terms', [AllKoperasiController::class, 'terms']);
-    Route::post('/anggota-join', [AllKoperasiController::class, 'keanggotaan']); 
+        Route::get('/koperasi-terms', [AllKoperasiController::class, 'terms']);
+        Route::post('/anggota-join', [AllKoperasiController::class, 'keanggotaan']);
+        Route::get('/my-savings', [AllKoperasiController::class, 'dataSaving']);
+        Route::get('/cek-limit', [AllKoperasiController::class, 'cekLimit']);
+        Route::post('/pengajuan-pinjaman', [AllKoperasiController::class, 'pengajuanPinjaman']);
 
     /**
      * Referal

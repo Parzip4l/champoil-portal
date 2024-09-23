@@ -53,7 +53,7 @@
                                             <div class="col-md-6">
                                                 <div class="item-details mt-4">
                                                     <p>Full Name</p>
-                                                    <h5>{{$employee->nama}}</h5>
+                                                    <h5 id="employee-name" data-nik="{{$employee->nik}}">{{$employee->nama}}</h5>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -321,7 +321,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <!-- Formulir untuk edit atau tambah data -->
-                                        <form id="editForm" method="POST" >
+                                        <form id="editForm" method="POST">
                                             @csrf
                                             <input type="hidden" id="editDate" name="tanggal" value="">
                                             <input type="hidden" name="user" value="{{$employee->nik}}">
@@ -466,11 +466,12 @@
 </script>
 <script>
     document.getElementById('monthSelect').addEventListener('change', function() {
-    var selectedMonth = this.value; // Dapatkan bulan yang dipilih
-    var selectedYear = new Date().getFullYear(); // Dapatkan tahun saat ini
+    var selectedMonth = this.value;
+    var selectedYear = new Date().getFullYear();
+    var nikData = document.getElementById('employee-name').getAttribute('data-nik');
 
     // Lakukan permintaan ke server untuk mendapatkan data berdasarkan bulan yang dipilih
-    var requestUrl = '{{ route('absen.getDataDetails') }}' + '?month=' + selectedMonth + '&year=' + selectedYear;
+    var requestUrl = '{{ route('absen.getDataDetails') }}' + '?month=' + selectedMonth + '&year=' + selectedYear + '&nik=' + nikData;
 
     fetch(requestUrl)
         .then(response => response.json())
@@ -511,6 +512,7 @@ function updateTable(data) {
             editButton.setAttribute('data-date', item['tanggal']);
             editButton.setAttribute('data-clock-in', item['clock_in']);
             editButton.setAttribute('data-clock-out', item['clock_out']);
+            editButton.setAttribute('data-nik', item['nik']);
             editButton.textContent = 'Edit';
             editCell.appendChild(editButton);
             row.appendChild(editCell);
@@ -540,7 +542,7 @@ $(document).ready(function() {
         var date = button.data('date');
         var clockIn = button.data('clock-in');
         var clockOut = button.data('clock-out');
-        var nik = button.data('nik');
+        var nik = document.getElementById('employee-name').getAttribute('data-nik');
         var modal = $(this);
 
         // Mengisi nilai tanggal pada formulir
@@ -552,7 +554,7 @@ $(document).ready(function() {
         // Set the action URL based on whether data exists for the date
         var actionUrl = "";
 
-        if (clockIn) {
+        if (clockIn !== null && clockIn !== undefined && clockIn !== "-") {
             // Data sudah ada, atur URL edit
             actionUrl = "{{ route('attendance.editData', [':date', ':nik']) }}";
         } else {

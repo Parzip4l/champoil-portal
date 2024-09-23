@@ -401,6 +401,7 @@ Password: ".$request->password;
     public function getAttendanceData(Request $request) {
         $selectedMonth = $request->input('month');
         $selectedYear = $request->input('year');
+        $nikData = $request->input('nik');
 
         // Hitung tanggal awal (start_date) dan tanggal akhir (end_date) berdasarkan bulan dan tahun yang dipilih
         $start_date = Carbon::create($selectedYear, $selectedMonth, 21, 0, 0, 0);
@@ -413,7 +414,7 @@ Password: ".$request->password;
         $currentDate = $start_date->copy();
         while ($currentDate->lte($end_date)) {
             // Cari data absen untuk tanggal saat ini
-            $attendanceData = Absen::whereDate('tanggal', $currentDate)->first();
+            $attendanceData = Absen::where('nik',$nikData)->whereDate('tanggal', $currentDate)->first();
 
             // Buat array data untuk tanggal ini
             $rowData = [
@@ -642,6 +643,7 @@ Password: ".$request->password;
                                 ->where('tanggal', $request->input('tanggal'))
                                 ->pluck('project')
                                 ->first();
+                                
             if ($company->unit_bisnis === 'Kas'){
                 if ($schedule === null) {
                     return redirect()->back()->with('error', 'Tidak ada jadwal untuk pengguna ini pada tanggal tersebut');

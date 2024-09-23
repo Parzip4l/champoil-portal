@@ -55,13 +55,13 @@
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="">
+                                            <a class="dropdown-item d-flex align-items-center" href="#">
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Approve</span>
+                                                <span class="">Details</span>
                                             </a>
-                                            <a class="dropdown-item d-flex align-items-center" data-bs-target="" data-bs-toggle="modal">
+                                            <a class="dropdown-item d-flex align-items-center" data-bs-target="#KoperasiModal{{$dataAnggota->id}}" data-bs-toggle="modal">
                                                 <i data-feather="edit-2" class="icon-sm me-2"></i>
-                                                <span class="">Reject</span>
+                                                <span class="">Edit</span>
                                             </a>
                                         </div>
                                     </div>
@@ -76,6 +76,42 @@
     </div>
 </div>
 
+<!-- Modal Details -->
+@foreach ($anggota as $dataAnggota)
+<div class="modal fade" id="KoperasiModal{{$dataAnggota->id}}" tabindex="-1" aria-labelledby="KoperasiModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="KoperasiModal">Edit Data Koperasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('koperasi-page.update', $dataAnggota->id)}}" method="POST" enctype="multipart/form-data">
+                    @method('PUT')
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Nama Lengkap</label>
+                            <input type="text" name="name" class="form-control" value="{{$dataAnggota->nama}}" placholder="" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Join Date</label>
+                            <input type="text" name="join_date" class="form-control" placholder="" value="{{$dataAnggota->join_date}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Member Status</label>
+                            <input type="text" name="member_status" class="form-control" value="{{$dataAnggota->member_status}}" placholder="" required readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Update Member</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 @endsection
 
 @push('plugin-scripts')

@@ -349,14 +349,14 @@ function updateTable(data) {
 <!-- Hapus Data Absen -->
 <script>
     $(document).ready(function () {
-            $('#deleteModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var date = button.data('date');
-                var nik = button.data('nik');
-                var modal = $(this);
-                modal.find('#deleteAttendanceBtn').attr('href', '/delete-attendance/' + date + '/' + nik);
-            });
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var date = button.data('date');
+            var nik = button.data('nik');
+            var modal = $(this);
+            modal.find('#deleteAttendanceBtn').attr('href', '/delete-attendance/' + date + '/' + nik);
         });
+    });
 </script>
 <style>
     td {

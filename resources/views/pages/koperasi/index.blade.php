@@ -165,7 +165,7 @@
                     </div>
                     
                     <div class="button-pinjaman mt-2">
-                        <a href="{{ $canApplyForLoan ? url('pengajuan-pinjaman') : '#' }}" class="btn btn-primary w-100" {{ $canApplyForLoan ? '' : 'disabled' }}>Apply for a Loan</a>
+                        <a href="{{ $canApplyForLoan ? url('pengajuan-pinjaman') : '#' }}" class="btn {{ $canApplyForLoan ? 'btn-primary' : 'btn-danger' }} w-100" {{ $canApplyForLoan ? '' : 'disabled' }}>Apply for a Loan</a>
                     </div>
                 </div>
                 @elseif($loan->status == 'waiting')
@@ -186,7 +186,9 @@
                         <h5>Remaining Debt</h5>
                     </div>
                     <div class="saldo-saya mb-2">
-                        <h3 class="color-custom-secondary">Rp {{ number_format($pinjaman->sisahutang, 0, ',', '.') }}</h3>
+                        <h3 class="color-custom-secondary">
+                            Rp {{ number_format(optional($pinjaman)->sisahutang ?? 0, 0, ',', '.') }}
+                        </h3>
                         <p class="color-custom-secondary" style="font-size : 8px; padding-right : 10px;">The bill will be deducted automatically in payroll</p>
                     </div>
                     <div class="bottom-data">

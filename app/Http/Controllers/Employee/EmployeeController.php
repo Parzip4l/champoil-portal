@@ -425,6 +425,7 @@ Password: ".$request->password;
 
             // Tambahkan kolom tombol Edit jika diperlukan
             $rowData['edit_button'] = true;
+            $rowData['delete_button'] = true;
 
             // Tambahkan kelas "text-danger" jika tanggal adalah hari Sabtu atau Minggu
             if ($currentDate->isWeekend()) {

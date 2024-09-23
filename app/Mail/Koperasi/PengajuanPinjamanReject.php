@@ -12,15 +12,15 @@ use Illuminate\Queue\SerializesModels;
 class PengajuanPinjamanReject extends Mailable
 {
     use Queueable, SerializesModels;
-    public $employee;
+    public $EmailData;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($employee)
+    public function __construct($EmailData)
     {
-        $this->employee = $employee;
+        $this->employee = $EmailData;
     }
 
     /**

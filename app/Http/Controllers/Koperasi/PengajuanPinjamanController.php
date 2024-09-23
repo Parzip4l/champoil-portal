@@ -154,6 +154,7 @@ class PengajuanPinjamanController extends Controller
                     ->update(['status' => 'approve', 'approve_by' => $code]);
 
         $records = Employee::where('nik', $employee_code)->get();
+        $EmailData = Employee::where('nik', $employee_code)->first();
         $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
 
 Kami dengan senang hati menginformasikan bahwa pengajuan pinjaman Anda di TRUEST telah disetujui. Selamat! Anda sekarang dapat menggunakan dana pinjaman sesuai dengan ketentuan yang telah disepakati.
@@ -175,7 +176,7 @@ TRUEST Team```';
         foreach($records as $row){
             push_notif_wa($html,'','',$row->telepon,'');
         }
-        Mail::to($employee->email)->send(new PengajuanPinjaman($employee));
+        Mail::to($EmailData->email)->send(new PengajuanPinjaman($EmailData));
 
         return redirect()->back()->with('success', 'Data has been update');
     }
@@ -192,6 +193,7 @@ TRUEST Team```';
                     ->update(['status' => 'rejected', 'approve_by' => $code]);
         
         $records = Employee::where('nik', $employee_code)->get();
+        $EmailData = Employee::where('nik', $employee_code)->first();
         $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
 
 Kami ingin menginformasikan bahwa pengajuan pinjaman Anda di TRUEST tidak dapat disetujui pada saat ini. Kami mohon maaf atas ketidaknyamanannya.
@@ -208,7 +210,7 @@ TRUEST Team```';
         foreach($records as $row){
             push_notif_wa($html,'','',$row->telepon,'');
         }
-        Mail::to($employee->email)->send(new PengajuanPinjamanReject($employee));
+        Mail::to($EmailData->email)->send(new PengajuanPinjamanReject($EmailData));
         return redirect()->back()->with('success', 'Data has been update');
     }
 

@@ -263,6 +263,11 @@
                                                             data-bs-toggle="modal" data-bs-target="#editModal"
                                                             data-date="{{ $currentDate->format('Y-m-d') }}"
                                                         >Edit</a>
+                                                        <a href="#" class="btn btn-sm btn-danger"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                            data-date="{{ $currentDate->format('Y-m-d') }}"
+                                                            data-nik="{{$employee->nik}}"
+                                                        ><i data-feather="trash" class="icon-sm me-2"></i>Hapus</a>
                                                     </td>
                                                     @endif
                                                 @endif
@@ -354,7 +359,23 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus Absen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus absen untuk tanggal ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="deleteAttendanceBtn" class="btn btn-danger">Hapus</a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('plugin-scripts')
@@ -495,6 +516,19 @@ function updateTable(data) {
             row.appendChild(editCell);
         }
 
+        if (item['delete_button']) {
+            var editCell = document.createElement('td');
+            var deleteButton = document.createElement('a');
+            deleteButton.href = '#';
+            deleteButton.className = 'btn btn-sm btn-danger';
+            deleteButton.setAttribute('data-bs-toggle', 'modal');
+            deleteButton.setAttribute('data-bs-target', '#deleteModal');
+            deleteButton.setAttribute('data-date', item['tanggal']);
+            deleteButton.textContent = 'delete';
+            editCell.appendChild(deleteButton);
+            row.appendChild(editCell);
+        }
+
         tbody.appendChild(row);
     });
 }
@@ -534,5 +568,16 @@ $(document).ready(function() {
     });
 });
 
+</script>
+<script>
+    $(document).ready(function () {
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var date = button.data('date');
+            var nik = button.data('nik');
+            var modal = $(this);
+            modal.find('#deleteAttendanceBtn').attr('href', '/delete-attendance/' + date + '/' + nik);
+        });
+    });
 </script>
 @endpush

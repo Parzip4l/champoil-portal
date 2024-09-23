@@ -38,13 +38,15 @@ class AllKoperasiController extends Controller
 
             // Check if the user is a cooperative member
             $anggota = Anggota::where('employee_code', $employeeCode)->where('member_status','active')->first();
+            $anggotaStatus = Anggota::where('employee_code', $employeeCode)->first();
 
             // If not a member, return available cooperative data for the business unit
             if (!$anggota) {
                 $koperasi = Koperasi::where('company', $unitBisnis)->get();
                 return response()->json([
-                    'success' => true,
+                    'success' => false,
                     'message' => 'You are not a cooperative member.',
+                    'status_anggota' => $anggotaStatus->member_status,
                     'data' => $koperasi
                 ], 200);
             }
@@ -72,7 +74,7 @@ class AllKoperasiController extends Controller
                                                 ->where('member_status', 'active')
                                                 ->where('join_date', '<=', now()->subMonths(3))
                                                 ->exists();
-
+                
                 $hasNoOutstandingLoan = Anggota::where('employee_code', $employeeCode)
                                                 ->where('loan_status', 'noloan')
                                                 ->exists();
@@ -93,6 +95,10 @@ class AllKoperasiController extends Controller
                 // If eligible for a loan, return loan application requirements
                 return response()->json([
                     'success' => true,
+                    'syarat1' => $isMemberForThreeMonths,
+                    'syarat2' => $hasNoOutstandingLoan,
+                    'syarat3' => $hadFullAttendance,
+                    'status_anggota' => $anggotaStatus->member_status,
                     'onloan_status' => $loan,
                     'eligibility' => $canApplyForLoan,
                     'savings' => $datasaya,
@@ -108,7 +114,11 @@ class AllKoperasiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Loan data retrieved.',
-                'loan_details' => $loan,
+                'syarat1' => $isMemberForThreeMonths,
+                'syarat2' => $hasNoOutstandingLoan,
+                'syarat3' => $hadFullAttendance,
+                'status_anggota' => $anggotaStatus->member_status,
+                'onloan_status' => $loan,
                 'remaining_loan' => $pinjaman,
                 'savings' => $datasaya,
                 'saldo_simpanan' => $saldosaya,
@@ -178,6 +188,60 @@ class AllKoperasiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function dataSaving(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $employeeCode = $user->name;
+            $employeeData = Employee::where('nik', $employeeCode)->first();
+
+            // Buat instance model Anggota
+            $datasaya = Saving::where('employee_id',$employeeCode)->get();
+    
+            // Kembalikan response JSON sukses
+            return response()->json([
+                'success' => true,
+                'data' => $datasaya
+            ], 201);
+    
+        } catch (\Exception $e) {
+            // Tangani pengecualian di sini dan kembalikan response JSON error
+            return response()->json([
+                'success' => false,
+                'message' => 'error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function dataPinjaman(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $employeeCode = $user->name;
+            $employeeData = Employee::where('nik', $employeeCode)->first();
+
+            // Buat instance model Anggota
+            $datasaya = Saving::where('employee_id',$employeeCode)->get();
+    
+            // Kembalikan response JSON sukses
+            return response()->json([
+                'success' => true,
+                'data' => $datasaya
+            ], 201);
+    
+        } catch (\Exception $e) {
+            // Tangani pengecualian di sini dan kembalikan response JSON error
+            return response()->json([
+                'success' => false,
+                'message' => 'error: ' . $e->getMessage()
             ], 500);
         }
     }

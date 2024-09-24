@@ -64,7 +64,7 @@ class AnggotaController extends Controller
                 ->count();
                 
 
-        $hadFullAttendance = $attendanceDays >= $scheduleDays-1;
+        $hadFullAttendance = $attendanceDays >= $scheduleDays;
         $canApplyForLoan = $isMemberForThreeMonths && $hasNoOutstandingLoan && $hadFullAttendance;
 
         // Pinjaman Cek

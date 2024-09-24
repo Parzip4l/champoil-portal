@@ -132,6 +132,32 @@ class AllKoperasiController extends Controller
         }
     }
 
+    public function cekAnggota(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $employeeCode = $user->name;
+            $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
+            $anggotaStatus = Anggota::where('employee_code', $employeeCode)->first();
+
+            if (!$anggotaStatus) {
+                $koperasi = Koperasi::where('company', $unitBisnis)->get();
+                return response()->json([
+                    'message' => 'You are not a cooperative member.',
+                    'status_anggota' => 'Not Member',
+                    'data' => $koperasi
+                ], 200);
+            }
+
+
+            return response()->json(['status_anggota' => $anggotaStatus->member_status], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
 
 
     public function terms(Request $request)

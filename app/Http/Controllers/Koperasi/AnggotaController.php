@@ -65,7 +65,7 @@ class AnggotaController extends Controller
                 
 
         $hadFullAttendance = $attendanceDays >= $scheduleDays-1;
-        $canApplyForLoan = $isMemberForThreeMonths && $hasNoOutstandingLoan  && $hadFullAttendance;
+        $canApplyForLoan = $isMemberForThreeMonths && $hasNoOutstandingLoan && $hadFullAttendance;
 
         // Pinjaman Cek
         $loan = Loan::where('employee_code',$code)->orderBy('created_at', 'desc')

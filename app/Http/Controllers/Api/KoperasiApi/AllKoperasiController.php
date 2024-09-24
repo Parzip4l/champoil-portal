@@ -48,7 +48,7 @@ class AllKoperasiController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'You are not a cooperative member.',
-                    'status_anggota' => $anggotaStatus->member_status,
+                    'status_anggota' => 'Not Member',
                     'data' => $koperasi
                 ], 200);
             }

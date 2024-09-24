@@ -275,6 +275,48 @@ class AllKoperasiController extends Controller
         }
     }
 
+    public function kalkulasiPinjaman(Request $request)
+    {
+        try 
+        {
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $employeeCode = $user->name;
+            $employeeData = Employee::where('nik', $employeeCode)->first();
+            $koperasi = Koperasi::where('company', $employeeData->unit_bisnis)->first();
+            $pinjamanAwal = $request->amount; // Jumlah pinjaman yang dimasukkan user
+            $tenor = $koperasi->tenor;
+            $membership = $koperasi->membership / 100; // bership
+            $merchendise = $koperasi->merchendise / 100; // Biaya merchaBiaya memndise
+            $persentase = $membership + $merchendise; // Total biaya tambahan
+            $kalkulasi = $pinjamanAwal * $persentase; // Kalkulasi biaya tambahan
+            $totalPinjaman = $pinjamanAwal + $kalkulasi; // Total pinjaman yang harus dibayar
+
+            $instalment = round($totalPinjaman / $tenor); // Jumlah cicilan per bulan
+
+            // Return hasil kalkulasi pinjaman sebagai respons
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'pinjamanAwal' => $pinjamanAwal,
+                    'biayaMembership' => $membership * 100 . '%',
+                    'biayaMerchandise' => $merchendise * 100 . '%',
+                    'totalPinjaman' => $totalPinjaman,
+                    'tenor' => $tenor,
+                    'cicilanPerBulan' => $instalment,
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Tangani pengecualian dan kembalikan respons error
+            return response()->json([
+                'success' => false,
+                'message' => 'error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function cekLimit(Request $request)
     {
         try {

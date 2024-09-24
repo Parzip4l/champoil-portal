@@ -77,6 +77,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/cek-limit', [AllKoperasiController::class, 'cekLimit']);
         Route::post('/pengajuan-pinjaman', [AllKoperasiController::class, 'pengajuanPinjaman']);
         Route::get('/member-cek', [AllKoperasiController::class, 'cekAnggota']);
+        Route::post('/kalkulasi-pinjaman', [AllKoperasiController::class, 'kalkulasiPinjaman']);
 
     /**
      * Referal

@@ -31,6 +31,7 @@ use App\Setting\Golongan\GolonganModel;
 use Yajra\DataTables\Facades\DataTables;
 use App\Mail\NewEmployee;
 use Illuminate\Support\Facades\Mail;
+use App\Koperasi\Anggota;
 
 class EmployeeController extends Controller
 {
@@ -105,7 +106,63 @@ class EmployeeController extends Controller
 
             return DataTables::of($query)
                 ->addColumn('action', function($data) {
-                    return view('partials.action-employee', compact('data'));
+                    // Menghasilkan tombol aksi dan modal untuk setiap karyawan
+                    $editUrl = route('employee.edit', ['employee' => $data->nik]);
+                    $viewUrl = route('employee.show', $data->id);
+
+                    return '
+                    <div class="dropdown">
+                        <button class="btn btn-link p-0 dropdown-toggle" type="button" id="customDropdownMenuButton-' . $data->id . '" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="customDropdownMenuButton-' . $data->id . '">
+                            <a class="dropdown-item d-flex align-items-center" href="' . $editUrl . '">
+                                <i data-feather="git-branch" class="icon-sm me-2"></i> <span>Edit</span>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="' . $viewUrl . '">
+                                <i data-feather="eye" class="icon-sm me-2"></i> <span>Detail</span>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#resignModal-' . $data->id . '">
+                                <i data-feather="user-x" class="icon-sm me-2"></i> <span>Resign</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Modal Resign untuk setiap karyawan -->
+                    <div class="modal fade" id="resignModal-' . $data->id . '" tabindex="-1" aria-labelledby="resignModalLabel-' . $data->id . '" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="resignModalLabel-' . $data->id . '">Pengunduran Diri Karyawan: ' . $data->nama . '</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="' . route('employee.resign') . '" method="POST">
+                                    ' . csrf_field() . '
+                                    <input type="hidden" name="id" value="' . $data->id . '">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="reason-' . $data->id . '" class="mb-2">Alasan Pengunduran Diri</label>
+                                            <select name="reason" class="form-control" id="reason-' . $data->id . '" required>
+                                                <option value="">Pilih Alasan</option>
+                                                <option value="Habis Kontrak">Habis Kontrak</option>
+                                                <option value="Kesempatan Lebih Baik">Kesempatan Lebih Baik</option>
+                                                <option value="Perubahan Karir">Perubahan Karir</option>
+                                                <option value="Alasan Pribadi">Alasan Pribadi</option>
+                                                <option value="Masalah Kesehatan">Masalah Kesehatan</option>
+                                                <option value="Relokasi">Relokasi</option>
+                                                <option value="Pensiun">Pensiun</option>
+                                                <option value="Lainnya">Lainnya</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-danger">Konfirmasi Pengunduran Diri</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>';
                 })
                 ->editColumn('status_kontrak', function ($data) {
                     $badgeClass = $data->status_kontrak == 'Permanent' ? 'bg-primary' : 'bg-success';
@@ -113,6 +170,9 @@ class EmployeeController extends Controller
                 })
                 ->rawColumns(['action', 'status_kontrak'])
                 ->make(true);
+
+
+
         }
 
         return view('pages.hc.karyawan.index',$data);
@@ -611,26 +671,44 @@ Password: ".$request->password;
     public function resign(Request $request)
     {
         $contact = Employee::find($request->input('id'));
+        // Pastikan karyawan ditemukan
+        if (!$contact) {
+            return redirect()->route('employee.index')->with('danger', 'Karyawan tidak ditemukan');
+        }
+
+        $cekAnggota = Anggota::where('employee_code', $contact->nik)->first(); 
         $contact->reason = $request->input('reason');
-        if($contact){
-            $data=[
-                "employee_code"=>$contact->nik,
-                "nama"=>$contact->nama,
-                "ktp"=>$contact->ktp,
-                "join_date"=>$contact->joindate,
-                "meta_karyawan"=>json_encode($contact),
-                "created_at"=>date('Y-m-d H:i:s'),
-                "unit_bisnis"=>$contact->unit_bisnis
-            ];
-            $insert_resign = EmployeeResign::insertGetId($data);
-            if($insert_resign){
-                Employee::where('id',$request->input('id'))->update(['resign_status'=>1]);
-                return redirect()->route('employee.index')->with('success', 'Employee Successfully Resign');
-            }else{
-                return redirect()->route('employee.index')->with('danger', 'Employee Failed Resign');
+
+        // Data untuk disimpan
+        $data = [
+            "employee_code" => $contact->nik,
+            "nama" => $contact->nama,
+            "ktp" => $contact->ktp,
+            "join_date" => $contact->joindate,
+            "meta_karyawan" => json_encode($contact),
+            "created_at" => date('Y-m-d H:i:s'),
+            "unit_bisnis" => $contact->unit_bisnis
+        ];
+
+        // Insert data resign
+        $insert_resign = EmployeeResign::insertGetId($data);
+
+        if ($insert_resign) {
+            // Update status resign karyawan
+            Employee::where('id', $request->input('id'))->update(['resign_status' => 1]);
+
+            // Cek apakah karyawan adalah anggota koperasi
+            if ($cekAnggota) { // Misalnya, is_member adalah kolom yang menunjukkan keanggotaan koperasi
+                // Ubah status anggota koperasi menjadi tidak aktif
+                Anggota::where('employee_code', $contact->nik)->update(['member_status' => 'deactive']);
             }
+
+            return redirect()->route('employee.index')->with('success', 'Karyawan berhasil mengundurkan diri');
+        } else {
+            return redirect()->route('employee.index')->with('danger', 'Karyawan gagal mengundurkan diri');
         }
     }
+
 
     public function CreateAbsen(Request $request)
     {

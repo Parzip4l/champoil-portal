@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\AllData\AllDataController;
 use App\Http\Controllers\Api\Schedules\ScheduleController;
 use App\Http\Controllers\Api\AllData\TaskManagementApi;
 use App\Http\Controllers\Api\KoperasiApi\AllKoperasiController;
+use App\Http\Controllers\Api\Schedular\DailyContrtoller;
 
 Route::prefix('v1')->group(function () {
 
@@ -152,6 +153,7 @@ Route::prefix('v1')->group(function () {
      * Project
      */
     Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
+    Route::get('/absen_daily', [DailyContrtoller::class, 'daily_absen']);
     
 
     /**

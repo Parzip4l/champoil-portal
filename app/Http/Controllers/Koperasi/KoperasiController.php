@@ -13,6 +13,9 @@ use App\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Koperasi\Loan;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class KoperasiController extends Controller
 {
@@ -346,4 +349,80 @@ class KoperasiController extends Controller
         ->first();
         return view ('pages.koperasi.payment.index', compact('datasaya','employee','saldosaya'));
     }
+
+    public function downloadExcel()
+{
+    // Membuat Spreadsheet baru
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Set judul kolom di Excel (sesuai format gambar)
+    $sheet->setCellValue('A1', 'No')
+        ->setCellValue('B1', 'Nama')
+        ->setCellValue('C1', 'Tenor')
+        ->setCellValue('D1', 'Total Pinjaman')
+        ->setCellValue('E1', 'Angsuran')
+        ->setCellValue('F1', 'Tanggal Approval')
+        ->setCellValue('G1', 'Tanggal Angsuran')
+        ->setCellValue('H1', 'Status Angsuran');
+
+    // Mengambil data dari database tabel anggota dan pengajuan pinjaman
+    // Mengambil hanya anggota yang statusnya 'onloan'
+    $anggotaData = Anggota::where('loan_status', 'onloan')->get();
+    $row = 2; // Mulai dari baris kedua untuk data
+
+    foreach ($anggotaData as $index => $anggota) {
+        // Cek apakah anggota memiliki pengajuan pinjaman dengan status 'approve'
+        $pengajuan = Loan::where('employee_code', $anggota->employee_code)
+                        ->where('status', 'approve')
+                        ->first();
+
+        // Jika ada pengajuan pinjaman dengan status 'approve'
+        if ($pengajuan) {
+            $tenor = $pengajuan->tenor;
+            $totalPinjaman = $pengajuan->amount;
+            $angsuran = $pengajuan->instalment;
+            $approvalDate = $pengajuan->updated_at;
+
+            // Set tanggal angsuran
+            for ($i = 0; $i < $tenor; $i++) {
+                $dueDate = \Carbon\Carbon::parse($approvalDate)->addMonths($i + 1)->format('Y-m-d');
+
+                
+
+                // Cek status pembayaran dari tabel loan_payments berdasarkan loan_id
+                $loanPayment = LoanPayment::where('loan_id', $pengajuan->id)
+                                            ->where('tanggal_pembayaran', $dueDate)
+                                            ->first();
+
+                $statusAngsuran = $loanPayment ? 'LUNAS' : 'BELUM LUNAS';
+
+                // Isi data ke dalam Excel
+                $sheet->setCellValue('A' . $row, $index + 1)
+                    ->setCellValue('B' . $row, $anggota->nama)
+                    ->setCellValue('C' . $row, $tenor)
+                    ->setCellValue('D' . $row, $totalPinjaman)
+                    ->setCellValue('E' . $row, $angsuran)
+                    ->setCellValue('F' . $row, $approvalDate->format('d/m/Y'))
+                    ->setCellValue('G' . $row, $dueDate)
+                    ->setCellValue('H' . $row, $statusAngsuran);
+
+                $row++;
+            }
+        }
+    }
+
+    // Siapkan nama file
+    $fileName = 'Laporan_Anggota_Pinjaman.xlsx';
+    $filePath = storage_path('app/public/' . $fileName);
+
+    // Simpan file Excel di storage
+    $writer = new Xlsx($spreadsheet);
+    $writer->save($filePath);
+
+    // Mengunduh file Excel
+    return response()->download($filePath)->deleteFileAfterSend(true);
+}
+
+
 }

@@ -182,6 +182,9 @@
                     <div class="col-md-6 align-self-center">
                         <h6 class="card-title mb-0">Data Anggota OnLoan</h6>
                     </div>
+                    <div class="col-md-6 text-right">
+                        <a href="{{url('download-excel')}}" class="btn btn-success">Download Excel</a>
+                    </div>
                 </div>
             </div>
             <div class="card-body">

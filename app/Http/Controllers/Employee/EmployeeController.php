@@ -404,8 +404,8 @@ Password: ".$request->password;
         $nikData = $request->input('nik');
 
         // Hitung tanggal awal (start_date) dan tanggal akhir (end_date) berdasarkan bulan dan tahun yang dipilih
-        $start_date = Carbon::create($selectedYear, $selectedMonth, 21, 0, 0, 0);
-        $end_date = $start_date->copy()->addMonth()->day(20);
+        $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->subMonth()->day(21);
+        $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->day(20);
 
         // Buat array yang akan berisi data untuk setiap tanggal dalam rentang
         $tableData = [];

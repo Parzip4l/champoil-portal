@@ -338,6 +338,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
             // Loan Settings
             Route::resource('loan-settings', App\Http\Controllers\Koperasi\LoanSettingController::class);
 
+            // Excel Export
+            Route::get('/download-excel', [App\Http\Controllers\Koperasi\KoperasiController::class, 'downloadExcel']);
+
             // Pengajuan Pinjaman
             Route::resource('pengajuan-pinjaman', App\Http\Controllers\Koperasi\PengajuanPinjamanController::class);
                 // Set Status 

@@ -24,7 +24,7 @@
                         <h6 class="card-title mb-0">Daftar Anggota Koperasi</h6>
                     </div>
                     <div class="col-md-6 text-right">
-                        <a href="#" class="btn btn-primary" data-bs-target="#KoperasiMember" data-bs-toggle="modal">Add Member</a>
+                        <a href="{{url('download-excel')}}" class="btn btn-success">Download Excel</a>
                     </div>
                 </div>
             </div>
@@ -38,6 +38,8 @@
                                 <th>Join Date</th>
                                 <th>Status</th>
                                 <th>Saldo Simpanan</th>
+                                <th>Status Pinjaman</th>
+                                <th>Sisa Hutang</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -47,18 +49,24 @@
                                 <td>{{$dataAnggota->id}}</td>
                                 <td>{{$dataAnggota->nama}}</td>
                                 <td>{{$dataAnggota->join_date}}</td>
-                                <td>{{$dataAnggota->member_status}}</td>
+                                @if($dataAnggota->member_status === "active")
+                                <td><span class="badge bg-success">{{$dataAnggota->member_status}}</span></td>
+                                @else
+                                <td><span class="badge bg-danger">{{$dataAnggota->member_status}}</span></td>
+                                @endif
                                 <td>Rp {{ number_format($dataAnggota->saldosimpanan, 0, ',', '.') }}</td>
+                                @if($dataAnggota->loan_status === "noloan")
+                                <td><span class="badge bg-primary">{{$dataAnggota->loan_status}}</span></td>
+                                @else 
+                                <td><span class="badge bg-danger">{{$dataAnggota->loan_status}}</span></td>
+                                @endif
+                                <td>Rp {{ number_format($dataAnggota->sisahutang, 0, ',', '.') }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <i data-feather="eye" class="icon-sm me-2"></i>
-                                                <span class="">Details</span>
-                                            </a>
                                             <a class="dropdown-item d-flex align-items-center" data-bs-target="#KoperasiModal{{$dataAnggota->id}}" data-bs-toggle="modal">
                                                 <i data-feather="edit-2" class="icon-sm me-2"></i>
                                                 <span class="">Edit</span>

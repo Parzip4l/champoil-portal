@@ -108,10 +108,46 @@ class AllKoperasiController extends Controller
                 ], 200);
             }
 
-            // If the member has a loan, return the remaining loan details
             $pinjaman = LoanPayment::where('loan_id', $loan->id)
-                                ->orderBy('created_at', 'desc')
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+
+            // Mendapatkan informasi anggota untuk sisahutang
+            $anggota = Anggota::where('employee_code', $employeeCode)->first();
+
+            // Menyiapkan objek next_bill yang kosong
+            $nextBill = null;
+
+            // Jika ada anggota dan sisa hutang lebih dari 0
+            if ($anggota && $anggota->sisahutang > 0) {
+                // Mencari tagihan berikutnya dari tabel Loan
+                $loanBill = Loan::where('employee_code', $employeeCode)
+                                ->where('instalment', '>', 0)
+                                ->where('status', 'approve')
                                 ->first();
+                
+                if ($loanBill) {
+                    $loanData = Loan::where('employee_code', $employeeCode)
+                                ->where('instalment', '>', 0)
+                                ->where('status', 'approve')
+                                ->latest()  // Mengurutkan berdasarkan created_at terbaru
+                                ->first();
+                    if (!$pinjaman) {
+                        $nextBill = [
+                            'due_date' => Carbon::parse($loanBill->created_at)->addMonth(), // 1 bulan setelah created_at
+                            'jumlah_pembayaran' => $loanData->instalment,
+                            'sisahutang' => $anggota->sisahutang,
+                        ];
+                    } else {
+                        // Jika sudah ada history, gunakan tanggal dan jumlah dari LoanPayment terakhir
+                        $nextBill = [
+                            'due_date' => $pinjaman->tanggal_pembayaran,
+                            'next_bill' => $loanData->instalment,
+                            'sisahutang' => $anggota->sisahutang,
+                        ];
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -119,6 +155,7 @@ class AllKoperasiController extends Controller
                 'status_anggota' => $anggotaStatus->member_status,
                 'onloan_status' => $loan,
                 'remaining_loan' => $pinjaman,
+                'next_bill' => $nextBill,
                 'savings' => $datasaya,
                 'saldo_simpanan' => $saldosaya,
             ], 200);

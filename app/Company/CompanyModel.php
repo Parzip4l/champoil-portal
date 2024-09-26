@@ -19,5 +19,7 @@ class CompanyModel extends Model
         'longitude',
         'radius',
         'logo',
+        'cutoff_start',
+        'cutoff_end',
     ];
 }

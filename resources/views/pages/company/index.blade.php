@@ -108,6 +108,14 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Cut Off Start</label>
+                            <input type="number" name="cutoff_start" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Cut Off End</label>
+                            <input type="number" name="cutoff_end" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label for="" class="form-label">Latitude</label>
                             <input type="text" name="latitude" class="form-control" required>
                         </div>
@@ -171,6 +179,14 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Cut Off Start</label>
+                            <input type="number" name="cutoff_start" class="form-control" value="{{$data->cutoff_start}}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Cut Off End</label>
+                            <input type="number" name="cutoff_end" class="form-control" value="{{$data->cutoff_end}}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label for="" class="form-label">Latitude</label>
                             <input type="text" name="latitude" value="{{$data->latitude}}" class="form-control" required>
                         </div>
@@ -184,7 +200,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="" class="form-label">Company Logo</label>
-                            <input type="file" name="logo" class="form-control" required>
+                            <input type="file" name="logo" class="form-control">
                         </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Update Company</button>

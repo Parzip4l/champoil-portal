@@ -79,6 +79,8 @@ class CompanyController extends Controller
             $company->company_address = $request->input('company_address');
             $company->use_scedule = $request->input('use_scedule');
             $company->schedule_type = $request->input('schedule_type');
+            $company->cutoff_start = $request->input('cutoff_start');
+            $company->cutoff_end = $request->input('cutoff_end');
             $company->latitude = $request->input('latitude');
             $company->longitude = $request->input('longitude');
             $company->radius = $request->input('radius');
@@ -144,10 +146,11 @@ class CompanyController extends Controller
                 'company_address' => 'nullable|string',
                 'use_scedule' => 'required|in:Yes,No',
                 'schedule_type' => 'required|in:Daily,Monthly,No',
+                'cutoff_start' => 'required',
+                'cutoff_end' => 'required',
                 'latitude' => 'required|string',
                 'longitude' => 'required|string',
-                'radius' => 'required|numeric',
-                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'radius' => 'required|numeric'
             ]);
 
             // Handle file upload

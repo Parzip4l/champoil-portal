@@ -211,22 +211,8 @@
                                         </thead>
                                         <tbody>
                                             @php
-                                            // Get the current month and year
-                                            $currentDate = Carbon::now();
-                                            $currentMonth = $currentDate->month;
-                                            $currentYear = $currentDate->year;
-
-                                            $today = now();
-                                            $start_date = $today->day >= 21 ? $today->copy()->day(21) : $today->copy()->subMonth()->day(21);
-                                            $end_date = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
-
-                                            // Set the start date to 21st of the previous month
-                                            $startDate = Carbon::create($currentYear, $currentMonth, 21, 0, 0, 0)->subMonth();
-
-                                            // Set the end date to 20th of the current month
-                                            $endDate = Carbon::create($currentYear, $currentMonth, 20, 0, 0, 0);
-
-                                            $currentDate = $start_date->copy();
+                                            // Use the dynamic $startDate and $endDate from the controller
+                                            $currentDate = $startDate->copy();
 
                                             // Create an array to store attendance data for each date
                                             $attendanceDataByDate = [];
@@ -235,9 +221,9 @@
                                             }
                                             @endphp
 
-                                            @while ($currentDate->lte($end_date))
+                                            @while ($currentDate->lte($endDate))
                                             <tr>
-                                            <td class="{{ $currentDate->isWeekend() ? 'text-danger' : '' }}">{{ $currentDate->translatedFormat('D, j M Y') }}</td>
+                                                <td class="{{ $currentDate->isWeekend() ? 'text-danger' : '' }}">{{ $currentDate->translatedFormat('D, j M Y') }}</td>
                                                 @if (isset($attendanceDataByDate[$currentDate->format('Y-m-d')]))
                                                     <td class="text-success">{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_in }}</td>
                                                     <td class="text-danger">{{ $attendanceDataByDate[$currentDate->format('Y-m-d')]->clock_out }}</td>
@@ -263,11 +249,6 @@
                                                             data-bs-toggle="modal" data-bs-target="#editModal"
                                                             data-date="{{ $currentDate->format('Y-m-d') }}"
                                                         >Edit</a>
-                                                        <a href="#" class="btn btn-sm btn-danger"
-                                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                            data-date="{{ $currentDate->format('Y-m-d') }}"
-                                                            data-nik="{{$employee->nik}}"
-                                                        ><i data-feather="trash" class="icon-sm me-2"></i>Hapus</a>
                                                     </td>
                                                     @endif
                                                 @endif
@@ -515,19 +496,6 @@ function updateTable(data) {
             editButton.setAttribute('data-nik', item['nik']);
             editButton.textContent = 'Edit';
             editCell.appendChild(editButton);
-            row.appendChild(editCell);
-        }
-
-        if (item['delete_button']) {
-            var editCell = document.createElement('td');
-            var deleteButton = document.createElement('a');
-            deleteButton.href = '#';
-            deleteButton.className = 'btn btn-sm btn-danger';
-            deleteButton.setAttribute('data-bs-toggle', 'modal');
-            deleteButton.setAttribute('data-bs-target', '#deleteModal');
-            deleteButton.setAttribute('data-date', item['tanggal']);
-            deleteButton.textContent = 'delete';
-            editCell.appendChild(deleteButton);
             row.appendChild(editCell);
         }
 

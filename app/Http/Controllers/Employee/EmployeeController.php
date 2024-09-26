@@ -32,6 +32,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Mail\NewEmployee;
 use Illuminate\Support\Facades\Mail;
 use App\Koperasi\Anggota;
+use App\Company\CompanyModel;
 
 class EmployeeController extends Controller
 {
@@ -373,11 +374,27 @@ Password: ".$request->password;
     {
         $employee = Employee::find($id);
         $nikdata = $employee->nik;
-
+        $companyUser = $employee->unit_bisnis;
+        $companyData = CompanyModel::where('company_name',$companyUser)->first();
         $today = now();
-        $startDate = $today->day >= 21 ? $today->copy()->day(20) : $today->copy()->subMonth()->day(21);
-        $endDate = $today->day >= 21 ? $today->copy()->addMonth()->day(20) : $today->copy()->day(20);
-
+        if ($companyData && $companyData->cutoff_start && $companyData->cutoff_end) {
+            $cutoffStart = (int)$companyData->cutoff_start; 
+            $cutoffEnd = (int)$companyData->cutoff_end; 
+        
+            // Jika hari ini >= cutoffStart, ambil cutoff dari bulan sebelumnya ke bulan ini
+            if ($today->day >= $cutoffStart) {
+                $startDate = $today->copy()->subMonth()->day($cutoffStart); // Bulan sebelumnya
+                $endDate = $today->copy()->day($cutoffEnd); // Bulan ini
+            } else {
+                // Jika tidak, ambil cutoff dari 2 bulan sebelumnya hingga bulan sebelumnya
+                $startDate = $today->copy()->subMonth(2)->day($cutoffStart);
+                $endDate = $today->copy()->subMonth()->day($cutoffEnd);
+            }
+        } else {
+            // Jika tidak ada cutoff, mundur 1 bulan
+            $startDate = $today->copy()->subMonth()->day(21); // Bulan sebelumnya
+            $endDate = $today->copy()->day(20); // Bulan ini
+        }
         // Hitung jumlah hari kerja tanpa absensi (termasuk akhir pekan)
         $totalWorkingDays = $startDate->diffInWeekdays($endDate) + 1;
 
@@ -429,7 +446,7 @@ Password: ".$request->password;
         $CountRequest = count($requestAbsen);
         
 
-        return view('pages.hc.karyawan.details', compact('employee', 'attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin'));
+        return view('pages.hc.karyawan.details', compact('employee', 'attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin','startDate', 'endDate'));
     }
 
     /**
@@ -458,14 +475,35 @@ Password: ".$request->password;
         
     }
 
-    public function getAttendanceData(Request $request) {
+    public function getAttendanceData(Request $request) 
+    {
         $selectedMonth = $request->input('month');
         $selectedYear = $request->input('year');
         $nikData = $request->input('nik');
+        $today = Carbon::now();
+         // Retrieve the company data based on employee's NIK 
+        $employee = Employee::where('nik', $nikData)->first();
+        $companyData = CompanyModel::where('company_name', $employee->unit_bisnis)->first();
 
-        // Hitung tanggal awal (start_date) dan tanggal akhir (end_date) berdasarkan bulan dan tahun yang dipilih
-        $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->subMonth()->day(21);
-        $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->day(20);
+        if ($companyData && $companyData->cutoff_start && $companyData->cutoff_end) {
+            $cutoffStart = (int)$companyData->cutoff_start; 
+            $cutoffEnd = (int)$companyData->cutoff_end;
+        
+            // Perhitungan tanggal yang lebih umum
+            if ($today->day >= $cutoffStart) {
+                // Jika hari ini >= cutoffStart, periode dimulai dari bulan sebelumnya hingga bulan ini
+                $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->subMonth()->day($cutoffStart);
+                $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->day($cutoffEnd);
+            } else {
+                // Jika hari ini < cutoffStart, periode dimulai dari 2 bulan sebelumnya hingga bulan sebelumnya
+                $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->subMonth(2)->day($cutoffStart);
+                $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->subMonth()->day($cutoffEnd);
+            }
+        } else {
+            // Jika tidak ada cutoff, periode default dari 21 bulan sebelumnya hingga 20 bulan ini
+            $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->subMonth()->day(21);
+            $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->day(20);
+        }
 
         // Buat array yang akan berisi data untuk setiap tanggal dalam rentang
         $tableData = [];
@@ -486,7 +524,6 @@ Password: ".$request->password;
 
             // Tambahkan kolom tombol Edit jika diperlukan
             $rowData['edit_button'] = true;
-            $rowData['delete_button'] = true;
 
             // Tambahkan kelas "text-danger" jika tanggal adalah hari Sabtu atau Minggu
             if ($currentDate->isWeekend()) {

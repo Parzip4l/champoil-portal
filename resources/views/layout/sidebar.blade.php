@@ -209,7 +209,7 @@
                             <a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payrol Data</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('loan-settings') }}" class="nav-link {{ active_class(['loan-settings']) }}">Loan</a>
+                            <a href="{{ url('employee-loan') }}" class="nav-link {{ active_class(['employee-loan']) }}">Loan</a>
                         </li>
                         
                         <li class="nav-item">

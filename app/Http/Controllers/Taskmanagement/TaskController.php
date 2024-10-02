@@ -80,7 +80,7 @@ class TaskController extends Controller
             foreach($data as $row){
                 if($key>0){
                     $insert[]=[
-                        'judul' => $row[1],
+                        'judul' => "{$row[1]}",
                         'project_id' => $row[2], 
                         'status'=>1,
                         'unix_code'=>$this->code_unix()

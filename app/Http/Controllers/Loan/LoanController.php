@@ -17,7 +17,8 @@ class LoanController extends Controller
     public function index()
     {
         $Loandata = LoanModel::all();
-        $karyawan = Employee::where('unit_bisnis','Kas')->get();
+        $karyawan = Employee::where('unit_bisnis','KAS')->get();
+        
         return view('pages.hc.loan.index', compact('Loandata','karyawan'));
     }
 

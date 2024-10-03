@@ -15,6 +15,10 @@ use App\ModelCG\Schedule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PDF;
 
 class TaskController extends Controller
@@ -42,6 +46,51 @@ class TaskController extends Controller
         $data['project']=Project::all();
         $data['project_id']=Auth::user()->project_id;
         return view('pages.operational.task.index',$data);
+    }
+
+    public function import(Request $request){
+        // Validate the uploaded file
+        $request->validate([
+            'file_excel' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        // Load the spreadsheet
+        $spreadsheet = IOFactory::load($request->file('file_excel'));
+
+        // Get the active sheet
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Initialize an array to hold the data
+        $data = [];
+
+        // Loop through each row in the sheet
+        foreach ($sheet->getRowIterator() as $row) {
+            $rowData = [];
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false); // This will return all cells, even if they are not set
+            foreach ($cellIterator as $cell) {
+                $rowData[] = $cell->getValue();
+            }
+            $data[] = $rowData;
+        }
+
+        $insert=[];
+        if(!empty($data)){
+            $key=0;
+            foreach($data as $row){
+                if($key>0){
+                    $insert[]=[
+                        'judul' => "{$row[1]}",
+                        'project_id' => $row[2], 
+                        'status'=>1,
+                        'unix_code'=>$this->code_unix()
+                    ];
+                    Task::insert($insert);
+                }
+                $key++;
+            }
+        }
+        return redirect()->route('task.index',['project_id'=>$request->project_id])->with('success', 'Data Patrol Successfully Added');return response()->json($data);
     }
 
     /**

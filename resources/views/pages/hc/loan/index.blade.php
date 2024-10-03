@@ -100,7 +100,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-2">
                             <label for="" class="form-label">Employee</label>
-                            <select class="js-example-basic-single form-select" data-width="100%" name="employee_id">
+                            <select class="form-select" data-width="100%" name="employee_id">
                                 @foreach($karyawan as $data)
                                     <option value="{{$data->nik}}">{{$data->nama}}</option>
                                 @endforeach

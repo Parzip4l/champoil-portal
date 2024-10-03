@@ -209,6 +209,10 @@
                             <a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payrol Data</a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ url('employee-loan') }}" class="nav-link {{ active_class(['employee-loan']) }}">Loan</a>
+                        </li>
+                        
+                        <li class="nav-item">
                             <a href="{{ url('payslip') }}" class="nav-link {{ active_class(['payslip']) }}">Payrol History</a>
                         </li>
                         @if($employee && $employee->unit_bisnis == 'CHAMPOIL')

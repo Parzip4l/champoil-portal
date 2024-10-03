@@ -13,6 +13,7 @@
                 <h5 class="mb-0 align-self-center">
                     Data Patrol
                     <a href="{{route('task-report')}}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Report</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#import-data" class="btn btn-sm btn-success text-white mr-3"  style="float:right;margin-left: 10px;">Import Excel</a>
                     <a href="#" class="btn btn-sm btn-primary ml-3" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
                     <a href="{{route('task-download-qr',['id'=>@$_GET['project_id']?@$_GET['project_id']:1])}}" target="_blank" class="btn btn-sm btn-danger ml-3" style="float:right;margin-right: 10px;">Export QR</a>
                 </h5>
@@ -158,6 +159,33 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="import-data" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Patrol</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('import-excel-patroli')}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">File</label>
+                            <input type="file" class="form-control" name="file_excel" required>    
+                        </div>
+                        
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Simpan Data</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

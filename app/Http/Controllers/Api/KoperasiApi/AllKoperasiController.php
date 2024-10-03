@@ -64,6 +64,7 @@ class AllKoperasiController extends Controller
             $loan = Loan::where('employee_code', $employeeCode)
                         ->orderBy('created_at', 'desc')
                         ->first();
+            
 
             // If no loan, check if the member is eligible for applying a loan
             if (!$loan) {
@@ -112,6 +113,11 @@ class AllKoperasiController extends Controller
                         ->orderBy('created_at', 'desc')
                         ->first();
 
+            $historyPinjaman = LoanPayment::where('loan_id', $loan->id)
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->toArray();
+
             // Mendapatkan informasi anggota untuk sisahutang
             $anggota = Anggota::where('employee_code', $employeeCode)->first();
 
@@ -130,7 +136,7 @@ class AllKoperasiController extends Controller
                     $loanData = Loan::where('employee_code', $employeeCode)
                                 ->where('instalment', '>', 0)
                                 ->where('status', 'approve')
-                                ->latest()  // Mengurutkan berdasarkan created_at terbaru
+                                ->latest()  
                                 ->first();
                     if (!$pinjaman) {
                         $nextBill = [
@@ -154,7 +160,7 @@ class AllKoperasiController extends Controller
                 'message' => 'Loan data retrieved.',
                 'status_anggota' => $anggotaStatus->member_status,
                 'onloan_status' => $loan,
-                'remaining_loan' => $pinjaman,
+                'remaining_loan' => $historyPinjaman,
                 'next_bill' => $nextBill,
                 'savings' => $datasaya,
                 'saldo_simpanan' => $saldosaya,

@@ -388,7 +388,7 @@
             @endif
             
             <!-- Apps Settings -->
-            @if(in_array('superadmin_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin)  || in_array('hr_frontline', $dataLogin))
             <li class="nav-item nav-category">Settings</li>
                 <li class="nav-item">
                     <a href="{{route('setting.index')}}" class="nav-link {{ active_class(['setting']) }}">

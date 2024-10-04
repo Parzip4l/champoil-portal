@@ -75,7 +75,7 @@
                                     <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>
                                 </li>
                             @endif
-                            @if($employee && $employee->unit_bisnis == 'Kas')
+                            @if($employee && $employee->unit_bisnis == 'Kas' ||   $employee->unit_bisnis == 'RUN')
                                 <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
                                 @if($user->project_id == NULL)
                                 <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>

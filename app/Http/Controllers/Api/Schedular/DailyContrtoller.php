@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class DailyContrtoller extends Controller
 {
     public function daily_absen(){
-        $records = Project::whereNull('deleted_at')->get();
+        $records = Project::whereNull('deleted_at')->where('company','Kas')->get();
         $yesterday = Carbon::yesterday()->format('Y-m-d');
         $result = [];
         

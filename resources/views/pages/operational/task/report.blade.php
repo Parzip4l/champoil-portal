@@ -37,161 +37,161 @@
 <div id="loadingBackdrop" class="loading-backdrop">
   <div class="loading-spinner"></div>
 </div>
+
 <div class="row">
     <div class="col-md-12">
         <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-3 d-none d-md-block">
-                        <div class="card">
-                            <div class="card-body d-none">
-                                <h6 class="card-title mb-4">Full calendar</h6>
-                                <div id='external-events' class='external-events'>
-                                
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-12 col-md-12">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between">
-                                <h5 class="mb-0 align-self-center">Filter Report</h5>
-                            </div>
-                        <div class="card-body">
-                            <form class="row g-3" id="form-filter">
-                                <div class="col-auto">
-                                    <label for="staticEmail2" class="visually-hidden">Project</label>
-                                    <select name="project_id" id="project_id" class="form-control select2">
-                                        <option value="">-- Select Project -- </option>
-                                        @if($project)
-                                            @foreach($project as $pr)
-                                                @php
-                                                    if($project_id==$pr->id){
-                                                        $selected="selected";
-                                                    }else{
-                                                        $selected="";
-                                                    }
-                                                @endphp
-                                                <option value="{{ $pr->id }}" {{$selected}}>{{ $pr->name }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary mb-3">Filter</button>
-                                </div>
-                                <div class="col-auto">
-                                  <!-- <a href="javascript:void(0)" class="btn btn-primary" onclick="handleDownload()">Download</a> -->
-                                  <a href="javascript:void(0)" id="printButton" class="btn btn-primary">Print Analityc</a>
-                                </div>
-                            </form>
-                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                    <div class="accordion-body" id="printSection">
-                        <div class="row">
-                            <div class="col-md-3 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Jumlah Titik Patroli</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <h2 id="jml_point">9</h2>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="value_test">
-                                        <br/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Jumlah Shift</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <h2 id="jml_shift">3</h2>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="app_training">
-                                    <br/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Jumlah Patroli per-shift</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <h2 id="total_patrol_per_shift">3</h2>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="patrol_per_shift">
-                                        Patroli dilaksanakan 3x per-titik
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Total Patroli per-bulan</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <h2 id="total_patrol_per_month">3</h2>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="patrol_per_month">
-                                        Patroli yang harus dilaksanakan
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-7 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Statistik Per-bulan</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <div id="chart" width="400" height="500"></div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="monthly_stats">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-5 desktop mb-4">
-                                <div class="card custom-card2">
-                                    <div class="card-body">
-                                        <div class="title-card">
-                                            <h6>Persentase Patroli</h6>
-                                        </div>
-                                        <div class="count mt-2">
-                                            <div id="data_source" width="400" height="500"></div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer d-flex" id="patrol_percentage">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                            <div id='fullcalendar'></div>
-                        </div>
+            <div class="col-md-3 d-none d-md-block">
+                <div class="card">
+                    <div class="card-body d-none">
+                        <h6 class="card-title mb-4">Full calendar</h6>
+                        <div id='external-events' class='external-events'>
+                        
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <div class="col-12 col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0 align-self-center">Filter Report</h5>
+                    </div>
+                <div class="card-body">
+                    <form class="row g-3" id="form-filter">
+                        <div class="col-auto">
+                            <label for="staticEmail2" class="visually-hidden">Project</label>
+                            <select name="project_id" id="project_id" class="form-control select2">
+                                <option value="">-- Select Project -- </option>
+                                @if($project)
+                                    @foreach($project as $pr)
+                                        @php
+                                            if($project_id==$pr->id){
+                                                $selected="selected";
+                                            }else{
+                                                $selected="";
+                                            }
+                                        @endphp
+                                        <option value="{{ $pr->id }}" {{$selected}}>{{ $pr->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary mb-3">Filter</button>
+                        </div>
+                        <div class="col-auto">
+                            <!-- <a href="javascript:void(0)" class="btn btn-primary" onclick="handleDownload()">Download</a> -->
+                            <a href="javascript:void(0)" id="printButton" class="btn btn-primary">Print Analityc</a>
+                        </div>
+                    </form>
+                    
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-3 desktop mb-4">
+                                            <div class="card custom-card2">
+                                                <div class="card-body">
+                                                    <div class="title-card">
+                                                        <h6>Jumlah Titik Patroli</h6>
+                                                    </div>
+                                                    <div class="count mt-2">
+                                                        <h2 id="jml_point">9</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer d-flex" id="value_test">
+                                                    <br/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 desktop mb-4">
+                                            <div class="card custom-card2">
+                                                <div class="card-body">
+                                                    <div class="title-card">
+                                                        <h6>Jumlah Shift</h6>
+                                                    </div>
+                                                    <div class="count mt-2">
+                                                        <h2 id="jml_shift">3</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer d-flex" id="app_training">
+                                                <br/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 desktop mb-4">
+                                            <div class="card custom-card2">
+                                                <div class="card-body">
+                                                    <div class="title-card">
+                                                        <h6>Jumlah Patroli per-shift</h6>
+                                                    </div>
+                                                    <div class="count mt-2">
+                                                        <h2 id="total_patrol_per_shift">3</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer d-flex" id="patrol_per_shift">
+                                                    <small>Patroli dilaksanakan 3x per-titik</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 desktop mb-4">
+                                            <div class="card custom-card2">
+                                                <div class="card-body">
+                                                    <div class="title-card">
+                                                        <h6>Total Patroli per-bulan</h6>
+                                                    </div>
+                                                    <div class="count mt-2">
+                                                        <h2 id="total_patrol_per_month">3</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer d-flex" id="patrol_per_shift">
+                                                <small>Patroli dilaksanakan 3x per-titik</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 desktop mb-4">
+                                    <div class="card custom-card2">
+                                        <div class="card-body">
+                                            <div class="title-card">
+                                                <h6>Persentase Patroli</h6>
+                                            </div>
+                                            <div class="count mt-2">
+                                                <div id="data_source" width="400" height="500"></div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex" id="patrol_percentage">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="row">
+                                <div class="col-md-12    desktop mb-4">
+                                    <div class="card custom-card2">
+                                        <div class="card-body">
+                                            <div class="title-card">
+                                                <h6>Statistik Per-bulan</h6>
+                                            </div>
+                                            <div class="count mt-2">
+                                                <div id="chart" width="400" height="500"></div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex" id="monthly_stats">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div> -->
+                        
+                    <div id='fullcalendar'></div>
+                </div>
+                </div>
+            </div>
         </div>
     </div>
-    
 </div>
+
 
 <div class="modal modal-xl" tabindex="-1" id="fullCalModal"> 
   <div class="modal-dialog">
@@ -257,26 +257,27 @@ document.getElementById('form-filter').addEventListener('submit', function(e) {
     e.preventDefault();
 
     let project_id = $('#project_id').val();
+    let currentMonth = moment().format('MM'); // Get the current month
 
     // Show loading indicator
     showLoading();
 
+    // Fetch report data
     axios.get('/api/v1/report-patroli-project', {
         params: {
-            project_id: project_id
+            project_id: project_id,
+            month: currentMonth // Pass the current month as a parameter
         }
     })
     .then(response => {
-        point = response.data.point || [];
-        point2 = response.data.point_green || [];
-        var total = ((response.data.jml_point*response.data.jml_shift)*3)*response.data.jumlah_hari;
-        
+        const { point = [], point_green: point2 = [], jml_point, jml_shift, jumlah_hari } = response.data;
+        const total = ((jml_point * jml_shift) * 3) * jumlah_hari;
+
         // Initialize or update FullCalendar here
-        updateCalendar(point,point2);
-        analityc(project_id,response.data,total);
-        $("#jml_shift").text(response.data.jml_shift);
-        $("#jml_point").text(response.data.jml_point);
-        
+        updateCalendar(point, point2, project_id);
+        analityc(project_id, response.data, total);
+        $("#jml_shift").text(jml_shift);
+        $("#jml_point").text(jml_point);
         $("#total_patrol_per_month").text(total);
     })
     .catch(error => {
@@ -288,106 +289,117 @@ document.getElementById('form-filter').addEventListener('submit', function(e) {
     });
 });
 
-function updateCalendar(point,point2){
-        // Initialize FullCalendar
-        var Draggable = FullCalendar.Draggable;
-        var calendarEl = document.getElementById('fullcalendar');
-        var containerEl = document.getElementById('external-events');
-        
-        var curYear = moment().format('YYYY');
-        var curMonth = moment().format('MM');
 
-        // Calendar Event Sources
-        var calendarEvents = {
-            id: 1,
-            backgroundColor: 'rgba(1,104,250, .15)',
-            borderColor: '#0168fa',
-            events: []
-        };
+function updateCalendar(point, point2, project_id) {
+    // Initialize FullCalendar
+    var Draggable = FullCalendar.Draggable;
+    var calendarEl = document.getElementById('fullcalendar');
+    var containerEl = document.getElementById('external-events');
 
-        var birthdayEvents = {
-            id: 2,
-            backgroundColor: 'rgba(16,183,89, .25)',
-            borderColor: '#10b759',
-            events: []
-        };
+    // Initialize the calendar
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        headerToolbar: {
+            left: "prev,today,next", // Handle navigation buttons
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        editable: true,
+        droppable: true, // Allows things to be dropped onto the calendar
+        fixedWeekCount: true,
+        initialView: 'dayGridMonth',
+        timeZone: 'UTC',
+        hiddenDays: [],
+        navLinks: true,
+        dayMaxEvents: 2,
+        events: [], // Leave empty initially
+        eventSources: [], // Dynamic event sources will be added later
+        datesSet: function(info) {
+            // This function runs when the user navigates to a different date range
+            
+            // Get the start date (which is the beginning of the visible month)
+            let start = moment(info.start).format('YYYY-MM-DD');
+            let end = moment(info.end).format('YYYY-MM-DD');
+            let year = moment(info.start).format('YYYY');
+            let month = moment(info.start).format('MM');
 
-        var holidayEvents = {
-            id: 3,
-            backgroundColor: 'rgba(241,0,117,.25)',
-            borderColor: '#f10075',
-            events: point // Default to empty array if undefined
-        };
+            console.log('Start of the selected month:', start);
 
-        var discoveredEvents = {
-            id: 4,
-            backgroundColor: 'rgba(0,204,204,.25)',
-            borderColor: '#00cccc',
-            events: point2 // Default to empty array if undefined
-        };
-
-        var meetupEvents = {
-            id: 5,
-            backgroundColor: 'rgba(91,71,251,.2)',
-            borderColor: '#5b47fb',
-            events: []
-        };
-
-        var otherEvents = {
-            id: 6,
-            backgroundColor: 'rgba(253,126,20,.25)',
-            borderColor: '#fd7e14',
-            events: []
-        };
-
-        new Draggable(containerEl, {
-            itemSelector: '.fc-event',
-            eventData: function(eventEl) {
-                return {
-                    title: eventEl.innerText
+            // Fetch new data based on the visible range (i.e., the currently visible month)
+            axios.get('/api/v1/report-patroli-project', {
+                params: {
+                    project_id: project_id,
+                    bulan: `${year}-${month}`
+                }
+            })
+            .then(response => {
+                // Update the event sources dynamically
+                const calendarEvents = {
+                    id: 1,
+                    backgroundColor: 'rgba(1,104,250, .15)',
+                    borderColor: '#0168fa',
+                    events: response.data.point || []
                 };
-            }
-        });
 
-        // Initialize the calendar
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            headerToolbar: {
-                left: "prev,today,next",
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-            },
-            editable: true,
-            droppable: true, // Allows things to be dropped onto the calendar
-            fixedWeekCount: true,
-            initialView: 'dayGridMonth',
-            timeZone: 'UTC',
-            hiddenDays: [],
-            navLinks: 'true',
-            dayMaxEvents: 2,
-            events: [],
-            eventSources: [calendarEvents, birthdayEvents, holidayEvents, discoveredEvents, meetupEvents, otherEvents],
-            drop: function(info) {
-                // Optional: Remove the element from the "Draggable Events" list
-                // info.draggedEl.parentNode.removeChild(info.draggedEl);
-            },
-            eventClick: function(info) {
-                var eventObj = info.event;
-                const date = new Date(eventObj.start);
-                const year = date.getFullYear();
-                let month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ensure month is 2 digits
-                let day = date.getDate().toString().padStart(2, '0'); // Ensure day is 2 digits
+                const birthdayEvents = {
+                    id: 2,
+                    backgroundColor: 'rgba(16,183,89, .25)',
+                    borderColor: '#10b759',
+                    events: response.data.point_green || []
+                };
 
-                const formattedDate = `${year}-${month}-${day}`;
+                const holidayEvents = {
+                    id: 3,
+                    backgroundColor: 'rgba(241,0,117,.25)',
+                    borderColor: '#f10075',
+                    events: point || [] // From the report
+                };
 
-                fetch('/api/v1/patroli-report-detail/' + eventObj.id + '/' + formattedDate)
+                const discoveredEvents = {
+                    id: 4,
+                    backgroundColor: 'rgba(0,204,204,.25)',
+                    borderColor: '#00cccc',
+                    events: point2 || [] // From the report
+                };
+
+                const meetupEvents = {
+                    id: 5,
+                    backgroundColor: 'rgba(91,71,251,.2)',
+                    borderColor: '#5b47fb',
+                    events: []
+                };
+
+                const otherEvents = {
+                    id: 6,
+                    backgroundColor: 'rgba(253,126,20,.25)',
+                    borderColor: '#fd7e14',
+                    events: []
+                };
+
+                // Remove the old event sources and add new ones
+                calendar.removeAllEventSources();
+                calendar.addEventSource(calendarEvents);
+                calendar.addEventSource(birthdayEvents);
+                calendar.addEventSource(holidayEvents);
+                calendar.addEventSource(discoveredEvents);
+                calendar.addEventSource(meetupEvents);
+                calendar.addEventSource(otherEvents);
+            })
+            .catch(error => {
+                console.error('There was an error fetching new events:', error);
+            });
+        },
+        eventClick: function(info) {
+            var eventObj = info.event;
+            const date = new Date(eventObj.start);
+            const year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ensure month is 2 digits
+            let day = date.getDate().toString().padStart(2, '0'); // Ensure day is 2 digits
+
+            const formattedDate = `${year}-${month}-${day}`;
+
+            axios.get(`/api/v1/patroli-report-detail/${eventObj.id}/${formattedDate}`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const reports = data.report;
+                    const reports = response.data.report;
                     $('#tanggal_report').text(formattedDate);
                     $('#body_data').empty();
                     let reportHTML = '';
@@ -396,13 +408,14 @@ function updateCalendar(point,point2){
                     reports.forEach(report => {
                         nomor += 1;
                         let label_status = report.kondisi === "Baik" ? "Kondisi Baik" : "Kondisi Tidak Baik";
-                        reportHTML += '<tr>' +
-                                      '<td>' + nomor + '</td>' +
-                                      '<td>' + report.point_name + '</td>' +
-                                      '<td>' + report.kondisi + '</td>' +
-                                      '<td><img src="' + report.photo + '" alt="Report Photo"></td>' +
-                                      '<td>' + report.petugas + '<br/> ' + report.tanggal + '</td>' +
-                                      '</tr>';
+                        reportHTML += `
+                            <tr>
+                                <td>${nomor}</td>
+                                <td>${report.point_name}</td>
+                                <td>${report.kondisi}</td>
+                                <td><img src="${report.photo}" alt="Report Photo"></td>
+                                <td>${report.petugas}<br/>${report.tanggal}</td>
+                            </tr>`;
                     });
 
                     $('#body_data').append(reportHTML);
@@ -411,16 +424,17 @@ function updateCalendar(point,point2){
                     console.error('There has been a problem with your fetch operation:', error);
                 });
 
-                $('#modalTitle1').html(eventObj.title);
-                $('#modalBody1').html(eventObj._def.extendedProps.description);
-                $('#eventUrl').attr('href', eventObj.url);
-                $('#fullCalModal').modal("show");
-            }
-        });
+            $('#modalTitle1').html(eventObj.title);
+            $('#modalBody1').html(eventObj._def.extendedProps.description);
+            $('#eventUrl').attr('href', eventObj.url);
+            $('#fullCalModal').modal("show");
+        }
+    });
 
-        calendar.render();
-
+    calendar.render();
 }
+
+
 
 function analityc(project,data,total){
     var donutOptions = {

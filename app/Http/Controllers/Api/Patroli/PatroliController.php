@@ -193,6 +193,11 @@ class PatroliController extends Controller
         $shift=$request->input('shift');
         $project=$request->input('project');
         $id_task=$request->input('id_task');
+
+        $bulan = $request->input('bulan') ?? date('Y-m');
+
+
+
         $result_patrol=[];
 
         $get_user = Schedule::where('tanggal',$tanggal)
@@ -200,10 +205,13 @@ class PatroliController extends Controller
                             ->where('project',$project)
                             ->first();
         $user = Employee::where('nik',$get_user->employee)->first();
-        $data_patrol = Patroli::where('employee_code',$user->nik)
-                                ->where('id_task',$id_task)
-                                ->whereDate('created_at',$tanggal)
-                                ->get();
+        $data_patrol = Patroli::where('employee_code', $user->nik)
+                        ->where('id_task', $id_task)
+                        ->whereDate('created_at', $tanggal)
+                        ->whereMonth('created_at', date('m', strtotime($bulan)))
+                        ->whereYear('created_at', date('Y', strtotime($bulan)))
+                        ->get();
+
         if(!empty($data_patrol)){
             foreach($data_patrol as $row){
                 $petugas = Employee::where('nik',$row->employee_code)->first();
@@ -323,6 +331,7 @@ class PatroliController extends Controller
         $user = $request->user('api');
 
         $project = $request->input('project_id');
+        $bulan = $request->input('bulan') ?? date('Y-m');
         
 
         $periode_filter = $request->input('periode')?$request->input('periode'):'';
@@ -365,7 +374,7 @@ class PatroliController extends Controller
         $patroli_ok=0;
         $patroli_nnot=0;
         if(!empty($report)){
-            foreach($this->tanggal_tahun() as $tanggal){
+            foreach($this->tanggal_tahun($bulan) as $tanggal){
                 foreach($report as $row){
                     $count = Patroli::where('unix_code',$row->unix_code)->whereDate('created_at',$tanggal)->count();
                     if($count > 0){
@@ -426,24 +435,34 @@ class PatroliController extends Controller
         return response()->json($data);
     }
 
-    private function tanggal_tahun(){
-        $year = date('Y');
+    private function tanggal_tahun($bulan = ""){
+        if ($bulan) {
+            // If $bulan is provided, extract the year and month from it
+            $year = date('Y', strtotime($bulan));
+            $month = date('m', strtotime($bulan));
 
-        // Tentukan awal dan akhir tahun
-        $startDate = Carbon::createFromDate($year, 1, 1);
-        $endDate = Carbon::createFromDate($year, 12, 31);
+            // Create start and end dates for the specific month
+            $startDate = Carbon::createFromDate($year, $month, 1);
+            $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        } else {
+            // If no $bulan is provided, use the current year and generate the full year range
+            $year = date('Y');
+            $startDate = Carbon::createFromDate($year, 1, 1);
+            $endDate = Carbon::createFromDate($year, 12, 31);
+        }
 
-        // Buat periode tanggal dari awal hingga akhir tahun
+        // Create a period from the start date to the end date
         $period = CarbonPeriod::create($startDate, $endDate);
 
-        // Loop melalui periode dan ambil setiap tanggal
+        // Collect all dates within the period
         $dates = [];
         foreach ($period as $date) {
-            $dates[] = $date->format('Y-m-d'); // Format tanggal sesuai kebutuhan
+            $dates[] = $date->format('Y-m-d');
         }
 
         return $dates;
     }
+
 
     public function export_report(){
         $data = [

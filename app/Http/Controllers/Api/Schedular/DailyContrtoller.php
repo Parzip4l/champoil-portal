@@ -31,6 +31,7 @@ class DailyContrtoller extends Controller
                 // Initialize counters
                 $absen = 0;
                 $not_absen = 0;
+                $no_absen =[];
         
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {
@@ -40,6 +41,12 @@ class DailyContrtoller extends Controller
                         ->where('tanggal', $yesterday)
                         ->count();
 
+                    $no_absen = DB::table('absens')
+                                    ->leftJoin('karyawan','karyawan.nik','=','absens.nik')
+                                    ->where('nik', $rs->employee)
+                                    ->where('tanggal', $yesterday)
+                                    ->get();
+                                    
                     if ($jml_absen > 0) {
                         $absen += 1;
                     } else {
@@ -52,7 +59,8 @@ class DailyContrtoller extends Controller
                     "project_name" => $row->name,
                     "schedule_on" => $schedules_total,  
                     "absen" => $absen,                 
-                    "not_absen" => $not_absen           
+                    "not_absen" => $not_absen,
+                    "no_absen"=>$no_absen           
                 ];
             }
         }

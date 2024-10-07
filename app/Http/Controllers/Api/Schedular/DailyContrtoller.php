@@ -21,6 +21,7 @@ class DailyContrtoller extends Controller
             foreach ($records as $row) {
                 // Fetch all schedules for this project on the given day where shift is not 'OFF'
                 $schedules = Schedule::where('schedules.project', $row->id)
+                    ->join('karyawan','karyawan.nik','=','schedules.employee')
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)
                     ->get();
@@ -41,16 +42,14 @@ class DailyContrtoller extends Controller
                         ->where('tanggal', $yesterday)
                         ->count();
 
-                    $no_absen[] = DB::table('absens')
-                                    ->rightJoin('karyawan','karyawan.nik','=','absens.nik')
-                                    ->where('absens.nik', $rs->employee)
-                                    ->where('tanggal', $yesterday)
-                                    ->get();
+    
 
                     if ($jml_absen > 0) {
                         $absen += 1;
+                        
                     } else {
                         $not_absen += 1;
+                        $no_absen[]=$rs->nama;
                     }
                 }
         

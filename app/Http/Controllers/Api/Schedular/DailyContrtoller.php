@@ -42,7 +42,7 @@ class DailyContrtoller extends Controller
                         ->count();
 
                     $no_absen[] = DB::table('absens')
-                                    ->leftJoin('karyawan','karyawan.nik','=','absens.nik')
+                                    ->rightJoin('karyawan','karyawan.nik','=','absens.nik')
                                     ->where('absens.nik', $rs->employee)
                                     ->where('tanggal', $yesterday)
                                     ->get();

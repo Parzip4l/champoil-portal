@@ -7,6 +7,11 @@
 @endpush
 
 @section('content')
+@php 
+        $user = Auth::user();
+        $dataLogin = json_decode(Auth::user()->permission); 
+        $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    @endphp
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">

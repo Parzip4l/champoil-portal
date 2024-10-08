@@ -195,7 +195,7 @@
                 @endif
             @endif
             <!-- Payroll Menu -->
-            @if(in_array('superadmin_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin) || in_array('hr_frontline', $dataLogin))
             <li class="nav-item nav-category">Payrol & Koperasi</li>
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#PayrolMaster" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="PayrolMaster">

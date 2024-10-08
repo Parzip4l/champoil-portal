@@ -54,7 +54,7 @@
 
             <!-- Employee Data -->
             @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
-                @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin))
+                @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('hr_frontline', $dataLogin))
                 <li class="nav-item nav-category">Employee</li>
                 <li class="nav-item {{ active_class(['']) }}">
                     <a class="nav-link" data-bs-toggle="collapse" href="#timemanagement" role="button" aria-expanded="{{ is_active_route(['timemanagement']) }}" aria-controls="timemanagement">

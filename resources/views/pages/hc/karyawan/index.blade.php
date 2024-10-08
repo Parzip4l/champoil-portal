@@ -246,7 +246,7 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'nama', name: 'nama',render: function (data, type, row) {
-        return `${data} <br> ${row.slack_id}`;
+        return `${data} <br> Slack ID : ${row.slack_id}`;
     } },
                 { data: 'nik', name: 'nik' },
                 { data: 'jenis_kelamin', name: 'jenis_kelamin' },

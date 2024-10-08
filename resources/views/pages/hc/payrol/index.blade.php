@@ -82,7 +82,7 @@
                     </table>
                 </div>
             </div>
-            @enndif
+        @endif
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
                 <a class="btn btn-primary mb-2" href="{{route('component.ns')}}"><i data-feather="plus" class="icon-sm me-2"></i> <span class="">Add Payrol Component</span></a>
                 <div class="table-responsive">

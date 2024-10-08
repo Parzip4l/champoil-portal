@@ -205,9 +205,11 @@
                 </a>
                 <div class="collapse {{ show_class(['category']) }}" id="PayrolMaster">
                     <ul class="nav sub-menu">
+                    @if(in_array('superadmin_access', $dataLogin))
                         <li class="nav-item">
                             <a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payrol Data</a>
                         </li>
+                    @endif
                         <li class="nav-item">
                             <a href="{{ url('employee-loan') }}" class="nav-link {{ active_class(['employee-loan']) }}">Loan</a>
                         </li>

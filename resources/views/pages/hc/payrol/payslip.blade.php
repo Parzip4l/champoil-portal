@@ -31,9 +31,12 @@
             </div>
             <div class="card-body">
                 <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
+                    @if(in_array('superadmin_access', $dataLogin))
                     <li class="nav-item">
                         <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
                     </li>
+                    @endif
+                    
                     @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
                     <li class="nav-item">
                         <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Frontline Officer</a>

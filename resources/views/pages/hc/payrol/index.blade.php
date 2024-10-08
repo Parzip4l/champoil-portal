@@ -21,7 +21,7 @@
         </div>
         <hr>
         <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
-        @if(in_array('superadmin_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
                 <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
             </li>
@@ -32,6 +32,7 @@
             </li>
         </ul>
         <div class="tab-content mt-3" id="lineTabContent">
+        @if(in_array('superadmin_access', $dataLogin))
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
             <a class="btn btn-primary mb-2" href="{{route('payrol-component.create')}}"><i data-feather="plus" class="icon-sm me-2"></i> <span class="">Add Payrol Component</span></a>
                 <div class="table-responsive">
@@ -81,6 +82,7 @@
                     </table>
                 </div>
             </div>
+            @enndif
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
                 <a class="btn btn-primary mb-2" href="{{route('component.ns')}}"><i data-feather="plus" class="icon-sm me-2"></i> <span class="">Add Payrol Component</span></a>
                 <div class="table-responsive">

@@ -470,8 +470,10 @@ Password: ".$request->password;
         $divisi = Divisi::where('company', $employee->unit_bisnis)->get();
         $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();
         $organisasi = Organisasi::where('company',$employee->unit_bisnis)->get();
+        $user = User::where('name',$id)->first();
+        
 
-        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan'));
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan','user'));
         
     }
 
@@ -645,6 +647,7 @@ Password: ".$request->password;
             $userInfo = User::where('name', $id)->first();
 
             if (!$userInfo) {
+                // Create a new user if not found
                 $userInfo = new User();
                 $userInfo->name = $request->nik;
                 $userInfo->email = $request->email;
@@ -653,7 +656,19 @@ Password: ".$request->password;
                 $userInfo->employee_code = $request->nik;
                 $userInfo->company = $company->unit_bisnis;
                 $userInfo->save();
+            } else {
+                // Update the existing user
+                $userInfo->name = $request->nik;
+                $userInfo->email = $request->email;
+                if ($request->password) {
+                    $userInfo->password = Hash::make($request->password); // Update password if provided
+                }
+                $userInfo->permission = json_encode($request->permissions);
+                $userInfo->employee_code = $request->nik;
+                $userInfo->company = $company->unit_bisnis;
+                $userInfo->update();
             }
+
 
             DB::commit();
             // Redirect to a view or return a response as needed

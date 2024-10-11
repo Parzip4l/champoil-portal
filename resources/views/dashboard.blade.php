@@ -1149,6 +1149,14 @@
                 </div>
             </div>
             @endif
+            <div class="card custom-card2 mt-3">
+                <div class="card-header">
+                    <h6>Grafik User Slack</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="user_slack" style="max-height:294px;"></canvas>      
+                </div>
+            </div>
         </div>
 
         <div class="col-md-8">
@@ -1475,6 +1483,19 @@ $(function() {
         var PersentaseHadir = new Chart(ctx, {
             type: 'doughnut',
             data: dataKehadiran,
+        });
+    });
+
+
+  
+
+    var userSlack = {!! json_encode($UserSlack) !!};
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('user_slack').getContext('2d');
+        var slack = new Chart(ctx, {
+            type: 'doughnut',
+            data: userSlack,
         });
     });
     

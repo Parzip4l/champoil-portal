@@ -152,14 +152,17 @@ class DashboardController extends Controller
         $slack_on = Employee::where('unit_bisnis', $company->unit_bisnis)
                             ->join('users','users.name','=','karyawan.nik')
                             ->where('resign_status', 0)
+                            
                             ->whereNull('users.project_id')
                             ->whereNotNull('slack_id')
+                            ->where('organisasi','FRONTLINE OFFICER')
                             ->count();
 
         $slack_off = Employee::where('unit_bisnis', $company->unit_bisnis)
                             ->join('users','users.name','=','karyawan.nik')
                             ->where('resign_status', 0)
                             ->whereNull('users.project_id')
+                            ->where('organisasi','FRONTLINE OFFICER')
                             ->whereNull('slack_id')
                             ->count();
 

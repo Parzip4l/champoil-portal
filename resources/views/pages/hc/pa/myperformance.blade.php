@@ -19,7 +19,7 @@
     </div>
 </div>
 <!-- Profile Card -->
-<div class="row">
+<div class="row mobile">
     <div class="col-md-12">
         <div class="card custom-card2 mb-3">
             <div class="card-body">
@@ -70,43 +70,53 @@
         <div class="card custom-card2">
             <div class="card-body">
                 <div class="form-list-wrap-pa">
-                    @foreach($paData as $data)
-                    <div class="content-pa-header d-flex justify-content-between">
-                        <div class="periode-data mb-4">
-                            <p>{{$data->periode}} {{$data->tahun}}</p>
+                    @if($paData->isEmpty())
+                        <div class="alert alert-danger text-center">
+                            <strong>Tidak ada data Performance Appraisal ditemukan.</strong>
                         </div>
-                        <div class="assign-data">
-                            @if ($data->approve_byemployee === 'false')
-                                <p class="text-danger">Not Signed</p>
-                            @else
-                                <p class="text-success">Already Signed</p>
-                            @endif
+                    @else
+                        @foreach($paData as $data)
+                        <div class="content-pa-header d-flex justify-content-between">
+                            <div class="periode-data mb-4">
+                                <p>{{$data->periode}} {{$data->tahun}}</p>
+                                
+                            </div>
+                            <div class="assign-data">
+                                @if ($data->approve_byemployee === 'false')
+                                    <p class="text-danger">Not Signed</p>
+                                @else
+                                    <p class="text-success">Already Signed</p>
+                                @endif
+                            </div>
+                            
                         </div>
-                    </div>
-                    <div class="pa-body mb-3">
-                        <div class="nilai">
-                            <p>{{$data->nilai_keseluruhan}}</p>
-                            @if ($predikatName === 'Baik Sekali')
-                                <h5 class="text-success">{{$predikatName}}</h5>
-                            @elseif ($predikatName === 'Baik')
-                                <h5 class="text-success">{{$predikatName}}</h5>
-                            @elseif ($predikatName === 'Cukup')
-                                <h5 class="text-warning">{{$predikatName}}</h5>
-                            @elseif ($predikatName === 'Kurang')
-                                <h5 class="text-warning">{{$predikatName}}</h5>
-                            @elseif ($predikatName === 'Kurang Sekali')
-                                <h5 class="text-danger">{{$predikatName}}</h5>
-                            @endif
+                        <div class="pa-body mb-3">
+                            <div class="nilai">
+                                <p>{{$data->nilai_keseluruhan}}</p>
+                                @if ($predikatName === 'Baik Sekali')
+                                    
+                                @elseif ($predikatName === 'Baik')
+                                    <h5 class="text-success">{{$predikatName}}</h5>
+                                @elseif ($predikatName === 'Cukup')
+                                    <h5 class="text-warning">{{$predikatName}}</h5>
+                                @elseif ($predikatName === 'Kurang')
+                                    <h5 class="text-warning">{{$predikatName}}</h5>
+                                @elseif ($predikatName === 'Kurang Sekali')
+                                    <h5 class="text-danger">{{$predikatName}}</h5>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                    <a href="{{route('details.Mypa', $data->id)}}" class="btn btn-sm btn-primary w-100">Lihat Details</a>
-                    <hr>
-                    @endforeach
+                        <p class="text-muted mb-2">Created By: {{$data->created_by}}</p>
+                        <a href="{{route('details.Mypa', $data->id)}}" class="btn btn-sm btn-primary w-100">Lihat Details</a>
+                        <hr>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <!-- End -->
 
 @endsection

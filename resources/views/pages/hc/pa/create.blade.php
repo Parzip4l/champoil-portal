@@ -108,6 +108,7 @@
                                             </td>
                                             <td>
                                                 <input type="number" class="form-control" name="nilai[{{ $dataFaktor->id }}]" max="4" oninput="validity.valid||(value=''); hitungTotal();">
+                                                <p class="text-danger" style="font-size:12px">*Berikan nilai dari 1-4</p>
                                             </td>
                                             <td><input type="text" class="form-control" name="nilaifaktor[]" readonly></td>
                                             <td><textarea name="keterangan[{{ $dataFaktor->id }}]" class="form-control"></textarea></td>
@@ -136,8 +137,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <td><textarea name="komentar_masukan" id="" class="form-control"></textarea></td>
-                                    <td><textarea name="catatan_target" id="" class="form-control"></textarea></td>
+                                    <td><textarea name="komentar_masukan" id="" required class="form-control"></textarea></td>
+                                    <td><textarea name="catatan_target" id="" required class="form-control"></textarea></td>
                                 </tbody>
                             </table>
                         </div>

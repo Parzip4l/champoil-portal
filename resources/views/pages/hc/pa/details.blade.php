@@ -21,7 +21,7 @@
 <div class="row mb-4">
     <div class="topbar-wrap d-flex justify-content-between">
         <div class="arrow-back">
-            <a href="{{route('setting.pa')}}" class="d-flex color-custom">
+            <a href="{{url('performance-appraisal/my-performance')}}" class="d-flex color-custom">
                 <i class="me-2 icon-lg" data-feather="chevron-left"></i>
                 <h5 class="align-self-center">Kembali</h5>
             </a>
@@ -60,7 +60,7 @@
                             <input type="hidden" name="nik" class="form-control" value="{{$performance->nik}}">
                         </div>
                         @if($performance->approve_byemployee === 'false')
-                        <a href="{{route('approve.Mypa', $performance->id)}}" class="btn btn-sm btn-success">Tanda Tangan</a>
+                            <a href="{{route('approve.Mypa', $performance->id)}}" class="btn btn-sm btn-success">Tanda Tangan</a>
                         @else
 
                         @endif
@@ -146,16 +146,17 @@
                     <div class="col-md-6">
                         <p class="">Karyawan Yang Dinilai</p>
                             @if($performance->approve_byemployee === 'false')
-                                <p class="mt-6">Belum Ditandatangan</p>
+                             <a href="{{route('approve.Mypa', $performance->id)}}" class="btn btn-sm btn-success mt-5">Tanda Tangan</a>
                                 
                             @else
                             <img src="{{ asset('images/approve.png') }}" alt="" class="approved">
                             <h5>{{$performance->name}}</h5>
                             <p class="text-muted">{{ $performance->updated_at->translatedFormat('d M Y') }}</p>
                             @endif
+                            
                     </div>
                     <div class="col-md-6">
-                        <p class="">Atasan Langsung</p>
+                        <p class="">Karyawan Yang Menilai</p>
                         <img src="{{ asset('images/approve.png') }}" alt="" class="approved">
                         <h5>{{$performance->created_by}}</h5>
                         <p class="text-muted">{{ $performance->created_at->translatedFormat('d M Y') }}</p>

@@ -123,7 +123,7 @@
             @endif
             <!-- Performance Appraisal Menu -->
             @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
-                @if(in_array('superadmin_access', $dataLogin))
+                @if(in_array('superadmin_access', $dataLogin)|| in_array('dashboard_access', $dataLogin))
                 <li class="nav-item {{ active_class(['']) }}">
                     <a class="nav-link" data-bs-toggle="collapse" href="#performance" role="button" aria-expanded="{{ is_active_route(['performance']) }}" aria-controls="performance">
                         <i class="link-icon" data-feather="file-text"></i>
@@ -136,8 +136,13 @@
                                 <a href="{{ route('index.pa') }}" class="nav-link {{ active_class(['performance-appraisal/performance-master']) }}">Performance Appraisal</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{url('performance-appraisal/my-performance')}}" class="nav-link {{ active_class(['performance-appraisal/my-performance']) }}">My Performance Appraisal</a>
+                            </li>
+                            @if(in_array('superadmin_access', $dataLogin))
+                            <li class="nav-item">
                                 <a href="{{ route('setting.pa') }}" class="nav-link {{ active_class(['performance-appraisal/setting']) }}">Settings</a>
                             </li>
+                            @endif
                         </ul>
                     </div>
                 </li>

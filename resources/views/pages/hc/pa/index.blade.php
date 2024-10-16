@@ -50,6 +50,7 @@
                         <th>Periode</th>
                         <th>Tahun</th>
                         <th>Nilai</th>
+                        <th>Created By</th>
                         <th>Aksi</th>
                     </tr>
                     </thead>
@@ -63,6 +64,7 @@
                             <td>{{$data->periode}}</td>
                             <td>{{$data->tahun}}</td>
                             <td>{{$data->nilai_keseluruhan}}</td>
+                            <td>{{$data->created_by}}</td>
                             <td>
                                 <div class="dropdown"> 
                                     <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -113,7 +115,7 @@
             if (result.isConfirmed) {
                 // Perform the delete action here (e.g., send a request to delete the data)
                 // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('kategori-pa.destroy', ':id') }}".replace(':id', id);
+                const deleteUrl = "{{ route('pa.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
                     headers: {

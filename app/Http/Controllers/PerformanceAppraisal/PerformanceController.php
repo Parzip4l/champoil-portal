@@ -288,9 +288,17 @@ class PerformanceController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-
-        $padata = PaModel::where('company', $company->unit_bisnis)->get();
-
+        $dataLogin = json_decode(Auth::user()->permission);
+        if (in_array('superadmin_access', $dataLogin)) {
+            // Tampilkan semua data PA
+            $padata =PaModel::where('company', $company->unit_bisnis)->get();
+        } elseif (in_array('dashboard_access', $dataLogin)) {
+            // Tampilkan data PA berdasarkan divisi
+            $padata = PaModel::where('created_by',$company->nama)->get();
+        } else {
+            // Jika tidak memiliki akses, data kosong
+            $padata = collect(); // Data kosong
+        }
         return view('pages.hc.pa.index', compact('padata'));
     }
 
@@ -298,17 +306,29 @@ class PerformanceController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
+        $dataAtasan = $company->manager;
 
         $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->where('level', $company->golongan)->get();
         $totalKategori = $kategoriPa->count();
-        $faktor = FaktorModel::where('company', $company->unit_bisnis)
-        ->get();
+        $faktor = FaktorModel::where('company', $company->unit_bisnis)->get();
         $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
-        ->where('resign_status',0)
-        ->where('organisasi', 'Management Leaders')
-        ->where('manager', $company->nama)
+        ->where('resign_status', 0)
+        ->where('divisi',$company->divisi)
+        ->where('nik', '!=', $company->nik)  // Kecualikan diri sendiri
         ->get();
         return view('pages.hc.pa.create', compact('faktor','employee','kategoriPa','totalKategori'));
+    }
+
+    public function deletePA($id)
+    {
+        try{
+            $padata = PaModel::findOrFail($id);
+            $padata->delete();
+
+            return redirect()->route('faktor-pa.setting')->with('success', 'Faktor data berhasil dihapus');
+        }catch(\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function getTotalKategori($level)
@@ -383,15 +403,25 @@ class PerformanceController extends Controller
             foreach ($kategoriPa as $kategori) {
                 // Mengambil faktor dari database berdasarkan kategori
                 $faktors = FaktorModel::where('kategori', $kategori->name)->where('level', $request->level)->get();
-
+                
                 // Looping untuk setiap faktor dalam kategori
                 foreach ($faktors as $faktor) {
+                    
                     // Mengambil nilai dan keterangan dari request berdasarkan id faktor
                     $nilai = $request->nilai[$faktor->id] ?? null;
                     $keterangan = $request->keterangan[$faktor->id] ?? null;
 
                     // Menambahkan data faktor ke dalam array detailsData hanya jika nilai tidak null
-                    if ($nilai !== null) {
+                    $exists = false;
+                    foreach ($detailsData as $detail) {
+                        if ($detail['id'] === $faktor->id) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+
+                    // Menambahkan data faktor ke dalam array detailsData hanya jika nilai tidak null dan belum ada dalam array
+                    if ($nilai !== null && !$exists) {
                         $detailsData[] = [
                             'id' => $faktor->id,
                             'kategori' => $kategori->name,
@@ -402,12 +432,12 @@ class PerformanceController extends Controller
                             'keterangan' => $keterangan,
                         ];
                     }
+                    
                 }
             }
-
             // Encode detailsData menjadi JSON sebelum disimpan
             $pa->detailsdata = json_encode($detailsData);
-
+            
             // Menyimpan data ke database
             $pa->save();
 
@@ -512,26 +542,23 @@ class PerformanceController extends Controller
     }
 
     public function MyPerformanceList()
-    {
-        $code = Auth::user()->employee_code;
-        $employee = Employee::where('nik', $code)->first();
-        $predikats = PredikatModel::where('company', $employee->unit_bisnis)->get();
-        $paData = PaModel::where('nik', $code)->get();
+{
+    $code = Auth::user()->employee_code;
+    $employee = Employee::where('nik', $code)->first();
+    $predikats = PredikatModel::where('company', $employee->unit_bisnis)->get();
+    $paData = PaModel::where('nik', $code)->get();
 
-        if ($paData->isEmpty()) {
-            // Handle the case where no paData is found
-            return response()->json(['error' => 'No performance appraisal data found'], 404);
-        }
-        
+    $hasData = !$paData->isEmpty();
+$predikatName = 0;
+    if ($hasData) {
         foreach ($paData as $pa) {
             $nilai_keseluruhan = floatval($pa->nilai_keseluruhan);
-            $predikatName = null;
-            
+            $predikatName = null; // Reset for each iteration
+
             foreach ($predikats as $predikat) {
-                
                 $minNilai = floatval($predikat->min_nilai);
                 $maxNilai = floatval($predikat->max_nilai);
-               
+
                 if ($nilai_keseluruhan >= $minNilai && $nilai_keseluruhan <= $maxNilai) {
                     $predikatName = $predikat->name;
                     break;
@@ -539,9 +566,12 @@ class PerformanceController extends Controller
             }
             $pa->predikat_name = $predikatName;
         }
-        
-        return view('pages.hc.pa.myperformance', compact('paData','employee','predikatName'));
     }
+
+    return view('pages.hc.pa.myperformance', compact('paData', 'employee', 'hasData', 'predikatName'));
+}
+
+
 
     public function DetailPerformance($id)
     {

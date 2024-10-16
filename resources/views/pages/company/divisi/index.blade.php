@@ -26,6 +26,7 @@
                         <thead>
                             <tr>
                                 <th>Divisi Name</th>
+                                <th>Manager Name</th>
                                 <th>Company Name</th>
                                 <th>Action</th>
                             </tr>
@@ -34,6 +35,7 @@
                             @foreach($divisi as $data)
                             <tr>
                                 <td><a href="{{ route('company.show', $data->id)}}">{{$data->name}}</a></td>
+                                <td>{{$data->manager}}</td>
                                 <td>{{$data->company}}</td>
                                 <td>
                                     <div class="dropdown">
@@ -81,6 +83,14 @@
                             <label for="" class="form-label">Divisi Name</label>
                             <input type="text" name="name" class="form-control" placholder="" required>
                         </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Manager Name</label>
+                            <select class="form-select" data-width="100%" name="manager" required>
+                                @foreach($karyawan as $manager)
+                                    <option value="{{$manager->nama}}">{{$manager->nama}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Add Divisi</button>
                         </div>
@@ -108,6 +118,14 @@
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Divisi Name</label>
                             <input type="text" name="name" class="form-control" placholder="e.g Indolumas Grease, PT" value="{{$data->name}}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Manager Name</label>
+                            <select class="form-select" data-width="100%" name="manager" required>
+                                @foreach($karyawan as $manager)
+                                    <option value="{{$manager->nama}}">{{$manager->nama}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Update Divisi</button>

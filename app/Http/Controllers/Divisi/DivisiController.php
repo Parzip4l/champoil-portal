@@ -22,8 +22,12 @@ class DivisiController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
+        $karyawan = Employee::where('unit_bisnis',$company->unit_bisnis)
+                            ->where('resign_status',0)
+                            ->where('organisasi','Management Leaders')->get();
+
         $divisi = Divisi::where('company', $company->unit_bisnis)->get();
-        return view('pages.company.divisi.index', compact('divisi'));
+        return view('pages.company.divisi.index', compact('divisi','karyawan'));
     }
 
     /**
@@ -48,11 +52,13 @@ class DivisiController extends Controller
         $company = Employee::where('nik', $code)->first();
 
         $request->validate([
-            'name' => 'required'
+            'name' => 'required',
+            'manager' => 'required'
         ]);
         
         $divisi = new Divisi();
         $divisi->name = $request->input('name');
+        $divisi->manager = $request->input('manager');
         $divisi->company = $company->unit_bisnis;
         $divisi->save();
 
@@ -94,6 +100,7 @@ class DivisiController extends Controller
             // Validate the form data
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
+                'manager' => 'required|string|max:255',
             ]);
     
             // Update the data

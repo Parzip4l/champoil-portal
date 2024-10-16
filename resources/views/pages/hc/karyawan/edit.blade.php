@@ -272,6 +272,50 @@
                     <input type="number" class="form-control" name="bank_number" required value="{{$employee->payrolinfo ? $employee->payrolinfo->bank_number : '' }}" placeholder="89120xxx">
                 </div>
             </div>
+            @if($employee->unit_bisnis === 'Kas')
+                <label class="form-label">Hak Akses</label>
+                @if($user)
+                    @php 
+                        $permission = json_decode($user->permission);
+                    @endphp
+                   
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access" 
+                                {{ in_array('dashboard_access', $permission) ? 'checked' : '' }}>
+                            <label class="form-check-label">User</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access"
+                                {{ in_array('hr_access', $permission) ? 'checked' : '' }}>
+                            <label class="form-check-label">HR</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access"
+                                {{ in_array('am_access', $permission) ? 'checked' : '' }}>
+                            <label class="form-check-label">Area Manager</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access"
+                                {{ in_array('pic_access', $permission) ? 'checked' : '' }}>
+                            <label class="form-check-label">Project PIC</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input type="checkbox" id="client" class="form-check-input" name="permissions[]" value="client_access"
+                                {{ in_array('client_access', $permission) ? 'checked' : '' }}>
+                            <label class="form-check-label">Client</label>
+                        </div>
+                    </div>
+                @endif
+            @endif
             @if (!$employee->user)
             <div class="card-header mb-3">
                 <h5>User Login Info</h5>

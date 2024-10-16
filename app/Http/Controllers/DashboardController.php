@@ -148,6 +148,35 @@ class DashboardController extends Controller
                 ]
             ]
         ];
+
+        $slack_on = Employee::where('unit_bisnis', $company->unit_bisnis)
+                            ->join('users','users.name','=','karyawan.nik')
+                            ->where('resign_status', 0)
+                            
+                            ->whereNull('users.project_id')
+                            ->whereNotNull('slack_id')
+                            ->where('organisasi','FRONTLINE OFFICER')
+                            ->count();
+
+        $slack_off = Employee::where('unit_bisnis', $company->unit_bisnis)
+                            ->join('users','users.name','=','karyawan.nik')
+                            ->where('resign_status', 0)
+                            ->whereNull('users.project_id')
+                            ->where('organisasi','FRONTLINE OFFICER')
+                            ->whereNull('slack_id')
+                            ->count();
+
+
+        $UserSlack = [
+            'labels' => ['Slack Complete','Slack  Not Complete'],
+            'datasets' => [
+                [
+                    'label' => 'Total Data',
+                    'backgroundColor' => ['#277BC0', '#FFB200'],
+                    'data' => [$slack_on, $slack_off],
+                ]
+            ]
+        ];
         //End Absensi Statistik
         $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
         $organisasiUser = $company->organisasi;
@@ -369,7 +398,7 @@ class DashboardController extends Controller
             'ChartKaryawan', 'kontrakKaryawan', 'karyawanTidakAbsenHariIni', 'managementData', 'frontlineData',
             'managementData2', 'frontlineData2', 'pengumuman', 'news', 'upcomingBirthdays', 'greeting', 'hariini2',
             'DataManagement', 'DataFrontline', 'totalValue', 'percentageChange', 'percentageChangeManagement','percentageChangeFrontline',
-            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress'
+            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress','UserSlack'
         ];
         
         return view('dashboard', compact(...$compactVariables));

@@ -7,6 +7,11 @@
 @endpush
 
 @section('content')
+@php 
+        $user = Auth::user();
+        $dataLogin = json_decode(Auth::user()->permission); 
+        $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    @endphp
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">
@@ -16,14 +21,18 @@
         </div>
         <hr>
         <ul class="nav nav-tabs nav-tabs-line" id="lineTab" role="tablist">
+            @if(in_array('superadmin_access', $dataLogin))
             <li class="nav-item">
                 <a class="nav-link active" id="home-line-tab" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Management Leaders</a>
             </li>
+            @endif
+            
             <li class="nav-item">
                 <a class="nav-link" id="profile-line-tab" data-bs-toggle="tab" data-bs-target="#profile" role="tab" aria-controls="profile" aria-selected="false">Frontline Officer</a>
             </li>
         </ul>
         <div class="tab-content mt-3" id="lineTabContent">
+        @if(in_array('superadmin_access', $dataLogin))
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
             <a class="btn btn-primary mb-2" href="{{route('payrol-component.create')}}"><i data-feather="plus" class="icon-sm me-2"></i> <span class="">Add Payrol Component</span></a>
                 <div class="table-responsive">
@@ -73,6 +82,7 @@
                     </table>
                 </div>
             </div>
+        @endif
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-line-tab">
                 <a class="btn btn-primary mb-2" href="{{route('component.ns')}}"><i data-feather="plus" class="icon-sm me-2"></i> <span class="">Add Payrol Component</span></a>
                 <div class="table-responsive">

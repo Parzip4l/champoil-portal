@@ -54,7 +54,7 @@
 
             <!-- Employee Data -->
             @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
-                @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin))
+                @if(in_array('superadmin_access', $dataLogin)|| in_array('client_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('hr_frontline', $dataLogin))
                 <li class="nav-item nav-category">Employee</li>
                 <li class="nav-item {{ active_class(['']) }}">
                     <a class="nav-link" data-bs-toggle="collapse" href="#timemanagement" role="button" aria-expanded="{{ is_active_route(['timemanagement']) }}" aria-controls="timemanagement">
@@ -75,7 +75,7 @@
                                     <a href="{{ route('backup.log') }}" class="nav-link {{ active_class(['ckup-log']) }}">Backup Record</a>
                                 </li>
                             @endif
-                            @if($employee && $employee->unit_bisnis == 'Kas')
+                            @if($employee && $employee->unit_bisnis == 'Kas' || $employee->unit_bisnis == 'RUN' || $employee->unit_bisnis == 'Run')
                                 <li class="nav-item"><a href="{{ route('schedule.index') }}" class="nav-link {{ active_class(['kas/schedule']) }}">Schedule</a></li>
                                 @if($user->project_id == NULL)
                                 <li class="nav-item"><a href="{{ url('kas/backup-schedule') }}" class="nav-link {{ active_class(['kas/backup-schedule']) }}">Backup Schedule</a></li>
@@ -195,7 +195,7 @@
                 @endif
             @endif
             <!-- Payroll Menu -->
-            @if(in_array('superadmin_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin) || in_array('hr_frontline', $dataLogin))
             <li class="nav-item nav-category">Payrol & Koperasi</li>
             <li class="nav-item {{ active_class(['']) }}">
                 <a class="nav-link" data-bs-toggle="collapse" href="#PayrolMaster" role="button" aria-expanded="{{ is_active_route(['asset-management']) }}" aria-controls="PayrolMaster">
@@ -205,9 +205,11 @@
                 </a>
                 <div class="collapse {{ show_class(['category']) }}" id="PayrolMaster">
                     <ul class="nav sub-menu">
+                    @if(in_array('superadmin_access', $dataLogin))
                         <li class="nav-item">
                             <a href="{{ url('payroll') }}" class="nav-link {{ active_class(['payroll']) }}">Payrol Data</a>
                         </li>
+                    @endif
                         <li class="nav-item">
                             <a href="{{ url('employee-loan') }}" class="nav-link {{ active_class(['employee-loan']) }}">Loan</a>
                         </li>
@@ -388,7 +390,7 @@
             @endif
             
             <!-- Apps Settings -->
-            @if(in_array('superadmin_access', $dataLogin))
+            @if(in_array('superadmin_access', $dataLogin)  || in_array('hr_frontline', $dataLogin))
             <li class="nav-item nav-category">Settings</li>
                 <li class="nav-item">
                     <a href="{{route('setting.index')}}" class="nav-link {{ active_class(['setting']) }}">

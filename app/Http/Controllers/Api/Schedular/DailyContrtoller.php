@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class DailyContrtoller extends Controller
 {
     public function daily_absen(){
-        $records = Project::whereNull('deleted_at')->get();
+        $records = Project::whereNull('deleted_at')->where('company','Kas')->get();
         $yesterday = Carbon::yesterday()->format('Y-m-d');
         $result = [];
         
@@ -21,6 +21,7 @@ class DailyContrtoller extends Controller
             foreach ($records as $row) {
                 // Fetch all schedules for this project on the given day where shift is not 'OFF'
                 $schedules = Schedule::where('schedules.project', $row->id)
+                    ->join('karyawan','karyawan.nik','=','schedules.employee')
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)
                     ->get();
@@ -31,6 +32,7 @@ class DailyContrtoller extends Controller
                 // Initialize counters
                 $absen = 0;
                 $not_absen = 0;
+                $no_absen =[];
         
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {
@@ -40,10 +42,14 @@ class DailyContrtoller extends Controller
                         ->where('tanggal', $yesterday)
                         ->count();
 
+    
+
                     if ($jml_absen > 0) {
                         $absen += 1;
+                        
                     } else {
                         $not_absen += 1;
+                        $no_absen[]=$rs->nama;
                     }
                 }
         
@@ -52,7 +58,8 @@ class DailyContrtoller extends Controller
                     "project_name" => $row->name,
                     "schedule_on" => $schedules_total,  
                     "absen" => $absen,                 
-                    "not_absen" => $not_absen           
+                    "not_absen" => $not_absen,
+                    "no_absen"=>$no_absen           
                 ];
             }
         }

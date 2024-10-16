@@ -73,13 +73,12 @@ class TaskController extends Controller
             }
             $data[] = $rowData;
         }
-
-        $insert=[];
+        
         if(!empty($data)){
             $key=0;
             foreach($data as $row){
                 if($key>0){
-                    $insert[]=[
+                    $insert=[
                         'judul' => "{$row[1]}",
                         'project_id' => $row[2], 
                         'status'=>1,

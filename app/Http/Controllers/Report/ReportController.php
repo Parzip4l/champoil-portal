@@ -48,7 +48,7 @@ class ReportController extends Controller
            
         }
 
-        $project = Project::where('deleted_at',NULL)->get();
+        $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;

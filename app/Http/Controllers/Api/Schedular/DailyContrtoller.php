@@ -67,6 +67,7 @@ class DailyContrtoller extends Controller
         // Return the records as a JSON response
         return response()->json([
             'status' => 'success',
+            'tanggal'=>$yesterday,
             'data' => $result
         ]);
         

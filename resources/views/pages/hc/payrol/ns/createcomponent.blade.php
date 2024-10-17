@@ -20,7 +20,7 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="name" class="form-label">Pilih Karyawan</label>
-                    <select class="form-control" data-width="100%" name="employee_code">
+                    <select class="form-control select2" data-width="100%" name="employee_code">
                         @foreach($employee as $data)
                             <option value="{{$data->nik}}">{{$data->nama}}</option>
                         @endforeach

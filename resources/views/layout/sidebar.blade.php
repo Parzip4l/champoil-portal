@@ -227,6 +227,11 @@
                             <a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payrol Frontline</a>
                         </li>
                         @endif
+                        @if($employee && $employee->unit_bisnis == 'Run')
+                        <li class="nav-item">
+                            <a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payrol Frontline</a>
+                        </li>
+                        @endif
                         @if($employee && $employee->unit_bisnis == 'Kas')
                         <li class="nav-item">
                             <a href="{{ route('payroll-kas.index') }}" class="nav-link {{ active_class(['payroll-kas.index']) }}">Payrol Frontline</a>

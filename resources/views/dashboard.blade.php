@@ -629,22 +629,7 @@
                 </div>
             </div>
             <div class="card-footer d-flex">
-                @if ($percentageChangeAll > 0)
-                    <span class="badge rounded-pill me-2 bg-success">
-                        <i class="link-icon icon-sm" data-feather="chevron-up"></i> {{ number_format($percentageChangeAll, 2) }}%
-                    </span>
-                    <p class="text-muted">Periode sebelumnya</p>
-                @elseif ($percentageChangeAll < 0)
-                    <span class="badge rounded-pill me-2 bg-danger">
-                        <i class="link-icon icon-sm" data-feather="chevron-down"></i> {{ number_format($percentageChangeAll, 2) }}%
-                    </span>
-                    <p class="text-muted">Periode sebelumnya</p>
-                @else
-                    <span class="badge rounded-pill me-2 bg-secondary">
-                        <i class="link-icon icon-sm" data-feather="minus"></i> {{ number_format($percentageChangeAll, 2) }}%
-                    </span>
-                    <p class="text-muted">Periode sebelumnya</p>
-                @endif
+                
             </div>
         </div>
     </div>

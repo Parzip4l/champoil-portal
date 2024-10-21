@@ -114,7 +114,7 @@ class ApiLoginController extends Controller
 
             if ($existingAbsen) {
                 DB::rollBack();
-                return response()->json(['message' => 'Clockin Rejected, Already Clocked In for Today!']);
+                return response()->json(['message' => 'Absen Ditolak, sudah ada absensi hari ini!']);
             }
 
             if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
@@ -124,10 +124,10 @@ class ApiLoginController extends Controller
 
                     if (!$scheduleKas) {
                         DB::rollBack();
-                        return response()->json(['message' => 'Clock In Rejected, Schedule not found! Please contact the Team Leader for the schedule.']);
+                        return response()->json(['message' => 'Absen Masuk Ditolak, Tidak ada schedule! silahkan hubungi team leader untuk schedule!.']);
                     }elseif ($scheduleKas->shift === 'OFF'){
                         DB::rollBack();
-                        return response()->json(['message' => 'Clock In Rejected, Schedule OFF. Please contact Team Leader for schedule changes!']);
+                        return response()->json(['message' => 'Absen Masuk Ditolak, Schedule OFF. silahkan hubungi team leader untuk mengubah schedule!']);
                     }
 
             }
@@ -161,10 +161,10 @@ class ApiLoginController extends Controller
                     'photo' => $filename,
                 ]);
                 DB::commit(); 
-                return response()->json(['message' => 'Clockin success, Happy Working Day!']);
+                return response()->json(['message' => 'Absen Masuk Berhasil, Selamat Bekerja!']);
             } else {
                 DB::rollBack();
-                return response()->json(['message' => 'Clockin Rejected, Outside Radius!']);
+                return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
             }
         } catch (\Exception $e) {
             DB::rollBack();

@@ -12,6 +12,7 @@ use App\Employee;
 use App\Feedback;
 use App\Payrol;
 use App\Payrollns;
+use App\Payrolinfo\Payrolinfo;
 use App\ModelCG\Payroll;
 use App\Absen\RequestAbsen;
 use App\ModelCG\asign_test;
@@ -165,6 +166,30 @@ class DashboardController extends Controller
                             ->where('organisasi','FRONTLINE OFFICER')
                             ->whereNull('slack_id')
                             ->count();
+                            
+        $data_karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)
+                            ->join('users','users.name','=','karyawan.nik')
+                            ->where('resign_status', 0)
+                            ->whereNull('users.project_id')
+                            ->where('organisasi','FRONTLINE OFFICER')
+                            ->get();
+        $bpjs  = 0;
+        $no_bpjs  = 0;
+        if($data_karyawan){
+            foreach($data_karyawan as $row){
+                $cek =  Payrolinfo::whereIn('bpjs_tk',[0,NULL,'-'])->where('employee_code',$row->nik)->count();
+                if($cek  > 0){
+                    $bpjs +=1;
+                }else{
+                    $no_bpjs +=1;
+                }
+            }
+        }
+
+        $data_bpjs=[
+            "bpjs"=>$bpjs,
+            "no_bpjs"=>$no_bpjs
+        ];
 
 
         $UserSlack = [
@@ -398,7 +423,7 @@ class DashboardController extends Controller
             'ChartKaryawan', 'kontrakKaryawan', 'karyawanTidakAbsenHariIni', 'managementData', 'frontlineData',
             'managementData2', 'frontlineData2', 'pengumuman', 'news', 'upcomingBirthdays', 'greeting', 'hariini2',
             'DataManagement', 'DataFrontline', 'totalValue', 'percentageChange', 'percentageChangeManagement','percentageChangeFrontline',
-            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress','UserSlack'
+            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress','UserSlack','data_bpjs'
         ];
         
         return view('dashboard', compact(...$compactVariables));

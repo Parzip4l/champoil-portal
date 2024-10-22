@@ -289,6 +289,7 @@ class AllDataController extends Controller
                 }else if($row->status ==2){
                     $status  = '<span class="badge rounded-pill bg-danger">Reject</span>';
                 }
+                $row->url_kyp = asset($row->ktp);
                 $row->status  = $status;
             }
         }
@@ -331,11 +332,10 @@ class AllDataController extends Controller
         }
         
         // Update the status
-        $pengajuan->status = $request->input('status');
-        $pengajuan->save(); // Save the changes
+        PengajuanCicilan::where('id',$request->input('id'))->update(['status' => $request->input('status')]); // Save the changes
         
         // If status is 'approved', perform an additional action
-        if ($pengajuan->status == 1) {
+        if ($request->input('status') == 1) {
             $this->saveToLoan($pengajuan);
         }
         
@@ -371,10 +371,14 @@ class AllDataController extends Controller
             ], 404);
         }
     
-        // Handle the file upload for KTP
         if ($request->hasFile('ktp')) {
             $file = $request->file('ktp');
-            $filePath = $file->store('uploads/ktp', 'public'); // Store the file in the public disk
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Generate a unique file name
+            $destinationPath = public_path('uploads/ktp'); // Define the public path
+            $file->move($destinationPath, $fileName); // Move the file to the public/uploads/ktp directory
+        
+            // Save the file path (optional, if you need to store the path in the database)
+            $filePath = 'uploads/ktp/' . $fileName;
         }
     
         // Prepare data for insertion

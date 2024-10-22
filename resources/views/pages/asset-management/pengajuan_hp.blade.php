@@ -64,12 +64,12 @@ $(document).ready(function() {
                     <input type="checkbox" name="select_row" value="${pengajuan.id}">
                     <span class="dt-checkbox-label"></span>
                 </div>`,
-                pengajuan.nama_lengkap,
+                pengajuan.nama_lengkap+`<a href="{{ asset('${pengajuan.ktp}') }}" target="_blank" class="btn btn-success approve-btn btn-sm">Lihat KTP</a>`,
                 pengajuan.tanggal_pengajuan,
                 pengajuan.nama_barang,
                 pengajuan.status, // This already includes HTML for the badge (e.g., "Approved" or "Rejected")
-                `<button class="btn btn-success approve-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},1)">Approve</button>
-                 <button class="btn btn-danger reject-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},2)">Reject</button>`
+                `<button class="btn btn-success approve-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},1)">Approve ${pengajuan.id}</button>
+                 <button class="btn btn-danger reject-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},2)">Reject ${pengajuan.id}</button>`
             ]).draw(false);
         });
     })

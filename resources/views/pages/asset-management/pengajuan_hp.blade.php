@@ -56,26 +56,27 @@ $(document).ready(function() {
     const table = $('.checkbox-datatable').DataTable();
 
     axios.get('/api/v1/data_pengajuan')
-        .then(response => {
-            const data = response.data.data;
-            data.forEach(pengajuan => {
-                table.row.add([
-                    `<div class="dt-checkbox">
-                        <input type="checkbox" name="select_row" value="${pengajuan.id}">
-                        <span class="dt-checkbox-label"></span>
-                    </div>`,
-                    pengajuan.nama_lengkap,
-                    pengajuan.tanggal_pengajuan,
-                    pengajuan.nama_barang,
-                    pengajuan.status,
-                    `<button class="btn btn-success approve-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},1)">Approve</button>
-                     <button class="btn btn-danger reject-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},2)">Reject</button>`
-                ]).draw(false);
-            });
-        })
-        .catch(error => {
-            console.error('There was an error fetching the data:', error);
+    .then(response => {
+        const data = response.data.data;
+        data.forEach(pengajuan => {
+            table.row.add([
+                `<div class="dt-checkbox">
+                    <input type="checkbox" name="select_row" value="${pengajuan.id}">
+                    <span class="dt-checkbox-label"></span>
+                </div>`,
+                pengajuan.nama_lengkap,
+                pengajuan.tanggal_pengajuan,
+                pengajuan.nama_barang,
+                pengajuan.status, // This already includes HTML for the badge (e.g., "Approved" or "Rejected")
+                `<button class="btn btn-success approve-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},1)">Approve</button>
+                 <button class="btn btn-danger reject-btn btn-sm" onClick="update_pengajuan(${pengajuan.id},2)">Reject</button>`
+            ]).draw(false);
         });
+    })
+    .catch(error => {
+        console.error('There was an error fetching the data:', error);
+    });
+
 });
 
 function update_pengajuan(id, status) {

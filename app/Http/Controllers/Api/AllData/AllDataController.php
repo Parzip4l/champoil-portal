@@ -23,6 +23,9 @@ use App\User;
 use App\Pengumuman\Pengumuman;
 use App\News\News;
 use App\ModelCG\Birthday;
+use App\ModelCG\asset\PengajuanCicilan;
+use App\ModelCG\asset\BarangCicilan;
+use App\Loan\LoanModel;
 
 class AllDataController extends Controller
 {
@@ -243,4 +246,177 @@ class AllDataController extends Controller
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+
+    public function check_nik(Request $request) {
+        // Validate the input to ensure NIK is provided
+        $request->validate([
+            'nik' => 'required|string|max:255',
+        ]);
+    
+        // Fetch the employee data based on NIK
+        $employee = Employee::where('nik', $request->input('nik'))->first();
+    
+        // Check if the employee exists
+        if ($employee) {
+            // Return success response with the employee data
+            return response()->json([
+                'status' => 'success',
+                'data' => $employee
+            ], 200);
+        } else {
+            // Return failure response if NIK not found
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Employee with the provided NIK not found.'
+            ], 404);
+        }
+    }
+
+    public function pengajuan_hp() {
+        
+        $pengajuan = PengajuanCicilan::all();
+        if($pengajuan){
+            foreach($pengajuan as $row){
+                $row->nama_lengkap = karyawan_bynik($row->nik)->nama;
+                $row->nama_project = project_byID($row->project)->name;
+                $row->nama_barang =BarangCicilanDetail($row->barang_diajukan)->nama_barang;
+                $row->harga_rupiah =formatRupiah($row->harga);
+                $row->tanggal_pengajuan =date('d F Y H:i:s',strtotime($row->created_at));
+                if($row->status ==0){
+                    $status  = '<span class="badge rounded-pill bg-warning">Pending</span>';
+                }else if($row->status ==1){
+                    $status  = '<span class="badge rounded-pill bg-success">Approved</span>';
+                }else if($row->status ==2){
+                    $status  = '<span class="badge rounded-pill bg-danger">Reject</span>';
+                }
+                $row->status  = $status;
+            }
+        }
+
+    
+        // Check if the employee exists
+        if ($pengajuan) {
+            // Return success response with the employee data
+            return response()->json([
+                'status' => 'success',
+                'data' => $pengajuan
+            ], 200);
+        } else {
+            // Return failure response if NIK not found
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Employee with the provided NIK not found.'
+            ], 404);
+        }
+    }
+
+    public function update_pengajuan(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:pengajuan_cicilans,id', // Ensure the ID exists in the database
+            'status' => 'required|in:1,2' // Ensure the status is either approved or rejected
+        ]);
+        
+        // Find the pengajuan by ID
+        $pengajuan = PengajuanCicilan::join('barang_cicilans', 'barang_cicilans.id', '=', 'pengajuan_cicilans.barang_diajukan')
+            ->where('pengajuan_cicilans.id', $request->input('id'))
+            ->first();
+        
+        // Check if pengajuan exists
+        if (!$pengajuan) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pengajuan not found.'
+            ], 404);
+        }
+        
+        // Update the status
+        $pengajuan->status = $request->input('status');
+        $pengajuan->save(); // Save the changes
+        
+        // If status is 'approved', perform an additional action
+        if ($pengajuan->status == 1) {
+            $this->saveToLoan($pengajuan);
+        }
+        
+        // Return a success response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pengajuan status updated successfully.'
+        ], 200);
+    }
+
+    public function submit_pengajuan_cicilan(Request $request) {
+        // Validate the request data
+        $request->validate([
+            'nik' => 'required|string|max:255',
+            'project' => 'required|string|max:255',
+            'nomor_hp' => 'required|string|max:15',
+            'email' => 'required|email|max:255',
+            'ktp' => 'required|file|mimes:jpg,png,pdf|max:2048', // Example validation for file
+            'barang_diajukan' => 'required|exists:barang_cicilans,id', // Assuming this refers to the BarangnCicilan model
+        ]);
+    
+        // Get the input data
+        $data = $request->all();
+    
+        // Find the price based on the item being applied for
+        $cek_harga = BarangCicilan::where('id',$request->input('barang_diajukan'))->first();
+    
+        // Check if the item exists
+        if (!$cek_harga) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Item not found.'
+            ], 404);
+        }
+    
+        // Handle the file upload for KTP
+        if ($request->hasFile('ktp')) {
+            $file = $request->file('ktp');
+            $filePath = $file->store('uploads/ktp', 'public'); // Store the file in the public disk
+        }
+    
+        // Prepare data for insertion
+        $insert = [
+            "nik" => $data['nik'],
+            "project" => $data['project'],
+            "nomor_hp" => $data['nomor_hp'],
+            "email" => $data['email'],
+            "ktp" => isset($filePath) ? $filePath : null, // Store file path or null if no file
+            "barang_diajukan" => $data['barang_diajukan'],
+            "harga" => $cek_harga->harga,
+            "status"=>0,
+            "created_at"=>date('Y-m-d H:i:s')
+        ];
+    
+        // Insert the data into the PengajuanCicilan model
+        $pengajuan = PengajuanCicilan::insert($insert); // Assuming `create` is used with fillable fields
+    
+        // Return success response
+        return response()->json([
+            'status' => 'success',
+            'data' => $pengajuan
+        ], 201);
+    }
+
+    private function saveToLoan($record){
+       
+
+        // Hitung besaran cicilan per bulan
+        $installmentAmount = $record->perbulan * 3;
+
+        
+
+        // Buat entri pinjaman
+        $loan = new LoanModel();
+        $loan->employee_id = $record->nik;
+        $loan->amount = $installmentAmount;
+        $loan->remaining_amount = $installmentAmount;
+        $loan->installments = 3;
+        $loan->installment_amount = $record->perbulan; // Use the new variable
+        $loan->save();
+    }
+    
+    
 }

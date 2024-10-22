@@ -51,6 +51,70 @@ function karyawan_bynik($nik){
   return $karyawan->where('nik',$nik)->first();
 }
 
+function BarangCicilan(){
+  // Retrieve the BarangCicilan model
+  $BarangCicilan = app('App\ModelCG\asset\BarangCicilan');
+  
+  // Initialize an empty string to hold the HTML
+  $html = '';
+
+  // Find the employee (karyawan) based on NIK
+  $item_master = $BarangCicilan->all();
+
+  // Check if the karyawan exists
+  if ($item_master) {
+      // Loop through all cicilan items (assumed relationship 'barangCicilanItems')
+      foreach ($item_master as $item) {
+          // Generate radio input for each item
+          $html .= '<input type="radio" name="barang_diajukan" value="' . $item->id . '"> ' . $item->nama_barang . '<br>';
+      }
+  } else {
+      $html = 'No Barang Cicilan found for this NIK.';
+  }
+
+  // Return the generated HTML
+  return $html;
+}
+
+function formatRupiah($key) {
+  // Ensure the input is a numeric value
+  if (!is_numeric($key)) {
+      return "Invalid amount"; // Handle non-numeric input
+  }
+
+  // Format the number as Rupiah
+  return 'Rp ' . number_format($key, 0, ',', '.'); // 0 decimal places, commas for thousands
+}
+
+function BarangCicilanDetail($id){
+  // Retrieve the BarangCicilan model
+  $BarangCicilan = app('App\ModelCG\asset\BarangCicilan')->where('id',$id)->first();
+
+
+  // Return the generated HTML
+  return $BarangCicilan;
+}
+
+function project_all() {
+  $projects = app('App\ModelCG\Project')->where('company','Kas')->get();
+
+  // Start building the HTML for the select input
+  $html = '<select id="project" name="project" class="form-control select2">';
+  $html .= '<option value="">-- Select Project --</option>';
+
+  // Loop through the projects to create options
+  foreach ($projects as $project) {
+      $html .= '<option value="' . $project->id . '">' . $project->name . '</option>';
+  }
+
+  // Close the select input
+  $html .= '</select>';
+
+  // Return the HTML
+  return $html;
+}
+
+
 
 function project_byID($id){
   $project = app('App\ModelCG\Project');

@@ -15,6 +15,7 @@
 Route::get('/dmaic-form', [App\Http\Controllers\DMAIC\DmaicController::class, 'create'])->name('dmic-form');
 Route::post('/submit-dmaic', [App\Http\Controllers\DMAIC\DmaicController::class, 'store'])->name('submit-dmaic');
 Route::get('/dmaic-success', [App\Http\Controllers\DMAIC\DmaicController::class, 'page_success'])->name('dmaic-success');
+Route::view('/pengajuan-asset-form','pages.asset-management.pengajuan_hp_form')->name('pengajuan-asset-form');
 
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
@@ -501,6 +502,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::post('/simpan-asset-vendor', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'VendorStore'])->name('asset-vendor.store');
         Route::put('/update-asset-vendor/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'UpdateVendor'])->name('asset-vendor.update');
         Route::delete('/delete-asset-vendor/{id}', [App\Http\Controllers\AssetManagement\AllAssetsController::class, 'DestroyVendor'])->name('asset-vendor.destroy');
+
+        //pengajuan HP
+        Route::view('/pengajuan-asset','pages.asset-management.pengajuan_hp')->name('pengajuan-asset');
     });
 
     // Company Setting
@@ -510,6 +514,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::put('/update-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'UpdateGolongan'])->name('golongan.update');
         Route::delete('/delete-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'DeleteGolongan'])->name('golongan.delete');
     });
+
+    
 
     
 });

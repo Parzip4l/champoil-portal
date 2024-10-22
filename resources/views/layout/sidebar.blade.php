@@ -384,6 +384,9 @@
                             <li class="nav-item">
                                 <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Transaksi Histori</a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pengajuan-asset') }}" class="nav-link {{ active_class(['']) }}">Pengajuan Cicilan HP</a>
+                            </li>
                         </ul>
                     </div>
                 </li>

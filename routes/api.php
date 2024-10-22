@@ -179,4 +179,9 @@ Route::prefix('v1')->group(function () {
 
     // Birthday
     Route::get('birthdayEmployee', [AllDataController::class, 'BirtdayList']);
+
+    Route::post('check-nik', [AllDataController::class, 'check_nik']);
+    Route::post('submit-pengajuan-cicilan', [AllDataController::class, 'submit_pengajuan_cicilan']);
+    Route::get('data_pengajuan', [AllDataController::class, 'pengajuan_hp']);
+    Route::post('/update_pengajuan', [AllDataController::class, 'update_pengajuan']);
 });

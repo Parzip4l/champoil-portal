@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
 // Model
@@ -396,11 +397,45 @@ class AllDataController extends Controller
     
         // Insert the data into the PengajuanCicilan model
         $pengajuan = PengajuanCicilan::insert($insert); // Assuming `create` is used with fillable fields
+
+        
+        $url = 'https://hooks.slack.com/services/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';
+
+        // Building the message
+        $message = [
+            "blocks" => [
+                [
+                    "type" => "section",
+                    "text" => [
+                        "type" => "mrkdwn",
+                        "text" => "Hallo, <@U06QC04FNG1> Terdapat Pengajuan Cicilan Baru"
+                    ]
+                ],
+                [
+                    "type" => "section",
+                    "text" => [
+                        "type" => "mrkdwn",
+                        "text" => "*Nama:*\n" . karyawan_bynik($data['nik'])->nama . "\n*Project:*\n" . project_byID($data['project'])->name . "\n*Barang:*\n" . BarangCicilanDetail($data['barang_diajukan'])->nama_barang . "\n*Tanggal:*\n" . date('d F Y H:i:s')
+                    ]
+                ]
+            ]
+        ];
+
+        // Sending the request
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post($url, $message);
+
+        // Check for errors
+        if ($response->failed()) {
+            // Handle failure, log the error, or throw an exception
+            throw new \Exception('Failed to send Slack notification');
+        }
     
         // Return success response
         return response()->json([
             'status' => 'success',
-            'data' => $pengajuan
+            'data' => $response
         ], 201);
     }
 

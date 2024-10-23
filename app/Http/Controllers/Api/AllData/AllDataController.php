@@ -402,35 +402,51 @@ class AllDataController extends Controller
         $url = 'https://hooks.slack.com/services/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';
 
         // Building the message
-        $message = [
+        $message = json_encode([
             "blocks" => [
                 [
                     "type" => "section",
                     "text" => [
                         "type" => "mrkdwn",
-                        "text" => "Hallo, <@U06QC04FNG1> Terdapat Pengajuan Cicilan Baru"
+                        "text" => "Hallo, <@U03SWH74U22> Terdapat Pengajuan Cicilan Baru"
                     ]
                 ],
                 [
                     "type" => "section",
                     "text" => [
                         "type" => "mrkdwn",
-                        "text" => "*Nama:*\n" . karyawan_bynik($data['nik'])->nama . "\n*Project:*\n" . project_byID($data['project'])->name . "\n*Barang:*\n" . BarangCicilanDetail($data['barang_diajukan'])->nama_barang . "\n*Tanggal:*\n" . date('d F Y H:i:s')
+                        "text" => "*Nama:*\n" . karyawan_bynik($data['nik']) . "\n*Project:*\n" . project_byID($data['project'])->name . "\n*Barang:*\n" . BarangCicilanDetail($data['barang_diajukan'])->nama_barang . "\n*Tanggal:*\n" . date('d F Y H:i:s')
                     ]
                 ]
             ]
-        ];
+        ]);
 
-        // Sending the request
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post($url, $message);
+        // Initialize cURL session
+        $curl = curl_init();
+
+        // Set the cURL options
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+        ]);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $message);
+
+        // Disable SSL verification (if needed, but not recommended for production)
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+        // Execute the cURL request
+        $response = curl_exec($curl);
 
         // Check for errors
-        if ($response->failed()) {
-            // Handle failure, log the error, or throw an exception
-            throw new \Exception('Failed to send Slack notification');
+        if ($response === false) {
+            throw new \Exception('Curl error: ' . curl_error($curl));
         }
+
+        // Close the cURL session
+        curl_close($curl);
     
         // Return success response
         return response()->json([

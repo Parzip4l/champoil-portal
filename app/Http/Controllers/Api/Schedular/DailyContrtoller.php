@@ -20,7 +20,7 @@ class DailyContrtoller extends Controller
         if (!$records->isEmpty()) {
             foreach ($records as $row) {
                 // Fetch all schedules for this project on the given day where shift is not 'OFF'
-                $schedules = Schedule::where('schedules.projec', $row->id)
+                $schedules = Schedule::where('schedules.project', $row->id)
                     ->join('karyawan','karyawan.nik','=','schedules.employee')
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)

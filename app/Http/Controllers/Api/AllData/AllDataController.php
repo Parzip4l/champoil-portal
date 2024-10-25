@@ -399,43 +399,48 @@ class AllDataController extends Controller
         $pengajuan = PengajuanCicilan::insert($insert); // Assuming `create` is used with fillable fields
 
         
-        $url = 'https://hooks.slack.com/services/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';
+        // $url = 'https://hooks.slack.com/services/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';
 
-        // Building the message
-        $message = [
-            "blocks" => [
-                [
-                    "type" => "section",
-                    "text" => [
-                        "type" => "mrkdwn",
-                        "text" => "Hallo, <@U06QC04FNG1> Terdapat Pengajuan Cicilan Baru"
-                    ]
-                ],
-                [
-                    "type" => "section",
-                    "text" => [
-                        "type" => "mrkdwn",
-                        "text" => "*Nama:*\n" . karyawan_bynik($data['nik'])->nama . "\n*Project:*\n" . project_byID($data['project'])->name . "\n*Barang:*\n" . BarangCicilanDetail($data['barang_diajukan'])->nama_barang . "\n*Tanggal:*\n" . date('d F Y H:i:s')
-                    ]
-                ]
-            ]
-        ];
+        // $namaKaryawan = karyawan_bynik($data['nik'])->nama ?? 'Unknown';
+        // $projectName = project_byID($data['project'])->name ?? 'Unknown';
+        // $barangNama = BarangCicilanDetail($data['barang_diajukan'])->nama_barang ?? 'Unknown';
+        // $tanggal = date('d F Y H:i:s');
 
-        // Sending the request
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post($url, $message);
+        // // Building the message
+        // $message = [
+        //     "blocks" => [
+        //         [
+        //             "type" => "section",
+        //             "text" => [
+        //                 "type" => "mrkdwn",
+        //                 "text" => "Hallo, <@U03SWH74U22> Terdapat Pengajuan Cicilan Baru"
+        //             ]
+        //         ],
+        //         [
+        //             "type" => "section",
+        //             "text" => [
+        //                 "type" => "mrkdwn",
+        //                 "text" => "*Nama:*\n" . $namaKaryawan . "\n*Project:*\n" . $projectName . "\n*Barang:*\n" . $barangNama . "\n*Tanggal:*\n" . $tanggal
+        //             ]
+        //         ]
+        //     ]
+        // ];
 
-        // Check for errors
-        if ($response->failed()) {
-            // Handle failure, log the error, or throw an exception
-            throw new \Exception('Failed to send Slack notification');
-        }
+        // // Sending the request to Slack using Laravel's Http Client
+        // $response = Http::withHeaders([
+        //     'Content-Type' => 'application/json',
+        // ])->post($url, json_encode($message)); // Ensure it's encoded properly as JSON
+
+        // // Check for errors in the response
+        // if ($response->failed()) {
+        //     // You can log the error or handle it as per your requirements
+        //     throw new \Exception('Failed to send Slack notification: ' . $response->body());
+        // }
     
         // Return success response
         return response()->json([
             'status' => 'success',
-            'data' => $response
+            'data' => $insert
         ], 201);
     }
 

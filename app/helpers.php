@@ -201,3 +201,12 @@ function push_slack_message($url,$message){
   curl_close($curl);
   return $resp;
 }
+
+function find_hook_slack($id){
+    // Retrieve the BarangCicilan model
+    $hook = app('App\Slack')->where('id',$id)->first();
+  
+  
+    // Return the generated HTML
+    return $hook['url'];
+}

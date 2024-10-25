@@ -64,7 +64,7 @@ $(document).ready(function() {
                     <input type="checkbox" name="select_row" value="${pengajuan.id}">
                     <span class="dt-checkbox-label"></span>
                 </div>`,
-                pengajuan.nama_lengkap+`<br/><a href="{{ asset('${pengajuan.ktp}') }}" target="_blank" class="btn btn-success approve-btn btn-xs">Lihat KTP</a>`,
+                pengajuan.nama_lengkap+`<br/>Nomor Kontak :${pengajuan.nomor_hp} <br/><a href="{{ asset('${pengajuan.ktp}') }}" target="_blank" class="btn btn-success approve-btn btn-xs">Lihat KTP</a>`,
                 pengajuan.tanggal_pengajuan,
                 pengajuan.nama_barang,
                 pengajuan.status, // This already includes HTML for the badge (e.g., "Approved" or "Rejected")

@@ -138,11 +138,11 @@ class ReportController extends Controller
                     $row['schedule'.$bln]=$row['query'.$bln]->count();
                     $row['absen'.$bln]  =0;
                     foreach($row['query'.$bln]->get() as $sch){
-                        $absen = Absen::where('project', $sch->project)
+                        $row['absen_count_'.$bln] = Absen::where('project', $sch->project)
                                         ->whereBetween('tanggal', [$start, $end])
                                         ->where('nik', $sch->employee)
                                         ->count();
-                        if($absen >  0){
+                        if($row['absen_count_'.$bln] >  0){
                             $row['absen'.$bln] +=1;
                         }
                     }

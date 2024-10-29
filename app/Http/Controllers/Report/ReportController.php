@@ -132,34 +132,27 @@ class ReportController extends Controller
                     $start = date('Y').'-'.$periode_min_1_month.'-'.'21';
                     $end = date('Y').'-'.$bulan.'-'.'20';
 
-                    $row['query'.$bln] = Schedule::where('project',$row->id)
-                                        ->whereBetween('tanggal', [$start, $end])
-                                        ->where('shift','!=','OFF');
-                    $row['schedule'.$bln]=$row['query'.$bln]->count();
-                    $row['absen'.$bln]  =0;
-                    foreach($row['query'.$bln]->get() as $sch){
-                        $row['absen_count_'.$bln] = Absen::where('project', $sch->project)
-                                        ->whereBetween('tanggal', [$start, $end])
-                                        ->where('nik', $sch->employee)
-                                        ->count();
-                        if($row['absen_count_'.$bln] >  0){
-                            $row['absen'.$bln] +=1;
-                        }
-                    }
+                    $row['schedule'.$bln] = Schedule::where('project',$row->id)
+                    ->whereBetween('tanggal', [$start, $end])
+                    ->where('shift','!=','OFF')
+                    ->count();
 
                     if(date('m', strtotime("+1 month")) == date('m',strtotime($bln))){
                         $row['on_periode'.$bln]=1;
                     }else{
                         $row['on_periode'.$bln]=0;
                     }
-            
+               
+                    $row['absen'.$bln] = Absen::where('project', $row->id)
+                                        ->whereBetween('tanggal', [$start, $end])
+                                        ->count();
                 
                     if($row['absen'.$bln] > 0 && $row['schedule'.$bln] > 0){
                         $row['persentase_absen'.$bln] = round(($row['absen'.$bln] / $row['schedule'.$bln]) * 100,2);
                     }
                 }
                 
-            
+              
             }
         }
         $data['project']=$project;

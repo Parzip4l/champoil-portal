@@ -168,6 +168,7 @@ Route::prefix('v1')->group(function () {
 
     //Schedule
     Route::get('project-schedules/{id}', [ScheduleController::class, 'data_shift']);
+    Route::get('project-schedules-report/', [ScheduleController::class, 'index']);
 
     
     // Pengumuman

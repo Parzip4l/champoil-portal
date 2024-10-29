@@ -34,7 +34,6 @@ class DailyContrtoller extends Controller
                 $not_absen = 0;
                 $no_absen =[];
 
-                $row->leader_pic =  karyawan_bynik($row->leader_pic);
         
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {
@@ -58,6 +57,7 @@ class DailyContrtoller extends Controller
                 // Add result for each project
                 $result[] = [
                     "project_name" => $row->name,
+                    "leader_pic"=>karyawan_bynik($row->leader_pic),
                     "schedule_on" => $schedules_total,  
                     "absen" => $absen,                 
                     "not_absen" => $not_absen,

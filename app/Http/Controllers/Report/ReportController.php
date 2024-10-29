@@ -54,24 +54,17 @@ class ReportController extends Controller
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
                 $row->persentase_tanpa_clockout = 0;
-                $schedule = Schedule::where('project',$row->id)
+                $row->schedule = Schedule::where('project',$row->id)
                                            ->whereBetween('tanggal', [$start, $end])
-                                           ->where('shift','!=','OFF');
-                $row->schedule = $schedule->count();
-                $row->absen  =0;
-                foreach($schedule->get() as $sch){
-                    $absen = Absen::where('project', $sch->project)
-                                    ->where('tanggal', $sch->tanggal)
-                                    ->where('nik', $sch->employee)
-                                    ->count();
-                    if($absen >  0){
-                        $row->absen +=1;
-                    }
-                }
+                                           ->where('shift','!=','OFF')
+                                           ->count();
 
                 $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
               
 
+                $row->absen = Absen::where('project', $row->id)
+                                    ->whereBetween('tanggal', [$start, $end])
+                                    ->count();
                 
                 $row->tanpa_clockout = Absen::where('project', $row->id)
                                     ->whereBetween('tanggal', [$start, $end])
@@ -84,6 +77,7 @@ class ReportController extends Controller
                                                     ->whereBetween('requests_attendence.tanggal', [$start, $end])
                                                     ->where('requests_attendence.aprrove_status','Pending')
                                                     ->count();
+                                                    
                 $row->approved = Schedule::join('requests_attendence','requests_attendence.employee','=','schedules.employee')
                                             ->where('schedules.project',$row->id)
                                             ->whereBetween('schedules.tanggal', [$start, $end])
@@ -116,7 +110,7 @@ class ReportController extends Controller
     }
 
     public function rekap_report(){
-        $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();
+        $project = Project::where('deleted_at',NULL)->get();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;

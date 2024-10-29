@@ -153,7 +153,6 @@ class DashboardController extends Controller
         $slack_on = Employee::where('unit_bisnis', $company->unit_bisnis)
                             ->join('users','users.name','=','karyawan.nik')
                             ->where('resign_status', 0)
-                            
                             ->whereNull('users.project_id')
                             ->whereNotNull('slack_id')
                             ->where('organisasi','FRONTLINE OFFICER')
@@ -171,6 +170,7 @@ class DashboardController extends Controller
                             ->join('users','users.name','=','karyawan.nik')
                             ->where('resign_status', 0)
                             ->whereNull('users.project_id')
+                            ->where('users.company',$company->unit_bisnis)
                             ->where('organisasi','FRONTLINE OFFICER')
                             ->get();
         $bpjs  = 0;

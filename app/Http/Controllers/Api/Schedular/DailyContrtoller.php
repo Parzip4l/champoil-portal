@@ -25,7 +25,7 @@ class DailyContrtoller extends Controller
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)
                     ->get();
-        
+                
                 // Total number of schedules
                 $schedules_total = $schedules->count();
         
@@ -33,6 +33,8 @@ class DailyContrtoller extends Controller
                 $absen = 0;
                 $not_absen = 0;
                 $no_absen =[];
+
+                $row->leader_pic =  karyawan_bynik($row->leader_pic);
         
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {

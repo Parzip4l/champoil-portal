@@ -62,23 +62,35 @@ class ScheduleController extends Controller
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
                 $row->persentase_tanpa_clockout = 0;
-                $row->schedule = Schedule::where('project',$row->id)
+                  
+                $schedule = Schedule::where('project',$row->id)
                                            ->whereBetween('tanggal', [$start, $end])
-                                           ->where('shift','!=','OFF')
-                                           ->count();
+                                           ->where('shift','!=','OFF');
+                $row->schedule = $schedule->count();
+                $row->absen  =0;
+                foreach($schedule->get() as $sch){
+                    $absen = Absen::where('project', $sch->project)
+                                    ->wheere('tanggal', $sch->tanggal)
+                                    ->wheere('nik', $sch->employee)
+                                    ->count();
+                    if($absen >  0){
+                        $row->absen +=1;
+                    }
+                }
+
+                
 
                 $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
               
 
-                $row->absen = Absen::where('project', $row->id)
-                                    ->whereBetween('tanggal', [$start, $end])
-                                    ->count();
+                
                 
                 $row->tanpa_clockout = Absen::where('project', $row->id)
                                     ->whereBetween('tanggal', [$start, $end])
                                     ->whereNotNull('clock_in')
                                     ->whereNull('clock_out')
                                     ->count();
+                                    
                 $row->need_approval = Schedule::join('requests_attendence','requests_attendence.employee','=','schedules.employee')
                                                     ->where('schedules.project',$row->id)
                                                     ->whereBetween('schedules.tanggal', [$start, $end])

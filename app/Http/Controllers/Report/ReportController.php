@@ -116,7 +116,7 @@ class ReportController extends Controller
     }
 
     public function rekap_report(){
-        $project = Project::where('deleted_at',NULL)->get();
+        $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;
@@ -132,10 +132,21 @@ class ReportController extends Controller
                     $start = date('Y').'-'.$periode_min_1_month.'-'.'21';
                     $end = date('Y').'-'.$bulan.'-'.'20';
 
-                    $row['schedule'.$bln] = Schedule::where('project',$row->id)
-                    ->whereBetween('tanggal', [$start, $end])
-                    ->where('shift','!=','OFF')
-                    ->count();
+                    $row['query'.$bln] = Schedule::where('project',$row->id)
+                                        ->whereBetween('tanggal', [$start, $end])
+                                        ->where('shift','!=','OFF');
+                    $row['schedule'.$bln]=$row['query'.$bln]->count();
+                    $row->schedule = $schedule->count();
+                    $row['absen'.$bln]  =0;
+                    foreach($schedule->get() as $sch){
+                        $absen = Absen::where('project', $sch->project)
+                                        ->whereBetween('tanggal', [$start, $end])
+                                        ->where('nik', $sch->employee)
+                                        ->count();
+                        if($absen >  0){
+                            $row['absen'.$bln] +=1;
+                        }
+                    }
 
                     if(date('m', strtotime("+1 month")) == date('m',strtotime($bln))){
                         $row['on_periode'.$bln]=1;
@@ -143,9 +154,6 @@ class ReportController extends Controller
                         $row['on_periode'.$bln]=0;
                     }
                
-                    $row['absen'.$bln] = Absen::where('project', $row->id)
-                                        ->whereBetween('tanggal', [$start, $end])
-                                        ->count();
                 
                     if($row['absen'.$bln] > 0 && $row['schedule'.$bln] > 0){
                         $row['persentase_absen'.$bln] = round(($row['absen'.$bln] / $row['schedule'.$bln]) * 100,2);

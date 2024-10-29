@@ -137,7 +137,7 @@ class ReportController extends Controller
                                         ->where('shift','!=','OFF');
                     $row['schedule'.$bln]=$row['query'.$bln]->count();
                     $row['absen'.$bln]  =0;
-                    foreach($row['schedule'.$bln]->get() as $sch){
+                    foreach($row['query'.$bln]->get() as $sch){
                         $absen = Absen::where('project', $sch->project)
                                         ->whereBetween('tanggal', [$start, $end])
                                         ->where('nik', $sch->employee)
@@ -152,14 +152,14 @@ class ReportController extends Controller
                     }else{
                         $row['on_periode'.$bln]=0;
                     }
-               
+            
                 
                     if($row['absen'.$bln] > 0 && $row['schedule'.$bln] > 0){
                         $row['persentase_absen'.$bln] = round(($row['absen'.$bln] / $row['schedule'.$bln]) * 100,2);
                     }
                 }
                 
-              
+            
             }
         }
         $data['project']=$project;

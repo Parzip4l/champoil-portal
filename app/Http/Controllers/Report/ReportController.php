@@ -61,8 +61,8 @@ class ReportController extends Controller
                 $row->absen  =0;
                 foreach($schedule->get() as $sch){
                     $absen = Absen::where('project', $sch->project)
-                                    ->wheere('tanggal', $sch->tanggal)
-                                    ->wheere('nik', $sch->employee)
+                                    ->where('tanggal', $sch->tanggal)
+                                    ->where('nik', $sch->employee)
                                     ->count();
                     if($absen >  0){
                         $row->absen +=1;

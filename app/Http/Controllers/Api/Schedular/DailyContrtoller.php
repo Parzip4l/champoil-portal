@@ -10,6 +10,8 @@ use App\ModelCG\Schedule;
 use App\ModelCG\Absen;
 use App\Employee;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SevenDayExport;
 
 class DailyContrtoller extends Controller
 {
@@ -79,43 +81,38 @@ class DailyContrtoller extends Controller
     
     public function seven_day() {
         // Fetch active employees in the specific business unit
-        $employees = Employee::where('unit_bisnis', 'like', '%Kas%')
-            ->where('resign_status', 0)
-            ->get();
-    
-        $result = [];
-    
-        foreach ($employees as $employee) {
-            // Retrieve schedules for the employee within the specified date range and non-OFF shifts
-            $schedules = Schedule::where('employee', $employee->nik)
-                ->where('shift', '!=', 'OFF')
-                ->whereBetween('tanggal', ['2024-10-15', '2024-10-30'])
-                ->orderBy('tanggal', 'desc') // Order by date instead of ID for relevance
-                ->get();
-    
-            $schedule_data = [];
-    
-            foreach ($schedules as $schedule) {
-                // Get absence count for each schedule date
-                $absen_count = DB::table('absens')->where('nik', $schedule->employee)
-                    ->where('tanggal', $schedule->tanggal)
-                    ->count();
-    
-                $schedule_data[] = [
-                    "tanggal" => $schedule->tanggal,
-                    "shift" => $schedule->shift,
-                    "absen_count" => $absen_count
-                ];
-            }
-    
-            $result[] = [
-                'employee' => $employee->nik,
-                'nama' => $employee->nama,
-                'schedules' => $schedule_data
-            ];
-        }
-    
-        return response()->json($result);
+    $employees = Employee::where('unit_bisnis', 'like', '%Kas%')
+    ->where('resign_status', 0)
+    ->get();
+
+$result = [];
+
+foreach ($employees as $employee) {
+    // Retrieve schedules for the employee within the specified date range and non-OFF shifts
+    $schedules = Schedule::where('employee', $employee->nik)
+        ->where('shift', '!=', 'OFF')
+        ->whereBetween('tanggal', ['2024-10-15', '2024-10-30'])
+        ->orderBy('tanggal', 'desc')
+        ->get();
+
+    foreach ($schedules as $schedule) {
+        // Get absence count for each schedule date
+        $absen_count = DB::table('absens')->where('nik', $schedule->employee)
+            ->where('tanggal', $schedule->tanggal)
+            ->count();
+
+        $result[] = [
+            'employee' => $employee->nik,
+            'nama' => $employee->nama,
+            "tanggal" => $schedule->tanggal,
+            "shift" => $schedule->shift,
+            "absen_count" => $absen_count
+        ];
+    }
+}
+
+// Export to Excel
+return Excel::download(new SevenDayExport($result), 'seven_day_schedule.xlsx');
     }
     
     

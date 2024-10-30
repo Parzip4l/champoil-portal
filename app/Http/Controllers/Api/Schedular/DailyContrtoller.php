@@ -11,6 +11,8 @@ use App\ModelCG\Absen;
 use App\Employee;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SevenDayExport;
+
 class DailyContrtoller extends Controller
 {
     public function daily_absen(){
@@ -90,8 +92,10 @@ class DailyContrtoller extends Controller
             $schedules = Schedule::where('employee', $employee->nik)
                 ->where('shift', '!=', 'OFF')
                 ->whereBetween('tanggal', ['2024-10-15', '2024-10-30'])
-                ->orderBy('tanggal', 'desc')
+                ->orderBy('tanggal', 'desc') // Order by date instead of ID for relevance
                 ->get();
+    
+            $schedule_data = [];
     
             foreach ($schedules as $schedule) {
                 // Get absence count for each schedule date
@@ -99,47 +103,21 @@ class DailyContrtoller extends Controller
                     ->where('tanggal', $schedule->tanggal)
                     ->count();
     
-                $result[] = [
-                    'Employee ID' => $employee->nik,
-                    'Name' => $employee->nama,
-                    'Date' => $schedule->tanggal,
-                    'Shift' => $schedule->shift,
-                    'Absence Count' => $absen_count
+                $schedule_data[] = [
+                    "tanggal" => $schedule->tanggal,
+                    "shift" => $schedule->shift,
+                    "absen_count" => $absen_count
                 ];
             }
+    
+            $result[] = [
+                'employee' => $employee->nik,
+                'nama' => $employee->nama,
+                'schedules' => $schedule_data
+            ];
         }
     
-        // Convert result to a collection and specify the headers
-        $collection = new Collection($result);
-        
-        // Export the data directly in the controller
-        return Excel::download(
-            new class($collection) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-                private $collection;
-    
-                public function __construct($collection)
-                {
-                    $this->collection = $collection;
-                }
-    
-                public function collection()
-                {
-                    return $this->collection;
-                }
-    
-                public function headings(): array
-                {
-                    return [
-                        'Employee ID',
-                        'Name',
-                        'Date',
-                        'Shift',
-                        'Absence Count'
-                    ];
-                }
-            },
-            'seven_day_schedule.xlsx'
-        );
+        return response()->json($result);
     }
     
     

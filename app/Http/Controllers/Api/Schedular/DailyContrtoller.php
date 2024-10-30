@@ -78,7 +78,7 @@ class DailyContrtoller extends Controller
 
     
     public function seven_day() {
-        $employee = Employee::where('unit_bisnis', 'like', '%Kas%')->where('status_resign',0)->get();
+        $employee = Employee::where('unit_bisnis', 'like', '%Kas%')->where('resign_status',0)->get();
         $result = [];
     
         foreach ($employee as $row) {

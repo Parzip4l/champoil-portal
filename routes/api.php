@@ -154,6 +154,7 @@ Route::prefix('v1')->group(function () {
      */
     Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
     Route::get('/absen_daily', [DailyContrtoller::class, 'daily_absen']);
+    Route::get('/seven_days', [DailyContrtoller::class, 'seven_day']);
     
 
     /**

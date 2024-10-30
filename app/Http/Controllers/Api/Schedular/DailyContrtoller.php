@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\ModelCG\Project;
 use App\ModelCG\Schedule;
 use App\ModelCG\Absen;
+use App\Employee;
 use Carbon\Carbon;
 
 class DailyContrtoller extends Controller
@@ -74,4 +75,43 @@ class DailyContrtoller extends Controller
         ]);
         
     }
+
+    
+    public function seven_day() {
+        $employee = Employee::where('unit_bisnis', 'like', '%Kas%')->get();
+        $result = [];
+    
+        foreach ($employee as $row) {
+            $schedules = Schedule::where('employee', $row->nik)
+                ->where('shift', '!=', 'OFF')
+                ->limit(7)
+                ->orderBy('id', 'desc')
+                ->get();
+    
+            $schedule_data = [];
+    
+            foreach ($schedules as $sc) {
+                $absen_count = Absen::where('nik', $row->nik)
+                    ->where('tanggal', $sc->tanggal)
+                    ->count();
+    
+                $schedule_data[] = [
+                    "tanggal" => $sc->tanggal,
+                    "shift" => $sc->shift,
+                    "absen_count" => $absen_count
+                ];
+            }
+    
+            $result[] = [
+                'employee' => $row->nik,
+                'schedules' => $schedule_data
+            ];
+        }
+    
+        return response()->json([
+            'status' => 'success',
+            'data' => $result
+        ]);
+    }    
+    
 }

@@ -78,12 +78,13 @@ class DailyContrtoller extends Controller
 
     
     public function seven_day() {
-        $employee = Employee::where('unit_bisnis', 'like', '%Kas%')->get();
+        $employee = Employee::where('unit_bisnis', 'like', '%Kas%')->where('status_resign',0)->get();
         $result = [];
     
         foreach ($employee as $row) {
             $schedules = Schedule::where('employee', $row->nik)
                 ->where('shift', '!=', 'OFF')
+                ->whereIN('periode',['OCTOBER-2024','NOVEMBER-2024'])
                 ->limit(7)
                 ->orderBy('id', 'desc')
                 ->get();

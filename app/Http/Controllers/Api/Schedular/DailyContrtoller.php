@@ -97,6 +97,7 @@ class DailyContrtoller extends Controller
     
                 $schedule_data[] = [
                     "tanggal" => $sc->tanggal,
+                    "nama"=>$row->nama,
                     "shift" => $sc->shift,
                     "absen_count" => $absen_count
                 ];

@@ -78,34 +78,39 @@ class DailyContrtoller extends Controller
 
     
     public function seven_day() {
-        $employee = Employee::where('unit_bisnis', 'like', '%Kas%')->where('resign_status',0)->get();
+        // Fetch active employees in the specific business unit
+        $employees = Employee::where('unit_bisnis', 'like', '%Kas%')
+            ->where('resign_status', 0)
+            ->get();
+    
         $result = [];
     
-        foreach ($employee as $row) {
-            $schedules = Schedule::where('employee', $row->nik)
+        foreach ($employees as $employee) {
+            // Retrieve schedules for the employee within the specified date range and non-OFF shifts
+            $schedules = Schedule::where('employee', $employee->nik)
                 ->where('shift', '!=', 'OFF')
-                ->whereIN('periode',['OCTOBER-2024','NOVEMBER-2024'])
-                ->limit(7)
-                ->orderBy('id', 'desc')
+                ->whereBetween('tanggal', ['2024-10-15', '2024-10-30'])
+                ->orderBy('tanggal', 'desc') // Order by date instead of ID for relevance
                 ->get();
     
             $schedule_data = [];
     
-            foreach ($schedules as $sc) {
-                $absen_count = Absen::where('nik', $row->nik)
-                    ->where('tanggal', $sc->tanggal)
+            foreach ($schedules as $schedule) {
+                // Get absence count for each schedule date
+                $absen_count = Absen::where('nik', $employee->nik)
+                    ->where('tanggal', $schedule->tanggal)
                     ->count();
     
                 $schedule_data[] = [
-                    "tanggal" => $sc->tanggal,
-                    "shift" => $sc->shift,
+                    "tanggal" => $schedule->tanggal,
+                    "shift" => $schedule->shift,
                     "absen_count" => $absen_count
                 ];
             }
     
             $result[] = [
-                'employee' => $row->nik,
-                "nama"=>$row->nama,
+                'employee' => $employee->nik,
+                'nama' => $employee->nama,
                 'schedules' => $schedule_data
             ];
         }
@@ -114,6 +119,7 @@ class DailyContrtoller extends Controller
             'status' => 'success',
             'data' => $result
         ]);
-    }    
+    }
+    
     
 }

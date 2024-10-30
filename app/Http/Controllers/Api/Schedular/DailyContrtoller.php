@@ -97,7 +97,6 @@ class DailyContrtoller extends Controller
     
                 $schedule_data[] = [
                     "tanggal" => $sc->tanggal,
-                    "nama"=>$row->nama,
                     "shift" => $sc->shift,
                     "absen_count" => $absen_count
                 ];
@@ -105,6 +104,7 @@ class DailyContrtoller extends Controller
     
             $result[] = [
                 'employee' => $row->nik,
+                "nama"=>$row->nama,
                 'schedules' => $schedule_data
             ];
         }

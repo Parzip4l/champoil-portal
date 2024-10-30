@@ -83,6 +83,7 @@ class DailyContrtoller extends Controller
         // Fetch active employees in the specific business unit
         $employees = Employee::where('unit_bisnis', 'like', '%Kas%')
             ->where('resign_status', 0)
+            ->whereIn('organisasi',["FRONTLINE OFFICER","Frontline Officer"])
             ->get();
     
         $result = [];

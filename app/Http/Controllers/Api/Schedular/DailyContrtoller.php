@@ -95,13 +95,21 @@ class DailyContrtoller extends Controller
                 ->get();
     
             $schedule_data = [];
-    
+            $off=0;
+            $jml_absen =0;
             foreach ($schedules as $schedule) {
+                
+                if($schedule->shift != 'OFF'){
+                    $off +=1;
+                }
+
                 // Get absence count for each schedule date
                 $absen_count = DB::table('absens')->where('nik', $schedule->employee)
                     ->where('tanggal', $schedule->tanggal)
                     ->count();
-    
+                if($absen_count != 0){
+                    $jml_absen +=1;
+                }
                 $schedule_data[] = [
                     "tanggal" => $schedule->tanggal,
                     "shift" => $schedule->shift,
@@ -112,6 +120,8 @@ class DailyContrtoller extends Controller
             $result[] = [
                 'employee' => $employee->nik,
                 'nama' => $employee->nama,
+                "jml_schedule"=>$off,
+                "jml_absen"=>$jml_absen,
                 'schedules' => $schedule_data
             ];
         }

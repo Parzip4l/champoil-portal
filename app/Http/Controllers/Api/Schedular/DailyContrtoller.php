@@ -90,7 +90,6 @@ class DailyContrtoller extends Controller
         foreach ($employees as $employee) {
             // Retrieve schedules for the employee within the specified date range and non-OFF shifts
             $schedules = Schedule::where('employee', $employee->nik)
-                ->where('shift', '!=', 'OFF')
                 ->whereBetween('tanggal', ['2024-10-20', '2024-10-29'])
                 ->orderBy('tanggal', 'desc') // Order by date instead of ID for relevance
                 ->get();

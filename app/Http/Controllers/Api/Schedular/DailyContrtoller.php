@@ -97,7 +97,7 @@ class DailyContrtoller extends Controller
     
             foreach ($schedules as $schedule) {
                 // Get absence count for each schedule date
-                $absen_count = Absen::where('nik', $employee->nik)
+                $absen_count = DB::table('absens')->where('nik', $schedule->employee)
                     ->where('tanggal', $schedule->tanggal)
                     ->count();
     

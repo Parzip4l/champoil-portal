@@ -188,9 +188,14 @@ TRUEST Team```';
         $companyData = $employee->unit_bisnis;
         $now = Carbon::now();
 
-        Loan::where('employee_code', $employee_code)
-                    ->where('company',$companyData)
-                    ->update(['status' => 'rejected', 'approve_by' => $code]);
+        $latestLoan = Loan::where('employee_code', $employee_code)
+                  ->where('company', $companyData)
+                  ->latest() // Orders by `created_at` in descending order
+                  ->first();
+
+        if ($latestLoan) {
+            $latestLoan->delete(); // Deletes only the latest record if it exists
+        }
         
         $records = Employee::where('nik', $employee_code)->get();
         $EmailData = Employee::where('nik', $employee_code)->first();

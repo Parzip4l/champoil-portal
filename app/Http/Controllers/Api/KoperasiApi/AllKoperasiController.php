@@ -159,7 +159,7 @@ class AllKoperasiController extends Controller
                 'success' => true,
                 'message' => 'Loan data retrieved.',
                 'status_anggota' => $anggotaStatus->member_status,
-                'onloan_status' => $loan->status,
+                'onloan_status' => $loan,
                 'remaining_loan' => $historyPinjaman,
                 'next_bill' => $nextBill,
                 'savings' => $datasaya,
@@ -296,12 +296,12 @@ class AllKoperasiController extends Controller
 
             Anggota::where('employee_code', $employeeCode)->update(['loan_status' => 'onloan']);
             $today = Carbon::now()->format('Y-m-d');
-            // LoanPayment::create([
-            //     'loan_id' => $loanUuid,
-            //     'tanggal_pembayaran' => $today,
-            //     'jumlah_pembayaran' => 0,
-            //     'sisahutang' => $totalPinjaman,
-            // ]);
+            LoanPayment::create([
+                'loan_id' => $loanUuid,
+                'tanggal_pembayaran' => $today,
+                'jumlah_pembayaran' => 0,
+                'sisahutang' => $totalPinjaman,
+            ]);
 
             return response()->json([
                 'success' => true,

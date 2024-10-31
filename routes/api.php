@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Schedules\ScheduleController;
 use App\Http\Controllers\Api\AllData\TaskManagementApi;
 use App\Http\Controllers\Api\KoperasiApi\AllKoperasiController;
 use App\Http\Controllers\Api\Schedular\DailyContrtoller;
+use App\Http\Controllers\Api\Emergency\EmergencyApi;
 
 Route::prefix('v1')->group(function () {
 
@@ -83,6 +84,13 @@ Route::prefix('v1')->group(function () {
     /**
      * Referal
      */
+
+    //  Emergency 
+
+    Route::get('/emergency-page', [EmergencyApi::class, 'index']);
+        Route::post('/emergency-request', [EmergencyApi::class, 'EmergencyRequest']);
+
+
     Route::get('/referal-search/{kode_referal}', [ReferalController::class, 'search_referal']);
 
     // Log Absen

@@ -22,6 +22,10 @@ class EmergencyModel extends Model
         'status',
     ];
 
+    public function details()
+    {
+        return $this->hasMany(EmergencyDetails::class, 'emergency_id', 'id');
+    }
     // Tentukan bahwa primary key adalah UUID
     protected $primaryKey = 'id';
 

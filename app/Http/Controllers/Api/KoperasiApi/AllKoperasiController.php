@@ -91,7 +91,7 @@ class AllKoperasiController extends Controller
                                     ->whereBetween('tanggal', [$start_date, $end_date])
                                     ->count();
 
-                $hadFullAttendance = $attendanceDays >= $scheduleDays - 1;
+                $hadFullAttendance = $attendanceDays === $scheduleDays;
 
                 $canApplyForLoan = $isMemberForThreeMonths && $hasNoOutstandingLoan && $hadFullAttendance;
 
@@ -296,12 +296,12 @@ class AllKoperasiController extends Controller
 
             Anggota::where('employee_code', $employeeCode)->update(['loan_status' => 'onloan']);
             $today = Carbon::now()->format('Y-m-d');
-            LoanPayment::create([
-                'loan_id' => $loanUuid,
-                'tanggal_pembayaran' => $today,
-                'jumlah_pembayaran' => 0,
-                'sisahutang' => $totalPinjaman,
-            ]);
+            // LoanPayment::create([
+            //     'loan_id' => $loanUuid,
+            //     'tanggal_pembayaran' => $today,
+            //     'jumlah_pembayaran' => 0,
+            //     'sisahutang' => $totalPinjaman,
+            // ]);
 
             return response()->json([
                 'success' => true,

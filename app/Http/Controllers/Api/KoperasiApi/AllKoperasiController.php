@@ -159,7 +159,7 @@ class AllKoperasiController extends Controller
                 'success' => true,
                 'message' => 'Loan data retrieved.',
                 'status_anggota' => $anggotaStatus->member_status,
-                'onloan_status' => $loan,
+                'onloan_status' => $loan->status,
                 'remaining_loan' => $historyPinjaman,
                 'next_bill' => $nextBill,
                 'savings' => $datasaya,

@@ -91,7 +91,7 @@ class AllKoperasiController extends Controller
                                     ->whereBetween('tanggal', [$start_date, $end_date])
                                     ->count();
 
-                $hadFullAttendance = $attendanceDays === $scheduleDays - 1;
+                $hadFullAttendance = $attendanceDays >= $scheduleDays - 1;
 
                 $canApplyForLoan = $isMemberForThreeMonths && $hasNoOutstandingLoan && $hadFullAttendance;
 

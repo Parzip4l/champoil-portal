@@ -26,6 +26,14 @@ class DailyContrtoller extends Controller
                 $schedules = Schedule::where('schedules.project', $row->id)
                     ->join('karyawan','karyawan.nik','=','schedules.employee')
                     ->where('shift', '!=', 'OFF')
+                    ->withCount([
+                        'scheduleParents as schedule_parent_count' => function ($query) {
+                            $query->select(DB::raw('count(*)'))
+                                  ->whereColumn('scheule_parents.project_id', 'schedules.project')
+                                  ->whereColumn('scheule_parents.employee', 'schedules.employee')
+                                  ->whereColumn('scheule_parents.periode', 'schedules.periode');
+                        }
+                    ])
                     ->where('schedules.tanggal', $yesterday)
                     ->get();
                 

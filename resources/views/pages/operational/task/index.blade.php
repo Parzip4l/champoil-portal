@@ -482,6 +482,24 @@
         mode: "range",
         dateFormat: "Y-m-d",
         onClose: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length === 2) {
+                const startDate = selectedDates[0];
+                const endDate = selectedDates[1];
+
+                // Calculate the difference in time and then convert to days
+                const timeDiff = endDate - startDate;
+                const dayDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
+
+                // Show alert if the difference is greater than 31 days
+                if (dayDiff > 14) {
+                    alert("MAKSIMAL 14 HARI");
+                    // Optionally clear the selected dates
+                    instance.clear(); // Uncomment if you want to clear the selection
+                    return; // Exit the function if the alert is shown
+                }
+            }
+
+
             var project = "{{ $project_id ?? '' }}"; // Default to empty string if undefined
             $("#project_list").empty();
             // Check if the project ID is empty

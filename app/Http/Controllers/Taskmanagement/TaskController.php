@@ -228,13 +228,8 @@ class TaskController extends Controller
         $data['project_id']=$id_project;
         $data['client']=Auth::user()->project_id;
         $records = Project::all();
-
-        if(!empty($periode_filter)){
-            $report = Task::where('project_id',$id_project)->get();
-        }else{
-            $report=[];
-        }
         
+        $report = Task::where('project_id',$id_project)->get();
 
         $point=[];
         $btn_download=[];

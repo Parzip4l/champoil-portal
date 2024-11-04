@@ -78,11 +78,15 @@
                             </select>
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-primary mb-3">Filter</button>
+                            <button type="submit" class="btn btn-primary mb-3 btn-sm">Filter</button>
                         </div>
                         <div class="col-auto">
                             <!-- <a href="javascript:void(0)" class="btn btn-primary" onclick="handleDownload()">Download</a> -->
-                            <a href="javascript:void(0)" id="printButton" class="btn btn-primary">Print Analityc</a>
+                            <a href="javascript:void(0)" id="printButton" class="btn btn-primary btn-sm">Print Analityc</a>
+                            <a href="javascript:void(0)" 
+                                class="btn btn-sm btn-success text-white mr-3" 
+                                style="float:right;margin-left: 10px;" 
+                                data-bs-toggle="modal" data-bs-target="#download">Download</a>
                         </div>
                     </form>
                     
@@ -222,6 +226,31 @@
         </div>
     </div>
   </div>
+</div>
+<div class="modal fade" id="download" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Download Data Patrol</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="download_file">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Judul</label>
+                            <input type="text" class="form-control" name="title" required>    
+                        </div>
+                        
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="submit">Download</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -572,5 +601,6 @@ function analityc(project,data,total){
     // Optionally, restore the event listeners or reload the page if necessary
     location.reload(); // Optional: reload the page to restore everything
 });
+
 </script>
 @endpush

@@ -511,5 +511,39 @@ class PatroliController extends Controller
         // Return a response indicating success
         return response()->json(['success' => true, 'path' => $filePath]);
     }
+
+    public function download_file_patrol(Request $request){
+        $tanggal = $request->input('tanggal');
+        $project = $request->input('project_id');
+        $explode = explode('-',$tanggal);
+        $date1= $explode[0].' 00:00:00';
+        $date2= $explode[1].' 23:59:59';
+
+        $task = Task::where('project_id',$project)->get();
+        if(!empty($task)){
+            foreach($task as $row){
+                $row->point= List_task::where('id_master',$row->id)->get();
+                if(!empty($row->list)){
+                    foreach($row->list as $key){
+                        $key->list = Patroli::where('unix_code',$row->unix_code)
+                                            ->whereBetween('created_at',[$date1,$date2])
+                                            ->get();
+                    }
+                }
+            }
+        }
+
+        
+
+        return response()->json(
+            [
+                'message' => 'Excel file saved successfully', 
+                'tanggal' => $tanggal,
+                'project' => $project,
+                'task'=> $task
+            ]
+        );
+
+    } 
     
 }

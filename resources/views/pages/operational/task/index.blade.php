@@ -1,18 +1,62 @@
 @extends('layout.master')
+@php 
+        $user = Auth::user();
+        $dataLogin = json_decode(Auth::user()->permission); 
+        $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    @endphp
+<style>
+  /* styles.css */
+.loading-backdrop {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 9999; /* High z-index to ensure it covers other elements */
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
 
+.loading-spinner {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    color: #fff; /* White text color */
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Light border */
+    border-radius: 50%;
+    border-top: 4px solid #fff; /* White top border for spinner effect */
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite; /* Spin animation */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
+<div id="loadingBackdrop" class="loading-backdrop">
+  <div class="loading-spinner"></div>
+</div>
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0 align-self-center">
                     Data Patrol
-                    
+                    <a href="javascript:void(0)" 
+                                class="btn btn-sm btn-success text-white mr-3" 
+                                style="float:right;margin-left: 10px;" 
+                                data-bs-toggle="modal" data-bs-target="#download">Download Data Patroli</a>
                     <a href="{{route('task-report')}}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Report</a>
                     <a href="#" data-bs-toggle="modal" data-bs-target="#import-data" class="btn btn-sm btn-success text-white mr-3"  style="float:right;margin-left: 10px;">Import Excel</a>
                     <a href="#" class="btn btn-sm btn-primary ml-3" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
@@ -273,7 +317,33 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="download" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Download Data Patrol</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="download_file">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Filter Tanggal</label>
+                            <input type="text" class="form-control" name="tanggal" required id="tanggal_report">    
+                        </div>
+                        <div id="project_list"></div>
+                        
+                        
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="button" id="download_file_patrol">Download</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- End -->
 @endsection
 
@@ -352,5 +422,80 @@
             text: '{{ session('error') }}',
         });
     @endif
+
+    $(document).ready(function() {
+        $('#loadingBackdrop').hide();
+        $('#download_file_patrol').on('click', function() {
+            // Define any parameters you want to send
+            $('#loadingBackdrop').show();
+            const params = {
+                tanggal: $("#tanggal_report").val(), // Example parameter
+                project_id: $("#project_id_filter").val() // Another example parameter
+            };
+
+            // Send GET request using Axios
+            axios.get('/api/v1/download_file_patrol', { params })
+                .then(function(response) {
+                    // Handle success response
+                    const filePath = response.data.path; // Ensure your backend sends the correct file path
+
+                    // Create a temporary link element
+                    const link = document.createElement('a');
+                    link.href = filePath; // Set the file path
+                    link.target = '_blank'; // Open in a new tab
+
+                    // Set the download attribute
+                    link.setAttribute('download', ''); // You can specify a filename here
+
+                    // Append to the body
+                    document.body.appendChild(link);
+                    
+                    // Programmatically click the link to trigger the download
+                    link.click();
+                    
+                    // Remove the link from the document
+                    document.body.removeChild(link);
+                    
+                    $('#loadingBackdrop').hide();
+                    alert('File downloaded successfully');
+                    // Optionally, you can handle the response, like redirecting to a download URL
+                    // window.location.href = response.data.downloadUrl; 
+                })
+                .catch(function(error) {
+                    // Handle error response
+                    console.error('Error downloading file', error);
+                    $('#loadingBackdrop').hide();
+                });
+        });
+    });
+
+    flatpickr("#tanggal_report", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onClose: function(selectedDates, dateStr, instance) {
+            var project = "{{ $employee->project_id ?? '' }}"; // Default to empty string if undefined
+            $("#project_list").empty();
+            // Check if the project ID is empty
+            if (!project) {
+                $("#project_list").append(`
+                    <div class="col-md-12 mb-2"> 
+                        <label for="" class="form-label">Project</label>
+                        <select name="project_id" id="project_id_filter" class="form-control select2">
+                            <option value="">-- Select Project -- </option>
+                            @if(isset($project) && count($project) > 0)
+                                @foreach($project as $pr)
+                                    <option value="{{ $pr->id }}">{{ $pr->name }}</option>
+                                @endforeach
+                            @endif
+                        </select> 
+                    </div>
+                `);
+
+            }
+            
+        }
+    }); 
+
+    
 </script>
 @endpush

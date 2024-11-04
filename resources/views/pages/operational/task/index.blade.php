@@ -3,6 +3,7 @@
         $user = Auth::user();
         $dataLogin = json_decode(Auth::user()->permission); 
         $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+        $project_id = json_decode(Auth::user()->project_id);
     @endphp
 <style>
   /* styles.css */
@@ -428,9 +429,17 @@
         $('#download_file_patrol').on('click', function() {
             // Define any parameters you want to send
             $('#loadingBackdrop').show();
+            var project = "{{ $project_id ?? '' }}";
+            let project_id='';
+            if(project ===''){
+                project_id  = $("#project_id_filter").val();
+            }else{
+                project_id  = project;
+            }
+            
             const params = {
                 tanggal: $("#tanggal_report").val(), // Example parameter
-                project_id: $("#project_id_filter").val() // Another example parameter
+                project_id:  project_id // Another example parameter
             };
 
             // Send GET request using Axios
@@ -473,7 +482,7 @@
         mode: "range",
         dateFormat: "Y-m-d",
         onClose: function(selectedDates, dateStr, instance) {
-            var project = "{{ $employee->project_id ?? '' }}"; // Default to empty string if undefined
+            var project = "{{ $project_id ?? '' }}"; // Default to empty string if undefined
             $("#project_list").empty();
             // Check if the project ID is empty
             if (!project) {

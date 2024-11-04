@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CgControllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Schedule;
+use App\ModelCG\ScheuleParent;
 use App\ModelCG\Shift;
 use App\Employee;
 use App\ModelCG\Project;
@@ -435,4 +436,23 @@ class ScheduleControllers extends Controller
             return redirect()->route('schedule.index')->with('error', 'Schedule Not Found');
         }
     }
+
+    public function stop_report($employee,$periode,$project)
+    {
+        $expode = explode(",",$employee);
+        $isInserted = ScheuleParent::insert([
+            'employee_code' => $expode[0],
+            'periode' => $expode[1],
+            'project_id' => $expode[2],
+            'created_at' =>date('Y-m-d')
+        ]);
+    
+        if ($isInserted) {
+            return redirect()->route('schedule.index')->with('success', 'Schedule Successfully Added');
+        } else {
+            return redirect()->route('schedule.index')->with('error', 'Failed to Add Schedule');
+        }
+    }
+
+    
 }

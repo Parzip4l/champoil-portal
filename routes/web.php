@@ -407,6 +407,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Schedule Details
         Route::get('/scheduleData/details/{project}/{periode}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetails'])->name('schedule.details');
         Route::get('/schedule/details/{project}/{periode}/{employee}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetailsEmployee'])->name('schedule.employee');
+        Route::get('/schedule/stop_report/{employee}/{periode}/{project}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'stop_report'])->name('schedule.stop_report');
         Route::post('/schedule-store', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'store'])->name('schedule-store');
 
         // Update Manual Schedule

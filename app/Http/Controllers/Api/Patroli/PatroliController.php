@@ -523,8 +523,8 @@ class PatroliController extends Controller
         if(!empty($task)){
             foreach($task as $row){
                 $row->point= List_task::where('id_master',$row->id)->get();
-                if(!empty($row->list)){
-                    foreach($row->list as $key){
+                if(!empty($row->point)){
+                    foreach($row->point as $key){
                         $key->list = Patroli::where('unix_code',$row->unix_code)
                                             ->whereBetween('created_at',[$date1,$date2])
                                             ->get();

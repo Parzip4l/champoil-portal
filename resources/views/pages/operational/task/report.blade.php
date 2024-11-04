@@ -1,4 +1,9 @@
 @extends('layout.master')
+    @php 
+        $user = Auth::user();
+        $dataLogin = json_decode(Auth::user()->permission); 
+        $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    @endphp
 <style>
   /* styles.css */
 .loading-backdrop {
@@ -239,12 +244,14 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Judul</label>
-                            <input type="text" class="form-control" name="title" required>    
+                            <label for="" class="form-label">Filter Tanggal</label>
+                            <input type="text" class="form-control" name="tanggal" required id="tanggal_report">    
                         </div>
+                        <div id="project_list"></div>
+                        
                         
                         <div class="col-md-12 mt-2">
-                            <button class="btn btn-primary w-100" type="submit">Download</button>
+                            <button class="btn btn-primary w-100" type="button" id="download_file_patrol">Download</button>
                         </div>
                     </div>
                 </form>
@@ -582,25 +589,100 @@ function analityc(project,data,total){
     });
   }
 
-  document.getElementById('printButton').addEventListener('click', function() {
-    // Get the content of the section to print
-    var printContent = document.getElementById('printSection').innerHTML;
+    
 
-    // Store the original content of the document
-    var originalContent = document.body.innerHTML;
+    document.getElementById('printButton').addEventListener('click', function() {
+        // Get the content of the section to print
+        var printContent = document.getElementById('printSection').innerHTML;
 
-    // Replace the body's content with the content to print
-    document.body.innerHTML = printContent;
+        // Store the original content of the document
+        var originalContent = document.body.innerHTML;
 
-    // Trigger the print dialog
-    window.print();
+        // Replace the body's content with the content to print
+        document.body.innerHTML = printContent;
 
-    // Restore the original content after printing
-    document.body.innerHTML = originalContent;
+        // Trigger the print dialog
+        window.print();
 
-    // Optionally, restore the event listeners or reload the page if necessary
-    location.reload(); // Optional: reload the page to restore everything
-});
+        // Restore the original content after printing
+        document.body.innerHTML = originalContent;
+
+        // Optionally, restore the event listeners or reload the page if necessary
+        location.reload(); // Optional: reload the page to restore everything
+    });
+
+    flatpickr("#tanggal_report", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onClose: function(selectedDates, dateStr, instance) {
+            var project = "{{ $employee->project_id ?? '' }}"; // Default to empty string if undefined
+            $("#project_list").empty();
+            // Check if the project ID is empty
+            if (!project) {
+                $("#project_list").append(`
+                    <div class="col-md-12 mb-2"> 
+                        <label for="" class="form-label">Project</label>
+                        <select name="project_id" id="project_id_filter" class="form-control select2">
+                            <option value="">-- Select Project -- </option>
+                            @if(isset($project) && count($project) > 0)
+                                @foreach($project as $pr)
+                                    <option value="{{ $pr->id }}">{{ $pr->name }}</option>
+                                @endforeach
+                            @endif
+                        </select> 
+                    </div>
+                `);
+
+            }
+            
+        }
+    }); 
+
+    
+    $(document).ready(function() {
+        $('#download_file_patrol').on('click', function() {
+            // Define any parameters you want to send
+            $('#loadingBackdrop').show();
+            const params = {
+                tanggal: $("#tanggal_report").val(), // Example parameter
+                project_id: $("#project_id_filter").val() // Another example parameter
+            };
+
+            // Send GET request using Axios
+            axios.get('/api/v1/download_file_patrol', { params })
+                .then(function(response) {
+                    // Handle success response
+                    const filePath = response.data.path; // Ensure your backend sends the correct file path
+
+                    // Create a temporary link element
+                    const link = document.createElement('a');
+                    link.href = filePath; // Set the file path
+                    link.target = '_blank'; // Open in a new tab
+
+                    // Set the download attribute
+                    link.setAttribute('download', ''); // You can specify a filename here
+
+                    // Append to the body
+                    document.body.appendChild(link);
+                    
+                    // Programmatically click the link to trigger the download
+                    link.click();
+                    
+                    // Remove the link from the document
+                    document.body.removeChild(link);
+                    
+                    $('#loadingBackdrop').hide();
+                    alert('File downloaded successfully');
+                    // Optionally, you can handle the response, like redirecting to a download URL
+                    // window.location.href = response.data.downloadUrl; 
+                })
+                .catch(function(error) {
+                    // Handle error response
+                    console.error('Error downloading file', error);
+                    $('#loadingBackdrop').hide();
+                });
+        });
+    });
 
 </script>
 @endpush

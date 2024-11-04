@@ -224,7 +224,7 @@ class TaskController extends Controller
 
         $data['detail_project'] = Project::find($id_project);
         
-        $data['project']=Project::all();
+        $data['project']=Project::where('company','Kas')->get();
         $data['project_id']=$id_project;
         $data['client']=Auth::user()->project_id;
         $records = Project::all();

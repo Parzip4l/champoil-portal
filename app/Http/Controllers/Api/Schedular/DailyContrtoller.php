@@ -28,21 +28,13 @@ class DailyContrtoller extends Controller
                     ->join('karyawan','karyawan.nik','=','schedules.employee')
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)
-                    ->withCount([
-                        'schedule_parent_count' => function ($query) {
-                            $query->select(DB::raw('count(*)'))
-                                  ->whereColumn('scheule_parents.project_id', 'schedules.project')
-                                  ->whereColumn('scheule_parents.employee', 'schedules.employee')
-                                  ->whereColumn('scheule_parents.periode', 'schedules.periode');
-                        }
-                    ])
                     ->get();
 
                 $cout_schedule =0;
                 if(!empty($schedules)){
                     foreach($schedules as $sh){
-                        $cek = ScheuleParent::where('employee',$sh->employee)-where('periode',$sh->periode)->where('project_id',$sh->project)->count();
-                        if($cek == 0){
+                        $sh->cek = ScheuleParent::where('employee',$sh->employee)-where('periode',$sh->periode)->where('project_id',$sh->project)->count();
+                        if($sh->cek == 0){
                             $cout_schedule +=1;
                         }
                     }
@@ -60,7 +52,7 @@ class DailyContrtoller extends Controller
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {
                     // Check attendance for the employee on the given date
-                    if($rs->schedule_parent_count==0){
+                    if($rs->cek==0){
                         $jml_absen = DB::table('absens')
                             ->where('nik', $rs->employee)
                             ->where('tanggal', $yesterday)

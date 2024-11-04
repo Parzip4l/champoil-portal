@@ -533,6 +533,35 @@ class PatroliController extends Controller
             }
         }
 
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set data in specific cells
+        $sheet->setCellValue('A1', 'ID');
+        $sheet->setCellValue('B1', 'Name');
+        $sheet->setCellValue('C1', 'Email');
+
+        // Example data array
+        $data = [
+            ['1', 'John Doe', 'john@example.com'],
+            ['2', 'Jane Smith', 'jane@example.com'],
+            ['3', 'Sam Johnson', 'sam@example.com'],
+        ];
+
+        // Loop through data and set cell values
+        $rowNumber = 2; // Start from row 2 (row 1 is the header)
+        foreach ($data as $row) {
+            $sheet->setCellValue('A' . $rowNumber, $row[0]);
+            $sheet->setCellValue('B' . $rowNumber, $row[1]);
+            $sheet->setCellValue('C' . $rowNumber, $row[2]);
+            $rowNumber++;
+        }
+
+        // Write the file
+        $writer = new Xlsx($spreadsheet);
+        $filePath = public_path('patroli/report_'.date('YmdHis').'.xlsx'); // Define your file path
+        $writer->save($filePath);
+
         
 
         return response()->json(

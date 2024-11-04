@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\ModelCG\Project;
 use App\ModelCG\Schedule;
+use App\ModelCG\ScheuleParent;
 use App\ModelCG\Absen;
 use App\Employee;
 use Carbon\Carbon;
@@ -26,6 +27,7 @@ class DailyContrtoller extends Controller
                 $schedules = Schedule::where('schedules.project', $row->id)
                     ->join('karyawan','karyawan.nik','=','schedules.employee')
                     ->where('shift', '!=', 'OFF')
+                    ->where('schedules.tanggal', $yesterday)
                     ->withCount([
                         'scheduleParents as schedule_parent_count' => function ($query) {
                             $query->select(DB::raw('count(*)'))
@@ -34,11 +36,20 @@ class DailyContrtoller extends Controller
                                   ->whereColumn('scheule_parents.periode', 'schedules.periode');
                         }
                     ])
-                    ->where('schedules.tanggal', $yesterday)
                     ->get();
+
+                $cout_schedule =0;
+                if(!empty($schedules)){
+                    foreach($schedules as $sh){
+                        $cek = ScheuleParent::where('employee',$sh->employee)-where('periode',$sh->periode)->where('project_id',$sh->project)->count();
+                        if($cek == 0){
+                            $cout_schedule +=1;
+                        }
+                    }
+                }
                 
                 // Total number of schedules
-                $schedules_total = $schedules->count();
+                $schedules_total = $cout_schedule;
         
                 // Initialize counters
                 $absen = 0;
@@ -49,19 +60,21 @@ class DailyContrtoller extends Controller
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {
                     // Check attendance for the employee on the given date
-                    $jml_absen = DB::table('absens')
-                        ->where('nik', $rs->employee)
-                        ->where('tanggal', $yesterday)
-                        ->count();
+                    if($rs->schedule_parent_count==0){
+                        $jml_absen = DB::table('absens')
+                            ->where('nik', $rs->employee)
+                            ->where('tanggal', $yesterday)
+                            ->count();
 
-    
+        
 
-                    if ($jml_absen > 0) {
-                        $absen += 1;
-                        
-                    } else {
-                        $not_absen += 1;
-                        $no_absen[]=$rs->nama;
+                        if ($jml_absen > 0) {
+                            $absen += 1;
+                            
+                        } else {
+                            $not_absen += 1;
+                            $no_absen[]=$rs->nama;
+                        }
                     }
                 }
         

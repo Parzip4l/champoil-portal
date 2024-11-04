@@ -33,7 +33,7 @@ class DailyContrtoller extends Controller
                 $cout_schedule =0;
                 if(!empty($schedules)){
                     foreach($schedules as $sh){
-                        $sh->cek = ScheuleParent::where('employee',$sh->employee)-where('periode',$sh->periode)->where('project_id',$sh->project)->count();
+                        $sh->cek = ScheuleParent::where('employee',$sh->employee)->where('periode',$sh->periode)->where('project_id',$sh->project)->count();
                         if($sh->cek == 0){
                             $cout_schedule +=1;
                         }

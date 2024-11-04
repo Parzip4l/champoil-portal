@@ -29,7 +29,7 @@ class DailyContrtoller extends Controller
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)
                     ->withCount([
-                        'ScheuleParent as schedule_parent_count' => function ($query) {
+                        'schedule_parent_count' => function ($query) {
                             $query->select(DB::raw('count(*)'))
                                   ->whereColumn('scheule_parents.project_id', 'schedules.project')
                                   ->whereColumn('scheule_parents.employee', 'schedules.employee')

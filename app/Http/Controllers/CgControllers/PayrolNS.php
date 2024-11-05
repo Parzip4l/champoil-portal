@@ -330,19 +330,14 @@ class PayrolNS extends Controller
                         ->whereBetween('tanggal', [date('Y-m-d',strtotime($startDate)), date('Y-m-d',strtotime($endDate))])
                         ->where('shift', '!=', 'OFF')
                         ->get();
-                    if(!empty($schedulesManBackup)){
-                        $totalScheduleManBackup = $schedulesManBackup->count();
-                    }else{
-                        $totalScheduleManBackup=0;
-                    }
-                    
+                    $totalScheduleManBackup = $schedulesManBackup->count();
                     $jabatanManbackup = 
                     $projectDetailsBackupData = ProjectDetails::where('project_code', $projectIDBackup)
                         ->where('jabatan', $man_backup_jabatan->jabatan)
                         ->pluck('tp_bulanan', 'project_code');
                     
                     $monthlySalaryProject = $projectDetailsBackupData->sum();
-                    $rateHarianBackup = round($monthlySalaryProject / $totalScheduleManBackup);
+                    $rateHarianBackup = $monthlySalaryProject / $totalScheduleManBackup;
                     $totalHariBackupmentah = 1;
                     $totalGajiBackupmentah = $totalHariBackupmentah * $rateHarianBackup;
                     

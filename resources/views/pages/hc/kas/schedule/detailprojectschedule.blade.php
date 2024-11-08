@@ -19,6 +19,7 @@
                             <tr>
                                 <th>Employee Name</th>
                                 <th>Project</th>
+                                <th>Status</th>
                                 <th>Periode</th>
                                 <th>Action</th>
                             </tr>
@@ -39,6 +40,7 @@
                                     </a>
                                 </td>
                                 <td> {{ $projectname }} </td>
+                                <td>{!! $schedule->status !!}</td>
                                 <td> {{ $schedule->periode }} </td>
                                 <td>
                                     <div class="dropdown">

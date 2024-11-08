@@ -310,9 +310,21 @@ class ScheduleControllers extends Controller
         ->where('project', $project)
         ->where('periode', $periode)
         ->groupBy('employee', 'periode');
+        
 
         $schedulesWithDetails = Schedule::whereIn('id', $schedules->pluck('schedule_id'))
             ->get();
+        foreach($schedulesWithDetails as $row){
+            $status = ScheuleParent::where('employee_code',$row->employee)
+                                        ->where('project_id', $project)
+                                        ->where('periode', $periode)
+                                        ->count();
+            if($status  == 0){
+                $row->status ='<span class="badge rounded-pill bg-success">Active</span>';
+            }else{
+                $row->status ='<span class="badge rounded-pill bg-danger">Non Active</span>';
+            }
+        }
 
         return view('pages.hc.kas.schedule.detailprojectschedule', [
             'project' => $project,

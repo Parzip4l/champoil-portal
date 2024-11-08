@@ -56,7 +56,7 @@
                                                 </a>
                                                 <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{$schedule->employee}},{{ $schedule->periode }},{{$schedule->project}}')">
                                                     <i data-feather="trash" class="icon-sm me-2"></i>
-                                                    <span class="">Stop</span>
+                                                    <span class="">Stop Schedule</span>
                                                 </a>
                                             </form>
                                         </div>

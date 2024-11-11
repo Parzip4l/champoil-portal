@@ -378,7 +378,7 @@ class PayrolNS extends Controller
                         ->whereBetween('tanggal', [date('Y-m-d',strtotime($startDate)), date('Y-m-d',strtotime($endDate))])
                         ->where('shift', '!=', 'OFF')
                         ->get();
-                    $totalDaysInSchedules = $schedules->count() + 1;
+                    $totalDaysInSchedules = $schedules->count();
                     $tidakmasukkerja = 0;
 
                     if ($totalDaysInSchedules > 0) {

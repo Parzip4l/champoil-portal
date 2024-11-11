@@ -337,7 +337,7 @@ class PayrolNS extends Controller
                         ->pluck('tp_bulanan', 'project_code');
                     
                     $monthlySalaryProject = $projectDetailsBackupData->sum();
-                        $rateHarianBackup = round($monthlySalaryProject / $totalScheduleManBackup);
+                    $rateHarianBackup = $totalScheduleManBackup != 0 ? round($monthlySalaryProject / $totalScheduleManBackup) : 0;
                     
                     
                     $totalHariBackupmentah = 1;

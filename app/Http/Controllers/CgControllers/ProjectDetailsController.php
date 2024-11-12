@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProjectDetailsImport;
+use Illuminate\Support\Facades\Auth;
+use App\Employee;
 
 class ProjectDetailsController extends Controller
 {
@@ -32,10 +34,8 @@ class ProjectDetailsController extends Controller
      */
     public function createDetails($id)
     {
-        $code = Auth::user()->employee_code;
-        $company = Employee::where('nik', $code)->first();
         $project = Project::find($id);
-        $jabatan = Jabatan::where('parent_category', $company->unit_bisnis)->get();
+        $jabatan = Jabatan::all();
         return view('pages.hc.kas.project.createdetails', compact('project', 'jabatan'));
     }
 
@@ -148,8 +148,10 @@ class ProjectDetailsController extends Controller
      */
     public function show($id)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $jabatan = Jabatan::where('parent_category', $company->unit_bisnis)->get();
         $project = Project::find($id);
-        $jabatan = Jabatan::all();
         return view('pages.hc.kas.project.createdetails', compact('project', 'jabatan'));
     }
 

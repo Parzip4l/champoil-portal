@@ -33,6 +33,7 @@ class ProjectDetailsController extends Controller
     public function createDetails($id)
     {
         $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         $project = Project::find($id);
         $jabatan = Jabatan::where('parent_category', $company->unit_bisnis)->get();
         return view('pages.hc.kas.project.createdetails', compact('project', 'jabatan'));

@@ -77,13 +77,15 @@ class RequestControllers extends Controller
             $requestabsen->save();
 
             $dataKaryawanRequest = $requestabsen->employee;
-
+            $schedule = Schedule::where('employee',$dataKaryawanRequest)->where('tanggal', $requestabsen->tanggal)->first();
+            
             // Cek status jika lupa absen
             if ($requestabsen->status = 'F') {
                 // Simpan Kedalam Table Absen
                 $absen = new Absen();
                 $absen->user_id = $dataKaryawanRequest;
                 $absen->nik = $dataKaryawanRequest;
+                $absen->project = $schedule->project ?? '';
                 $absen->tanggal = $requestabsen->tanggal;
                 $absen->clock_in = $requestabsen->clock_in;
                 $absen->clock_out = $requestabsen->clock_out;

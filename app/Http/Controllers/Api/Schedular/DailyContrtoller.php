@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\ModelCG\Project;
 use App\ModelCG\Schedule;
+use App\ModelCG\ScheuleParent;
 use App\ModelCG\Absen;
 use App\Employee;
 use Carbon\Carbon;
@@ -28,9 +29,19 @@ class DailyContrtoller extends Controller
                     ->where('shift', '!=', 'OFF')
                     ->where('schedules.tanggal', $yesterday)
                     ->get();
+
+                $cout_schedule =0;
+                if(!empty($schedules)){
+                    foreach($schedules as $sh){
+                        $sh->cek = ScheuleParent::where('employee_code',$sh->employee)->where('periode',$sh->periode)->where('project_id',$sh->project)->count();
+                        if($sh->cek == 0){
+                            $cout_schedule +=1;
+                        }
+                    }
+                }
                 
                 // Total number of schedules
-                $schedules_total = $schedules->count();
+                $schedules_total = $cout_schedule;
         
                 // Initialize counters
                 $absen = 0;
@@ -41,19 +52,21 @@ class DailyContrtoller extends Controller
                 // Count absentees and presentees based on clock_in field
                 foreach ($schedules as $rs) {
                     // Check attendance for the employee on the given date
-                    $jml_absen = DB::table('absens')
-                        ->where('nik', $rs->employee)
-                        ->where('tanggal', $yesterday)
-                        ->count();
+                    if($rs->cek==0){
+                        $jml_absen = DB::table('absens')
+                            ->where('nik', $rs->employee)
+                            ->where('tanggal', $yesterday)
+                            ->count();
 
-    
+        
 
-                    if ($jml_absen > 0) {
-                        $absen += 1;
-                        
-                    } else {
-                        $not_absen += 1;
-                        $no_absen[]=$rs->nama;
+                        if ($jml_absen > 0) {
+                            $absen += 1;
+                            
+                        } else {
+                            $not_absen += 1;
+                            $no_absen[]=$rs->nama;
+                        }
                     }
                 }
         
@@ -77,6 +90,56 @@ class DailyContrtoller extends Controller
         ]);
         
     }
+
+    public function report_absen() {
+        $records = Project::whereNull('deleted_at')
+            ->where('company', 'Kas')
+            ->get();
+    
+        $date1 = "2024-10-21";
+        $yesterday = Carbon::yesterday()->format('Y-m-d');
+        
+        $result = [];
+    
+        if (!$records->isEmpty()) {
+            foreach ($records as $row) {
+                // Clone the base schedule query to ensure a fresh query for each project
+                $projectSchedules = Schedule::select('karyawan.nama', 'schedules.*')
+                    ->join('karyawan', 'karyawan.nik', '=', 'schedules.employee')
+                    ->where('schedules.shift', '!=', 'OFF')
+                    ->where('project', $row->id)
+                    ->whereBetween('tanggal', [$date1, $yesterday])
+                    ->get();
+    
+                if ($projectSchedules->isNotEmpty()) {
+                    foreach ($projectSchedules as $absen) {
+                        // Count the absences for the employee on the specified date
+                        $absen->jml = DB::table('absens')
+                            ->where('nik', $absen->employee)
+                            ->where('tanggal', $absen->tanggal)
+                            ->count();
+                    }
+                }
+    
+                // Add the project data and related schedules to the result array
+                $result[] = [
+                    'project' => $row->name,
+                    'schedule' => $projectSchedules,
+                ];
+            }
+        }
+    
+        // Return the records as a JSON response
+        return response()->json([
+            'status' => 'success',
+            'tanggal' => $date1 . ' - ' . $yesterday,
+            'data' => $result
+        ]);
+    }
+    
+    
+    
+    
 
     
     public function seven_day() {

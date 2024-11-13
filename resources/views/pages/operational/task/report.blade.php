@@ -1,4 +1,9 @@
 @extends('layout.master')
+    @php 
+        $user = Auth::user();
+        $dataLogin = json_decode(Auth::user()->permission); 
+        $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    @endphp
 <style>
   /* styles.css */
 .loading-backdrop {
@@ -78,11 +83,12 @@
                             </select>
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-primary mb-3">Filter</button>
+                            <button type="submit" class="btn btn-primary mb-3 btn-sm">Filter</button>
                         </div>
                         <div class="col-auto">
                             <!-- <a href="javascript:void(0)" class="btn btn-primary" onclick="handleDownload()">Download</a> -->
-                            <a href="javascript:void(0)" id="printButton" class="btn btn-primary">Print Analityc</a>
+                            <a href="javascript:void(0)" id="printButton" class="btn btn-primary btn-sm">Print Analityc</a>
+                            
                         </div>
                     </form>
                     
@@ -223,6 +229,7 @@
     </div>
   </div>
 </div>
+
 @endsection
 
 @push('plugin-scripts')
@@ -553,24 +560,30 @@ function analityc(project,data,total){
     });
   }
 
-  document.getElementById('printButton').addEventListener('click', function() {
-    // Get the content of the section to print
-    var printContent = document.getElementById('printSection').innerHTML;
+    
 
-    // Store the original content of the document
-    var originalContent = document.body.innerHTML;
+    document.getElementById('printButton').addEventListener('click', function() {
+        // Get the content of the section to print
+        var printContent = document.getElementById('printSection').innerHTML;
 
-    // Replace the body's content with the content to print
-    document.body.innerHTML = printContent;
+        // Store the original content of the document
+        var originalContent = document.body.innerHTML;
 
-    // Trigger the print dialog
-    window.print();
+        // Replace the body's content with the content to print
+        document.body.innerHTML = printContent;
 
-    // Restore the original content after printing
-    document.body.innerHTML = originalContent;
+        // Trigger the print dialog
+        window.print();
 
-    // Optionally, restore the event listeners or reload the page if necessary
-    location.reload(); // Optional: reload the page to restore everything
-});
+        // Restore the original content after printing
+        document.body.innerHTML = originalContent;
+
+        // Optionally, restore the event listeners or reload the page if necessary
+        location.reload(); // Optional: reload the page to restore everything
+    });
+
+    
+    
+
 </script>
 @endpush

@@ -176,6 +176,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('birthdays-messages') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="message-square"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Birthdays Messages</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -278,6 +292,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>

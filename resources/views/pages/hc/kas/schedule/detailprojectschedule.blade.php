@@ -19,6 +19,7 @@
                             <tr>
                                 <th>Employee Name</th>
                                 <th>Project</th>
+                                <th>Status</th>
                                 <th>Periode</th>
                                 <th>Action</th>
                             </tr>
@@ -39,6 +40,7 @@
                                     </a>
                                 </td>
                                 <td> {{ $projectname }} </td>
+                                <td>{!! $schedule->status !!}</td>
                                 <td> {{ $schedule->periode }} </td>
                                 <td>
                                     <div class="dropdown">
@@ -52,9 +54,9 @@
                                                     <i data-feather="eye" class="icon-sm me-2"></i>
                                                     <span class="">Details</span>
                                                 </a>
-                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $schedule->schedule_code }}')">
-                                                    <i data-feather="trash" class="icon-sm me-2"></i>
-                                                    <span class="">Delete</span>
+                                                <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{$schedule->employee}},{{ $schedule->periode }},{{$schedule->project}}')">
+                                                    <i data-feather="slash" class="icon-sm me-2"></i>
+                                                    <span class="">Stop Schedule</span>
                                                 </a>
                                             </form>
                                         </div>
@@ -81,51 +83,54 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
-    function showDeleteDataDialog(id) {
-        Swal.fire({
-            title: 'Hapus Data',
-            text: 'Anda Yakin Akan Menghapus Data Ini?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Perform the delete action here (e.g., send a request to delete the data)
-                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
-                const deleteUrl = "{{ route('schedule.destroy', ':id') }}".replace(':id', id);
-                fetch(deleteUrl, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                }).then((response) => {
-                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Schedule Successfully Deleted',
-                            icon: 'success',
-                        }).then(() => {
-                            window.location.reload(); // Refresh halaman setelah menutup alert
-                        });
-                    } else {
-                        // Handle error response if needed
-                        Swal.fire({
-                            title: 'Schedule Failed to Delete',
-                            text: 'An error occurred while deleting data.',
-                            icon: 'error',
-                        });
-                    }
-                }).catch((error) => {
-                    // Handle fetch error if needed
+    function showDeleteDataDialog(employee, periode, project) {
+    Swal.fire({
+        title: 'Hapus Data',
+        text: 'Anda Yakin Akan Stop Data Ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Construct the delete URL with the provided parameters
+            const deleteUrl = `{{ route('schedule.stop_report', ['employee' => ':employee', 'periode' => ':periode', 'project' => ':project']) }}`;
+            const formattedUrl = deleteUrl
+                .replace(':employee', encodeURIComponent(employee))
+                .replace(':periode', encodeURIComponent(periode))
+                .replace(':project', encodeURIComponent(project));
+            
+            fetch(formattedUrl, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+            })
+            .then((response) => {
+                if (response.ok) {
                     Swal.fire({
-                        title: 'Shift Failed to Delete',
-                        text: 'An error occurred while deleting data.',
+                        title: 'Schedule Successfully Stoped',
+                        icon: 'success',
+                    }).then(() => {
+                        window.location.reload(); // Refresh the page after the alert closes
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Schedule Failed to Stoped',
+                        text: 'An error occurred while Stoped data.',
                         icon: 'error',
                     });
+                }
+            })
+            .catch((error) => {
+                Swal.fire({
+                    title: 'Shift Failed to Stoped',
+                    text: 'An error occurred while Stoped data.',
+                    icon: 'error',
                 });
-            }
-        });
-    }
+            });
+        }
+    });
+}
 </script>
 <script>
     @if(session('success'))

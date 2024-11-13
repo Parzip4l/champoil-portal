@@ -338,7 +338,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     // App Setting
     Route::resource('setting', App\Http\Controllers\Setting\SettingController::class);
     Route::get('version', [App\Http\Controllers\Setting\SettingController::class, 'apps_version'])->name('version');
+    Route::get('birthdays-messages', [App\Http\Controllers\Setting\SettingController::class, 'birthdays_messages'])->name('birthdays-messages');
     Route::post('version-save', [App\Http\Controllers\Setting\SettingController::class, 'save_version'])->name('version-save');
+    Route::post('save-messages', [App\Http\Controllers\Setting\SettingController::class, 'save_messages'])->name('save-messages');
         // Pajak
         Route::resource('pajak', App\Http\Controllers\Pajak\PajakController::class);
         Route::get('/pajak-data/{pajakid}', [App\Http\Controllers\Pajak\PajakController::class, 'pajakdetails'])->name('pajak.details');
@@ -407,6 +409,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Schedule Details
         Route::get('/scheduleData/details/{project}/{periode}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetails'])->name('schedule.details');
         Route::get('/schedule/details/{project}/{periode}/{employee}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'showDetailsEmployee'])->name('schedule.employee');
+        Route::get('/schedule/stop_report/{employee}/{periode}/{project}', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'stop_report'])->name('schedule.stop_report');
         Route::post('/schedule-store', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'store'])->name('schedule-store');
 
         // Update Manual Schedule

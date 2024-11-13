@@ -152,6 +152,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/download-report', [PatroliController::class, 'download_report']);
     Route::post('/save-chart-image', [PatroliController::class, 'saveChartImage']);
 
+    Route::get('/download_file_patrol', [PatroliController::class, 'download_file_patrol']);
+
 
 
     Route::get('/patroli-report', [TaskController::class, 'report_patroli']);
@@ -162,7 +164,7 @@ Route::prefix('v1')->group(function () {
      */
     Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
     Route::get('/absen_daily', [DailyContrtoller::class, 'daily_absen']);
-    Route::get('/seven_days', [DailyContrtoller::class, 'seven_day']);
+    Route::get('/report-absens-qc', [DailyContrtoller::class, 'report_absen']);
     
 
     /**

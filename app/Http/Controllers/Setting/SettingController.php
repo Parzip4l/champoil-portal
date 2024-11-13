@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Employee;
 use App\User;
 use App\Setting\Golongan\GolonganModel;
+use App\ModelCG\BirthdaysMessages;
 
 use App\Version;
 
@@ -108,5 +109,23 @@ class SettingController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function birthdays_messages(){
+        return view('pages.app-setting.birthdays_message');
+    }
+
+    public function save_messages(Request $request)
+    {
+        $data = $request->all();
+        $insert = [
+            'tanggal'=>$data['tanggal_tahun'],
+            'message'=>$data['message'],
+            'created_at'=>date('Y-m-d')
+        ];
+
+        BirthdaysMessages::insert($insert);
+
+        return redirect()->route('birthdays-messages')->with('success', 'Data Successfully Added');
     }
 }

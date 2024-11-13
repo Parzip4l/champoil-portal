@@ -511,5 +511,109 @@ class PatroliController extends Controller
         // Return a response indicating success
         return response()->json(['success' => true, 'path' => $filePath]);
     }
+
+    public function download_file_patrol(Request $request){
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $tanggal = $request->input('tanggal');
+        $project = $request->input('project_id');
+        $explode = explode(' to ',$tanggal);
+        $date1= $explode[0].' 00:00:00';
+        $date2= $explode[1].' 23:59:59';
+
+        $task = Task::where('project_id',$project)->get();
+        if(!empty($task)){
+            foreach($task as $row){
+                $row->point= List_task::where('id_master',$row->id)->get();
+                if(!empty($row->point)){
+                    foreach($row->point as $key){
+                        $key->list = Patroli::where('unix_code',$row->unix_code)
+                                            ->whereBetween('created_at',[$date1,$date2])
+                                            ->get();
+                    }
+                }
+            }
+        }
+
+        $sheet->getStyle('A1:H1')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+    
+        // Output project name
+        $sheet->setCellValue('A1','REPORT PATROLI ( '.$tanggal.' )');
+        $sheet->mergeCells('A1:H1');
+    
+        // Set table headers
+        $sheet->setCellValue('A2', 'Tanggal');
+        $sheet->setCellValue('B2', 'Status');
+        $sheet->setCellValue('C2', 'Description');
+        $sheet->setCellValue('D2', 'Task');
+        $sheet->setCellValue('E2', 'Point');
+        $sheet->setCellValue('F2', 'Petugas');
+
+            // Example data writing
+            $rowNumber = 3;
+            $no = 1;
+        
+            foreach ($task as $row) {
+                if ($row->point) {
+                    $no2 = 1;
+                    foreach ($row->point as $rs) {
+                        $rowNumber++;
+                        if ($rs->list) {
+                            foreach ($rs->list as $det) {
+                                $nama = karyawan_bynik($det->employee_code);
+                                if(!empty($nama)){
+                                    $employee =  $nama->nama;
+                                }else{
+                                    $employee = $det->employee_code;
+                                }
+                                
+
+                                $sheet->setCellValue('A' . $rowNumber, $det->created_at); // No need for number again
+                                $sheet->setCellValue('B' . $rowNumber, $det->status); // No need for task again
+                                $sheet->setCellValue('C' . $rowNumber, $det->description); // No need for date again
+                                $sheet->setCellValue('D' . $rowNumber, $rs->task);
+                                $sheet->setCellValue('E' . $rowNumber, $row->judul); // Replace with actual status
+                                $sheet->setCellValue('F' . $rowNumber, $employee); // Replace with actual keterangan
+                                
+                                $rowNumber++;
+                            }
+                        }
+                        $no2++;
+                    }
+                }
+                $rowNumber++;
+                $no++;
+            }
+        // Set the header for the file download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="project_582307_report241104110534.xlsx"');
+        header('Cache-Control: max-age=0');
+        $writer = new Xlsx($spreadsheet);
+        Storage::makeDirectory('reports');
+        $fileName = 'report_'.date('ymdhis').'.xlsx'; // Example file name
+        $filePath = storage_path('app/reports/' . $fileName); // Example storage path
+    
+        try {
+            $writer->save($filePath);
+            $publicPath = public_path('reports');
+            if (!file_exists($publicPath)) {
+                mkdir($publicPath, 0755, true); // Create the public directory if it doesn't exist
+            }
+
+            // Move the file to the public directory
+            $newFilePath = $publicPath . '/' . $fileName;
+            rename($filePath, $newFilePath); // Move the fil
+        } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
+            return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
+        }
+    
+        // Return response with file path
+        return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
+
+    } 
     
 }

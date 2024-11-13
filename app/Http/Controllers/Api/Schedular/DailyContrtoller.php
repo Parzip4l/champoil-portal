@@ -91,6 +91,47 @@ class DailyContrtoller extends Controller
         
     }
 
+    public function report_absen() {
+        $records = Project::whereNull('deleted_at')
+            ->where('company', 'Kas')
+            ->get();
+
+        $schedule = Schedule::select('karyawan.nama','schedules.*')->join('karyawan','karyawan.nik','=','schedules.employee');
+        
+        $date1 = "2024-10-21";
+        $yesterday = Carbon::yesterday()->format('Y-m-d');
+        
+        $result = [];
+        
+        if (!$records->isEmpty()) {
+            foreach ($records as $row) {
+                $cek = $schedule->where('project',$row->id)->whereBetween('tanggal',[$date1,$yesterday])->get();
+
+                $data_list=[];
+                if(!empty($cek)){
+                    foreach($cek as $absen){
+                        $absen->jml =  DB::table('absens')
+                                            ->where('nik', $absen->employee)
+                                            ->where('tanggal', $absen->tanggal)
+                                            ->count();
+                    }
+                }
+
+                $row->data = $cek;
+            }
+        }
+    
+        // Return the records as a JSON response
+        return response()->json([
+            'status' => 'success',
+            'tanggal' => $yesterday,
+            'data' => $records
+        ]);
+    }
+    
+    
+    
+
     
     public function seven_day() {
         // Fetch active employees in the specific business unit

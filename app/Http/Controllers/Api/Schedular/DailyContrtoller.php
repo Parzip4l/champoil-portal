@@ -95,39 +95,48 @@ class DailyContrtoller extends Controller
         $records = Project::whereNull('deleted_at')
             ->where('company', 'Kas')
             ->get();
-
-        $schedule = Schedule::select('karyawan.nama','schedules.*')->join('karyawan','karyawan.nik','=','schedules.employee')->where('schedules.shift','!=','OFF');
-        
+    
         $date1 = "2024-10-21";
         $yesterday = Carbon::yesterday()->format('Y-m-d');
         
         $result = [];
-        
+    
         if (!$records->isEmpty()) {
             foreach ($records as $row) {
-                $cek = $schedule->where('project',$row->id)->whereBetween('tanggal',[$date1,$yesterday])->get();
-
-                $data_list=[];
-                if(!empty($cek)){
-                    foreach($cek as $absen){
-                        $absen->jml =  DB::table('absens')
-                                            ->where('nik', $absen->employee)
-                                            ->where('tanggal', $absen->tanggal)
-                                            ->count();
+                // Clone the base schedule query to ensure a fresh query for each project
+                $projectSchedules = Schedule::select('karyawan.nama', 'schedules.*')
+                    ->join('karyawan', 'karyawan.nik', '=', 'schedules.employee')
+                    ->where('schedules.shift', '!=', 'OFF')
+                    ->where('project', $row->id)
+                    ->whereBetween('tanggal', [$date1, $yesterday])
+                    ->get();
+    
+                if ($projectSchedules->isNotEmpty()) {
+                    foreach ($projectSchedules as $absen) {
+                        // Count the absences for the employee on the specified date
+                        $absen->jml = DB::table('absens')
+                            ->where('nik', $absen->employee)
+                            ->where('tanggal', $absen->tanggal)
+                            ->count();
                     }
                 }
-
-                $row->data = $cek;
+    
+                // Add the project data and related schedules to the result array
+                $result[] = [
+                    'project' => $row->name,
+                    'schedule' => $projectSchedules,
+                ];
             }
         }
     
         // Return the records as a JSON response
         return response()->json([
             'status' => 'success',
-            'tanggal' => $yesterday,
-            'data' => $records
+            'tanggal' => $date1 . ' - ' . $yesterday,
+            'data' => $result
         ]);
     }
+    
     
     
     

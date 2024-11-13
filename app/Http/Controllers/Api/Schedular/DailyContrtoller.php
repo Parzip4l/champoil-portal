@@ -96,7 +96,7 @@ class DailyContrtoller extends Controller
             ->where('company', 'Kas')
             ->get();
 
-        $schedule = Schedule::select('karyawan.nama','schedules.*')->join('karyawan','karyawan.nik','=','schedules.employee');
+        $schedule = Schedule::select('karyawan.nama','schedules.*')->join('karyawan','karyawan.nik','=','schedules.employee')->where('schedules.shift','!=','OFF');
         
         $date1 = "2024-10-21";
         $yesterday = Carbon::yesterday()->format('Y-m-d');

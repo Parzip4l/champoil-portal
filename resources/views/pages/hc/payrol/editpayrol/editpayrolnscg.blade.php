@@ -41,11 +41,11 @@
             <div class="row mb-3 allowance-group">
                 <div class="col-md-6">
                     <label class="form-label">Total Schedule</label>
-                    <input type="number" class="form-control datainput totalabsen" name="totalHariSchedule" placeholder="Rp." required value="{{$allowences->totalHariSchedule}}">
+                    <input type="number" class="form-control datainput totalabsen" name="totalHariSchedule" placeholder="Rp." required value="{{ $allowences->totalHariSchedule ?? '0' }}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Total Masuk</label>
-                    <input type="number" class="form-control datainput allowance" id="TotalMasuk" name="totalHari" placeholder="Rp." required value="{{$allowences->totalHari}}" readonly>
+                    <input type="number" class="form-control datainput allowance" id="TotalMasuk" name="totalHari" placeholder="Rp." required value="{{$allowences->totalHari ?? '0' }}" readonly>
                 </div>
             </div>
             <h5>Allowance</h5>
@@ -53,11 +53,11 @@
             <div class="row mb-3 allowance-group">
                 <div class="col-md-6">
                     <label class="form-label">Total Hari Backup</label>
-                    <input type="number" class="form-control datainput" name="totalHariBackup" id="totalHariBackup" placeholder="Rp." required value="{{$allowences->totalHariBackup}}">
+                    <input type="number" class="form-control datainput" name="totalHariBackup" id="totalHariBackup" placeholder="Rp." required value="{{$allowences->totalHariBackup ?? '0' }}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Total Gaji Backup</label>
-                    <input type="number" class="form-control datainput jamLembur" id="totalGajiBackup" name="totalGajiBackup" placeholder="Rp." required value="{{$allowences->totalGajiBackup}}">
+                    <input type="number" class="form-control datainput jamLembur" id="totalGajiBackup" name="totalGajiBackup" placeholder="Rp." required value="{{$allowences->totalGajiBackup ?? '0' }}">
                 </div>
             </div>
             <h5>Deductions</h5>
@@ -65,35 +65,35 @@
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Hutang</label>
-                    <input type="number" id="mess" class="form-control datainput deduction" name="potongan_hutang" placeholder="Rp. " required value="{{$deductions->hutang_koperasi}}">
+                    <input type="number" id="mess" class="form-control datainput deduction" name="potongan_hutang" placeholder="Rp. " required value="{{$deductions->hutang_koperasi ?? '0' }}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Garda Pratama</label>
-                    <input type="number" id="potongan_gp" class="form-control datainput deduction" name="potongan_gp" placeholder="Rp. " required value="{{$deductions->potongan_Gp}}">
+                    <input type="number" id="potongan_gp" class="form-control datainput deduction" name="potongan_gp" placeholder="Rp. " required value="{{$deductions->potongan_Gp ?? '0' }}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Jumlah Hari Tidak Absen</label>
-                    <input type="number" id="tidak_absen" class="form-control datainput deduction" name="tidak_absen" placeholder="Rp. " required value="{{$deductions->tidak_absen}}">
+                    <input type="number" id="tidak_absen" class="form-control datainput deduction" name="tidak_absen" placeholder="Rp. " required value="{{$deductions->tidak_absen ?? '0' }}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Tidak Absen / Hari</label>
-                    <input type="number" id="rate_harian" class="form-control deduction" name="rate_harian" placeholder="Rp. " required value="{{$deductions->rate_harian}}">
+                    <input type="number" id="rate_harian" class="form-control deduction" name="rate_harian" placeholder="Rp. " required value="{{$deductions->rate_harian ?? '0' }}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Total Potongan Absensi</label>
-                    <input type="number" id="potongan_absen" class="form-control deduction" name="potongan_absen" placeholder="Rp. " required value="{{$deductions->potongan_absen}}">
+                    <input type="number" id="potongan_absen" class="form-control deduction" name="potongan_absen" placeholder="Rp. " required value="{{$deductions->potongan_absen ?? '0' }}">
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="kode_karyawan" class="form-label">Iuran Koperasi</label>
-                    <input type="number" id="potongan_absen" class="form-control deduction" name="potongan_absen" placeholder="Rp. " required value="{{$deductions->iuran_koperasi}}">
+                    <input type="number" id="potongan_absen" class="form-control deduction" name="potongan_absen" placeholder="Rp. " required value="{{$deductions->iuran_koperasi ?? '0' }}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">PPH 21</label>
-                    <input type="number" id="PPH21" class="form-control datainput deduction" name="PPH21" placeholder="Rp. " required value="{{ round($deductions->PPH21)}}">
+                    <input type="number" id="PPH21" class="form-control datainput deduction" name="PPH21" placeholder="Rp. " required value="{{ round($deductions->PPH21 ?? 0) }}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Take Home Pay</label>
-                    <input type="number" id="thp" class="form-control datainput" name="thp" placeholder="Rp. " required value="{{$payrolComponent->thp}}">
+                    <input type="number" id="thp" class="form-control datainput" name="thp" placeholder="Rp. " required value="{{$payrolComponent->thp ?? '0' }}">
                 </div>
             </div>
         </form>

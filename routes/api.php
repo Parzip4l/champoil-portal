@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\AllData\TaskManagementApi;
 use App\Http\Controllers\Api\KoperasiApi\AllKoperasiController;
 use App\Http\Controllers\Api\Schedular\DailyContrtoller;
 use App\Http\Controllers\Api\Emergency\EmergencyApi;
+use App\Http\Controllers\Api\VoiceOfController;
 
 Route::prefix('v1')->group(function () {
 
@@ -73,13 +74,13 @@ Route::prefix('v1')->group(function () {
 
     // Koperasi
     Route::get('/koperasi-page', [AllKoperasiController::class, 'index']);
-        Route::get('/koperasi-terms', [AllKoperasiController::class, 'terms']);
-        Route::post('/anggota-join', [AllKoperasiController::class, 'keanggotaan']);
-        Route::get('/my-savings', [AllKoperasiController::class, 'dataSaving']);
-        Route::get('/cek-limit', [AllKoperasiController::class, 'cekLimit']);
-        Route::post('/pengajuan-pinjaman', [AllKoperasiController::class, 'pengajuanPinjaman']);
-        Route::get('/member-cek', [AllKoperasiController::class, 'cekAnggota']);
-        Route::post('/kalkulasi-pinjaman', [AllKoperasiController::class, 'kalkulasiPinjaman']);
+    Route::get('/koperasi-terms', [AllKoperasiController::class, 'terms']);
+    Route::post('/anggota-join', [AllKoperasiController::class, 'keanggotaan']);
+    Route::get('/my-savings', [AllKoperasiController::class, 'dataSaving']);
+    Route::get('/cek-limit', [AllKoperasiController::class, 'cekLimit']);
+    Route::post('/pengajuan-pinjaman', [AllKoperasiController::class, 'pengajuanPinjaman']);
+    Route::get('/member-cek', [AllKoperasiController::class, 'cekAnggota']);
+    Route::post('/kalkulasi-pinjaman', [AllKoperasiController::class, 'kalkulasiPinjaman']);
 
     /**
      * Referal
@@ -88,7 +89,7 @@ Route::prefix('v1')->group(function () {
     //  Emergency 
 
     Route::get('/emergency-page', [EmergencyApi::class, 'index']);
-        Route::post('/emergency-request', [EmergencyApi::class, 'EmergencyRequest']);
+    Route::post('/emergency-request', [EmergencyApi::class, 'EmergencyRequest']);
 
 
     Route::get('/referal-search/{kode_referal}', [ReferalController::class, 'search_referal']);
@@ -194,6 +195,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('check-nik', [AllDataController::class, 'check_nik']);
     Route::post('submit-pengajuan-cicilan', [AllDataController::class, 'submit_pengajuan_cicilan']);
+    Route::post('submit-voice', [VoiceOfController::class, 'submit_voice']);
+    Route::get('voice', [VoiceOfController::class, 'index']);
     Route::get('data_pengajuan', [AllDataController::class, 'pengajuan_hp']);
     Route::post('/update_pengajuan', [AllDataController::class, 'update_pengajuan']);
 });

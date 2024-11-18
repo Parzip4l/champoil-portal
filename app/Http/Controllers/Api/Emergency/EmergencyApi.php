@@ -152,6 +152,7 @@ class EmergencyApi extends Controller
 
                 // Ambil Firebase Token berdasarkan Nik
                 $firebaseToken = FirebaseToken::where('user_id', $absentUser->nik)->first();
+                dd($firebaseToken);
 
                 // Pastikan token ditemukan
                 if ($firebaseToken) {
@@ -167,6 +168,12 @@ class EmergencyApi extends Controller
                             'time_estimate' => $timeEstimateMinutes . ' minutes',
                         ]
                     );
+                } else {
+                    // Kembalikan pesan jika token tidak ditemukan
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Token perangkat tidak ditemukan untuk user ' . $absentUser->nik
+                    ], 404); // HTTP status 404 indicates that the resource was not found
                 }
             }
 

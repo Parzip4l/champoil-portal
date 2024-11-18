@@ -81,7 +81,7 @@ class AbsenController extends Controller
 
         if(!empty($client_id)){
             $query->where('absens.project', $client_id);
-        }
+        } 
 
         if ($request->ajax()) {
             return DataTables::of($query)

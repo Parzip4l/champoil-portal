@@ -531,30 +531,32 @@ class PatroliController extends Controller
                 ->where('project_id', $project)
                 ->get();
 
-            // Prepare data for PDF view
-            $data = [
-            'tasks' => $tasks,
-            'tanggal' => $tanggal,
-            ];
+            dd($tasks);
 
-            // Generate PDF using DomPDF
-            $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
-            $pdf->setPaper('A3', 'portrait');
+            // // Prepare data for PDF view
+            // $data = [
+            // 'tasks' => $tasks,
+            // 'tanggal' => $tanggal,
+            // ];
 
-            // Save PDF to a file
-            $fileName = 'report_' . date('YmdHis') . '.pdf';
-            $publicPath = public_path('reports');
-            if (!is_dir($publicPath)) {
-                mkdir($publicPath, 0755, true);
-            }
-            $filePath = $publicPath . '/' . $fileName;
-            $pdf->save($filePath);
+            // // Generate PDF using DomPDF
+            // $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
+            // $pdf->setPaper('A3', 'portrait');
 
-            // Return the file download path
-            return response()->json([
-                'message' => 'PDF file saved successfully',
-                'path' => asset('reports/' . $fileName)
-            ]);
+            // // Save PDF to a file
+            // $fileName = 'report_' . date('YmdHis') . '.pdf';
+            // $publicPath = public_path('reports');
+            // if (!is_dir($publicPath)) {
+            //     mkdir($publicPath, 0755, true);
+            // }
+            // $filePath = $publicPath . '/' . $fileName;
+            // $pdf->save($filePath);
+
+            // // Return the file download path
+            // return response()->json([
+            //     'message' => 'PDF file saved successfully',
+            //     'path' => asset('reports/' . $fileName)
+            // ]);
         }else{
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();

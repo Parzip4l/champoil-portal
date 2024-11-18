@@ -47,7 +47,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if($employee->unit_bisnis === 'Kas' && $employee->project_id ==  NULL)
+                        @if($employee->unit_bisnis === 'Kas' && is_null($user->project_id))
                         <div class="col-md-4">
                             <label for="project" class="form-label">Project</label>
                             <select name="project" id="project" class="form-control select2">

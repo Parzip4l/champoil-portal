@@ -522,21 +522,22 @@ class PatroliController extends Controller
             $date2 = $explode[1] . ' 23:59:59';
             $jml=0;
             // Fetch tasks and associated data
-            $tasks = Task::with(['point' => function($query) use ($date1, $date2) {
-                // Eager load the related 'list' and apply the 'created_at' filter within this relationship
-                $query->with(['list' => function($query) use ($date1, $date2) {
-                    $query->whereBetween('created_at', [$date1, $date2]); // Filtering on 'created_at'
-                }]);
-            }])
-            ->where('project_id', $project) // Filter by project ID
-            ->get();
+            $tasks = Task::where('project_id', $project)->get();
+            foreach ($tasks as $task) {
+                $task->point = List_task::where('id_master', $task->id)->get();
+                foreach ($task->point as $point) {
+                    $point->list = Patroli::where('id_task', $point->id)
+                        ->whereBetween('created_at', [$date1, $date2])
+                        ->get();
+                }
+            }
 
-            
+            // // dd($task->count());
 
             // Prepare data for PDF view
             $data = [
-            'tasks' => $tasks,
-            'tanggal' => $tanggal,
+                'tasks' => $tasks,
+                'tanggal' => $tanggal,
             ];
 
             // Generate PDF using DomPDF
@@ -555,7 +556,8 @@ class PatroliController extends Controller
             // Return the file download path
             return response()->json([
                 'message' => 'PDF file saved successfully',
-                'path' => asset('reports/' . $fileName)
+                'path' => asset('reports/' . $fileName),
+                'task'=>$tasks
             ]);
         }else{
             $spreadsheet = new Spreadsheet();

@@ -53,31 +53,31 @@
     }
 
     .message {
-    margin-bottom: 10px;
-    display: inherit;
-    align-items: flex-start;
-}
+        margin-bottom: 10px;
+        display: inherit;
+        align-items: flex-start;
+    }
 
-.message .message-text {
-    max-width: 70%;
-    padding: 8px 12px;
-    border-radius: 20px;
-    background-color: #E1E1E1;
-}
+    .message .message-text {
+        max-width: 70%;
+        padding: 8px 12px;
+        border-radius: 20px;
+        background-color: #E1E1E1;
+    }
 
-.message .message-text.sent {
-    background-color: #4E73DF;
-    color: white;
-    align-self: flex-end;
-    display: inherit;
-    margin-left: auto; /* Aligns the message to the right */
-}
+    .message .message-text.sent {
+        background-color: #4E73DF;
+        color: white;
+        align-self: flex-end;
+        display: inherit;
+        margin-left: auto; /* Aligns the message to the right */
+    }
 
-.message .message-time {
-    margin-left: 10px;
-    font-size: 0.75rem;
-    color: #aaa;
-}
+    .message .message-time {
+        margin-left: 10px;
+        font-size: 0.75rem;
+        color: #aaa;
+    }
 
 </style>
 @push('plugin-styles')
@@ -217,8 +217,8 @@
 
             <!-- Chat Footer -->
             <div class="chat-footer">
-                <input type="text" id="messageInput" class="chat-input" placeholder="Type your message...">
-                <button class="send-button" onclick="sendMessage()">&#8594;</button>
+                
+                
             </div>
         </div>
   </div>
@@ -237,6 +237,7 @@
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
     <script>
         $(document).ready(function() {
+            $(".chat-footer").empty();
             $("#todo").empty();
             $("#onprog").empty();
             $("#done").empty();
@@ -269,20 +270,71 @@
             });
 
             // Example JavaScript function for the click event
-            viewDetails=function(id) {
-                axios.get('/api/v1/voice-detail')
-                .then(function (response) {
-                    
-                })
-                .catch(function (error) {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        title: "Error!",
-                        text: 'There was an error fetching the data.',
-                        icon: "error"
+            viewDetails = function(id) {
+            $("#chatBody").empty(); // Clear previous chat content
+                axios.get('/api/v1/voice-detail/' + id)
+                    .then(function(response) {
+                        const data = response.data;
+
+                        if (data.error === false && data.records.length > 0) {
+                            // Loop through each record and append it to the chat body
+                            data.records.forEach(record => {
+                                // Create a new message element for each record
+                                let messageElement = document.createElement("div");
+                                messageElement.classList.add("message");
+
+                                // Format the main message text
+                                let messageText = `
+                                    Project: ${record.project} <br>
+                                    Name: ${record.nama} <br>
+                                    Pertanyaan: ${record.pertanyaan || "N/A"} <br>
+                                    Date: ${record.created_at}
+                                `;
+
+                                // Create and add message text element
+                                let messageTextElement = document.createElement("div");
+                                messageTextElement.classList.add("message-text");
+                                messageTextElement.innerHTML = messageText;
+                                messageElement.appendChild(messageTextElement);
+
+                                // Loop through the percakapan array and add each conversation entry
+                                record.percakapan.forEach(chat => {
+                                    let chatElement = document.createElement("div");
+                                    chatElement.classList.add("chat-entry");
+                                    chatElement.innerHTML = `
+                                        Answer: ${chat.jawaban || "N/A"} <br>
+                                        Timestamp: ${new Date(chat.created_at).toLocaleString()}
+                                    `;
+                                    messageElement.appendChild(chatElement);
+                                });
+
+                                // Append the message to the chat body
+                                document.getElementById("chatBody").appendChild(messageElement);
+
+                                // Update chat footer with the input and send button
+                                document.querySelector(".chat-footer").innerHTML = `
+                                    <input type="text" id="messageInput" class="chat-input" placeholder="Type your message...">
+                                    <button class="send-button" onclick="sendMessage('${record.nomor_wa}', '${record.id}')">&#8594;</button>
+                                `;
+                            });
+
+                            // Scroll to the latest message
+                            document.getElementById("chatBody").scrollTop = document.getElementById("chatBody").scrollHeight;
+                        } else {
+                            console.log('No records found or error in response');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: 'There was an error fetching the data.',
+                            icon: "error"
+                        });
                     });
-                });
-            }
+            };
+
+
 
             axios.get('/api/v1/voice')
                 .then(function (response) {
@@ -305,54 +357,76 @@
 
     </script>
     <script>
-        function sendMessage() {
-            let messageText = document.getElementById("messageInput").value;
-            if (messageText.trim() === '') return; // Don't send if the message is empty
-
-            // Create the message element
-            let messageElement = document.createElement("div");
-            messageElement.classList.add("message");
+        function sendMessage(nomor_wa,record_id) {
             
-            let messageTextElement = document.createElement("div");
+            const url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
+            let messageText = document.getElementById("messageInput").value;
+            if (messageText.trim() === '') return;
+
+            // Add message to chat body
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+
+            const messageTextElement = document.createElement("div");
             messageTextElement.classList.add("message-text", "sent");
             messageTextElement.textContent = messageText;
 
-            let messageTime = document.createElement("span");
+            const messageTime = document.createElement("span");
             messageTime.classList.add("message-time");
             messageTime.textContent = new Date().toLocaleTimeString();
 
             messageElement.appendChild(messageTextElement);
             messageElement.appendChild(messageTime);
 
-            // Append the message to the chat body
             document.getElementById("chatBody").appendChild(messageElement);
-
-            // Clear the input field
             document.getElementById("messageInput").value = '';
-            
-            // Scroll to the latest message
+
+            const data = {
+                chatId:  `${nomor_wa}@c.us`,
+                message: messageText
+            };
+
+            const headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'
+            };
+            //submit relations
+            const formData  ={
+                voice_id:record_id,
+                voice_user:1,
+                jawaban:messageText,
+            };
+            axios.post('/api/v1/voice-detail-submit',formData)
+            .then(response => {
+                
+            })
+            .catch(error => {
+                console.error('Error sending message:', error.response ? error.response.data : error.message);
+                Swal.fire({
+                    title: "Error!",
+                    text: 'Failed to send the message.',
+                    icon: "error"
+                });
+            });
+
+            axios.post(url, data, { headers })
+                .then(response => {
+
+                    
+
+
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error.response ? error.response.data : error.message);
+                    Swal.fire({
+                        title: "Error!",
+                        text: 'Failed to send the message.',
+                        icon: "error"
+                    });
+                });
+
             document.getElementById("chatBody").scrollTop = document.getElementById("chatBody").scrollHeight;
         }
-
-        // You can also simulate receiving a message (for demonstration purposes)
-        setTimeout(function() {
-            let messageElement = document.createElement("div");
-            messageElement.classList.add("message");
-            
-            let messageTextElement = document.createElement("div");
-            messageTextElement.classList.add("message-text");
-            messageTextElement.textContent = "Hello! How can I help you?";
-
-            let messageTime = document.createElement("span");
-            messageTime.classList.add("message-time");
-            messageTime.textContent = new Date().toLocaleTimeString();
-
-            messageElement.appendChild(messageTextElement);
-            messageElement.appendChild(messageTime);
-
-            document.getElementById("chatBody").appendChild(messageElement);
-
-            document.getElementById("chatBody").scrollTop = document.getElementById("chatBody").scrollHeight;
-        }, 2000);
     </script>
 @endpush

@@ -197,6 +197,8 @@ Route::prefix('v1')->group(function () {
     Route::post('submit-pengajuan-cicilan', [AllDataController::class, 'submit_pengajuan_cicilan']);
     Route::post('submit-voice', [VoiceOfController::class, 'submit_voice']);
     Route::get('voice', [VoiceOfController::class, 'index']);
+    Route::get('voice-detail/{id}', [VoiceOfController::class, 'voice_detail']);
+    Route::post('voice-detail-submit', [VoiceOfController::class, 'submit_voice_relations']);
     Route::get('data_pengajuan', [AllDataController::class, 'pengajuan_hp']);
     Route::post('/update_pengajuan', [AllDataController::class, 'update_pengajuan']);
 });

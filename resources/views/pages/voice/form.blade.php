@@ -21,6 +21,10 @@
                         <label for="" class="form-label">Nama Lengkap : *</label>
                         <input type="text" name="nama" class="form-control" required="">   
                     </div>
+                    <div class="col-md-12 mb-2">
+                        <label for="" class="form-label">Nomor WA : *</label>
+                        <input type="text" name="nomor_wa" class="form-control" required="">   
+                    </div>
                     
                     <div class="col-md-12 mb-2">
                         <label for="" class="form-label">Project : *</label>

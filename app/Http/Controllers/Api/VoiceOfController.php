@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\VoiceofGuardians;
+use App\ModelCG\VoiceRellations;
+
 
 
 class VoiceOfController extends Controller
@@ -54,6 +56,35 @@ class VoiceOfController extends Controller
         return response()->json($result, 200);
     }
 
+    public function voice_detail($id){
+        $msg="success";
+        $error=false;
+        $records = VoiceofGuardians::find($id);
+
+        $list=[];
+     
+        if(!empty($records)){
+                $detail =VoiceRellations::where('voice_id',$records->id)->get();
+                $list[]=[
+                    "id"=>$records->id,
+                    "nama"=> $records->nama,
+                    "project"=>project_byID($records->project)->name,
+                    "nomor_wa"=>$records->nomor_wa,
+                    "pertanyaan"=>$records->pertanyaan,
+                    "created_at"=>date('d F Y H:i:s',strtotime($records->created_at)),
+                    "percakapan"=>$detail
+                ];
+        }
+
+        $result=[
+            "msg"=>$msg,
+            "error"=>$error,
+            "records"=>@$list
+        ];
+
+        return response()->json($result, 200);
+    }
+
     public function submit_voice(Request $request){
         $error = true;  // Default to true (failed)
         $msg = "Failed"; // Default message
@@ -64,6 +95,7 @@ class VoiceOfController extends Controller
                 'nama' => 'required|string',
                 'project' => 'required|string',
                 'pertanyaan' => 'required|string',
+                'nomor_wa' => 'required',
                 'attachment' => 'required|file', // Ensure a file is uploaded
             ]);
     
@@ -89,12 +121,53 @@ class VoiceOfController extends Controller
                 "project" => $validated['project'],
                 "pertanyaan" => $validated['pertanyaan'],
                 "attachment" => $fileUrl,  // Store the public URL
+                "nomor_wa" => $validated['nomor_wa'],
                 "status" => 0,
                 "created_at" => now(), // Use Laravel's helper function
             ];
     
             // Insert the data into the database
             $query = VoiceofGuardians::insert($insert);
+    
+            // If insertion is successful, update the error flag and message
+            $error = false;
+            $msg = "Data successfully submitted.";
+    
+            // Prepare the result to return
+            $result = [
+                "msg" => $msg,
+                "error" => $error,
+                "records" => $insert
+            ];
+    
+            return response()->json($result, 200);
+    
+        } catch (\Exception $e) {
+            // Catch any errors and set the error flag and message
+            $msg = $e->getMessage();
+            return response()->json([
+                "msg" => $msg,
+                "error" => $error,
+            ], 400);
+        }
+    }
+
+    public function submit_voice_relations(Request $request){
+        $error = false;  // Default to true (failed)
+        $msg = "Failed"; // Default message
+        $data= $request->all();
+    
+        try {
+            
+           $insert=[
+            "voice_id"=>$data['voice_id'],
+            "voice_user"=>$data['voice_user'],
+            "jawaban"=>$data["jawaban"],
+            "created_at" => now(),
+           ];
+    
+            // Insert the data into the database
+            $query = VoiceRellations::insert($insert);
     
             // If insertion is successful, update the error flag and message
             $error = false;

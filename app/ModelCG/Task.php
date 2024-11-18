@@ -10,4 +10,13 @@ class Task extends Model
     use HasFactory;
     protected $connection = 'mysql_secondary';
     protected $table = 'master_tasks';
+
+    /**
+     * Get the points associated with the task.
+     */
+    public function point()
+    {
+        // Define the relationship with List_task
+        return $this->hasMany(List_task::class, 'id_master'); 
+    }
 }

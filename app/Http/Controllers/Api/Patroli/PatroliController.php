@@ -544,6 +544,7 @@ class PatroliController extends Controller
 
             // Generate PDF using DomPDF
             $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
+            $pdf->setPaper('A3', 'portrait');
 
             // Save PDF to a file
             $fileName = 'report_' . date('YmdHis') . '.pdf';

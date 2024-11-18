@@ -523,40 +523,40 @@ class PatroliController extends Controller
             $jml=0;
             // Fetch tasks and associated data
             $tasks = Task::with(['point' => function($query) use ($date1, $date2) {
-                // Eager load related 'point' and 'list' using a nested query for 'Patroli'
+                // Eager load the related 'list' and apply the 'created_at' filter within this relationship
                 $query->with(['list' => function($query) use ($date1, $date2) {
-                        $query->whereBetween('created_at', [$date1, $date2]);
-                    }]);
-                }])
-                ->where('project_id', $project)
-                ->get();
+                    $query->whereBetween('created_at', [$date1, $date2]); // Filtering on 'created_at'
+                }]);
+            }])
+            ->where('project_id', $project) // Filter by project ID
+            ->get();
 
-            dd($tasks);
+            
 
-            // // Prepare data for PDF view
-            // $data = [
-            // 'tasks' => $tasks,
-            // 'tanggal' => $tanggal,
-            // ];
+            // Prepare data for PDF view
+            $data = [
+            'tasks' => $tasks,
+            'tanggal' => $tanggal,
+            ];
 
-            // // Generate PDF using DomPDF
-            // $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
-            // $pdf->setPaper('A3', 'portrait');
+            // Generate PDF using DomPDF
+            $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
+            $pdf->setPaper('A3', 'portrait');
 
-            // // Save PDF to a file
-            // $fileName = 'report_' . date('YmdHis') . '.pdf';
-            // $publicPath = public_path('reports');
-            // if (!is_dir($publicPath)) {
-            //     mkdir($publicPath, 0755, true);
-            // }
-            // $filePath = $publicPath . '/' . $fileName;
-            // $pdf->save($filePath);
+            // Save PDF to a file
+            $fileName = 'report_' . date('YmdHis') . '.pdf';
+            $publicPath = public_path('reports');
+            if (!is_dir($publicPath)) {
+                mkdir($publicPath, 0755, true);
+            }
+            $filePath = $publicPath . '/' . $fileName;
+            $pdf->save($filePath);
 
-            // // Return the file download path
-            // return response()->json([
-            //     'message' => 'PDF file saved successfully',
-            //     'path' => asset('reports/' . $fileName)
-            // ]);
+            // Return the file download path
+            return response()->json([
+                'message' => 'PDF file saved successfully',
+                'path' => asset('reports/' . $fileName)
+            ]);
         }else{
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();

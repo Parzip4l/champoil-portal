@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\AllData\TaskManagementApi;
 use App\Http\Controllers\Api\KoperasiApi\AllKoperasiController;
 use App\Http\Controllers\Api\Schedular\DailyContrtoller;
 use App\Http\Controllers\Api\Emergency\EmergencyApi;
+use App\Http\Controllers\Api\Emergency\FirebaseTokenController;
 use App\Http\Controllers\Api\VoiceOfController;
 
 Route::prefix('v1')->group(function () {
@@ -90,6 +91,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/emergency-page', [EmergencyApi::class, 'index']);
     Route::post('/emergency-request', [EmergencyApi::class, 'EmergencyRequest']);
+    Route::middleware('auth:api')->post('/firebase-token', [FirebaseTokenController::class, 'store']);
 
 
     Route::get('/referal-search/{kode_referal}', [ReferalController::class, 'search_referal']);

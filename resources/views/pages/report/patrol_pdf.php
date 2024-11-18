@@ -38,6 +38,7 @@
 </head>
 <body>
     <h2>Report Patroli (<?php echo $tanggal; ?>)</h2>
+    <?php  print_r($tasks); ?>
     <table>
         <thead>
             <tr>

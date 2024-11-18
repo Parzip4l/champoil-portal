@@ -42,11 +42,12 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>Task</th>
+                <th>Point</th>
                 <th>Tanggal</th>
                 <th>Status</th>
                 <th>Description</th>
-                <th>Task</th>
-                <th>Point</th>
+                
                 <th>Petugas</th>
             </tr>
         </thead>
@@ -58,11 +59,11 @@
                         <?php foreach ($point->list as $entry): ?>
                             <tr>
                                 <td><?php echo $no ?></td>
+                                <td><?php echo $point->task; ?></td>
+                                <td><?php echo $task->judul; ?></td>
                                 <td><?php echo $entry->created_at; ?></td>
                                 <td><?php echo $entry->status; ?></td>
                                 <td><?php echo $entry->description; ?></td>
-                                <td><?php echo $point->task; ?></td>
-                                <td><?php echo $task->judul; ?></td>
                                 <td><?php echo karyawan_bynik($entry->employee_code)->nama ?? $entry->employee_code; ?></td>
                             </tr>
                             <?php $no++; ?>

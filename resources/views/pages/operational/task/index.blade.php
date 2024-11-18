@@ -333,6 +333,19 @@
                             <label for="" class="form-label">Filter Tanggal</label>
                             <input type="text" class="form-control" name="tanggal" required id="tanggal_report">    
                         </div>
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label">Pilih Jenis File</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="filter_type" id="excel" value="excel" required>
+                                    <label class="form-check-label" for="excel">Excel</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="filter_type" id="pdf" value="pdf" required>
+                                    <label class="form-check-label" for="pdf">PDF</label>
+                                </div>
+                            </div>
+                        </div>
                         <div id="project_list"></div>
                         
                         
@@ -436,10 +449,13 @@
             }else{
                 project_id  = project;
             }
+
+            var jenis_file = $('input[name="filter_type"]:checked').val();
             
             const params = {
                 tanggal: $("#tanggal_report").val(), // Example parameter
-                project_id:  project_id // Another example parameter
+                project_id:  project_id, // Another example parameter
+                jenis_file:jenis_file
             };
 
             // Send GET request using Axios

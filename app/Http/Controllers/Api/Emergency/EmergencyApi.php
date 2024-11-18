@@ -152,7 +152,6 @@ class EmergencyApi extends Controller
 
                 // Ambil Firebase Token berdasarkan Nik
                 $firebaseToken = FirebaseToken::where('user_id', $absentUser->nik)->first();
-                dd($firebaseToken);
 
                 // Pastikan token ditemukan
                 if ($firebaseToken) {

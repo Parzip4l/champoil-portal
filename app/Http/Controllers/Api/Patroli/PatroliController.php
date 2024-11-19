@@ -526,7 +526,7 @@ class PatroliController extends Controller
             foreach ($tasks as $task) {
                 $task->point = List_task::where('id_master', $task->id)->get();
                 foreach ($task->point as $point) {
-                    $point->list = Patroli::where('id_task', $point->id)
+                    $point->list = Patroli::where('id', $point->id)
                         ->whereBetween('created_at', [$date1, $date2])
                         ->get();
                 }

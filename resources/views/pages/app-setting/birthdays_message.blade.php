@@ -68,69 +68,61 @@
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      var calendarEl = document.getElementById('fullcalendar');
+  var calendarEl = document.getElementById('fullcalendar');
 
-      // Birthday Events Source
-      var curYear = moment().format('YYYY');
-      var curMonth = moment().format('MM');
+  // Current Year and Month
+  var curYear = moment().format('YYYY');
+  var curMonth = moment().format('MM');
+
+  // Birthday Events Source
+  var birthdayEvents = {
+    id: 'birthday-source', // Unique ID for the event source
+    backgroundColor: 'rgba(16,183,89, .25)',
+    borderColor: '#10b759',
+    events: <?php echo json_encode($birthdays) ?>
+  };
+
+  // Initialize FullCalendar
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+      left: "prev,today,next",
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+    },
+    editable: true, // Allows event dragging and resizing
+    droppable: true, // Allows external elements to be dropped
+    fixedWeekCount: true, // Ensures all months have the same number of weeks
+    initialView: 'dayGridMonth', // Default view
+    timeZone: 'UTC',
+    dayMaxEvents: 2, // Limits the number of events displayed per day
+    events: birthdayEvents.events, // Directly passing the events array
+
+    // Event click handler
+    eventClick: function(info) {
+      var eventObj = info.event;
+      var modalTitle = document.getElementById('modalTitle1');
+      var modalBody = document.getElementById('modalBody1');
       
-      var birthdayEvents = {
-        id: 2,
-        backgroundColor: 'rgba(16,183,89, .25)',
-        borderColor: '#10b759',
-        events: [
-          {
-            id: '7',
-            start: `${curYear}-${curMonth}-01T18:00:00`,
-            end: `${curYear}-${curMonth}-01T23:30:00`,
-            title: 'Jensen Birthday',
-            description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-          },
-          {
-            id: '8',
-            start: `${curYear}-${curMonth}-21T15:00:00`,
-            end: `${curYear}-${curMonth}-21T21:00:00`,
-            title: 'Carl\'s Birthday',
-            description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-          },
-          {
-            id: '9',
-            start: `${curYear}-${curMonth}-23T15:00:00`,
-            end: `${curYear}-${curMonth}-23T21:00:00`,
-            title: 'Yaretzi\'s Birthday',
-            description: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis az pede mollis...'
-          }
-        ]
-      };
+      if (modalTitle && modalBody) {
+        modalTitle.innerHTML = eventObj.title;
+        modalBody.innerHTML = eventObj.extendedProps.description || "No additional details.";
+        $('#fullCalModal').modal("show");
+      }
+    },
 
-      // Initialize FullCalendar
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        headerToolbar: {
-          left: "prev,today,next",
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-        },
-        editable: true,
-        droppable: true,
-        fixedWeekCount: true,
-        initialView: 'dayGridMonth',
-        timeZone: 'UTC',
-        dayMaxEvents: 2,
-        events: [birthdayEvents], // Ensure you add more event sources if they exist
-        eventClick: function(info) {
-          var eventObj = info.event;
-          $('#modalTitle1').html(eventObj.title);
-          $('#modalBody1').html(eventObj.extendedProps.description);
-          $('#fullCalModal').modal("show");
-        },
-        dateClick: function(info) {
-          console.log(info.dateStr);
-          $("#tanggal_tahun").attr('value',info.dateStr);
-          $('#fullCalModal').modal("show");
-        }
-      });
+    // Date click handler
+    dateClick: function(info) {
+      console.log("Clicked date: ", info.dateStr);
+      var dateInput = document.getElementById('tanggal_tahun');
+      if (dateInput) {
+        dateInput.value = info.dateStr; // Set the clicked date
+        $('#fullCalModal').modal("show");
+      }
+    }
+  });
 
-      calendar.render();
-    });
+  // Render the calendar
+  calendar.render();
+});
   </script>
 @endpush

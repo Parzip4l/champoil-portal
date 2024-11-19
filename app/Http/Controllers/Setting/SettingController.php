@@ -13,6 +13,8 @@ use App\Employee;
 use App\User;
 use App\Setting\Golongan\GolonganModel;
 use App\ModelCG\BirthdaysMessages;
+use Carbon\Carbon;
+
 
 use App\Version;
 
@@ -112,8 +114,36 @@ class SettingController extends Controller
     }
 
     public function birthdays_messages(){
-        return view('pages.app-setting.birthdays_message');
+        // Ambil data karyawan dengan unit_bisnis 'Kas'
+        $data['birth_days'] = Employee::where('unit_bisnis', 'Kas')->get()->map(function ($employee) {
+            // Konversi tanggal_lahir ke objek Carbon
+            $tanggalLahir = Carbon::parse($employee->tanggal_lahir);
+
+            // Buat tanggal ulang tahun untuk tahun ini
+            $ulangTahun = Carbon::createFromDate(now()->year, $tanggalLahir->month, $tanggalLahir->day);
+
+            // Tambahkan atribut ulang_tahun ke dalam data karyawan
+            $employee->ulang_tahun = $ulangTahun->toDateString();
+
+            return $employee;
+        });
+
+        // Formatkan data ulang tahun ke array JSON-like
+        $birthdays = $data['birth_days']->map(function ($employee) {
+            return [
+                'id' => $employee->id,
+                'start' => $employee->ulang_tahun,
+                'end' => $employee->ulang_tahun,
+                'title' => "{$employee->nama} Birthday"
+            ];
+        });
+
+        // Pass data to view
+        $data['birthdays'] = $birthdays->toArray(); // Convert to array for view compatibility
+
+        return view('pages.app-setting.birthdays_message', $data);
     }
+
 
     public function save_messages(Request $request)
     {

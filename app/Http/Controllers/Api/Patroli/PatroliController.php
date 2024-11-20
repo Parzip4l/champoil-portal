@@ -716,36 +716,43 @@ class PatroliController extends Controller
                 $patroli = Patroli::whereBetween('created_at', [$startDate, $endDate])->get();
 
                 if ($patroli->isNotEmpty()) {
-                    // Fetch all schedule data for the given patroli records in one query
-                    $employees = $patroli->pluck('employee_code');
-                    $dates = $patroli->pluck('created_at');
-
-                    $schedules = DB::table('schedules')
-                        ->join('shifts', 'shifts.code', '=', 'schedules.shift')
+                    $employees = $patroli->pluck('employee_code')->unique();
+                    $dates = $patroli->pluck('created_at')->map(function ($date) {
+                        return Carbon::parse($date)->format('Y-m-d');
+                    })->unique();
+                
+                    // Query untuk jadwal dari koneksi kedua
+                    $schedules = Schedule::join('shifts', 'shifts.code', '=', 'schedules.shift')
                         ->whereIn('employee', $employees)
                         ->whereIn('tanggal', $dates)
                         ->get();
-
+                
+                    $shift1 = [];
+                    $shift2 = [];
+                
                     foreach ($patroli as $pat) {
-                        $activity = $schedules->first(function ($schedule) use ($pat) {
-                            return $schedule->employee == $pat->employee_code && $schedule->tanggal == $pat->created_at;
+                        $patDate = Carbon::parse($pat->created_at)->format('Y-m-d');
+                        $activity = $schedules->first(function ($schedule) use ($pat, $patDate) {
+                            return $schedule->employee == $pat->employee_code && $schedule->tanggal == $patDate;
                         });
-
+                
                         if ($activity) {
-                            // Add your logic here
-                            if ($activity->shift == "pg") {
-                                // Handle morning shift logic
+                            if ($activity->shift == 'pg') {
+                                $shift1[] = 1; // Tambahkan 1 untuk shift1
                             } else {
-                                // Handle other shift logic
+                                $shift2[] = 1; // Tambahkan 1 untuk shift2
                             }
                         }
                     }
+                
+                    $valueShift1 = array_sum($shift1);
+                    $valueShift2 = array_sum($shift2);
                 }
 
 
 
-                $shift1[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
-                $shift2[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
+                // $shift1[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
+                // $shift2[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
             
                 // Get the scheduled shifts for the month (group by 'shift' and count them)
                 $scheduleData = Schedule::whereBetween('created_at', [$startDate, $endDate])
@@ -801,8 +808,8 @@ class PatroliController extends Controller
             "grafik_key" => $bulan_hari,
             "grafik_value" => $value_data,
             "jml_hari" => $jml_hari,
-            "value_shift1" => $shift1,
-            "value_shift2" => $shift2,
+            "value_shift1" => $valueShift1,
+            "value_shift2" => $valueShift2,
             "schedule"=>$schedule,
             "day_in"=>$days_in_month
         ];

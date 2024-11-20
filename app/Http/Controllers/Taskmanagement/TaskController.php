@@ -30,19 +30,19 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        if(Auth::user()->project_id == NULL){
-            $task = Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
-            ->select('master_tasks.*', 'projects.name as project_name');
-            if($request->input('project_id')){
-                $task->where('projects.id',$request->input('project_id'));
-            }
-        }else{
-            $task= Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
-            ->select('master_tasks.*', 'projects.name as project_name')
-            ->where('projects.id',Auth::user()->project_id);
-        }
+        // if(Auth::user()->project_id == NULL){
+        //     $task = Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
+        //     ->select('master_tasks.*', 'projects.name as project_name');
+        //     if($request->input('project_id')){
+        //         $task->where('projects.id',$request->input('project_id'));
+        //     }
+        // }else{
+        //     $task= Task::join('projects', 'master_tasks.project_id', '=', 'projects.id')
+        //     ->select('master_tasks.*', 'projects.name as project_name')
+        //     ->where('projects.id',Auth::user()->project_id);
+        // }
         
-        $data['records']=$task->get();
+        // $data['records']=$task->get();
         $data['project']=Project::all();
         $data['project_id']=Auth::user()->project_id;
         return view('pages.operational.task.index',$data);

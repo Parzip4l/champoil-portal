@@ -764,6 +764,11 @@ class PatroliController extends Controller
                 // }
             
                 // Get the number of days in the current month
+                
+            }
+
+            foreach ($key as $index => $month) {
+                $monthNumber = $index + 1;
                 $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
             }
             

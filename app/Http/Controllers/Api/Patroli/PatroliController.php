@@ -667,7 +667,7 @@ class PatroliController extends Controller
 
     public function dashboard_analytic(Request $request){
         // Fetch the project with id 582307
-        $project = Project::where('id', 706989)->first();
+        $project = Project::where('id', 582307)->first();
         $filter = "monthly";
         $key = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
     

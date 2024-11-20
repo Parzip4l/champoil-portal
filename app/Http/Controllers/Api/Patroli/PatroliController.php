@@ -767,10 +767,10 @@ class PatroliController extends Controller
                 
             }
 
-            // foreach ($key as $index => $month) {
-            //     $monthNumber = $index + 1;
-            //     $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
-            // }
+            foreach ($key as $index => $month) {
+                $monthNumber = $index + 1;
+                $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
+            }
             
     
             // Populate the $value array with values for each month

@@ -693,7 +693,7 @@ class PatroliController extends Controller
         $shift2 = [];
         $patroli_pershift = 0;
     
-        $value = [];
+        $value_data = [];
         $jml_hari = [];
         
     
@@ -770,7 +770,7 @@ class PatroliController extends Controller
     
             // Populate the $value array with values for each month
             foreach ($days_in_month as $month => $days) {
-                $value[] = ($total_point * 4) * $days * $project->details_data;  // Calculate total patroli points for the month
+                $value_data[] = ($total_point * 4) * $days * $project->details_data;  // Calculate total patroli points for the month
                 $jml_hari[] = $days;  // Store the number of days for the month
                 $bulan_hari[]=$month.' ( '.$days.' ) ';
             }
@@ -794,7 +794,7 @@ class PatroliController extends Controller
             "patroli_pershift" => $this->format_ribuan($total_point * 30),
             "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 2) * $project->details_data * 30),
             "grafik_key" => $bulan_hari,
-            "grafik_value" => $value,
+            "grafik_value" => $value_data,
             "jml_hari" => $jml_hari,
             "value_shift1" => $shift1,
             "value_shift2" => $shift2,

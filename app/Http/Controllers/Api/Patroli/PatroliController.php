@@ -733,7 +733,7 @@ class PatroliController extends Controller
     
             // Populate the $value array with values for each month
             foreach ($days_in_month as $month => $days) {
-                $value_data[] = ($total_point* 4) * $days;  // Calculate total patroli points for the month
+                $value_data[] = ($total_point* $masing2shift) * $days*$jml_shift;  // Calculate total patroli points for the month
                 $jml_hari[] = $days;  // Store the number of days for the month
                 $bulan_hari[]=$month.' ( '.$days.' ) ';
             }

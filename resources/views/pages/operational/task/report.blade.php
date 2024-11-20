@@ -193,9 +193,9 @@
         type: 'pie', // Pie chart type
         height: 350
       },
-      series: [44, 55, 13], // Data for the pie chart
-      labels: ['SHIFT 1', 'SHIFT 2', 'No Patrol'], // Labels for the pie chart
-      colors: ['#008FFB', '#00E396', '#FF4560'], // Custom colors for the pie slices
+      series: [44, 13], // Data for the pie chart
+      labels: ['Patroli', 'No Patrol'], // Labels for the pie chart
+      colors: ['#008FFB','#FF4560'], // Custom colors for the pie slices
       title: {
         text: 'Chart Statistic',
         align: 'center'

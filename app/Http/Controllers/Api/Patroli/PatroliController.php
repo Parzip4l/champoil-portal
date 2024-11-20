@@ -689,8 +689,6 @@ class PatroliController extends Controller
         }
     
         $total_titik = count($master);
-        $shift1 = [];
-        $shift2 = [];
         $patroli_pershift = 0;
     
         $value_data = [];
@@ -707,9 +705,9 @@ class PatroliController extends Controller
             foreach ($key as $index => $month) {
                 $monthNumber = $index + 1;
                 // Get the first day of the month (no need to format the date for whereMonth)
-                // $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
-                // // Get the last day of the month
-                // $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
+                $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
+                // Get the last day of the month
+                $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
             
                 // Count the number of patroli for the current month (use whereBetween to filter by the full month range)
 
@@ -717,12 +715,18 @@ class PatroliController extends Controller
                                 ->join('schedules','schedules.employee','patrolis.employee_code')
                                 ->join('shifts','shifts.code','=','schedules.shift')
                                 ->where('shifts.name','SCHEDULE PAGI')
-                                ->whereMonth('patrolis.created_at', $monthNumber)->count();
+                                ->where('schedules.project',$project->id)
+                                ->whereMonth('schedules.tanggal', $monthNumber)
+                                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $startDate . ' 23:59:59'])
+                                ->count();
                 $shift2[] = DB::table('patrolis')
                                 ->join('schedules','schedules.employee','patrolis.employee_code')
                                 ->join('shifts','shifts.code','=','schedules.shift')
                                 ->where('shifts.name','SCHEDULE MALAM')
-                                ->whereMonth('patrolis.created_at', $monthNumber)->count();
+                                ->where('schedules.project',$project->id)
+                                ->whereMonth('schedules.tanggal', $monthNumber)
+                                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $startDate . ' 23:59:59'])
+                                ->count();
             
                
                 $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);  
@@ -730,7 +734,7 @@ class PatroliController extends Controller
     
             // Populate the $value array with values for each month
             foreach ($days_in_month as $month => $days) {
-                $value_data[] = ($total_point * 4) * $days * 4;  // Calculate total patroli points for the month
+                $value_data[] = ($total_point* 4) * $days;  // Calculate total patroli points for the month
                 $jml_hari[] = $days;  // Store the number of days for the month
                 $bulan_hari[]=$month.' ( '.$days.' ) ';
             }
@@ -751,14 +755,13 @@ class PatroliController extends Controller
             "total_point" => $this->format_ribuan($total_point),
             "patroli_shift" => $project->details_data,
             "jumlah_shift" => 2,
-            "patroli_pershift" => $this->format_ribuan($total_point * 30),
-            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 2) * $project->details_data * 30),
+            "patroli_pershift" => $this->format_ribuan(($total_point * 30)*4),
+            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 30)*4*2),
             "grafik_key" => $bulan_hari,
             "grafik_value" => $value_data,
             "jml_hari" => $jml_hari,
             "value_shift1" => $shift1,
-            "value_shift2" => $shift2,
-            "ddates"=>$ddates
+            "value_shift2" => $shift2
         ];
     
         // Return the response with the result data

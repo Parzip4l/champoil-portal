@@ -684,6 +684,7 @@ class PatroliController extends Controller
             $point = 0;
             foreach ($master as $row) {
                 $point += List_task::where('id_master', $row->id)->count();
+                $list_task[] = List_task::where('id_master', $row->id)->get();
             }
             $total_point = $point;
         }
@@ -708,27 +709,29 @@ class PatroliController extends Controller
                 $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
                 // Get the last day of the month
                 $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
-            
-                // Count the number of patroli for the current month (use whereBetween to filter by the full month range)
+                
+                // foreach($master as $mas){
+                    
+                    $shift1[] = DB::table('patrolis')
+                                    ->join('schedules','schedules.employee','patrolis.employee_code')
+                                    ->join('shifts','shifts.code','=','schedules.shift')
+                                    ->where('shifts.name','SCHEDULE PAGI')
+                                    ->where('schedules.project',$project->id)
+                                    ->whereBetween('schedules.tanggal',  [$startDate , $endDate])    
+                                    ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                                    ->count();
+                    $shift2[] = DB::table('patrolis')
+                                    ->join('schedules','schedules.employee','patrolis.employee_code')
+                                    ->join('shifts','shifts.code','=','schedules.shift')
+                                    ->where('shifts.name','SCHEDULE MALAM')
+                                    ->where('schedules.project',$project->id)
+                                    ->whereBetween('schedules.tanggal',  [$startDate , $endDate])
+                                    ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                                    ->count();
+                // }
+                
 
-                $shift1[] = DB::table('patrolis')
-                                ->join('schedules','schedules.employee','patrolis.employee_code')
-                                ->join('shifts','shifts.code','=','schedules.shift')
-                                ->where('shifts.name','SCHEDULE PAGI')
-                                ->where('schedules.project',$project->id)
-                                ->whereMonth('schedules.tanggal', $monthNumber)
-                                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $startDate . ' 23:59:59'])
-                                ->count();
-                $shift2[] = DB::table('patrolis')
-                                ->join('schedules','schedules.employee','patrolis.employee_code')
-                                ->join('shifts','shifts.code','=','schedules.shift')
-                                ->where('shifts.name','SCHEDULE MALAM')
-                                ->where('schedules.project',$project->id)
-                                ->whereMonth('schedules.tanggal', $monthNumber)
-                                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $startDate . ' 23:59:59'])
-                                ->count();
-            
-               
+                
                 $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);  
             }
     

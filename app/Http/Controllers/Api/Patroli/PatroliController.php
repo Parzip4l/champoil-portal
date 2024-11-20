@@ -767,10 +767,10 @@ class PatroliController extends Controller
                 
             }
 
-            foreach ($key as $index => $month) {
-                $monthNumber = $index + 1;
-                $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
-            }
+            // foreach ($key as $index => $month) {
+            //     $monthNumber = $index + 1;
+            //     $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
+            // }
             
     
             // Populate the $value array with values for each month
@@ -803,7 +803,8 @@ class PatroliController extends Controller
             "jml_hari" => $jml_hari,
             "value_shift1" => $shift1,
             "value_shift2" => $shift2,
-            "schedule"=>$schedule
+            "schedule"=>$schedule,
+            "day_in"=>$days_in_month
         ];
     
         // Return the response with the result data

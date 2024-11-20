@@ -707,78 +707,26 @@ class PatroliController extends Controller
             foreach ($key as $index => $month) {
                 $monthNumber = $index + 1;
                 // Get the first day of the month (no need to format the date for whereMonth)
-                $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
-                // Get the last day of the month
-                $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
+                // $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
+                // // Get the last day of the month
+                // $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
             
                 // Count the number of patroli for the current month (use whereBetween to filter by the full month range)
 
-                $patroli = Patroli::whereBetween('created_at', [$startDate, $endDate])->get();
-
-                if ($patroli->isNotEmpty()) {
-                    $employees = $patroli->pluck('employee_code')->unique();
-                    $dates = $patroli->pluck('created_at')->map(function ($date) {
-                        return Carbon::parse($date)->format('Y-m-d');
-                    })->unique();
-                
-                    // Query untuk jadwal dari koneksi kedua
-                    $schedules = Schedule::join('shifts', 'shifts.code', '=', 'schedules.shift')
-                        ->whereIn('employee', $employees)
-                        ->whereIn('tanggal', $dates)
-                        ->get();
-                
-                    $shift1 = [];
-                    $shift2 = [];
-                
-                    foreach ($patroli as $pat) {
-                        $patDate = Carbon::parse($pat->created_at)->format('Y-m-d');
-                        $activity = $schedules->first(function ($schedule) use ($pat, $patDate) {
-                            return $schedule->employee == $pat->employee_code && $schedule->tanggal == $patDate;
-                        });
-                
-                        if ($activity) {
-                            if ($activity->shift == 'pg') {
-                                $shift1[] = 1; // Tambahkan 1 untuk shift1
-                            } else {
-                                $shift2[] = 1; // Tambahkan 1 untuk shift2
-                            }
-                        }
-                    }
-                
-                    $valueShift1 = array_sum($shift1);
-                    $valueShift2 = array_sum($shift2);
-                }
-
-
-
-                // $shift1[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
-                // $shift2[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
+                $shift1[] = DB::table('patrolis')
+                                ->join('schedules','schedules.employee','patrolis.employee_code')
+                                ->join('shifts','shifts.code','=','schedules.shift')
+                                ->where('shifts.name','SCHEDULE PAGI')
+                                ->whereMonth('patrolis.created_at', $monthNumber)->count();
+                $shift2[] = DB::table('patrolis')
+                                ->join('schedules','schedules.employee','patrolis.employee_code')
+                                ->join('shifts','shifts.code','=','schedules.shift')
+                                ->where('shifts.name','SCHEDULE MALAM')
+                                ->whereMonth('patrolis.created_at', $monthNumber)->count();
             
-                // Get the scheduled shifts for the month (group by 'shift' and count them)
-                $scheduleData = Schedule::whereBetween('created_at', [$startDate, $endDate])
-                                        ->groupBy('shift')
-                                        ->selectRaw('shift')
-                                        ->where('shift','!=','OFF')
-                                        ->get();
-                $schedule[] = $scheduleData;
-                // foreach($schedule as $sch){
-                //     // $get_employee = Schedule::whereBetween('created_at', [$startDate, $endDate])
-                //     //             ->where('shift',$sch->shift)
-                //     //             ->get();
-                //     // foreach($get_employee as $emp){
-                        
-                //     // }
-                // }
-            
-                // Get the number of days in the current month
-                
+               
+                $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);  
             }
-
-            foreach ($key as $index => $month) {
-                $monthNumber = $index + 1;
-                $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
-            }
-            
     
             // Populate the $value array with values for each month
             foreach ($days_in_month as $month => $days) {
@@ -808,10 +756,9 @@ class PatroliController extends Controller
             "grafik_key" => $bulan_hari,
             "grafik_value" => $value_data,
             "jml_hari" => $jml_hari,
-            "value_shift1" => $valueShift1,
-            "value_shift2" => $valueShift2,
-            "schedule"=>$schedule,
-            "day_in"=>$days_in_month
+            "value_shift1" => $shift1,
+            "value_shift2" => $shift2,
+            "ddates"=>$ddates
         ];
     
         // Return the response with the result data

@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Patroli extends Model
 {
     use HasFactory;
-    protected $connection = 'mysql_secondary';
-    protected $table = 'patrolis';
 
     
 }

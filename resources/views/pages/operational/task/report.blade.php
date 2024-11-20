@@ -151,14 +151,9 @@
             },
             series: [
                 {
-                name: 'SHIFT 1',
+                name: 'Activity',
                 type: 'line', // Line chart for SHIFT 1
                 data: response_data.value_shift1 // Data points for SHIFT 1
-                },
-                {
-                name: 'SHIFT 2',
-                type: 'line', // Line chart for SHIFT 2
-                data: response_data.value_shift2 // Data points for SHIFT 2
                 },
                 {
                 name: 'Target Activity',

@@ -667,7 +667,7 @@ class PatroliController extends Controller
 
     public function dashboard_analytic(Request $request){
         // Fetch the project with id 582307
-        $project = Project::where('id', 582307)->first();
+        $project = Project::where('id', 706989)->first();
         $filter = "monthly";
         $key = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
     
@@ -694,6 +694,10 @@ class PatroliController extends Controller
     
         $value_data = [];
         $jml_hari = [];
+
+        $shift_act = json_decode($project->details_data);
+        $jml_shift = $shift_act[0];
+        $masing2shift = $shift_act[1];
         
     
         // If filter is "monthly"
@@ -711,23 +715,15 @@ class PatroliController extends Controller
                 $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
                 
                 // foreach($master as $mas){
+
+             
                     
-                    $shift1[] = DB::table('patrolis')
-                                    ->join('schedules','schedules.employee','patrolis.employee_code')
-                                    ->join('shifts','shifts.code','=','schedules.shift')
-                                    ->where('shifts.name','SCHEDULE PAGI')
-                                    ->where('schedules.project',$project->id)
-                                    ->whereBetween('schedules.tanggal',  [$startDate , $endDate])    
-                                    ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-                                    ->count();
-                    $shift2[] = DB::table('patrolis')
-                                    ->join('schedules','schedules.employee','patrolis.employee_code')
-                                    ->join('shifts','shifts.code','=','schedules.shift')
-                                    ->where('shifts.name','SCHEDULE MALAM')
-                                    ->where('schedules.project',$project->id)
-                                    ->whereBetween('schedules.tanggal',  [$startDate , $endDate])
-                                    ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-                                    ->count();
+                    
+                $shift1[] = Task::join('patrolis','patrolis.unix_code','=','master_tasks.unix_code')
+                                ->where('master_tasks.project_id',$project->id)
+                                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                                ->count();
+                $shift2[] = [];
                 // }
                 
 
@@ -757,9 +753,9 @@ class PatroliController extends Controller
             "total_titik" => $this->format_ribuan($total_titik),
             "total_point" => $this->format_ribuan($total_point),
             "patroli_shift" => $project->details_data,
-            "jumlah_shift" => 2,
-            "patroli_pershift" => $this->format_ribuan(($total_point * 30)*4),
-            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 30)*4*2),
+            "jumlah_shift" => $jml_shift,
+            "patroli_pershift" => $this->format_ribuan(($total_point * 30)*$masing2shift),
+            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 30)*$masing2shift*$jml_shift),
             "grafik_key" => $bulan_hari,
             "grafik_value" => $value_data,
             "jml_hari" => $jml_hari,

@@ -127,7 +127,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::get('/add_task/{id}', [App\Http\Controllers\Taskmanagement\ListController::class, 'list_task'])->name('add_task');
     Route::get('/qrcode/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class, 'qr_code'])->name('qrcode');
     Route::post('/task-update', [App\Http\Controllers\Taskmanagement\TaskController::class, 'update'])->name('task-update');
-    Route::get('task-report', [App\Http\Controllers\Taskmanagement\TaskController::class,'report'])->name('task-report');
+    Route::view('task-report', 'pages.operational.task.report')->name('task-report');
     Route::get('task-download-qr/{id}', [App\Http\Controllers\Taskmanagement\TaskController::class,'download_qr'])->name('task-download-qr');
     Route::post('/import-excel-patroli', [App\Http\Controllers\Taskmanagement\TaskController::class, 'import'])->name('import-excel-patroli');
     

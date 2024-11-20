@@ -664,5 +664,153 @@ class PatroliController extends Controller
         return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
 
     } 
+
+    public function dashboard_analytic(Request $request){
+        // Fetch the project with id 582307
+        $project = Project::where('id', 582307)->first();
+        $filter = "monthly";
+        $key = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    
+        // Check if project exists
+        if (!$project) {
+            return response()->json(['error' => 'Project not found'], 404);
+        }
+    
+        // Initialize variables
+        $master = Task::where('project_id', $project->id)->get();
+        $total_point = 0;
+    
+        if ($master) {
+            $point = 0;
+            foreach ($master as $row) {
+                $point += List_task::where('id_master', $row->id)->count();
+            }
+            $total_point = $point;
+        }
+    
+        $total_titik = count($master);
+        $shift1 = [];
+        $shift2 = [];
+        $patroli_pershift = 0;
+    
+        $value = [];
+        $jml_hari = [];
+        
+    
+        // If filter is "monthly"
+        if ($filter == "monthly") {
+            
+            $currentYear = date("Y");
+            $days_in_month = [];
+    
+            // Loop through each month abbreviation in the $key array
+            foreach ($key as $index => $month) {
+                $monthNumber = $index + 1;
+                // Get the first day of the month (no need to format the date for whereMonth)
+                $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
+                // Get the last day of the month
+                $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
+            
+                // Count the number of patroli for the current month (use whereBetween to filter by the full month range)
+
+                $patroli = Patroli::whereBetween('created_at', [$startDate, $endDate])->get();
+
+                if ($patroli->isNotEmpty()) {
+                    // Fetch all schedule data for the given patroli records in one query
+                    $employees = $patroli->pluck('employee_code');
+                    $dates = $patroli->pluck('created_at');
+
+                    $schedules = DB::table('schedules')
+                        ->join('shifts', 'shifts.code', '=', 'schedules.shift')
+                        ->whereIn('employee', $employees)
+                        ->whereIn('tanggal', $dates)
+                        ->get();
+
+                    foreach ($patroli as $pat) {
+                        $activity = $schedules->first(function ($schedule) use ($pat) {
+                            return $schedule->employee == $pat->employee_code && $schedule->tanggal == $pat->created_at;
+                        });
+
+                        if ($activity) {
+                            // Add your logic here
+                            if ($activity->shift == "pg") {
+                                // Handle morning shift logic
+                            } else {
+                                // Handle other shift logic
+                            }
+                        }
+                    }
+                }
+
+
+
+                $shift1[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
+                $shift2[] = Patroli::whereBetween('created_at', [$startDate, $endDate])->count();
+            
+                // Get the scheduled shifts for the month (group by 'shift' and count them)
+                $scheduleData = Schedule::whereBetween('created_at', [$startDate, $endDate])
+                                        ->groupBy('shift')
+                                        ->selectRaw('shift')
+                                        ->where('shift','!=','OFF')
+                                        ->get();
+                $schedule[] = $scheduleData;
+                // foreach($schedule as $sch){
+                //     // $get_employee = Schedule::whereBetween('created_at', [$startDate, $endDate])
+                //     //             ->where('shift',$sch->shift)
+                //     //             ->get();
+                //     // foreach($get_employee as $emp){
+                        
+                //     // }
+                // }
+            
+                // Get the number of days in the current month
+                $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
+            }
+            
+    
+            // Populate the $value array with values for each month
+            foreach ($days_in_month as $month => $days) {
+                $value[] = ($total_point * 4) * $days * $project->details_data;  // Calculate total patroli points for the month
+                $jml_hari[] = $days;  // Store the number of days for the month
+                $bulan_hari[]=$month.' ( '.$days.' ) ';
+            }
+        } else {
+            // Handle the case for daily values (if needed)
+            $key = [];
+            $currentMonth = date('m');
+            $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $currentMonth, date('Y'));
+    
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $key[] = str_pad($day, 2, '0', STR_PAD_LEFT);
+            }
+        }
+    
+        // Prepare the result data
+        $result = [
+            "total_titik" => $this->format_ribuan($total_titik),
+            "total_point" => $this->format_ribuan($total_point),
+            "patroli_shift" => $project->details_data,
+            "jumlah_shift" => 2,
+            "patroli_pershift" => $this->format_ribuan($total_point * 30),
+            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 2) * $project->details_data * 30),
+            "grafik_key" => $bulan_hari,
+            "grafik_value" => $value,
+            "jml_hari" => $jml_hari,
+            "value_shift1" => $shift1,
+            "value_shift2" => $shift2,
+            "schedule"=>$schedule
+        ];
+    
+        // Return the response with the result data
+        return response()->json([
+            'record' => $result,
+        ]);
+    }
+    
+    private function format_ribuan($val){
+        // Format number with thousands separator
+        return number_format($val, 0, '.', ',');
+    }
+    
     
 }

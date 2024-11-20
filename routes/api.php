@@ -203,4 +203,11 @@ Route::prefix('v1')->group(function () {
     Route::post('voice-detail-submit', [VoiceOfController::class, 'submit_voice_relations']);
     Route::get('data_pengajuan', [AllDataController::class, 'pengajuan_hp']);
     Route::post('/update_pengajuan', [AllDataController::class, 'update_pengajuan']);
+
+
+    Route::post('dashboard-patroli', [PatroliController::class, 'dashboard_analytic']);
+      
+
+
+
 });

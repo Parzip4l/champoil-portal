@@ -45,6 +45,7 @@ class TaskController extends Controller
         // $data['records']=$task->get();
         $data['project']=Project::all();
         $data['project_id']=Auth::user()->project_id;
+        $data['records']=[];
         return view('pages.operational.task.index',$data);
     }
 

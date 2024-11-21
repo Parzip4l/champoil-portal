@@ -21,7 +21,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Company\CompanyModel;
 use Yajra\DataTables\Facades\DataTables;
 use App\Organisasi\Organisasi;
-
+use Illuminate\Support\Facades\Log;
 class AbsenController extends Controller
 {
     /**
@@ -31,27 +31,30 @@ class AbsenController extends Controller
      */
     public function index(Request $request)
     {
-        
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
         $project = Project::all();
         $client_id = Auth::user()->project_id;
-        $organisasi = Organisasi::where('company',$company->unit_bisnis)->get();
-        $periode = $request->input('periode');
-
+        $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
+    
         $today = now();
-        if ($today->day < 21) {
-            $startDate = Carbon::create($today->year, $today->month, 21)->subMonth();
-            $endDate = Carbon::create($today->year, $today->month, 20);
+        $periode = $request->input('periode');
+        Log::info('Periode dari request:', ['periode' => $periode]);
+    
+        if ($periode) {
+            // Parsing periode
+            [$startDate, $endDate] = explode(' - ', $periode);
+            Log::info('Data hasil explode:', ['start' => $startDate, 'end' => $endDate]);
         } else {
-            // Jika hari ini adalah tanggal 21 atau setelahnya, kita berada di periode saat ini
-            $startDate = Carbon::create($today->year, $today->month, 21);
-            $endDate = Carbon::create($today->year, $today->month, 20)->addMonth();
+            // Periode default
+            $startDate = Carbon::create($today->year, $today->month, 21)->format('Y-m-d');
+            $endDate = Carbon::create($today->year, $today->month, 20)->addMonth()->format('Y-m-d');
         }
-
+    
+        // Query absensi
         $query = DB::table('users')
             ->join('karyawan', 'karyawan.nik', '=', 'users.name')
-            ->leftJoin('absens', function($join) use ($startDate, $endDate) {
+            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
                 $join->on('absens.nik', '=', 'users.name')
                     ->whereBetween('absens.tanggal', [$startDate, $endDate]);
             })
@@ -62,7 +65,6 @@ class AbsenController extends Controller
                 'karyawan.organisasi',
                 'karyawan.unit_bisnis',
                 DB::raw("GROUP_CONCAT(absens.tanggal ORDER BY absens.tanggal) as dates"),
-                DB::raw("GROUP_CONCAT(absens.status ORDER BY absens.tanggal) as statuses"),
                 DB::raw("GROUP_CONCAT(absens.clock_in ORDER BY absens.tanggal) as clock_ins"),
                 DB::raw("GROUP_CONCAT(absens.clock_out ORDER BY absens.tanggal) as clock_outs")
             )
@@ -70,33 +72,30 @@ class AbsenController extends Controller
             ->where('karyawan.resign_status', '0')
             ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi', 'karyawan.unit_bisnis')
             ->orderBy('karyawan.nama');
-
+    
         if ($request->organisasi && $request->organisasi !== 'ALL') {
             $query->where('karyawan.organisasi', $request->organisasi);
         }
     
         if ($request->project && $request->project !== 'ALL') {
-            $query->where('absens.project', $request->project); // Adjust this line if project data is elsewhere
+            $query->where('absens.project', $request->project);
         }
-
-        if($client_id){
-            $query->where('absens.project', $client_id);
-        }
-
+    
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->editColumn('nama', function($row) {
-                    return '<a href="' . route('absen.details', ['nik' => $row->nik]) . '">' . htmlspecialchars($row->nama) . '</a>';
+                ->editColumn('nama', function ($row) {
+                    $link = route('absen.details', ['nik' => $row->nik]);
+                    return '<a href="' . $link . '">' . htmlspecialchars($row->nama) . '</a>';
                 })
-                ->addColumn('attendance', function($row) use ($startDate, $endDate) {
+                ->addColumn('attendance', function ($row) use ($startDate, $endDate) {
                     $attendanceData = [];
                     $dates = explode(',', $row->dates);
                     $clockIns = explode(',', $row->clock_ins);
                     $clockOuts = explode(',', $row->clock_outs);
-                    
+    
                     $dateIndexMap = array_flip($dates);
-
+    
                     foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
                         $formattedDate = $date->format('Y-m-d');
                         if (isset($dateIndexMap[$formattedDate])) {
@@ -108,10 +107,10 @@ class AbsenController extends Controller
                         }
                         $attendanceData['absens_' . $date->format('Ymd')] = [
                             'clock_in' => $clockIn,
-                            'clock_out' => $clockOut
+                            'clock_out' => $clockOut,
                         ];
                     }
-
+    
                     return $attendanceData;
                 })
                 ->filter(function ($query) use ($request) {
@@ -123,18 +122,18 @@ class AbsenController extends Controller
                 ->rawColumns(['nama'])
                 ->toJson();
         }
-
+    
+        // Generate daftar bulan untuk dropdown
         $months = [];
         for ($i = 0; $i < 12; $i++) {
-            $start = $today->copy()->startOfYear()->addMonths($i)->day(21);
+            $start = $today->copy()->startOfYear()->subMonth()->addMonths($i)->day(21);
             $end = $start->copy()->addMonth()->day(20);
-            $months[$start->format('Y-m-d') . ' - ' . $end->format('Y-m-d')] = $start->format('d M Y') . ' - ' . $end->format('d M Y');
+            $months[$start->format('Y-m-d') . ' - ' . $end->format('Y-m-d')] = $end->format('M Y');
         }
-
-        return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id','organisasi'));
+    
+        return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id', 'organisasi'));
     }
-
-
+    
 
     public function indexbackup()
     {

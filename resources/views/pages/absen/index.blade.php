@@ -47,7 +47,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if($employee->unit_bisnis === 'Kas' && is_null($user->project_id))
+                        @if($employee->unit_bisnis === 'Kas')
                         <div class="col-md-4">
                             <label for="project" class="form-label">Project</label>
                             <select name="project" id="project" class="form-control select2">
@@ -60,9 +60,10 @@
                         @endif
                         <div class="col-md-4">
                             <label for="periode" class="form-label">Periode</label>
-                            <select name="periode" id="periode" class="form-control">
-                                @foreach($months as $key => $range)
-                                    <option value="{{ $key }}">{{ $range }}</option>
+                            <select id="periode" class="form-control">
+                                <option value="">Select Periode</option>
+                                @foreach($months as $key => $label)
+                                    <option value="{{ $key }}">{{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -80,18 +81,17 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="dataTableExample1" class="table table-striped nowrap" width="100%">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>  
-                                @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
-                                    <th>{{ $date->format('d M Y') }}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                <table id="dataTableExample1" class="table table-striped table-bordered">
+    <thead id="table-header">
+        <!-- Header dinamis akan diisi oleh JavaScript -->
+    </thead>
+    <tbody>
+        <!-- DataTable akan secara otomatis mengisi data di sini -->
+    </tbody>
+</table>
+
+</table>
+
                 </div>
             </div>
         </div>
@@ -106,51 +106,77 @@
 
 @push('custom-scripts')
 <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+
 <script>
-$(document).ready(function() {
-    var table = $('#dataTableExample1').DataTable({
-        scrollX: true,
-        scrollCollapse: true,
-        paging: true,
-        fixedColumns: {
-            left: 1
-        },
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '{{ route("absen.index") }}',
-            data: function (d) {
-                d.organisasi = $('#organisasi').val();
-                d.project = $('#project').val();
-                d.periode = $('#periode').val();
-            }
-        },
-        columns: [
-            { data: 'nama', name: 'nama', render: function(data, type, row) {
-                return '<a href="' + row.absen_details_url + '">' + data + '</a>';
-            }},
-            @foreach(\Carbon\CarbonPeriod::create($startDate, $endDate) as $date)
-                { 
-                    data: 'attendance.absens_{{ $date->format('Ymd') }}',
-                    name: 'attendance.absens_{{ $date->format('Ymd') }}',
-                    defaultContent: '-',
-                    render: function(data, type, row) {
+    $(document).ready(function () {
+        var table;
+
+        function generateTableHeader(startDate, endDate) {
+            var headerHtml = '<tr><th>Nama</th>'; 
+            var columns = [{ data: 'nama', name: 'name' }];
+            
+            for (var date = moment(startDate); date.isSameOrBefore(endDate); date.add(1, 'days')) {
+                var dateFormatted = date.format('DD MMM YYYY');
+                headerHtml += `<th>${dateFormatted}</th>`;
+                columns.push({
+                    data: `attendance.absens_${date.format('YYYYMMDD')}`,
+                    name: `attendance.absens_${date.format('YYYYMMDD')}`,
+                    render: function (data) {
                         if (data) {
-                            var clockIn = data.clock_in || '-';
-                            var clockOut = data.clock_out || '-';
-                            return '<span class="text-success">' + clockIn + '</span> - <span class="text-danger">' + clockOut + '</span>';
+                            return '<span class="text-success">' + data.clock_in + '</span> - <span class="text-danger">' + data.clock_out + '</span>';
                         } else {
                             return '-';
                         }
                     }
-                },
-            @endforeach
-        ]
-    });
-    $('#filter-form select').change(function() {
-        table.draw();
-    });
-});
+                });
+            }
 
+            headerHtml += '</tr>';
+            $('#table-header').html(headerHtml);
+            return columns;
+        }
+
+        function initDataTable(startDate, endDate) {
+            var columns = generateTableHeader(startDate, endDate);
+
+            if (table) {
+                table.destroy();
+            }
+            table = $('#dataTableExample1').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route("absen.index") }}',
+                    data: function (d) {
+                        d.periode = $('#periode').val();
+                        d.organisasi = $('#organisasi').val(); // Tambahkan filter organisasi
+                        d.project = $('#project').val(); // Tambahkan filter project
+                    },
+                },
+                columns: columns,
+            });
+        }
+
+        // Periode default
+        var defaultStart = moment().startOf('month').date(21); 
+        var defaultEnd = moment().startOf('month').add(1, 'month').date(20); 
+
+        // Inisialisasi DataTable dengan periode default
+        initDataTable(defaultStart, defaultEnd);
+
+        // Handle perubahan periode
+        $('#periode').change(function () {
+            var periode = $(this).val();
+            var [startDate, endDate] = periode.split(' - ');
+            initDataTable(moment(startDate), moment(endDate));
+        });
+
+        // Handle perubahan filter organisasi dan project
+        $('#organisasi, #project').change(function () {
+            table.ajax.reload(); // Reload data pada DataTable
+        });
+    });
 </script>
+
 @endpush

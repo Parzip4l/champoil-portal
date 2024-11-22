@@ -364,6 +364,23 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label">Pilih Shift</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="shift" id="pagi" value="pagi" required>
+                                    <label class="form-check-label" for="pagi">PAGI</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="shift" id="midle" value="midle" required>
+                                    <label class="form-check-label" for="midle">MIDLE</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="shift" id="malam" value="malam" required>
+                                    <label class="form-check-label" for="malam">MALAM</label>
+                                </div>
+                            </div>
+                        </div>
                         <div id="project_list"></div>
                         
                         
@@ -469,11 +486,13 @@
             }
 
             var jenis_file = $('input[name="filter_type"]:checked').val();
+            var shift = $('input[name="shift"]:checked').val();
             
             const params = {
                 tanggal: $("#tanggal_report").val(), // Example parameter
                 project_id:  project_id, // Another example parameter
-                jenis_file:jenis_file
+                jenis_file:jenis_file,
+                shift:shift
             };
 
             // Send GET request using Axios

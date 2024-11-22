@@ -564,25 +564,41 @@ class PatroliController extends Controller
 
         // Ambil data patroli berdasarkan task_id
         $patroliData = Patroli::whereIn('id_task', array_column($result, 'task_id'))
-        ->select('id_task', 'created_at', 'employee_code','status','description')
+        ->select('id_task', 'created_at', 'employee_code', 'status', 'description')
         ->get();
 
-        // Kelompokkan data patroli berdasarkan id_task dan tanggal
+        // Kelompokkan data patroli berdasarkan id_task dan tanggal (format Y-m-d)
         $patroliDataGrouped = $patroliData->groupBy(function ($item) {
-            // Mengelompokkan berdasarkan task_id dan tanggal
+        // Mengelompokkan berdasarkan task_id dan tanggal
             return $item->id_task . '-' . $item->created_at->format('Y-m-d'); // Format tanggal menjadi 'Y-m-d'
         });
 
         // Tambahkan data patroli ke dalam hasil
-        foreach ($result as &$res) {
-            // Membuat key grup berdasarkan task_id dan tanggal
-            $groupKey = $res['task_id'] . '-' . $res['tanggal'];  // Pastikan tanggal di 'result' sesuai dengan format yang diinginkan
-            
+            foreach ($result as &$res) {
+            // Membuat key grup berdasarkan task_id dan tanggal yang sesuai format Y-m-d
+            $groupKey = $res['task_id'] . '-' . \Carbon\Carbon::parse($res['tanggal'])->format('Y-m-d');  // Format tanggal di 'result' ke Y-m-d
+
             // Ambil data patroli yang dikelompokkan berdasarkan task_id dan tanggal
-            $activityData = $patroliDataGrouped->get($groupKey, collect()); // jika tidak ada, kembalikan koleksi kosong
-            
+            $activityData = $patroliDataGrouped->get($groupKey, collect()); // Jika tidak ada, kembalikan koleksi kosong
+
             // Menambahkan aktivitas patroli jika ada, atau array kosong jika tidak ada data
             $res['activity'] = $activityData->toArray();
+
+            /// Tambahkan data jadwal (schedule) berdasarkan employee_code dan tanggal
+            $schedule=[];
+            if(!empty($res['activity'])){
+                $schedule = Schedule::where('employee', $res['activity'][0]['employee_code'])  // Ambil jadwal berdasarkan employee_code
+                ->whereDate('tanggal', \Carbon\Carbon::parse($res['tanggal'])->format('Y-m-d'))  // Pastikan format tanggal sesuai
+                    ->first();
+            }
+              // Ambil data jadwal pertama yang ditemukan
+
+            // Jika jadwal ditemukan, tambahkan shift_on ke dalam data aktivitas
+            if ($schedule) {
+                foreach ($res['activity'] as &$activity) {
+                $activity['shift_on'] = $schedule->shift_on; // Menambahkan shift_on ke dalam data aktivitas
+            }
+            }
         }
 
         
@@ -623,6 +639,8 @@ class PatroliController extends Controller
                 // Tambahkan path file ke dalam array hasil
                 $files[] = asset('reports/' . $fileName);
             }
+
+            
 
             // Return semua path file dalam JSON response
             return response()->json([

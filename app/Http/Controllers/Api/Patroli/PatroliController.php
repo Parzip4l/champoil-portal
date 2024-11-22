@@ -593,24 +593,42 @@ class PatroliController extends Controller
         ];
         
         if($request->input('jenis_file') == "pdf"){
-            // Generate PDF using DomPDF
-            $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
-            $pdf->setPaper('A3', 'portrait');
+            ini_set('memory_limit', '4096M');
+            $chunks = array_chunk($data['tasks'], 500);
+            $files = []; // Array untuk menyimpan semua file yang dihasilkan
 
-            // Save PDF to a file
-            $fileName = 'report_' . date('YmdHis') . '.pdf';
-            $publicPath = public_path('reports');
-            if (!is_dir($publicPath)) {
-                mkdir($publicPath, 0755, true);
+            foreach ($chunks as $index => $chunk) {
+                // Data khusus untuk kelompok ini
+                $chunkedData = $data['tasks'] ; // Salin data asli
+                $chunkedData= ["tasks"=>$chunk,"tanggal"=>$tanggal]; // Ganti 'tasks' dengan data bagian
+
+                // Generate PDF
+                $pdf = Pdf::loadView('pages.report.patrol_pdf', $chunkedData);
+                $pdf->setPaper('A3', 'portrait');
+
+                // Nama file unik untuk setiap PDF
+                $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
+                $publicPath = public_path('reports');
+
+                // Buat folder jika belum ada
+                if (!is_dir($publicPath)) {
+                    mkdir($publicPath, 0755, true);
+                }
+
+                $filePath = $publicPath . '/' . $fileName;
+
+                // Simpan PDF
+                $pdf->save($filePath);
+
+                // Tambahkan path file ke dalam array hasil
+                $files[] = asset('reports/' . $fileName);
             }
-            $filePath = $publicPath . '/' . $fileName;
-            $pdf->save($filePath);
 
-            // Return the file download path
+            // Return semua path file dalam JSON response
             return response()->json([
-                'message' => 'PDF file saved successfully',
-                'path' => asset('reports/' . $fileName),
-                'task'=>$tasks
+                'message' => 'PDF files saved successfully',
+                'paths' => $files, // Semua file PDF yang dihasilkan
+                'tasks' => $data['tasks'] // Data asli untuk referensi
             ]);
         }else{
             $spreadsheet = new Spreadsheet();

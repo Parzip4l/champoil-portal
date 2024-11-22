@@ -55,15 +55,30 @@
         <tbody>
             <?php if (!empty($tasks)): ?>
                 <?php $no=1; ?>
-                <?php foreach ($tasks as $task): ?>
-                        <tr style="background-color:#05a34a">
+                    <?php 
+                    foreach ($tasks as $task): 
+                        $bg="";
+                        $text="";
+                        if(empty($task['activity'])){
+                            $bg="red";
+                            $text="white";
+                            $status ="-";
+                            $description ="-";
+                            $employee_code ="-";
+                        }else{
+                            $status =$task['activity'][0]['status'];
+                            $description =$task['activity'][0]['description'];
+                            $employee_code =karyawan_bynik($task['activity'][0]['employee_code'])->nama;
+                        }
+                    ?>
+                        <tr style="background-color:<?php echo $bg ?>;color:<?php echo $text ?>">
                             <td><?php echo $no ?></td>
                             <td><?php echo $task['tanggal']; ?></td>
                             <td><?php echo $task['task']; ?></td>
                             <td><?php echo $task['point']; ?></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td><?php echo $status ?></td>
+                            <td><?php echo $description; ?></td>
+                            <td><?php echo $employee_code; ?></td>
                         </tr>
 
                     <?php $no++ ?>

@@ -480,25 +480,33 @@
             axios.get('/api/v1/download_file_patrol', { params })
                 .then(function(response) {
                     // Handle success response
-                    const filePath = response.data.path; // Ensure your backend sends the correct file path
+                    const paths = response.data.paths; // Pastikan backend mengirimkan key `paths` berisi array
+        
+                    if (Array.isArray(paths) && paths.length > 0) {
+                        paths.forEach((filePath, index) => {
+                            // Buat elemen link sementara
+                            const link = document.createElement('a');
+                            link.href = filePath; // Set path dari array
+                            link.target = '_blank'; // Buka di tab baru
+                            
+                            // Tambahkan atribut download (opsional untuk mengatur nama file)
+                            link.setAttribute('download', `report_part_${index + 1}.pdf`);
 
-                    // Create a temporary link element
-                    const link = document.createElement('a');
-                    link.href = filePath; // Set the file path
-                    link.target = '_blank'; // Open in a new tab
+                            // Tambahkan ke body
+                            document.body.appendChild(link);
+                            
+                            // Klik link untuk memulai unduhan
+                            link.click();
+                            
+                            // Hapus link setelah digunakan
+                            document.body.removeChild(link);
+                        });
 
-                    // Set the download attribute
-                    link.setAttribute('download', ''); // You can specify a filename here
+                        alert('Semua file berhasil diunduh.');
+                    } else {
+                        alert('Tidak ada file yang tersedia untuk diunduh.');
+                    }
 
-                    // Append to the body
-                    document.body.appendChild(link);
-                    
-                    // Programmatically click the link to trigger the download
-                    link.click();
-                    
-                    // Remove the link from the document
-                    document.body.removeChild(link);
-                    
                     $('#loadingBackdrop').hide();
                     alert('File downloaded successfully');
                     // Optionally, you can handle the response, like redirecting to a download URL
@@ -525,8 +533,8 @@
                 const dayDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
 
                 // Show alert if the difference is greater than 31 days
-                if (dayDiff > 14) {
-                    alert("MAKSIMAL 14 HARI");
+                if (dayDiff > 7) {
+                    alert("MAKSIMAL 7 HARI");
                     // Optionally clear the selected dates
                     instance.clear(); // Uncomment if you want to clear the selection
                     return; // Exit the function if the alert is shown

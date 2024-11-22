@@ -50,22 +50,40 @@
 </div>
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0 align-self-center">
-                    Data Patrol
-                    <a href="javascript:void(0)" 
-                                class="btn btn-sm btn-success text-white mr-3" 
-                                style="float:right;margin-left: 10px;" 
-                                data-bs-toggle="modal" data-bs-target="#download">Download Data Patroli</a>
-                    <a href="{{route('task-report')}}" class="btn btn-sm btn-warning text-white mr-3"  style="float:right;margin-left: 10px;">Report</a>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#import-data" class="btn btn-sm btn-success text-white mr-3"  style="float:right;margin-left: 10px;">Import Excel</a>
-                    <a href="#" class="btn btn-sm btn-primary ml-3" data-bs-toggle="modal" data-bs-target="#taskModel" style="float:right">Tambah Patrol</a>
-                    <a href="{{route('task-download-qr',['id'=>@$_GET['project_id']?@$_GET['project_id']:1])}}" target="_blank" class="btn btn-sm btn-danger ml-3" style="float:right;margin-right: 10px;">Export QR</a>
-                </h5>
-                
-                
+        <div class="card custom-card2">
+        <div class="card-header">
+            <div class="head-card d-flex justify-content-between">
+                <div class="header-title align-self-center">
+                    <h6 class="card-title align-self-center mb-0">Data Patroli</h6>
+                    
+                </div>
+                <div class="tombol-pembantu d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#download">
+                                <i data-feather="download" class="icon-sm me-2"></i> Download Data Patroli
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center me-2" href="{{ route('task-report') }}">
+                                <i data-feather="file-text" class="icon-sm me-2"></i> Report
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#import-data">
+                                <i data-feather="upload" class="icon-sm me-2"></i> Import Excel
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#taskModel">
+                                <i data-feather="plus" class="icon-sm me-2"></i> Tambah Patrol
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center me-2" href="{{ route('task-download-qr', ['id' => @$_GET['project_id'] ?: 1]) }}" target="_blank">
+                                <i data-feather="download" class="icon-sm me-2"></i> Export QR
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </div>
             
             <div class="card-body">
             @if($project_id==NULL)

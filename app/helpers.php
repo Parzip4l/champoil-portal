@@ -115,6 +115,36 @@ function project_all() {
 }
 
 
+function project_filter($project_id){
+  $project = app('App\ModelCG\Project');
+  if(empty($project_id)){
+    $records = $project->where('company','Kas')->get();
+
+    $result = [
+        [
+            "id" => "project",
+            "name" => "Project",
+            "parent_id" => null
+        ]
+    ];
+  
+    // Add child nodes for each project
+    foreach ($records as $project) {
+        $result[] = [
+            "id" => $project->id,
+            "name" => $project->name,
+            "parent_id" => "project"
+        ];
+    }
+  }else{
+    $result=[];
+  }
+  
+
+  return $result;
+
+}
+
 
 function project_byID($id){
   $project = app('App\ModelCG\Project');

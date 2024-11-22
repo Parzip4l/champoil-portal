@@ -38,38 +38,35 @@
 </head>
 <body>
     <h2>Report Patroli (<?php echo $tanggal; ?>)</h2>
-    <?php  print_r($tasks); ?>
+    
     <table>
         <thead>
             <tr>
                 <th>No</th>
+                <th>Tanggal</th>
                 <th>Task</th>
                 <th>Point</th>
-                <th>Tanggal</th>
+                
                 <th>Status</th>
                 <th>Description</th>
-                
                 <th>Petugas</th>
             </tr>
         </thead>
         <tbody>
             <?php if (!empty($tasks)): ?>
+                <?php $no=1; ?>
                 <?php foreach ($tasks as $task): ?>
-                    <?php foreach ($task->point as $point): ?>
-                        <?php $no=1; ?>
-                        <?php foreach ($point->list as $entry): ?>
-                            <tr>
-                                <td><?php echo $no ?></td>
-                                <td><?php echo $point->task; ?></td>
-                                <td><?php echo $task->judul; ?></td>
-                                <td><?php echo $entry->created_at; ?></td>
-                                <td><?php echo $entry->status; ?></td>
-                                <td><?php echo $entry->description; ?></td>
-                                <td><?php echo karyawan_bynik($entry->employee_code)->nama ?? $entry->employee_code; ?></td>
-                            </tr>
-                            <?php $no++; ?>
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
+                        <tr style="background-color:#05a34a">
+                            <td><?php echo $no ?></td>
+                            <td><?php echo $task['tanggal']; ?></td>
+                            <td><?php echo $task['task']; ?></td>
+                            <td><?php echo $task['point']; ?></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                    <?php $no++ ?>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>

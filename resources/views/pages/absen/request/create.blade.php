@@ -33,7 +33,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Type</label>
-                                    <select name="status" class="form-select" data-width="100%" required>
+                                    <select name="status" id="status-select" class="form-select" data-width="100%" required>
                                         <option value="">Select Type</option>
                                         @foreach($typeRequest as $dataRequest)
                                             <option value="{{$dataRequest->code}}">{{$dataRequest->name}}</option>
@@ -50,6 +50,12 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div id="lembur-input" class="col-md-6" style="display: none;">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Jam Lembur</label>
+                                    <input type="number" name="jam_lembur" class="form-control" required>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Clock In</label>
@@ -201,5 +207,20 @@
     function formAbsen() {
         document.getElementById("btn-absen").submit();
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusSelect = document.getElementById('status-select');
+        if (statusSelect) {
+            statusSelect.addEventListener('change', function() {
+                const lemburInput = document.getElementById('lembur-input');
+                if (this.value === 'L') {
+                    lemburInput.style.display = 'block';
+                } else {
+                    lemburInput.style.display = 'none';
+                }
+            });
+        }
+    });
 </script>
 @endpush

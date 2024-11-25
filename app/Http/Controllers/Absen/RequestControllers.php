@@ -176,6 +176,7 @@ class RequestControllers extends Controller
         $pengajuan->unik_code = $randomNumber;
         $pengajuan->tanggal = $request->input('tanggal');
         $pengajuan->employee = $request->input('employee');
+        $pengajuan->jam_lembur = $request->input('jam_lembur');
         $pengajuan->clock_in = $request->input('clock_in');
         $pengajuan->clock_out = $request->input('clock_out');
         $pengajuan->status = $request->input('status');

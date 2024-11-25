@@ -24,10 +24,12 @@ use App\ModelCG\Status_patrol;
 use App\ModelCG\Schedule;
 use App\Employee;
 use App\ModelCG\Project;
+use App\ModelCG\Shift;
 use App\ModelCG\ProjectRelations;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
 use PDF;
 
 class PatroliController extends Controller
@@ -513,75 +515,121 @@ class PatroliController extends Controller
     }
 
     public function download_file_patrol(Request $request){
-        if($request->input('jenis_file') == "pdf"){
-            // Parse request inputs
-            $tanggal = $request->input('tanggal');
-            $project = $request->input('project_id');
-            $explode = explode(' to ', $tanggal);
+        // Parse request inputs
+        $tanggal = $request->input('tanggal');
+        $project = $request->input('project_id');
+        $explode = explode(' to ', $tanggal);
+        $jml_tgl =count($explode);
+        if($jml_tgl > 1){
             $date1 = $explode[0] . ' 00:00:00';
             $date2 = $explode[1] . ' 23:59:59';
-            $jml=0;
-            // Fetch tasks and associated data
-            $tasks = Task::where('project_id', $project)->get();
+        }else{
+            $date1 = $explode[0] . ' 00:00:00';
+            $date2 = $explode[0] . ' 23:59:59';
+        }
+        
+
+        $jml = 0;
+        $result = [];
+        $start = Carbon::parse($date1)->startOfDay();
+        $end = Carbon::parse($date2)->endOfDay();
+
+        // Create the date period with daily intervals
+        $dates = CarbonPeriod::create($start, '1 day', $end);
+
+        // Get the shift data
+        $shift = $request->input('shift');
+        $shift_records = Shift::where('name', 'like', '%' . $shift . '%')->get();
+        $result_shift = $shift_records->pluck('code')->toArray();
+
+        // Format dates into an array
+        $dateList = [];
+        foreach ($dates as $date) {
+            $dateList[] = $date->format('Y-m-d');
+        }
+
+        // Store tasks with points and patrol data
+        $allTasks = [];
+        foreach ($dateList as $date) {
+            $tasks = Task::select('id', 'judul')->where('project_id', $project)->get();
+            
             foreach ($tasks as $task) {
-                $task->point = List_task::where('id_master', $task->id)->get();
-                foreach ($task->point as $point) {
-                    $point->list = Patroli::where('id', $point->id)
-                        ->whereBetween('created_at', [$date1, $date2])
-                        ->get();
+                $task->filter_tanggal = $date;
+                
+                // Get the points for each task
+                $task->points = List_task::select('id', 'id_master', 'task')
+                                        ->where('id_master', $task->id)
+                                        ->get();
+                
+                // Get patrol data for each point
+                foreach ($task->points as $row) {
+                    $row->list_data = Patroli::select('employee_code', 'status', 'description', 'image', 'created_at')
+                                            ->where('id_task', $row->id)
+                                            ->whereDate('patrolis.created_at', '=', $date) // Ensure filtering by the specific date
+                                            ->limit(3)
+                                            ->get();
                 }
+
+                // Add tasks to the allTasks array
+                $allTasks[] = $task;
+            }
+        }
+
+        // Prepare data to return
+        $data = [
+            'tanggal' => $tanggal,
+            'tasks' => $allTasks,
+        ];
+        
+        if($request->input('jenis_file') == "pdf"){
+            ini_set('memory_limit', '4096M');
+            $tasksArray = $data['tasks'];
+            $chunks = array_chunk($tasksArray, 500);
+            $files = []; // Array untuk menyimpan semua file yang dihasilkan
+            
+            foreach ($chunks as $index => $chunk) {
+                // Data khusus untuk kelompok ini
+                $chunkedData = $data['tasks'] ; // Salin data asli
+                $chunkedData= ["tasks"=>$chunk,"tanggal"=>$tanggal]; // Ganti 'tasks' dengan data bagian
+                // Generate PDF
+                $pdf = Pdf::loadView('pages.report.patrol_pdf', $chunkedData);
+                $pdf->setOption('no-outline', true);
+                $pdf->setOption('isHtml5ParserEnabled', true);
+                $pdf->setOption('isPhpEnabled', true);
+                $pdf->setPaper('legal', 'portrait');
+
+                // Nama file unik untuk setiap PDF
+                $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
+                $publicPath = public_path('reports');
+
+                // Buat folder jika belum ada
+                if (!is_dir($publicPath)) {
+                    mkdir($publicPath, 0755, true);
+                }
+
+                $filePath = $publicPath . '/' . $fileName;
+
+                // Simpan PDF
+                $pdf->save($filePath);
+
+                // Tambahkan path file ke dalam array hasil
+                $files[] = asset('reports/' . $fileName);
             }
 
-            // // dd($task->count());
+            
 
-            // Prepare data for PDF view
-            $data = [
-                'tasks' => $tasks,
-                'tanggal' => $tanggal,
-            ];
-
-            // Generate PDF using DomPDF
-            $pdf = Pdf::loadView('pages.report.patrol_pdf', $data);
-            $pdf->setPaper('A3', 'portrait');
-
-            // Save PDF to a file
-            $fileName = 'report_' . date('YmdHis') . '.pdf';
-            $publicPath = public_path('reports');
-            if (!is_dir($publicPath)) {
-                mkdir($publicPath, 0755, true);
-            }
-            $filePath = $publicPath . '/' . $fileName;
-            $pdf->save($filePath);
-
-            // Return the file download path
+            // Return semua path file dalam JSON response
             return response()->json([
-                'message' => 'PDF file saved successfully',
-                'path' => asset('reports/' . $fileName),
-                'task'=>$tasks
+                'message' => 'PDF files saved successfully',
+                'paths' => $files, // Semua file PDF yang dihasilkan
+                'tasks' => $data['tasks'] // Data asli untuk referensi
             ]);
         }else{
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
     
-            $tanggal = $request->input('tanggal');
-            $project = $request->input('project_id');
-            $explode = explode(' to ',$tanggal);
-            $date1= $explode[0].' 00:00:00';
-            $date2= $explode[1].' 23:59:59';
-    
-            $task = Task::where('project_id',$project)->get();
-            if(!empty($task)){
-                foreach($task as $row){
-                    $row->point= List_task::where('id_master',$row->id)->get();
-                    if(!empty($row->point)){
-                        foreach($row->point as $key){
-                            $key->list = Patroli::where('unix_code',$row->unix_code)
-                                                ->whereBetween('created_at',[$date1,$date2])
-                                                ->get();
-                        }
-                    }
-                }
-            }
+            
+            
     
             $sheet->getStyle('A1:H1')->applyFromArray([
                 'font' => ['bold' => true],
@@ -660,119 +708,137 @@ class PatroliController extends Controller
         }
         
     
-        // Return response with file path
+        // // Return response with file path
         return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
+        // return response()->json(['message' => $data]);
 
     } 
 
     public function dashboard_analytic(Request $request){
         // Fetch the project with id 582307
         $project = Project::where('id', 582307)->first();
-        $filter = "monthly";
-        $key = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-    
+        
+
         // Check if project exists
         if (!$project) {
             return response()->json(['error' => 'Project not found'], 404);
         }
-    
+
+        // Retrieve filter data from request
+        $filter_data = $request->filters;
+
+        // Initialize the month array (key)
+        $bulan = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        $key = $bulan;
+
+        // Check if Monthly filters are provided and update $key
+        if (!empty($filter_data['Monthly'])) {
+            $key=$filter_data['Monthly'];
+        }
+
+        $shift=[];
+        $schedule = Shift::select('name', DB::raw('COUNT(*) as total'))
+                            ->where(function ($query) {
+                                $query->where('name', 'LIKE', '%PAGI%')
+                                    ->orWhere('name', 'LIKE', '%MALAM%')
+                                    ->orWhere('name', 'LIKE', '%MIDLE%');
+                            })
+                            ->groupBy('name') // Group by 'name'
+                            ->get();
+
         // Initialize variables
         $master = Task::where('project_id', $project->id)->get();
         $total_point = 0;
-    
         if ($master) {
             $point = 0;
+            $list_task = [];
             foreach ($master as $row) {
                 $point += List_task::where('id_master', $row->id)->count();
                 $list_task[] = List_task::where('id_master', $row->id)->get();
             }
             $total_point = $point;
         }
-    
+
         $total_titik = count($master);
         $patroli_pershift = 0;
-    
+
         $value_data = [];
         $jml_hari = [];
-
+        // Decode shift data
         $shift_act = json_decode($project->details_data);
         $jml_shift = $shift_act[0];
         $masing2shift = $shift_act[1];
-        
-    
         // If filter is "monthly"
-        if ($filter == "monthly") {
-            
-            $currentYear = date("Y");
-            $days_in_month = [];
-    
-            // Loop through each month abbreviation in the $key array
-            foreach ($key as $index => $month) {
-                $monthNumber = $index + 1;
-                // Get the first day of the month (no need to format the date for whereMonth)
-                $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01'; 
-                // Get the last day of the month
-                $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
-                
-                // foreach($master as $mas){
+        $currentYear = date("Y");
+        $days_in_month = [];
+        $act = [];
+        // Loop through each month abbreviation in the $key array
+        foreach ($key as $index => $month) {
+            $monthNumber = date('m', strtotime($month));
+            $startDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-01';
+            $endDate = $currentYear . '-' . str_pad($monthNumber, 2, '0', STR_PAD_LEFT) . '-' . cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
 
-             
-                    
-                    
-                $shift1[] = Task::join('patrolis','patrolis.unix_code','=','master_tasks.unix_code')
-                                ->where('master_tasks.project_id',$project->id)
-                                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-                                ->count();
-                $shift2[] = [];
-                // }
-                
+            // Count the patrols in the current month range
+            $act[] = Task::join('patrolis', 'patrolis.unix_code', '=', 'master_tasks.unix_code')
+                ->where('master_tasks.project_id', $project->id)
+                ->whereBetween('patrolis.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->count();
 
-                
-                $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);  
-            }
-    
-            // Populate the $value array with values for each month
-            foreach ($days_in_month as $month => $days) {
-                $value_data[] = ($total_point* $masing2shift) * $days*$jml_shift;  // Calculate total patroli points for the month
-                $jml_hari[] = $days;  // Store the number of days for the month
-                $bulan_hari[]=$month.' ( '.$days.' ) ';
-            }
-        } else {
-            // Handle the case for daily values (if needed)
-            $key = [];
-            $currentMonth = date('m');
-            $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $currentMonth, date('Y'));
-    
-            for ($day = 1; $day <= $daysInMonth; $day++) {
-                $key[] = str_pad($day, 2, '0', STR_PAD_LEFT);
-            }
+            // Store the number of days in the month
+            $days_in_month[$month] = cal_days_in_month(CAL_GREGORIAN, $monthNumber, $currentYear);
         }
-    
+
+        $total_calculate=0;
+        // Calculate the value for each month
+        foreach ($days_in_month as $month => $days) {
+            $value_data[] = ($total_point * $masing2shift) * $days;
+            $jml_hari[] = $days;
+            $bulan_hari[] = $month . ' (' . $days . ')';
+            $total_calculate +=$days;
+        }
+        // Calculate percentages and shift data
+        $percent = [];
+        $no_key = 0;
+        foreach ($act as $act_key => $act_val) {
+            if($no_key<= count($key)){
+                $percent[] = round(($act_val / $value_data[$no_key]) * 100, 2) . ' %';
+                $no_key++;
+            }
+            
+        }
+        $shift1 = $act;
+        // Yearly values
+        $yearly = array_sum($value_data);
+        $yearly_activity = array_sum($shift1);
+        // Pie chart data
+        $pie_chart = [$yearly_activity, $yearly];
         // Prepare the result data
         $result = [
             "total_titik" => $this->format_ribuan($total_titik),
             "total_point" => $this->format_ribuan($total_point),
             "patroli_shift" => $project->details_data,
             "jumlah_shift" => $jml_shift,
-            "patroli_pershift" => $this->format_ribuan(($total_point * 30)*$masing2shift),
-            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * 30)*$masing2shift*$jml_shift),
+            "patroli_pershift" => $this->format_ribuan(($total_point * $total_calculate) * $masing2shift),
+            "total_patroli" => "Total : " . $this->format_ribuan(($total_point * $total_calculate) * $masing2shift),
             "grafik_key" => $bulan_hari,
             "grafik_value" => $value_data,
             "jml_hari" => $jml_hari,
             "value_shift1" => $shift1,
-            "value_shift2" => $shift2
+            "percent" => $percent,
+            "pie_chart" => $pie_chart
         ];
-    
         // Return the response with the result data
         return response()->json([
             'record' => $result,
         ]);
     }
-    
-    private function format_ribuan($val){
+
+    private function format_ribuan($val)
+    {
         // Format number with thousands separator
         return number_format($val, 0, '.', ',');
     }
+
     
     
 }

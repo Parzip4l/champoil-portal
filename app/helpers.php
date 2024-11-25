@@ -51,6 +51,24 @@ function karyawan_bynik($nik){
   return $karyawan->where('nik',$nik)->first();
 }
 
+function schedule($nik, $tanggal) {
+  $schedule = app('App\ModelCG\Schedule');
+  
+  // Convert $tanggal to a Carbon instance to manipulate it
+  $tanggalCarbon = Carbon::parse($tanggal);
+
+  // Check if the time is after 00:00 and adjust the date accordingly
+  if ($tanggalCarbon->format('H:i') > '00:00:00') {
+      // Subtract one day from the date
+      $tanggalCarbon->subDay();
+  }
+
+  // Query the schedule for the employee using the potentially adjusted date
+  return $schedule->where('employee', $nik)
+                  ->where('tanggal', $tanggalCarbon->format('Y-m-d')) // Format date to match 'Y-m-d'
+                  ->first();
+}
+
 function BarangCicilan(){
   // Retrieve the BarangCicilan model
   $BarangCicilan = app('App\ModelCG\asset\BarangCicilan');

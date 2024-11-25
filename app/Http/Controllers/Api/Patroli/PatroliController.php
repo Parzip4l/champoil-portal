@@ -519,108 +519,84 @@ class PatroliController extends Controller
         $tanggal = $request->input('tanggal');
         $project = $request->input('project_id');
         $explode = explode(' to ', $tanggal);
-        $date1 = $explode[0] . ' 00:00:00';
-        $date2 = $explode[1] . ' 23:59:59';
-        $jml=0;
-        $result=[];
+        $jml_tgl =count($explode);
+        if($jml_tgl > 1){
+            $date1 = $explode[0] . ' 00:00:00';
+            $date2 = $explode[1] . ' 23:59:59';
+        }else{
+            $date1 = $explode[0] . ' 00:00:00';
+            $date2 = $explode[0] . ' 23:59:59';
+        }
+        
+
+        $jml = 0;
+        $result = [];
         $start = Carbon::parse($date1)->startOfDay();
         $end = Carbon::parse($date2)->endOfDay();
 
-        // Buat periode tanggal dengan interval harian
+        // Create the date period with daily intervals
         $dates = CarbonPeriod::create($start, '1 day', $end);
 
-        // Format hasilnya menjadi array
+        // Get the shift data
+        $shift = $request->input('shift');
+        $shift_records = Shift::where('name', 'like', '%' . $shift . '%')->get();
+        $result_shift = $shift_records->pluck('code')->toArray();
+
+        // Format dates into an array
         $dateList = [];
         foreach ($dates as $date) {
             $dateList[] = $date->format('Y-m-d');
         }
 
-        $tasks = Task::where('project_id', $project)->get();
-        foreach($dateList as $date){
+        // Store tasks with points and patrol data
+        $allTasks = [];
+        foreach ($dateList as $date) {
+            $tasks = Task::select('id', 'judul')->where('project_id', $project)->get();
             
             foreach ($tasks as $task) {
-                $task->point =  List_task::where('id_master',$task->id)->get();
-                foreach($task->point as $key){
-                    for ($i = 1; $i <= 3; $i++) { // Perbaiki kondisi loop
-                        if($i==1){
-                            $time="07:00:00";
-                        }else if($i==2){
-                            $time="14:00:00";
-                        }else{
-                            $time="00:00:00";
-                        }
-                        $result[] = [
-                            "tanggal" => $date,
-                            "time"=>$time,
-                            "task" => $task->judul,
-                            "point" => $key->task,
-                            "task_id"=>$key->id
-                        ];
-                    }
-                    
+                $task->filter_tanggal = $date;
+                
+                // Get the points for each task
+                $task->points = List_task::select('id', 'id_master', 'task')
+                                        ->where('id_master', $task->id)
+                                        ->get();
+                
+                // Get patrol data for each point
+                foreach ($task->points as $row) {
+                    $row->list_data = Patroli::select('employee_code', 'status', 'description', 'image', 'created_at')
+                                            ->where('id_task', $row->id)
+                                            ->whereDate('patrolis.created_at', '=', $date) // Ensure filtering by the specific date
+                                            ->limit(3)
+                                            ->get();
                 }
+
+                // Add tasks to the allTasks array
+                $allTasks[] = $task;
             }
         }
 
-        // Ambil data patroli berdasarkan task_id
-        $patroliData = Patroli::whereIn('id_task', array_column($result, 'task_id'))
-        ->select('id_task', 'created_at', 'employee_code', 'status', 'description')
-        ->get();
-
-        // Kelompokkan data patroli berdasarkan id_task dan tanggal (format Y-m-d)
-        $patroliDataGrouped = $patroliData->groupBy(function ($item) {
-        // Mengelompokkan berdasarkan task_id dan tanggal
-            return $item->id_task . '-' . $item->created_at->format('Y-m-d'); // Format tanggal menjadi 'Y-m-d'
-        });
-
-        // Tambahkan data patroli ke dalam hasil
-            foreach ($result as &$res) {
-            // Membuat key grup berdasarkan task_id dan tanggal yang sesuai format Y-m-d
-            $groupKey = $res['task_id'] . '-' . \Carbon\Carbon::parse($res['tanggal'])->format('Y-m-d');  // Format tanggal di 'result' ke Y-m-d
-
-            // Ambil data patroli yang dikelompokkan berdasarkan task_id dan tanggal
-            $activityData = $patroliDataGrouped->get($groupKey, collect()); // Jika tidak ada, kembalikan koleksi kosong
-
-            // Menambahkan aktivitas patroli jika ada, atau array kosong jika tidak ada data
-            $res['activity'] = $activityData->toArray();
-
-            /// Tambahkan data jadwal (schedule) berdasarkan employee_code dan tanggal
-            $schedule=[];
-            if(!empty($res['activity'])){
-                $schedule = Schedule::where('employee', $res['activity'][0]['employee_code'])  // Ambil jadwal berdasarkan employee_code
-                ->whereDate('tanggal', \Carbon\Carbon::parse($res['tanggal'])->format('Y-m-d'))  // Pastikan format tanggal sesuai
-                    ->first();
-            }
-              // Ambil data jadwal pertama yang ditemukan
-
-            // Jika jadwal ditemukan, tambahkan shift_on ke dalam data aktivitas
-            if ($schedule) {
-                foreach ($res['activity'] as &$activity) {
-                $activity['shift_on'] = $schedule->shift_on; // Menambahkan shift_on ke dalam data aktivitas
-            }
-            }
-        }
-
-        
-
+        // Prepare data to return
         $data = [
-            'tanggal'=>$tanggal,
-            'tasks' => $result
+            'tanggal' => $tanggal,
+            'tasks' => $allTasks,
         ];
         
         if($request->input('jenis_file') == "pdf"){
             ini_set('memory_limit', '4096M');
-            $chunks = array_chunk($data['tasks'], 500);
+            $tasksArray = $data['tasks'];
+            $chunks = array_chunk($tasksArray, 500);
             $files = []; // Array untuk menyimpan semua file yang dihasilkan
-
+            
             foreach ($chunks as $index => $chunk) {
                 // Data khusus untuk kelompok ini
                 $chunkedData = $data['tasks'] ; // Salin data asli
                 $chunkedData= ["tasks"=>$chunk,"tanggal"=>$tanggal]; // Ganti 'tasks' dengan data bagian
-
                 // Generate PDF
                 $pdf = Pdf::loadView('pages.report.patrol_pdf', $chunkedData);
-                $pdf->setPaper('A3', 'portrait');
+                $pdf->setOption('no-outline', true);
+                $pdf->setOption('isHtml5ParserEnabled', true);
+                $pdf->setOption('isPhpEnabled', true);
+                $pdf->setPaper('legal', 'portrait');
 
                 // Nama file unik untuk setiap PDF
                 $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
@@ -732,7 +708,7 @@ class PatroliController extends Controller
         }
         
     
-        // Return response with file path
+        // // Return response with file path
         return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
         // return response()->json(['message' => $data]);
 

@@ -31,7 +31,7 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         if(Auth::user()->project_id == NULL){
-            $task = Task::join('project_id', $request->input('project_id'));
+            $task = Task::where('project_id', $request->input('project_id'));
         }else{
             $task= Task::where('project_id',Auth::user()->project_id);
         }

@@ -286,6 +286,12 @@
                             <h6>Rp {{ number_format($data->p_membership, 0, ',', '.') }}</h6>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-group mb-3">
+                            <p class="text-muted mb-2">Rate Lembur / Jam</p>
+                            <h6>Rp {{ number_format($data->lembur_rate, 0, ',', '.') }}</h6>
+                        </div>
+                    </div>
                 </div>
                 <hr>
                 <div class="row">

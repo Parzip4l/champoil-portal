@@ -42,5 +42,6 @@ class ProjectDetails extends Model
         'tp_membership',
         'tp_bulanan',
         'rate_harian',
+        'lembur_rate',
     ];
 }

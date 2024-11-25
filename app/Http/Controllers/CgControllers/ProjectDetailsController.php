@@ -80,6 +80,7 @@ class ProjectDetailsController extends Controller
             $tp_membership = $request->input('tp_membership');
             $tp_bulanan = $request->input('tp_bulanan');
             $rate_harian = $request->input('rate_harian');
+            $lembur_rate = $request->input('lembur_rate');
 
             $project = new ProjectDetails();
             $project->project_code = $project_code;
@@ -113,6 +114,7 @@ class ProjectDetailsController extends Controller
             $project->tp_membership = $tp_membership;
             $project->tp_bulanan = $tp_bulanan;
             $project->rate_harian = $rate_harian;
+            $project->lembur_rate = $lembur_rate;
             $project->save();
 
             return redirect()->route('project.index')->with(['success' => 'Data Berhasil Disimpan!']);
@@ -198,6 +200,7 @@ class ProjectDetailsController extends Controller
                 'r_deduction' => $request->input('r_deduction'),
                 'p_deduction' => $request->input('p_deduction'),
                 'tp_bulanan' => $request->input('tp_bulanan'),
+                'lembur_rate' => $request->input('lembur_rate'),
             ]);
 
             return redirect()->route('project.show',['project' => $projectDetails->project_code])->with('success', 'Data updated successfully');

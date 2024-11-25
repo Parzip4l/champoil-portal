@@ -117,6 +117,11 @@
                                                 <input type="number" name="p_deduction" class="form-control project-deduction" id="project-deduction" required>
                                             </div>
                                         </div>
+                                        <div class="form-group mb-3">
+                                                <label for="" class="form-label">Rate Lembur / Jam</label>
+                                                <input type="number" name="lembur_rate" class="form-control" required>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-header mb-2">
                                         <h4>Total Details</h4>

@@ -99,6 +99,20 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
+                                                <span>Lembur</span>
+                                            </div>
+                                            <div class="col-md-6 text-right mb-2">
+                                                <span class="text-right text-muted mb-4"> {{$allowencesData->totalJamLembur ?? 0}} Jam</span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span></span>
+                                            </div>
+                                            <div class="col-md-6 text-right mb-2">
+                                                <span class="text-right mb-4">Rp. {{ number_format($allowencesData->totalrateLembur ?? 0, 0, ',', '.') }} </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
                                                 <span>Tunjangan Lain Lain</span>
                                             </div>
                                             <div class="col-md-6 text-right">
@@ -299,7 +313,7 @@
                             Tidak Absen
                         </span>
                         <span class="text-muted">
-                            {{$deductionData->tidak_masuk_kerja}} Hari
+                            {{$deductionData->tidak_masuk_kerja ?? 0}} Hari
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">

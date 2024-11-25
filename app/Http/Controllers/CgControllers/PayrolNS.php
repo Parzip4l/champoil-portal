@@ -22,6 +22,7 @@ use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
 use App\Koperasi\Loan;
 use App\Koperasi\Saving;
+use App\Absen\RequestAbsen;
 
 // TaX
 use App\Pajak\Pajak;
@@ -152,6 +153,7 @@ class PayrolNS extends Controller
                     ->get();
                 $totalWorkingDays = $absen->count();
 
+                
                 // Initialize variables
                 $totalHari = 0;
                 $totalGaji = 0;
@@ -167,6 +169,8 @@ class PayrolNS extends Controller
                 $rate_harianbackup = 0;
                 $potonganAbsen = 0;
                 $totalSimpanan = 0;
+                $totalJamLembur = 0;
+                $totalGajiLembur = 0;
 
                 // Koperasi Deduction
                 $anggota = Anggota::where('employee_code', $nik)->first();
@@ -235,6 +239,45 @@ class PayrolNS extends Controller
                         // Calculate the total loan deductions
                         $loanDeductions = $loans->sum('instalment');
                     }
+                }
+
+                // Hitung Lemburan
+
+                // Ambil semua data lembur untuk karyawan berdasarkan NIK
+                $ceklembur = RequestAbsen::where('employee', $nik)
+                    ->where('status', 'L')
+                    ->where('aprrove_status', 'Approved')
+                    ->whereBetween('tanggal', [$startDate, $endDate])
+                    ->select('employee', 'project', 'jam_lembur')
+                    ->get();
+                    
+                if($ceklembur)
+                {
+                    // Kelompokkan data lembur berdasarkan proyek
+                    $groupedByProject = $ceklembur->groupBy('project');
+
+                    // Iterasi setiap kelompok proyek
+                    foreach ($groupedByProject as $projectCode => $lemburList) {
+                        // Totalkan jam lembur untuk proyek ini
+                        $totalJamPerProject = $lemburList->sum('jam_lembur');
+                        
+                        // Ambil rate lembur berdasarkan proyek dan jabatan
+                        $projectRate = ProjectDetails::where('project_code', $projectCode)
+                            ->where('jabatan', $jabatan)
+                            ->select('lembur_rate')
+                            ->first();
+                        if ($projectRate) {
+                            // Hitung total gaji lembur untuk proyek ini (jam lembur * rate lembur)
+                            $totalLemburForProject = $totalJamPerProject * $projectRate->lembur_rate;
+                            
+                            // Tambahkan total gaji lembur proyek ini ke total gaji lembur keseluruhan
+                            $totalGajiLembur += $totalLemburForProject;
+                            
+                            // Tambahkan jam lembur proyek ini ke total jam lembur keseluruhan
+                            $totalJamLembur += $totalJamPerProject;
+                        }
+                    }
+                   
                 }
 
                 $newSaving = new Saving();
@@ -415,7 +458,7 @@ class PayrolNS extends Controller
                             $p_tlain = $projectDetailsPPH->sum('p_tlain');
                         }
 
-                        $gajiPPH = ($p_gajipokok + $p_tkerja + $p_tlain + $p_tkes + 61300 - $potonganAbsen) + $totalGajiBackup;
+                        $gajiPPH = ($p_gajipokok + $p_tkerja + $p_tlain + $p_tkes + 61300 - $potonganAbsen) + $totalGajiBackup + $totalGajiLembur;
 
                         $dataPajak = PajakDetails::where('pajak_id', $taxCode)->get();
                         $matchingPajakDetail = null;
@@ -444,7 +487,7 @@ class PayrolNS extends Controller
                     }
 
                     
-
+                    
                     $ProjectAllowances = ProjectDetails::whereIn('project_code', $projectIds)
                         ->where('jabatan', $jabatan)
                         ->select('p_tkerja','p_tlain')
@@ -469,9 +512,11 @@ class PayrolNS extends Controller
 
                     $potonganlain = $tidakmasukkerja + $TotalGP;
                     $montlySalary = $totalGaji + $totalGajiBackup;
-                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions + $potonganAbsen + $PajakPendapatan + $deductionTotalAdditional - $allowanceTotalAdditional);
+                    $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions + $potonganAbsen + $PajakPendapatan + $deductionTotalAdditional - $allowanceTotalAdditional) + $totalGajiLembur;
                     $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;
-                    $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup;
+                    $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup + $totalGajiLembur;
+
+                   
                     $allowenceData = [
                         'tunjangan_lain' => $projectAllowancesTotal,
                         'allowance_total' => $allowanceTotal,
@@ -479,6 +524,8 @@ class PayrolNS extends Controller
                         'totalHari' => $totalWorkingDays,
                         'totalHariBackup' => $TotalHariBackup,
                         'totalGajiBackup' => $totalGajiBackup,
+                        'totalJamLembur' => $totalJamLembur,
+                        'totalrateLembur' => $totalGajiLembur,
                     ];
 
                     $deductionData = [
@@ -496,7 +543,6 @@ class PayrolNS extends Controller
                     ];
                 }
 
-                
                 $payroll = new Payroll();
                 $payroll->employee_code = $nik;
                 $payroll->periode = $startDate->format('d-m-Y') . ' - ' . $endDate->format('d-m-Y');

@@ -65,7 +65,7 @@ class DailyContrtoller extends Controller
                             
                         } else {
                             $not_absen += 1;
-                            $no_absen[]=$rs->nama;
+                            $no_absen[]=["nama"=>$rs->nama,"slack_id"=>$rs->slack_id];
                         }
                     }
                 }

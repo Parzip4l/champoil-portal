@@ -172,7 +172,7 @@ class VoiceOfController extends Controller
                 $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
                 $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
                 $chatId = '6285624038980@c.us';
-                $message = 'Feedback anda sudah ddidjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$query]);
+                $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
 
                 $client = new Client();
 

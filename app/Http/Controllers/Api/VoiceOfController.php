@@ -128,6 +128,65 @@ class VoiceOfController extends Controller
     
             // Insert the data into the database
             $query = VoiceofGuardians::insert($insert);
+            if($query){
+                $payload = [
+                    'blocks' => [
+                        [
+                            'type' => 'divider'
+                        ],
+                        [
+                            'type' => 'header',
+                            'text' => [
+                                'type' => 'plain_text',
+                                'text' => 'Guardians Feedback',
+                                'emoji' => true
+                            ]
+                        ],
+                        [
+                            'type' => 'section',
+                            'text' => [
+                                'type' => 'mrkdwn',
+                                'text' => 'hallo @here terdapat feedback  dengan rincian seperti berikut'
+                            ]
+                        ],
+                        [
+                            'type' => 'section',
+                            'text' => [
+                                'type' => 'mrkdwn',
+                                'text' => '*Nama Lengkap : *'.$validated['nama']
+                            ]
+                        ],
+                        [
+                            'type' => 'section',
+                            'text' => [
+                                'type' => 'mrkdwn',
+                                'text' => '*Nomor Wa :*'.$validated['nomor_wa']
+                            ]
+                        ],
+                        [
+                            'type' => 'section',
+                            'text' => [
+                                'type' => 'mrkdwn',
+                                'text' => '*Project :*'.project_byID($validated['project'])->name
+                            ]
+                        ],
+                        [
+                            'type' => 'section',
+                            'text' => [
+                                'type' => 'mrkdwn',
+                                'text' => '*Keterangan :*'.$validated['pertanyaan']
+                            ]
+                        ]
+                    ]
+                ];
+
+                $client = new Client();
+
+                // Send the POST request to the webhook URL
+                $response = $client->post('https://hooks.slack.com/services/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', [
+                    'json' => $payload // Send the message as JSON
+                ]);
+            }
     
             // If insertion is successful, update the error flag and message
             $error = false;

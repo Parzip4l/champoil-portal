@@ -163,7 +163,6 @@ class VoiceOfController extends Controller
                 "voice_id"=>$data['voice_id'],
                 "voice_user"=>$data['voice_user'],
                 "jawaban"=>$data["jawaban"],
-                "status"=>0,
                 "created_at" => now(),
             ];
     

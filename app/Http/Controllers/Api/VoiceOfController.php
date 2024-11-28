@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\VoiceofGuardians;
 use App\ModelCG\VoiceRellations;
-
+use GuzzleHttp\Client;
 
 
 class VoiceOfController extends Controller
@@ -159,15 +159,38 @@ class VoiceOfController extends Controller
     
         try {
             
-           $insert=[
-            "voice_id"=>$data['voice_id'],
-            "voice_user"=>$data['voice_user'],
-            "jawaban"=>$data["jawaban"],
-            "created_at" => now(),
-           ];
+            $insert=[
+                "voice_id"=>$data['voice_id'],
+                "voice_user"=>$data['voice_user'],
+                "jawaban"=>$data["jawaban"],
+                "status"=>0,
+                "created_at" => now(),
+            ];
     
             // Insert the data into the database
             $query = VoiceRellations::insert($insert);
+            if($query && $data['voice_user']==1){
+                $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
+                $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
+                $chatId = '6285624038980@c.us';
+                $message = 'Feedback anda sudah ddidjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$query]);
+
+                $client = new Client();
+
+                $response = $client->post($url, [
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => "Bearer $token",
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'chatId' => $chatId,
+                        'message' => $message,
+                    ],
+                ]);
+    
+                $responseBody = json_decode($response->getBody(), true);
+            }
     
             // If insertion is successful, update the error flag and message
             $error = false;

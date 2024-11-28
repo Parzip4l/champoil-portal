@@ -302,7 +302,7 @@
                                 // Loop through the percakapan array and add each conversation entry
                                 record.percakapan.forEach(chat => {
                                     const chatElement = document.createElement("div");
-                                    if(chat.voice_user===0){
+                                    if(chat.voice_user==0){
                                         chatElement.classList.add("message-text");
                                     }else{
                                         chatElement.classList.add("message-text","sent");

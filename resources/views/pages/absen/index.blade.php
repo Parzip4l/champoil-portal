@@ -81,17 +81,14 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                <table id="dataTableExample1" class="table table-striped table-bordered">
-    <thead id="table-header">
-        <!-- Header dinamis akan diisi oleh JavaScript -->
-    </thead>
-    <tbody>
-        <!-- DataTable akan secara otomatis mengisi data di sini -->
-    </tbody>
-</table>
-
-</table>
-
+                    <table id="dataTableExample1" class="table table-striped table-bordered">
+                        <thead id="table-header">
+                            <!-- Header dinamis akan diisi oleh JavaScript -->
+                        </thead>
+                        <tbody>
+                            <!-- DataTable akan secara otomatis mengisi data di sini -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -109,74 +106,117 @@
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        var table;
+$(document).ready(function () {
+    var table;
 
-        function generateTableHeader(startDate, endDate) {
-            var headerHtml = '<tr><th>Nama</th>'; 
-            var columns = [{ data: 'nama', name: 'name' }];
-            
-            for (var date = moment(startDate); date.isSameOrBefore(endDate); date.add(1, 'days')) {
-                var dateFormatted = date.format('DD MMM YYYY');
-                headerHtml += `<th>${dateFormatted}</th>`;
-                columns.push({
-                    data: `attendance.absens_${date.format('YYYYMMDD')}`,
-                    name: `attendance.absens_${date.format('YYYYMMDD')}`,
-                    render: function (data) {
-                        if (data) {
-                            return '<span class="text-success">' + data.clock_in + '</span> - <span class="text-danger">' + data.clock_out + '</span>';
-                        } else {
-                            return '-';
-                        }
+    // Fungsi untuk menghasilkan daftar tanggal
+    function generateDates(startDate, endDate) {
+        var dates = [];
+        var current = moment(startDate);
+
+        // Menambahkan tanggal satu per satu dalam rentang
+        while (current.isSameOrBefore(endDate)) {
+            dates.push(current.format('YYYY-MM-DD'));
+            current.add(1, 'days');
+        }
+
+        return dates;
+    }
+
+    // Fungsi untuk menghasilkan header tabel
+    function generateTableHeader(startDate, endDate) {
+        var headerHtml = '<tr><th>Nama</th>';
+        var columns = [{ data: 'nama', name: 'name' }];
+
+        // Dapatkan semua tanggal dalam rentang startDate sampai endDate
+        var dates = generateDates(startDate, endDate);
+
+        // Menambahkan kolom untuk setiap tanggal
+        dates.forEach(function (date) {
+            var dateFormatted = moment(date).format('DD MMM YYYY');
+            headerHtml += `<th>${dateFormatted}</th>`;
+            columns.push({
+                data: `attendance.absens_${moment(date).format('YYYYMMDD')}`,
+                name: `attendance.absens_${moment(date).format('YYYYMMDD')}`,
+                render: function (data) {
+                    if (data) {
+                        return '<span class="text-success">' + data.clock_in + '</span> - <span class="text-danger">' + data.clock_out + '</span>';
+                    } else {
+                        return '-';
                     }
-                });
-            }
-
-            headerHtml += '</tr>';
-            $('#table-header').html(headerHtml);
-            return columns;
-        }
-
-        function initDataTable(startDate, endDate) {
-            var columns = generateTableHeader(startDate, endDate);
-
-            if (table) {
-                table.destroy();
-            }
-            table = $('#dataTableExample1').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{{ route("absen.index") }}',
-                    data: function (d) {
-                        d.periode = $('#periode').val();
-                        d.organisasi = $('#organisasi').val(); // Tambahkan filter organisasi
-                        d.project = $('#project').val(); // Tambahkan filter project
-                    },
-                },
-                columns: columns,
+                }
             });
+        });
+
+        headerHtml += '</tr>';
+        $('#table-header').html(headerHtml);
+        return columns;
+    }
+
+    // Fungsi untuk menginisialisasi DataTable
+    function initDataTable(startDate, endDate) {
+        var columns = generateTableHeader(startDate, endDate);
+
+        if (table) {
+            table.destroy(); // Destroy the previous table instance
         }
 
-        // Periode default
-        var defaultStart = moment().startOf('month').date(21); 
-        var defaultEnd = moment().startOf('month').add(1, 'month').date(20); 
+        table = $('#dataTableExample1').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route("absen.index") }}',
+                data: function (d) {
+                    d.periode = $('#periode').val();
+                    d.organisasi = $('#organisasi').val(); // Tambahkan filter organisasi
+                    d.project = $('#project').val(); // Tambahkan filter project
+                },
+            },
+            columns: columns,
+            drawCallback: function(settings) {
+                var api = this.api();
+                var columnsCount = api.columns().header().length;
+                var headerCells = $(api.table().header()).find('th');
 
-        // Inisialisasi DataTable dengan periode default
+                // Pastikan bahwa lebar kolom ditetapkan sesuai dengan kolom yang tersedia
+                for (var i = 1; i < columnsCount; i++) {
+                    var column = api.column(i);
+                    headerCells[i].style.width = column.sWidthOrig !== null && column.sWidthOrig !== '' ? 
+                        column.sWidthOrig :
+                        ''; // Langsung menggunakan nilai sWidthOrig tanpa fungsi _fnStringToCss
+                }
+
+                // Force adjust columns to fix width calculation issue
+                api.columns.adjust();
+            }
+        });
+    }
+
+    // Periode default
+    var defaultStart = moment().startOf('month').date(21); 
+    var defaultEnd = moment().startOf('month').add(1, 'month').date(19); 
+
+    // Inisialisasi DataTable dengan periode default
+    setTimeout(function () {
         initDataTable(defaultStart, defaultEnd);
+    }, 1000); // Timeout 100ms untuk memastikan elemen DOM sudah ter-render
 
-        // Handle perubahan periode
-        $('#periode').change(function () {
-            var periode = $(this).val();
-            var [startDate, endDate] = periode.split(' - ');
-            initDataTable(moment(startDate), moment(endDate));
-        });
-
-        // Handle perubahan filter organisasi dan project
-        $('#organisasi, #project').change(function () {
-            table.ajax.reload(); // Reload data pada DataTable
-        });
+    // Handle perubahan periode
+    $('#periode').change(function () {
+        var periode = $(this).val();
+        var [startDate, endDate] = periode.split(' - ');
+        console.log('Start:', startDate, 'End:', endDate);
+        initDataTable(moment(startDate), moment(endDate));
     });
+
+    // Handle perubahan filter organisasi dan project
+    $('#organisasi, #project').change(function () {
+        table.ajax.reload(); // Reload data pada DataTable
+    });
+});
+
 </script>
+
+
 
 @endpush

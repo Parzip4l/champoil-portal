@@ -67,6 +67,7 @@ class PatroliController extends Controller
         $segments = $request->segments();
         $data['task']=Task::where('unix_code',$segments[1])->first();
         $data['list']=List_task::where('id_master',$data['task']->id)->get();
+        $data['project'] =  Project::where('company','kas')->get();
         if($data['list']){
             foreach($data['list'] as $row){
                 $row->detail = Patroli::where('id_task',$row->id)->where('unix_code',$segments[1])->first();

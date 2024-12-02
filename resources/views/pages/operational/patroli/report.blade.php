@@ -24,7 +24,7 @@
                                     @if($project)
                                         @foreach($project as $pr)
                                             @php
-                                                if($project_id==$pr->id){
+                                                if(@$project_id==$pr->id){
                                                     $selected="selected";
                                                 }else{
                                                     $selected="";

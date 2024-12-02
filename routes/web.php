@@ -521,7 +521,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     });
 
     
-
+    Route::view('/sample','pages.report.patrol_pdf')->name('sample');
     
 });
 

@@ -47,7 +47,10 @@ class ReportController extends Controller
             $end=$explode[1];
            
         }
-
+        $percen_50=0;
+        $percen_50_80=0;
+        $percen_80_99=0;
+        $percen_100=0;
         $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();
         if($project){
             foreach($project as $row){
@@ -94,6 +97,15 @@ class ReportController extends Controller
             
                 if($row->absen > 0 && $row->schedule > 0){
                     $row->persentase_absen = round(($row->absen / $row->schedule) * 100,2);
+                    if($row->persentase_absen <= 50 ){
+                        $percen_50 +=1;
+                    }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
+                        $percen_50_80 +=1;
+                    }else if($row->persentase_absen >80 && $row->persentase_absen <= 99 ){
+                        $percen_80_99 +=1;
+                    }else if($row->persentase_absen >= 100 ){
+                        $percen_100 +=1;
+                    }
                 }
                 
                 $row->absen_backup = Absen::where('project_backup',$row->id)
@@ -106,6 +118,12 @@ class ReportController extends Controller
         }
 
         $data['project']=$project;
+        $data['percent']=[
+            $percen_50,
+            $percen_50_80,
+            $percen_80_99,
+            $percen_100
+        ];
         return view('pages.report.absen.index',$data);
     }
 

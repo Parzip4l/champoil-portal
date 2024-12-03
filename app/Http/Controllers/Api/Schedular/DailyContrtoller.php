@@ -96,7 +96,7 @@ class DailyContrtoller extends Controller
             ->where('company', 'Kas')
             ->get();
     
-        $date1 = "2024-10-21";
+        $date1 = "2024-11-21";
         $yesterday = Carbon::yesterday()->format('Y-m-d');
         
         $result = [];

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 // Model
 use App\ModelCG\Schedule;
@@ -117,10 +118,12 @@ class EmergencyApi extends Controller
             $emergency->status = 'active';
             $emergency->company = $company;
             $emergency->save();
-
+            
             $userLatitude = $request->latitude;
             $userLongitude = $request->longitude;
 
+            $namaUser = Employee::where('nik',$user->name)->select('nama')->first();
+            $namaProject = Project::where('id', $schedule->project)->select('name')->first();
             // Ambil data absen dalam radius 5 KM
             $absentUsers = Absen::select('nik', 'longtitude', 'latitude', 'project')
                 ->where('tanggal', $today)
@@ -154,31 +157,46 @@ class EmergencyApi extends Controller
                 $firebaseToken = FirebaseToken::where('user_id', $absentUser->nik)->first();
 
                 // Pastikan token ditemukan
-                if ($firebaseToken) {
-                    // Kirim notifikasi ke absentUser
-                    $firebaseService->sendNotification(
-                        $firebaseToken->token, // Token perangkat
-                        'Darurat!',
-                        'Ada permintaan darurat dekat lokasi Anda.',
-                        [
-                            'emergency_id' => $emergency->id,
-                            'category' => $request->kategori,
-                            'distance' => $formattedDistance,
-                            'time_estimate' => $timeEstimateMinutes . ' minutes',
-                        ]
-                    );
+                if ($firebaseToken && is_string($firebaseToken->token)) {
+                    try {
+                        // Kirim notifikasi
+                        $firebaseResponse = $firebaseService->sendNotification(
+                            $firebaseToken->token,
+                            'Darurat!',
+                            'Ada permintaan darurat dekat lokasi Anda.',
+                            [
+                                'emergency_id' => $emergency->id,
+                                'category' => $request->kategori,
+                                'distance' => $formattedDistance,
+                                'time_estimate' => $timeEstimateMinutes . ' minutes',
+                            ]
+                        );
+                
+                        // Log respons Firebase
+                        Log::info("Notifikasi berhasil dikirim ke user {$absentUser->nik}: " . json_encode($firebaseResponse));
+                
+                    } catch (\Exception $ex) {
+                        // Log kesalahan jika terjadi
+                        Log::error("Gagal mengirim notifikasi ke user {$absentUser->nik}: " . $ex->getMessage());
+                    }
                 } else {
-                    // Kembalikan pesan jika token tidak ditemukan
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Token perangkat tidak ditemukan untuk user ' . $absentUser->nik
-                    ], 404); // HTTP status 404 indicates that the resource was not found
+                    // Log jika token tidak valid atau tidak ditemukan
+                    Log::warning("Token perangkat tidak valid atau tidak ditemukan untuk user {$absentUser->nik}");
                 }
             }
 
             DB::commit(); // Commit the transaction
 
-            return response()->json(['message' => 'Your emergency notification has been received. We will provide immediate assistance!.'], 200);
+            return response()->json([
+                'message' => 'Your emergency notification has been received. We will provide immediate assistance!',
+                'name' => $namaUser,
+                'project' => $namaProject,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'distance' => $formattedDistance,
+                'time_estimate' => $timeEstimateMinutes . ' minutes',
+                'firebase_responses' => $firebaseResponse 
+            ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback the transaction jika terjadi kesalahan

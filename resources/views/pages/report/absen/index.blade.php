@@ -19,162 +19,192 @@
     </div>
 @endif
 <div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card custom-card2">
-        <div class="card-header">
-            <div class="head-card justify-content-between">
-                <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-2">Report Absensi</h6>
-                    <form>
-                        <div class="row">
-                            @csrf
-                            <div class="col-md-5">
-                                <select name="periode" class="form-control mb-2 select2" id="periode" required>
-                                    <option value="">Periode</option>
-                                    @if(bulan())
-                                        @foreach(bulan() as $key=>$value)
-                                            @php 
-                                                $checked="";
-                                                if(strtoupper($value).'-'.date('Y') == $_GET['periode']){
-                                                    $checked= 'selected';
-                                                }
-                                            @endphp
-                                                
-                                            <option value="{{ strtoupper($value).'-'.date('Y') }}" {{$checked}}>{{ $value }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">Dibawah 50 %</div>
+            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[0] / count($project)) * 100,2) }} %</div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">Absensi 50 s/d 80 %</div>
+            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[1] / count($project)) * 100,2) }} %</div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">Absensi 80 s/d 99 %</div>
+            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[2] / count($project)) * 100,2) }} %</div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">Absensi 100 %</div>
+            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[3] / count($project)) * 100,2) }} %</div>
+        </div>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <div class="head-card justify-content-between">
+                    <div class="header-title align-self-center">
+                        <h6 class="card-title align-self-center mb-2">Report Absensi</h6>
+                        <form>
+                            <div class="row">
+                                @csrf
+                                <div class="col-md-5">
+                                    <select name="periode" class="form-control mb-2 select2" id="periode" required>
+                                        <option value="">Periode</option>
+                                        @if(bulan())
+                                            @foreach(bulan() as $key=>$value)
+                                                @php 
+                                                    $checked="";
+                                                    if(strtoupper($value).'-'.date('Y') == $_GET['periode']){
+                                                        $checked= 'selected';
+                                                    }
+                                                @endphp
+                                                    
+                                                <option value="{{ strtoupper($value).'-'.date('Y') }}" {{$checked}}>{{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="tanggal" id="daterange_picker">
+                                </div>
+                                <div class="col-md-2">
+                                <button type="button" class="btn btn-primary" id='search'>Filter</button>
+                                </div>
                                 
-                            </div>
-                            <div class="col-md-5">
-                                <input type="text" class="form-control" name="tanggal" id="daterange_picker">
-                            </div>
-                            <div class="col-md-2">
-                            <button type="button" class="btn btn-primary" id='search'>Filter</button>
-                            </div>
-                            
-                        </div>  
-                    </form>
+                            </div>  
+                        </form>
+                        
+                    </div>
                     
                 </div>
-                
             </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-            <a href="{{ route('rekap-report') }}" class="btn btn-xs btn-warning" style="float:right;color:white">Rekap</a>
-            <table id="dataTableExample" class="table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Project Name</th>
-                    <th>Total Schedule</th>
-                    <th>Total Absensi</th>
-                    <th>Persentase</th>
-                    <th>Tanpa Clockout</th>
-                    <th>Persentase</th>
-                    <th>Total Schedule Backup</th>
-                    <th>Total Absensi</th>
-                    <th>Persentase</th>
-                    <th>Leader PIC</th>
-                    <th>Need Approval</th>
-                    <th>Approved</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @if($project)
-                        @php 
-                            $no=1;
-                            $total_schedule=0;
-                            $total_absen=0;
-                            $schedule_backup=0;
-                            $absen_backup=0;
-                            $percent_absen=0;
-                            $percent_backup=0;
-                            $total_tidak_clockout= 0;
-                            $persentase_tidak_clockout = 0;
-                            $color="";
-                        @endphp
-                        @foreach($project as $row)
+            <div class="card-body">
+                <div class="table-responsive">
+                <a href="{{ route('rekap-report') }}" class="btn btn-xs btn-warning" style="float:right;color:white">Rekap</a>
+                <table id="dataTableExample" class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Project Name</th>
+                        <th>Total Schedule</th>
+                        <th>Total Absensi</th>
+                        <th>Persentase</th>
+                        <th>Tanpa Clockout</th>
+                        <th>Persentase</th>
+                        <th>Total Schedule Backup</th>
+                        <th>Total Absensi</th>
+                        <th>Persentase</th>
+                        <th>Leader PIC</th>
+                        <th>Need Approval</th>
+                        <th>Approved</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @if($project)
                             @php 
-                                if($row->persentase_absen <= 50 ){
-                                    $color="background-color:#ff6f74";
-                                }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
-                                    $color="background-color:#fff199";
-                                }else{
-                                    $color="";
+                                $no=1;
+                                $total_schedule=0;
+                                $total_absen=0;
+                                $schedule_backup=0;
+                                $absen_backup=0;
+                                $percent_absen=0;
+                                $percent_backup=0;
+                                $total_tidak_clockout= 0;
+                                $persentase_tidak_clockout = 0;
+                                $color="";
+                                $percen_50=0;
+                                $percen_50_80=0;
+                                $percen_80_99=0;
+                                $percen_100=0;
+                            @endphp
+                            @foreach($project as $row)
+                                @php 
+                                    if($row->persentase_absen <= 50 ){
+                                        $color="background-color:#ff6f74";
+                                    }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
+                                        $color="background-color:#fff199";
+                                    }else{
+                                        $color="";
+                                    }
+
+                                    
+
+                                
+                                @endphp
+                                <tr style="{{ $color }}">
+                                    <td>{{ $no }}</td>
+                                    <td>
+                                        <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}"
+                                        style="color:black">
+                                            {{ $row->name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $row->schedule }}</td>
+                                    <td>{{ $row->absen }}</td>
+                                    <td style="text-align:right">{{ $row->persentase_absen }} %</td>
+                                    <td>{{ $row->tanpa_clockout }}</td>
+                                    <td style="text-align:right">{{ $row->persentase_tanpa_clockout }} %</td>
+                                    <td>{{ $row->schedule_backup }}</td>
+                                    <td>{{ $row->absen_backup }}</td>
+                                    <td style="text-align:right">{{ $row->persentase_backup }} %</td>
+                                    <td>{{ @karyawan_bynik($row->leader_pic)->nama }}</td>
+                                    <td>{{ $row->need_approval }}</td>
+                                    <td>{{ $row->approved }}</td>
+                                </tr>
+                                @php
+                                    $total_schedule +=$row->schedule;
+                                    $total_absen +=$row->absen;
+                                    $schedule_backup +=$row->schedule_backup;
+                                    $absen_backup +=$row->absen_backup;
+                                    $total_tidak_clockout +=$row->tanpa_clockout;
+                                $no++;
+                            @endphp
+                            @endforeach
+                            @php 
+                                if($total_absen > 0 && $total_schedule> 0){
+                                    $percent_absen = round(($total_absen / $total_schedule) * 100,2);
+                                }
+                                if($total_absen > 0 && $total_tidak_clockout> 0){
+                                    $persentase_tidak_clockout = round(($total_tidak_clockout / $total_absen) * 100, 2);
+                                }
+                                if($absen_backup > 0 && $schedule_backup> 0){
+                                    $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
                                 }
 
-                              
+                                if($percent_absen <= 50 ){
+                                    $color="background-color:#ff6f74";
+                                }else if($percent_absen >50 && $percent_absen >80 ){
+                                    $color="background-color:#fff199";
+                                }
                             @endphp
                             <tr style="{{ $color }}">
-                                <td>{{ $no }}</td>
-                                <td>
-                                    <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}"
-                                       style="color:black">
-                                        {{ $row->name }}
-                                    </a>
-                                </td>
-                                <td>{{ $row->schedule }}</td>
-                                <td>{{ $row->absen }}</td>
-                                <td style="text-align:right">{{ $row->persentase_absen }} %</td>
-                                <td>{{ $row->tanpa_clockout }}</td>
-                                <td style="text-align:right">{{ $row->persentase_tanpa_clockout }} %</td>
-                                <td>{{ $row->schedule_backup }}</td>
-                                <td>{{ $row->absen_backup }}</td>
-                                <td style="text-align:right">{{ $row->persentase_backup }} %</td>
-                                <td>{{ @karyawan_bynik($row->leader_pic)->nama }}</td>
-                                <td>{{ $row->need_approval }}</td>
-                                <td>{{ $row->approved }}</td>
+                                <td colspan=2>Total</td>
+                                <td>{{ $total_schedule }}</td>
+                                <td>{{ $total_absen }}</td>
+                                <td style="text-align:right">{{ $percent_absen }} %</td>
+                                <td>{{ $total_tidak_clockout }}</td>
+                                <td style="text-align:right">{{ $persentase_tidak_clockout }} %</td>
+                                <td>{{ $schedule_backup }}</td>
+                                <td>{{ $absen_backup }}</td>
+                                <td style="text-align:right">{{ $percent_backup }} %</td>
+                                <td></td>
+                                <td></td>
                             </tr>
-                            @php
-                                $total_schedule +=$row->schedule;
-                                $total_absen +=$row->absen;
-                                $schedule_backup +=$row->schedule_backup;
-                                $absen_backup +=$row->absen_backup;
-                                $total_tidak_clockout +=$row->tanpa_clockout;
-                            $no++;
-                        @endphp
-                        @endforeach
-                        @php 
-                            if($total_absen > 0 && $total_schedule> 0){
-                                $percent_absen = round(($total_absen / $total_schedule) * 100,2);
-                            }
-                            if($total_absen > 0 && $total_tidak_clockout> 0){
-                                $persentase_tidak_clockout = round(($total_tidak_clockout / $total_absen) * 100, 2);
-                            }
-                            if($absen_backup > 0 && $schedule_backup> 0){
-                                $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
-                            }
 
-                            if($percent_absen <= 50 ){
-                                $color="background-color:#ff6f74";
-                            }else if($percent_absen >50 && $percent_absen >80 ){
-                                $color="background-color:#fff199";
-                            }
-                        @endphp
-                        <tr style="{{ $color }}">
-                            <td colspan=2>Total</td>
-                            <td>{{ $total_schedule }}</td>
-                            <td>{{ $total_absen }}</td>
-                            <td style="text-align:right">{{ $percent_absen }} %</td>
-                            <td>{{ $total_tidak_clockout }}</td>
-                            <td style="text-align:right">{{ $persentase_tidak_clockout }} %</td>
-                            <td>{{ $schedule_backup }}</td>
-                            <td>{{ $absen_backup }}</td>
-                            <td style="text-align:right">{{ $percent_backup }} %</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-
-                    @endif
-                    
-                </tbody>
-            </table>
+                        @endif
+                        
+                    </tbody>
+                </table>
+                </div>
             </div>
         </div>
     </div>
-  </div>
 </div>
 @endsection
 

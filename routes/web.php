@@ -17,6 +17,7 @@ Route::post('/submit-dmaic', [App\Http\Controllers\DMAIC\DmaicController::class,
 Route::get('/dmaic-success', [App\Http\Controllers\DMAIC\DmaicController::class, 'page_success'])->name('dmaic-success');
 Route::view('/pengajuan-asset-form','pages.asset-management.pengajuan_hp_form')->name('pengajuan-asset-form');
 Route::view('voice-frontline', 'pages.voice.form')->name('voice-frontline');
+Route::view('voice-frontline-detail/{id}', 'pages.voice.detail')->name('voice-frontline-detail');
 
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
@@ -520,7 +521,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     });
 
     
-
+    Route::view('/sample','pages.report.patrol_pdf')->name('sample');
     
 });
 

@@ -40,7 +40,6 @@ class AbsenController extends Controller
         $today = now();
         $periode = $request->input('periode');
         Log::info('Periode dari request:', ['periode' => $periode]);
-    
         if ($periode) {
             // Parsing periode
             [$startDate, $endDate] = explode(' - ', $periode);
@@ -50,6 +49,9 @@ class AbsenController extends Controller
             $startDate = Carbon::create($today->year, $today->month, 21)->format('Y-m-d');
             $endDate = Carbon::create($today->year, $today->month, 20)->addMonth()->format('Y-m-d');
         }
+
+        Log::info('Periode dari default:', ['start' => $startDate]);
+        Log::info('Periode dari default:', ['end' => $endDate]);
     
         // Query absensi
         $query = DB::table('users')
@@ -125,8 +127,8 @@ class AbsenController extends Controller
     
         // Generate daftar bulan untuk dropdown
         $months = [];
-        for ($i = 0; $i < 12; $i++) {
-            $start = $today->copy()->startOfYear()->subMonth()->addMonths($i)->day(21);
+        for ($i = 0; $i < 13; $i++) {
+            $start = $today->copy()->startOfYear()->addYear($i >= 12 ? 1 : 0)->addMonths($i % 12)->day(21);
             $end = $start->copy()->addMonth()->day(20);
             $months[$start->format('Y-m-d') . ' - ' . $end->format('Y-m-d')] = $end->format('M Y');
         }

@@ -69,8 +69,8 @@
             <tr>
                 <?php 
                 $point = 1;
-                $max_points = count($task["point"]);  // Get the number of points in the current task
-                foreach ($task["point"] as $key => $row) { 
+                $max_points = count($task["points"]);  // Get the number of points in the current task
+                foreach ($task["points"] as $key => $row) { 
                     $colspan = 1;  // Default colspan value
 
                     // Set colspan based on the number of points
@@ -98,7 +98,7 @@
                                 <?php echo karyawan_bynik($data['employee_code'])->nama; ?> - <?php echo schedule($data['employee_code'],$data['created_at'])->shift; ?><br/>
                                 <?php echo $data['status']; ?><br/>
                                 <?php echo $data['description']; ?><br/>
-                                <?php echo $data['created_at']; ?><br/>
+                                <?php echo date('Y-m-d H:i:s',strtotime($data['created_at'])); ?><br/>
                         <?php 
                                 } 
                             }else{

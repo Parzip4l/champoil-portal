@@ -61,6 +61,7 @@
     .message .message-text {
         max-width: 70%;
         padding: 8px 12px;
+        margin-bottom:3px;
         border-radius: 20px;
         background-color: #E1E1E1;
     }
@@ -69,6 +70,7 @@
         background-color: #4E73DF;
         color: white;
         align-self: flex-end;
+        margin-bottom:3px;
         display: inherit;
         margin-left: auto; /* Aligns the message to the right */
     }
@@ -271,7 +273,7 @@
 
             // Example JavaScript function for the click event
             viewDetails = function(id) {
-            $("#chatBody").empty(); // Clear previous chat content
+                $("#chatBody").empty(); // Clear previous chat content
                 axios.get('/api/v1/voice-detail/' + id)
                     .then(function(response) {
                         const data = response.data;
@@ -299,11 +301,15 @@
 
                                 // Loop through the percakapan array and add each conversation entry
                                 record.percakapan.forEach(chat => {
-                                    let chatElement = document.createElement("div");
-                                    chatElement.classList.add("chat-entry");
-                                    chatElement.innerHTML = `
-                                        Answer: ${chat.jawaban || "N/A"} <br>
-                                        Timestamp: ${new Date(chat.created_at).toLocaleString()}
+                                    const chatElement = document.createElement("div");
+                                    if(chat.voice_user==0){
+                                        chatElement.classList.add("message-text");
+                                    }else{
+                                        chatElement.classList.add("message-text","sent");
+                                    }
+                                    
+                                    chatElement.innerHTML = `${chat.jawaban || "N/A"} <br>
+                                        ${new Date(chat.created_at).toLocaleString()}
                                     `;
                                     messageElement.appendChild(chatElement);
                                 });

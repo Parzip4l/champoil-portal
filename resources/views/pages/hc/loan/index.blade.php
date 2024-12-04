@@ -8,11 +8,11 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
+    <div class="col-md-9 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Data Pinjaman Karyawan</h5>
-                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#JabatanModal">Tambah Data Pinjaman</a>
+                <!-- <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#JabatanModal">Tambah Data Pinjaman</a> -->
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -84,33 +84,28 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- Modal Data FNG -->
-<div class="modal fade bd-example-modal-xl" id="JabatanModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Pinjaman</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="mb-0 align-self-center">Tambah Data Pinjaman</h5>
             </div>
-            <div class="modal-body">
-                <form action="{{route('employee-loan.store')}}" method="POST">
+            <div class="card-body">
+            <form action="{{route('employee-loan.store')}}" method="POST">
                     @csrf
                     <div class="row">
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Employee</label>
-                            <select class="form-select" data-width="100%" name="employee_id">
+                            <select class="form-select select2" data-width="100%" name="employee_id" >
                                 @foreach($karyawan as $data)
                                     <option value="{{$data->nik}}">{{$data->nama}}</option>
                                 @endforeach
                             </select>    
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Jumlah Pinjaman</label>
                             <input type="number" name="amount" class="form-control" required>   
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Tenor Pinjaman</label>
                             <input type="number" name="installments" class="form-control" required>   
                         </div>
@@ -123,6 +118,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Modal Show Load -->
 @foreach ($Loandata as $data)
@@ -250,10 +246,14 @@
             text: '{{ session('error') }}',
         });
     @endif
+    $('.select2').on('select2:open', function () {
+            $('.select2-container--open').css('z-index', '99999');
+        });
 </script>
 <style>
     span.select2-container.select2-container--default.select2-container--open {
         z-index: 9999!important;
     }
+    
 </style>
 @endpush

@@ -140,7 +140,7 @@
                                                 <span>Potongan Diksar</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_gp ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. {{ number_format($deductionData->potongan_Gp ?? 0, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">

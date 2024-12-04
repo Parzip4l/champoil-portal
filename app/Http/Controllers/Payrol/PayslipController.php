@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Route;
 
+use App\Mail\PayslipEmail;
+use PDF;
+
+use App\Imports\PayrollImport;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
+
 class PayslipController extends Controller
 {
     /**
@@ -112,12 +120,67 @@ class PayslipController extends Controller
         $employee = Employee::where('nik', $code)->first();
         $companyData = $employee->unit_bisnis;
 
-        Payrol::where('month', $month)->where('year', $year)
-        ->where('unit_bisnis', $companyData)
-        ->update(['payrol_status' => 'Locked']);
+        // Initialize an array to store PDF paths
+        $pdfPaths = [];
 
-        return redirect()->back()->with('success', 'Payroll locked successfully');
+        try {
+            // Begin database transaction
+            DB::beginTransaction();
+
+            // Update payroll status to 'Locked'
+            Payrol::where('month', $month)
+                ->where('year', $year)
+                ->where('unit_bisnis', $companyData)
+                ->update(['payrol_status' => 'Locked']);
+
+            // Fetch all employees in the payroll
+            $payrolls = Payrol::where('month', $month)
+                ->where('year', $year)
+                ->where('unit_bisnis', $companyData)
+                ->get();
+
+            // Generate PDFs for each employee
+            foreach ($payrolls as $payroll) {
+                $employee = Employee::where('nik', $payroll->employee_code)->first();
+
+                if ($employee) {
+                    $directory = storage_path('app/public/payslips/');
+                    if (!File::exists($directory)) {
+                        File::makeDirectory($directory, 0755, true);
+                    }
+
+                    $pdfPath = $directory . 'payslip_' . $payroll->employee_code . '.pdf';
+                    $pdf = PDF::loadView('pdf.payslip', compact('payroll', 'employee'));
+                    $pdf->save($pdfPath);
+
+                    $pdfPaths[$payroll->employee_code] = $pdfPath; // Store the path in the array
+                }
+            }
+
+            // Send the email with the payslip PDF attachment to each employee
+            foreach ($payrolls as $payroll) {
+                $employee = Employee::where('nik', $payroll->employee_code)->first();
+                if ($employee) {
+                    $pdfPath = $pdfPaths[$payroll->employee_code] ?? null;
+                    if ($pdfPath) {
+                        Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
+                    }
+                }
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Payroll locked and emails sent successfully');
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of any exception
+            DB::rollback();
+            // Log the error
+            \Log::error('Error locking payroll: ' . $e->getMessage());
+            return redirect()->back()->with(['error' => 'Error locking payroll. Please try again.' . $e->getMessage()]);
+        }
     }
+
 
     public function publishPayslip($month, $year)
     {

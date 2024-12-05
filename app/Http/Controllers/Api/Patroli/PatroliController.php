@@ -518,17 +518,19 @@ class PatroliController extends Controller
         // Parse request inputs
         $tanggal = $request->input('tanggal');
         $project = $request->input('project_id');
+        $jam1 = $request->input('jam1');
+        $jam2 = $request->input('jam2');
         $explode = explode(' to ', $tanggal);
         $jml_tgl =count($explode);
-        if($jml_tgl > 1){
-            $date1 = $explode[0] . ' 00:00:00';
-            $date2 = $explode[1] . ' 23:59:59';
-        }else{
-            $date1 = $explode[0] . ' 00:00:00';
-            $date2 = $explode[0] . ' 23:59:59';
+
+        if ($jml_tgl > 1) {
+            $date1 = $explode[0];
+            $date2 = $explode[1];
+        } else {
+            $date1 = $explode[0];
+            $date2 = $explode[0];
         }
         
-
         $jml = 0;
         $result = [];
         $start = Carbon::parse($date1)->startOfDay();
@@ -537,182 +539,363 @@ class PatroliController extends Controller
         // Create the date period with daily intervals
         $dates = CarbonPeriod::create($start, '1 day', $end);
 
-        // Get the shift data
-        $shift = $request->input('shift');
-        $shift_records = Shift::where('name', 'like', '%' . $shift . '%')->get();
-        $result_shift = $shift_records->pluck('code')->toArray();
-
-        // Format dates into an array
-        $dateList = [];
-        foreach ($dates as $date) {
-            $dateList[] = $date->format('Y-m-d');
-        }
-
-        // Store tasks with points and patrol data
-        $allTasks = [];
-        foreach ($dateList as $date) {
-            $tasks = Task::select('id', 'judul')->where('project_id', $project)->get();
-            
-            foreach ($tasks as $task) {
-                $task->filter_tanggal = $date;
-                
-                // Get the points for each task
-                $task->points = List_task::select('id', 'id_master', 'task')
-                                        ->where('id_master', $task->id)
-                                        ->get();
-                
-                // Get patrol data for each point
-                foreach ($task->points as $row) {
-                    $row->list_data = Patroli::select('employee_code', 'status', 'description', 'image', 'created_at')
-                                            ->where('id_task', $row->id)
-                                            ->whereDate('patrolis.created_at', '=', $date) // Ensure filtering by the specific date
-                                            ->limit(3)
-                                            ->get();
-                }
-
-                // Add tasks to the allTasks array
-                $allTasks[] = $task;
-            }
-        }
-
-        // Prepare data to return
-        $data = [
-            'tanggal' => $tanggal,
-            'tasks' => $allTasks,
-        ];
-        
-        if($request->input('jenis_file') == "pdf"){
-            ini_set('memory_limit', '4096M');
-            $tasksArray = $data['tasks'];
-            $chunks = array_chunk($tasksArray, 500);
-            $files = []; // Array untuk menyimpan semua file yang dihasilkan
-            
-            foreach ($chunks as $index => $chunk) {
-                // Data khusus untuk kelompok ini
-                $chunkedData = $data['tasks'] ; // Salin data asli
-                $chunkedData= ["tasks"=>$chunk,"tanggal"=>$tanggal]; // Ganti 'tasks' dengan data bagian
-                // Generate PDF
-                $pdf = Pdf::loadView('pages.report.patrol_pdf', $chunkedData);
-                $pdf->setOption('no-outline', true);
-                $pdf->setOption('isHtml5ParserEnabled', true);
-                $pdf->setOption('isPhpEnabled', true);
-                $pdf->setPaper('legal', 'portrait');
-
-                // Nama file unik untuk setiap PDF
-                $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
-                $publicPath = public_path('reports');
-
-                // Buat folder jika belum ada
-                if (!is_dir($publicPath)) {
-                    mkdir($publicPath, 0755, true);
-                }
-
-                $filePath = $publicPath . '/' . $fileName;
-
-                // Simpan PDF
-                $pdf->save($filePath);
-
-                // Tambahkan path file ke dalam array hasil
-                $files[] = asset('reports/' . $fileName);
+        if($project==582307){
+           
+            $dateList = [];
+            foreach ($dates as $date) {
+                $dateList[] = $date->format('Y-m-d');
             }
 
-            
+            $schedule = Schedule::join('shifts', 'shifts.code', '=', 'schedules.shift')
+                                ->whereBetween('tanggal', [$date1, $date2])
+                                ->where('project', 582307)
+                                ->where('shift', '!=', 'OFF')
+                                ->orderBy('shifts.name','asc')
+                                ->get();
 
-            // Return semua path file dalam JSON response
-            return response()->json([
-                'message' => 'PDF files saved successfully',
-                'paths' => $files, // Semua file PDF yang dihasilkan
-                'tasks' => $data['tasks'] // Data asli untuk referensi
-            ]);
-        }else{
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-    
-            
-            
-    
-            $sheet->getStyle('A1:H1')->applyFromArray([
-                'font' => ['bold' => true],
-                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
-            ]);
-        
-            // Output project name
-            $sheet->setCellValue('A1','REPORT PATROLI ( '.$tanggal.' )');
-            $sheet->mergeCells('A1:H1');
-        
-            // Set table headers
-            $sheet->setCellValue('A2', 'Tanggal');
-            $sheet->setCellValue('B2', 'Status');
-            $sheet->setCellValue('C2', 'Description');
-            $sheet->setCellValue('D2', 'Task');
-            $sheet->setCellValue('E2', 'Point');
-            $sheet->setCellValue('F2', 'Petugas');
-    
-                // Example data writing
-                $rowNumber = 3;
-                $no = 1;
-            
-                foreach ($task as $row) {
-                    if ($row->point) {
-                        $no2 = 1;
-                        foreach ($row->point as $rs) {
-                            $rowNumber++;
-                            if ($rs->list) {
-                                foreach ($rs->list as $det) {
-                                    $nama = karyawan_bynik($det->employee_code);
-                                    if(!empty($nama)){
-                                        $employee =  $nama->nama;
-                                    }else{
-                                        $employee = $det->employee_code;
-                                    }
-                                    
-    
-                                    $sheet->setCellValue('A' . $rowNumber, $det->created_at); // No need for number again
-                                    $sheet->setCellValue('B' . $rowNumber, $det->status); // No need for task again
-                                    $sheet->setCellValue('C' . $rowNumber, $det->description); // No need for date again
-                                    $sheet->setCellValue('D' . $rowNumber, $rs->task);
-                                    $sheet->setCellValue('E' . $rowNumber, $row->judul); // Replace with actual status
-                                    $sheet->setCellValue('F' . $rowNumber, $employee); // Replace with actual keterangan
-                                    
-                                    $rowNumber++;
-                                }
+            $patroli = Task::where('project_id',582307)->get();
+
+            foreach ($dateList as $date) {
+                foreach($patroli as $patrol){
+                    $patrol->tanggal_filter=$date;
+                    $data_patrol  = Patroli::where('unix_code',$patrol->unix_code)->whereBetween('created_at',[$date1.' '.$jam1.':00', $date2.' '.$jam2.':00'])->get();
+                    $patroli_history=[];
+                    if(!empty($data_patrol)){
+                        foreach($data_patrol as $row){
+                            if($row->status != 'Baik'){
+                                $patroli_history=$row;
+                            }else{
+                                $patroli_history=$row;
                             }
-                            $no2++;
                         }
                     }
-                    $rowNumber++;
-                    $no++;
+                    $patrol->data_history  = $patroli_history;
                 }
-            // Set the header for the file download
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment; filename="project_582307_report241104110534.xlsx"');
-            header('Cache-Control: max-age=0');
-            $writer = new Xlsx($spreadsheet);
-            Storage::makeDirectory('reports');
-            $fileName = 'report_'.date('ymdhis').'.xlsx'; // Example file name
-            $filePath = storage_path('app/reports/' . $fileName); // Example storage path
-        
-            try {
-                $writer->save($filePath);
-                $publicPath = public_path('reports');
-                if (!file_exists($publicPath)) {
-                    mkdir($publicPath, 0755, true); // Create the public directory if it doesn't exist
-                }
-    
-                // Move the file to the public directory
-                $newFilePath = $publicPath . '/' . $fileName;
-                rename($filePath, $newFilePath); // Move the fil
-            } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
-                return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
             }
+            
+            
+            // Menyiapkan data untuk diproses lebih lanjut
+            $data = [
+                'tanggal' => $patroli,
+                'schedule'=>$this->groupBy($schedule),
+                'jam' => $jam1 . '-' . $jam2
+            ];
+            if($request->input('jenis_file') == "pdf"){
+                
+                    $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
+                    $pdf->setOption('no-outline', true);
+                    $pdf->setOption('isHtml5ParserEnabled', true);
+                    $pdf->setOption('isPhpEnabled', true);
+                    $pdf->setPaper('legal', 'portrait');
+
+                    // Nama file unik untuk setiap PDF
+                    $fileName = 'report_' . date('YmdHis') . ".pdf";
+                    $publicPath = public_path('reports');
+
+                    // Buat folder jika belum ada
+                    if (!is_dir($publicPath)) {
+                        mkdir($publicPath, 0755, true);
+                    }
+
+                    $filePath = $publicPath . '/' . $fileName;
+
+                    // Simpan PDF
+                    $pdf->save($filePath);
+
+                    // Tambahkan path file ke dalam array hasil
+                    $files = asset('reports/' . $fileName);
+                
+
+                
+
+                // Return semua path file dalam JSON response
+                return response()->json([
+                    'message' => 'PDF files saved successfully',
+                    'path' => $files,
+                    'file_name'=>$fileName
+                ]);
+            }else{
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+
+                
+                
+
+                $sheet->getStyle('A1:H1')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+                ]);
+
+                // Output project name
+                $sheet->setCellValue('A1','REPORT PATROLI ( '.$tanggal.' )');
+                $sheet->mergeCells('A1:H1');
+
+                // Set table headers
+                $sheet->setCellValue('A2', 'Tanggal');
+                $sheet->setCellValue('B2', 'Status');
+                $sheet->setCellValue('C2', 'Description');
+                $sheet->setCellValue('D2', 'Task');
+                $sheet->setCellValue('E2', 'Point');
+                $sheet->setCellValue('F2', 'Petugas');
+
+                    // Example data writing
+                    $rowNumber = 3;
+                    $no = 1;
+                
+                    foreach ($task as $row) {
+                        if ($row->point) {
+                            $no2 = 1;
+                            foreach ($row->point as $rs) {
+                                $rowNumber++;
+                                if ($rs->list) {
+                                    foreach ($rs->list as $det) {
+                                        $nama = karyawan_bynik($det->employee_code);
+                                        if(!empty($nama)){
+                                            $employee =  $nama->nama;
+                                        }else{
+                                            $employee = $det->employee_code;
+                                        }
+                                        
+
+                                        $sheet->setCellValue('A' . $rowNumber, $det->created_at); // No need for number again
+                                        $sheet->setCellValue('B' . $rowNumber, $det->status); // No need for task again
+                                        $sheet->setCellValue('C' . $rowNumber, $det->description); // No need for date again
+                                        $sheet->setCellValue('D' . $rowNumber, $rs->task);
+                                        $sheet->setCellValue('E' . $rowNumber, $row->judul); // Replace with actual status
+                                        $sheet->setCellValue('F' . $rowNumber, $employee); // Replace with actual keterangan
+                                        
+                                        $rowNumber++;
+                                    }
+                                }
+                                $no2++;
+                            }
+                        }
+                        $rowNumber++;
+                        $no++;
+                    }
+                // Set the header for the file download
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment; filename="project_582307_report241104110534.xlsx"');
+                header('Cache-Control: max-age=0');
+                $writer = new Xlsx($spreadsheet);
+                Storage::makeDirectory('reports');
+                $fileName = 'report_'.date('ymdhis').'.xlsx'; // Example file name
+                $filePath = storage_path('app/reports/' . $fileName); // Example storage path
+
+                try {
+                    $writer->save($filePath);
+                    $publicPath = public_path('reports');
+                    if (!file_exists($publicPath)) {
+                        mkdir($publicPath, 0755, true); // Create the public directory if it doesn't exist
+                    }
+
+                    // Move the file to the public directory
+                    $newFilePath = $publicPath . '/' . $fileName;
+                    rename($filePath, $newFilePath); // Move the fil
+                } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
+                    return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
+                }
+            }
+
+
+            return view('pages.report.html_view',$data);
+
+
+            // return response()->json(['message' => $data]);
+        }else{
+            if($jml_tgl > 1){
+                $date1 = $explode[0] . ' 00:00:00';
+                $date2 = $explode[1] . ' 23:59:59';
+            }else{
+                $date1 = $explode[0] . ' 00:00:00';
+                $date2 = $explode[0] . ' 23:59:59';
+            }
+            // Get the shift data
+            $shift = $request->input('shift');
+            $shift_records = Shift::where('name', 'like', '%' . $shift . '%')->get();
+            $result_shift = $shift_records->pluck('code')->toArray();
+
+            // Format dates into an array
+            $dateList = [];
+            foreach ($dates as $date) {
+                $dateList[] = $date->format('Y-m-d');
+            }
+
+            // Store tasks with points and patrol data
+            $allTasks = [];
+            foreach ($dateList as $date) {
+                $tasks = Task::select('id', 'judul')->where('project_id', $project)->get();
+                
+                foreach ($tasks as $task) {
+                    $task->filter_tanggal = $date;
+                    
+                    // Get the points for each task
+                    $task->points = List_task::select('id', 'id_master', 'task')
+                                            ->where('id_master', $task->id)
+                                            ->get();
+                    
+                    // Get patrol data for each point
+                    foreach ($task->points as $row) {
+                        $row->list_data = Patroli::select('employee_code', 'status', 'description', 'image', 'created_at')
+                                                ->where('id_task', $row->id)
+                                                ->whereDate('patrolis.created_at', '=', $date) // Ensure filtering by the specific date
+                                                ->limit(3)
+                                                ->get();
+                    }
+
+                    // Add tasks to the allTasks array
+                    $allTasks[] = $task;
+                }
+            }
+
+            // Prepare data to return
+            $data = [
+                'tanggal' => $tanggal,
+                'jam'=>$jam1.'-'.$jam2,
+                'tasks' => $allTasks,
+            ];
+
+            if($request->input('jenis_file') == "pdf"){
+                ini_set('memory_limit', '4096M');
+                $tasksArray = $data['tasks'];
+                $chunks = array_chunk($tasksArray, 500);
+                $files = []; // Array untuk menyimpan semua file yang dihasilkan
+                
+                foreach ($chunks as $index => $chunk) {
+                    // Data khusus untuk kelompok ini
+                    $chunkedData = $data['tasks'] ; // Salin data asli
+                    $chunkedData= ["tasks"=>$chunk,"tanggal"=>$tanggal]; // Ganti 'tasks' dengan data bagian
+                    // Generate PDF
+                    $pdf = Pdf::loadView('pages.report.patrol_pdf', $chunkedData);
+                    $pdf->setOption('no-outline', true);
+                    $pdf->setOption('isHtml5ParserEnabled', true);
+                    $pdf->setOption('isPhpEnabled', true);
+                    $pdf->setPaper('legal', 'portrait');
+
+                    // Nama file unik untuk setiap PDF
+                    $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
+                    $publicPath = public_path('reports');
+
+                    // Buat folder jika belum ada
+                    if (!is_dir($publicPath)) {
+                        mkdir($publicPath, 0755, true);
+                    }
+
+                    $filePath = $publicPath . '/' . $fileName;
+
+                    // Simpan PDF
+                    $pdf->save($filePath);
+
+                    // Tambahkan path file ke dalam array hasil
+                    $files[] = asset('reports/' . $fileName);
+                }
+
+                
+
+                // Return semua path file dalam JSON response
+                return response()->json([
+                    'message' => 'PDF files saved successfully',
+                    'paths' => $files, // Semua file PDF yang dihasilkan
+                    'tasks' => $data['tasks'] // Data asli untuk referensi
+                ]);
+            }else{
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+
+                
+                
+
+                $sheet->getStyle('A1:H1')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+                ]);
+
+                // Output project name
+                $sheet->setCellValue('A1','REPORT PATROLI ( '.$tanggal.' )');
+                $sheet->mergeCells('A1:H1');
+
+                // Set table headers
+                $sheet->setCellValue('A2', 'Tanggal');
+                $sheet->setCellValue('B2', 'Status');
+                $sheet->setCellValue('C2', 'Description');
+                $sheet->setCellValue('D2', 'Task');
+                $sheet->setCellValue('E2', 'Point');
+                $sheet->setCellValue('F2', 'Petugas');
+
+                    // Example data writing
+                    $rowNumber = 3;
+                    $no = 1;
+                
+                    foreach ($task as $row) {
+                        if ($row->point) {
+                            $no2 = 1;
+                            foreach ($row->point as $rs) {
+                                $rowNumber++;
+                                if ($rs->list) {
+                                    foreach ($rs->list as $det) {
+                                        $nama = karyawan_bynik($det->employee_code);
+                                        if(!empty($nama)){
+                                            $employee =  $nama->nama;
+                                        }else{
+                                            $employee = $det->employee_code;
+                                        }
+                                        
+
+                                        $sheet->setCellValue('A' . $rowNumber, $det->created_at); // No need for number again
+                                        $sheet->setCellValue('B' . $rowNumber, $det->status); // No need for task again
+                                        $sheet->setCellValue('C' . $rowNumber, $det->description); // No need for date again
+                                        $sheet->setCellValue('D' . $rowNumber, $rs->task);
+                                        $sheet->setCellValue('E' . $rowNumber, $row->judul); // Replace with actual status
+                                        $sheet->setCellValue('F' . $rowNumber, $employee); // Replace with actual keterangan
+                                        
+                                        $rowNumber++;
+                                    }
+                                }
+                                $no2++;
+                            }
+                        }
+                        $rowNumber++;
+                        $no++;
+                    }
+                // Set the header for the file download
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment; filename="project_582307_report241104110534.xlsx"');
+                header('Cache-Control: max-age=0');
+                $writer = new Xlsx($spreadsheet);
+                Storage::makeDirectory('reports');
+                $fileName = 'report_'.date('ymdhis').'.xlsx'; // Example file name
+                $filePath = storage_path('app/reports/' . $fileName); // Example storage path
+
+                try {
+                    $writer->save($filePath);
+                    $publicPath = public_path('reports');
+                    if (!file_exists($publicPath)) {
+                        mkdir($publicPath, 0755, true); // Create the public directory if it doesn't exist
+                    }
+
+                    // Move the file to the public directory
+                    $newFilePath = $publicPath . '/' . $fileName;
+                    rename($filePath, $newFilePath); // Move the fil
+                } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
+                    return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
+                }
+            }
+
+
+            // // // Return response with file path
+            // return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
+            return response()->json(['message' => $data]);
         }
-        
-    
-        // // Return response with file path
-        return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
-        // return response()->json(['message' => $data]);
 
     } 
+
+    function groupBy($collection, $key = 'name') {
+        $grouped = [];
+        foreach ($collection as $item) {
+            $grouped[$item->$key][] = $item;
+        }
+        return $grouped;
+    }
 
     public function dashboard_analytic(Request $request){
         // Fetch the project with id 582307

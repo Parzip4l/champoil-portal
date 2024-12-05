@@ -44,7 +44,7 @@
     <table>
         <thead>
             <tr>
-                <th>NO</th>
+                <th>SHIFT</th>
                 <th>Date</th>
                 <th>Time</th>
                 <th>CODE</th>

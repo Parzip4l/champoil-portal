@@ -572,15 +572,19 @@ class PatroliController extends Controller
                     $patrol->data_history  = $patroli_history;
                 }
             }
-            
+
+            $project  = Project::where('id',582307)->first();
             
             // Menyiapkan data untuk diproses lebih lanjut
             $data = [
                 'tanggal' => $patroli,
                 'schedule'=>$this->groupBy($schedule),
-                'jam' => $jam1 . '-' . $jam2
+                'jam' => $jam1 . '-' . $jam2,
+                'filter'=>$date1.' '.$jam1.' - '.$date2.' '.$jam2,
+                'project'=>$project->name
             ];
             if($request->input('jenis_file') == "pdf"){
+                    
                 
                     $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
                     $pdf->setOption('no-outline', true);
@@ -612,7 +616,8 @@ class PatroliController extends Controller
                 return response()->json([
                     'message' => 'PDF files saved successfully',
                     'path' => $files,
-                    'file_name'=>$fileName
+                    'file_name'=>$fileName,
+                    'project'=>$project->name
                 ]);
             }else{
                 $spreadsheet = new Spreadsheet();

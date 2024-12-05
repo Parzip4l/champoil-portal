@@ -41,6 +41,8 @@
     </style>
 </head>
 <body>
+    <h2 style="text-align:center">{{ $project }}</h2>
+    <h4 style="text-align:center">{{ $filter }}</h4>
     <table>
         <thead>
             <tr>

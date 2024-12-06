@@ -78,13 +78,6 @@
                                         @else
                                         <a class="dropdown-item d-flex align-items-center" href="{{route('details.Mypa', $data->id)}}"><i data-feather="eye" class="icon-sm me-2"></i> <span class="">Lihat </span></a>
                                         @endif
-                                        <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                                            @csrf @method('DELETE') 
-                                            <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                                <i data-feather="trash" class="icon-sm me-2"></i>
-                                                <span class="">Delete</span>
-                                            </a>
-                                        </form>
                                     </div>
                                 </div>
                             </td>

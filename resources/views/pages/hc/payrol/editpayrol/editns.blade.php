@@ -77,7 +77,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Jam Lembur</label>
-                    <input type="number" class="form-control datainput jamLembur" id="jamLembur" name="jam_lembur" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$totalOvertimeHours}}@else{{$allowance->total_overtime_hours}}@endif">
+                    <input type="number" class="form-control datainput jamLembur" id="jamLembur" name="jam_lembur" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$totalOvertimeHours}}@else{{$payrolComponent->jam_lembur}}@endif">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Total Lembur</label>

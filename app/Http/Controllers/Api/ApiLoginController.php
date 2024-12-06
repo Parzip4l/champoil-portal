@@ -34,6 +34,7 @@ use App\Slack;
 use App\ModelCG\Shift;
 use App\Backup\AbsenBackup;
 use App\Payrol\Component;
+use App\Urbanica\PayrolUrbanica;
 
 class ApiLoginController extends Controller
 {
@@ -540,6 +541,10 @@ class ApiLoginController extends Controller
                                 $payslips = Payroll::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
                                             ->get();
+                            }elseif($unit_bisnis == 'Run'){
+                                $payslips = PayrolUrbanica::where('employee_code', $employeeCode)
+                                            ->where('payslip_status', 'Published')
+                                            ->get();
                             } else {
                                 $payslips = Payrollns::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
@@ -589,6 +594,8 @@ class ApiLoginController extends Controller
             // Determine the correct model to use based on the unit_bisnis and organisasi
             if (strtolower($organisasi->unit_bisnis) === 'kas') {
                 $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payroll::findOrFail($id);
+            }elseif(strtolower($organisasi->unit_bisnis) === 'run'){
+                $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : PayrolUrbanica::findOrFail($id);
             } else {
                 $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payrollns::findOrFail($id);
             }

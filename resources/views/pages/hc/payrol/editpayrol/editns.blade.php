@@ -27,15 +27,18 @@
       <div class="card-body">
         @php 
             $employee = \App\Employee::where('nik', $payrolComponent->employee_code)->first();
-            $dailysalary = \App\PayrolComponent_NS::where('employee_code', $payrolComponent->employee_code)->select('daily_salary')->first();
+            if($employee->unit_bisnis==='Run'){
+                $dailysalary = \App\PayrolComponent_NS::where('employee_code', $payrolComponent->employee_code)->select('daily_salary')->first();
+                $allowance = json_decode($payrolComponent->allowances);
+                $totalOvertimeHours = intval($allowance->total_overtime_hours);
+                $lembur = $allowance->lembur[0];
+                $lemburpay = intval($allowance->total_overtime_pay);
+                $totalabsen = $allowance->total_absence;
+            }
             $dateParts = explode(" - ", $payrolComponent->periode);
             $startDate = \Carbon\Carbon::parse($dateParts[0])->format('j F Y');
             $endDate = \Carbon\Carbon::parse($dateParts[1])->format('j F Y');
-            $allowance = json_decode($payrolComponent->allowances);
-            $totalOvertimeHours = intval($allowance->total_overtime_hours);
-            $lembur = $allowance->lembur[0];
-            $lemburpay = intval($allowance->total_overtime_pay);
-            $totalabsen = $allowance->total_absence;
+            
         @endphp
         <h4 class="card-title">Payrol Edit {{$employee->nama}} Periode {{ \Carbon\Carbon::parse($dateParts[1])->format('j F Y') }}</h4>
         <form method="POST" action="{{ route('updateNS.payroldata', $payrolComponent->id) }}" enctype="multipart/form-data">

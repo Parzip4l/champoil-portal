@@ -22,6 +22,7 @@ use App\Imports\PayrollImport;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Urbanica\PayrolUrbanica;
 
 class PayslipController extends Controller
 {
@@ -50,6 +51,10 @@ class PayslipController extends Controller
                     ->select('periode','payrol_status','payslip_status','run_by', \DB::raw('SUM(thp) as total_payroll')) // Tambahkan id pada select clause
                     ->groupBy('periode','payrol_status','payslip_status','run_by')
                     ->get();
+            }elseif($unit_bisnis == 'Run'){
+                $datans = PayrolUrbanica::select('month','periode', 'year','payrol_status','payslip_status','run_by', \DB::raw('SUM(thp) as total_payroll'))
+                    ->groupBy('month', 'periode','year', 'payrol_status', 'payslip_status','run_by')
+                    ->get();
             } else {
                 $datans = Payrollns::select('month', 'year','periode','payrol_status','payslip_status','run_by',\DB::raw('SUM(thp) as total_payroll'))
                     ->groupBy('month', 'year','periode','payrol_status', 'payslip_status','run_by')
@@ -71,12 +76,24 @@ class PayslipController extends Controller
 
         if ($employee) {
             $unit_bisnis = $employee->unit_bisnis;
-            $data = Payrol::join('karyawan', 'payrols.employee_code', '=', 'karyawan.nik')
-                ->select('payrols.id', 'payrols.*')
-                ->where('karyawan.unit_bisnis', $unit_bisnis)
-                ->where('payrols.month', $month)
-                ->where('payrols.year', $year)
-                ->get();
+
+            if($unit_bisnis === 'Run')
+            {
+                $data = PayrolUrbanica::join('karyawan', 'payrol_urbanica.employee_code', '=', 'karyawan.nik')
+                    ->select('payrol_urbanica.id', 'payrol_urbanica.*')
+                    ->where('karyawan.unit_bisnis', $unit_bisnis)
+                    ->where('payrol_urbanica.month', $month)
+                    ->where('payrol_urbanica.year', $year)
+                    ->get();
+            }else {
+                $data = Payrol::join('karyawan', 'payrols.employee_code', '=', 'karyawan.nik')
+                    ->select('payrols.id', 'payrols.*')
+                    ->where('karyawan.unit_bisnis', $unit_bisnis)
+                    ->where('payrols.month', $month)
+                    ->where('payrols.year', $year)
+                    ->get();
+            }
+            
         } else {
             $data = [];
         }
@@ -99,6 +116,12 @@ class PayslipController extends Controller
                     ->select('payrolls.id', 'payrolls.*') 
                     ->where('karyawan.unit_bisnis', $unit_bisnis)
                     ->get();
+            }elseif($unit_bisnis == 'Run'){
+                $datans = PayrolUrbanica::join('karyawan', 'payrol_urbanica.employee_code', '=', 'karyawan.nik')
+                            ->select('payrol_urbanica.id', 'payrol_urbanica.*') 
+                            ->where('karyawan.unit_bisnis', $unit_bisnis)
+                            ->where('payrol_urbanica.periode', $periode)
+                            ->get();
             }else{
                 $datans = Payrollns::join('karyawan', 'payrollns.employee_code', '=', 'karyawan.nik')
                             ->select('payrollns.id', 'payrollns.*') 
@@ -211,6 +234,8 @@ class PayslipController extends Controller
         $unit_bisnis = $employee->unit_bisnis;
         if ($unit_bisnis == 'Kas') {
             Payroll::where('periode', $periode)->update(['payrol_status' => 'Locked']);
+        }elseif($unit_bisnis == 'Run'){
+            PayrolUrbanica::where('periode', $periode)->update(['payrol_status' => 'Locked']);
         }else{
             Payrollns::where('periode', $periode)->update(['payrol_status' => 'Locked']);
         }
@@ -229,6 +254,17 @@ class PayslipController extends Controller
             if ($isPayrollLocked) {
                 // If the payroll is locked, update the payslip status to 'Published'
                 Payroll::where('periode', $periode)->update(['payslip_status' => 'Published']);
+                return redirect()->back()->with('success', 'Payslip published successfully');
+            } else {
+                // If the payroll is not locked, display an error message
+                return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            }
+        }elseif($unit_bisnis == 'Run') {
+            $isPayrollLocked = PayrolUrbanica::where('periode', $periode)->where('payrol_status', 'Locked')->exists();
+
+            if ($isPayrollLocked) {
+                // If the payroll is locked, update the payslip status to 'Published'
+                PayrolUrbanica::where('periode', $periode)->update(['payslip_status' => 'Published']);
                 return redirect()->back()->with('success', 'Payslip published successfully');
             } else {
                 // If the payroll is not locked, display an error message
@@ -348,6 +384,10 @@ class PayslipController extends Controller
                 $payslips = $dbSecondary->table('payrolls')
                             ->where('payslip_status', 'Published')
                             ->get();
+            }elseif($unit_bisnis == 'Run'){
+                $payslips = PayrolUrbanica::where('employee_code', $employeeCode)
+                        ->where('payslip_status', 'Published')
+                        ->get();
             }else{
                 $payslips = Payrollns::where('employee_code', $employeeCode)
                         ->where('payslip_status', 'Published')
@@ -460,6 +500,12 @@ class PayslipController extends Controller
                 return redirect()->back()->with('error', 'Payrol Component not found.');
             }
             return view('pages.hc.payrol.editpayrol.editpayrolnscg', compact('payrolComponent'));
+        }elseif($unit_bisnis == 'Run'){
+            $payrolComponent = PayrolUrbanica::findOrFail($id);
+            if (!$payrolComponent) {
+                return redirect()->back()->with('error', 'Payrol Component not found.');
+            }
+            return view('pages.hc.payrol.editpayrol.editns', compact('payrolComponent'));
         }else {
             $payrolComponent = Payrollns::findOrFail($id);
             if (!$payrolComponent) {
@@ -557,25 +603,61 @@ class PayslipController extends Controller
             $request->validate([
                 'daily_salary' => 'required|numeric',
             ]);
-    
-            // Retrieve the payroll component by ID
-            $payrolComponent = Payrollns::findOrFail($id);
-    
-            // Update the payroll component fields
-            $payrolComponent->daily_salary = $request->input('daily_salary');
-            $payrolComponent->total_absen = $request->input('total_absen');
-            $payrolComponent->lembur_salary = $request->input('lembur_salary');
-            $payrolComponent->jam_lembur = $request->input('jam_lembur');
-            $payrolComponent->total_lembur = $request->input('total_lembur');
-            $payrolComponent->uang_makan = $request->input('uang_makan');
-            $payrolComponent->uang_kerajinan = $request->input('uang_kerajinan');
-            $payrolComponent->potongan_hutang = $request->input('potongan_hutang');
-            $payrolComponent->potongan_mess = $request->input('potongan_mess');
-            $payrolComponent->potongan_lain = $request->input('potongan_lain');
-            $payrolComponent->total_daily = $request->input('total_daily');
-            $payrolComponent->thp = $request->input('thp');
-            // Save the updated payroll component
-            $payrolComponent->save();
+
+            $code = Auth::user()->employee_code;
+            $employeeData = Employee::where('nik', $code)->first();
+            $unit_bisnis = $employeeData->unit_bisnis;
+            
+            if ($unit_bisnis === 'Run') {
+                // Retrieve the existing payroll component by ID
+                $payrolComponent = PayrolUrbanica::findOrFail($id);
+            
+                // Calculate total allowances and deductions
+                $totalAllowance = $request->input('uang_kerajinan') + $request->input('total_lembur') + $request->input('uang_makan');
+                $totalDeduction = $request->input('potongan_lain') + $request->input('potongan_hutang') + $request->input('potongan_mess');
+            
+                // Update the payroll component
+                $payrolComponent->allowances = json_encode([
+                    'lembur' => $request->input('lembur_salary'),
+                    'total_overtime_hours' => $request->input('jam_lembur'),
+                    'total_overtime_pay' => $request->input('total_lembur'),
+                    'uang_makan' => $request->input('uang_makan'),
+                    'kerajinan' => $request->input('uang_kerajinan'),
+                    'total_absence' => $request->input('total_absen'),
+                    'total_allowance' => $totalAllowance,  // Total allowance calculated
+                ]);
+                $payrolComponent->deductions = json_encode([
+                    'mess' => $request->input('potongan_mess'),
+                    'hutang' => $request->input('potongan_hutang'),
+                    'lain_lain' => $request->input('potongan_lain'),
+                    'total_deduction' => $totalDeduction,  // Total deduction calculated
+                ]);
+            
+                // Set or update the payroll data
+                $payrolComponent->basic_salary = $request->input('daily_salary') * $request->input('total_absen');
+                $payrolComponent->thp = $request->input('thp');
+                
+                // Save the updated payroll component
+                $payrolComponent->save();
+
+            }else{
+                $payrolComponent = Payrollns::findOrFail($id);
+                $payrolComponent->daily_salary = $request->input('daily_salary');
+                $payrolComponent->total_absen = $request->input('total_absen');
+                $payrolComponent->lembur_salary = $request->input('lembur_salary');
+                $payrolComponent->jam_lembur = $request->input('jam_lembur');
+                $payrolComponent->total_lembur = $request->input('total_lembur');
+                $payrolComponent->uang_makan = $request->input('uang_makan');
+                $payrolComponent->uang_kerajinan = $request->input('uang_kerajinan');
+                $payrolComponent->potongan_hutang = $request->input('potongan_hutang');
+                $payrolComponent->potongan_mess = $request->input('potongan_mess');
+                $payrolComponent->potongan_lain = $request->input('potongan_lain');
+                $payrolComponent->total_daily = $request->input('total_daily');
+                $payrolComponent->thp = $request->input('thp');
+                
+                // Save the updated payroll component
+                $payrolComponent->save();
+            }
     
             $periode = $request->input('periode');
     
@@ -584,10 +666,7 @@ class PayslipController extends Controller
         } catch (QueryException $exception) {
             // Handle database-related exceptions
             return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
-        } catch (\Exception $exception) {
-            // Handle other exceptions
-            return redirect()->back()->with('error', 'Error updating payroll component: ' . $exception->getMessage());
-        }
+        } 
     }
 
     /**

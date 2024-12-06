@@ -10,15 +10,32 @@
 @endpush
 
 @section('content')
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif  
+
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
     <div class="card custom-card2">
       <div class="card-body">
         @php 
             $employee = \App\Employee::where('nik', $payrolComponent->employee_code)->first();
+            $dailysalary = \App\PayrolComponent_NS::where('employee_code', $payrolComponent->employee_code)->select('daily_salary')->first();
             $dateParts = explode(" - ", $payrolComponent->periode);
             $startDate = \Carbon\Carbon::parse($dateParts[0])->format('j F Y');
             $endDate = \Carbon\Carbon::parse($dateParts[1])->format('j F Y');
+            $allowance = json_decode($payrolComponent->allowances);
+            $totalOvertimeHours = intval($allowance->total_overtime_hours);
+            $lembur = $allowance->lembur[0];
+            $lemburpay = intval($allowance->total_overtime_pay);
+            $totalabsen = $allowance->total_absence;
         @endphp
         <h4 class="card-title">Payrol Edit {{$employee->nama}} Periode {{ \Carbon\Carbon::parse($dateParts[1])->format('j F Y') }}</h4>
         <form method="POST" action="{{ route('updateNS.payroldata', $payrolComponent->id) }}" enctype="multipart/form-data">
@@ -33,7 +50,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="Ktp" class="form-label">Daily Sallary</label>
-                    <input type="number" class="form-control datainput" id="basic_salary" name="daily_salary" placeholder="Rp." value="{{$payrolComponent->daily_salary}}">
+                    <input type="number" class="form-control datainput" id="basic_salary" name="daily_salary" placeholder="Rp." value="@if($employee->unit_bisnis === 'Run'){{ $dailysalary->daily_salary }}@else{{ $payrolComponent->daily_salary }}@endif">
                 </div>
             </div>
             <h5>Daily Salary</h5>
@@ -41,11 +58,11 @@
             <div class="row mb-3 allowance-group">
                 <div class="col-md-6">
                     <label class="form-label">Total Absensi</label>
-                    <input type="number" class="form-control datainput totalabsen" name="total_absen" placeholder="Rp." required value="{{$payrolComponent->total_absen}}">
+                    <input type="number" class="form-control datainput totalabsen" name="total_absen" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$totalabsen}}@else{{$payrolComponent->total_absen}}@endif">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Total Daily Salary</label>
-                    <input type="number" class="form-control datainput allowance" id="TotalDaily" name="total_daily" placeholder="Rp." required value="{{$payrolComponent->total_daily}}" readonly>
+                    <input type="number" class="form-control datainput allowance" id="TotalDaily" name="total_daily" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$payrolComponent->basic_salary}}@else{{$payrolComponent->total_daily}}@endif" readonly>
                 </div>
             </div>
             <h5>Allowance</h5>
@@ -53,25 +70,25 @@
             <div class="row mb-3 allowance-group">
                 <div class="col-md-4">
                     <label class="form-label">Lembur Salary</label>
-                    <input type="number" class="form-control datainput" name="lembur_salary" id="LemburSalary" placeholder="Rp." required value="{{$payrolComponent->lembur_salary}}">
+                    <input type="number" class="form-control datainput" name="lembur_salary" id="LemburSalary" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$lembur}}@else{{$payrolComponent->lembur_salary}}@endif">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Jam Lembur</label>
-                    <input type="number" class="form-control datainput jamLembur" id="jamLembur" name="jam_lembur" placeholder="Rp." required value="{{$payrolComponent->jam_lembur}}">
+                    <input type="number" class="form-control datainput jamLembur" id="jamLembur" name="jam_lembur" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$totalOvertimeHours}}@else{{$allowance->total_overtime_hours}}@endif">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Total Lembur</label>
-                    <input type="number" class="form-control datainput allowance" id="TotalLembur" name="total_lembur" placeholder="Rp." required value="{{$payrolComponent->total_lembur}}">
+                    <input type="number" class="form-control datainput allowance" id="TotalLembur" name="total_lembur" placeholder="Rp." required value="@if($employee->unit_bisnis === 'Run'){{$lemburpay}}@else{{$payrolComponent->total_lembur}}@endif">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Kerajinan</label>
-                    <input type="number" id="Kerajinan" class="form-control datainput allowance" name="uang_kerajinan" placeholder="Rp. " required value="{{$payrolComponent->uang_kerajinan}}">
+                    <input type="number" id="Kerajinan" class="form-control datainput allowance" name="uang_kerajinan" placeholder="Rp. " required value="{{$payrolComponent->uang_kerajinan ?? 0}}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Uang Makan</label>
-                    <input type="number" id="Makan" class="form-control datainput allowance" name="uang_makan" placeholder="Rp." required value="{{$payrolComponent->uang_makan}}">
+                    <input type="number" id="Makan" class="form-control datainput allowance" name="uang_makan" placeholder="Rp." required value="{{$payrolComponent->uang_makan ?? 0}}">
                 </div>
             </div>
             <h5>Deductions</h5>
@@ -79,15 +96,15 @@
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Mess</label>
-                    <input type="number" id="mess" class="form-control datainput deduction" name="potongan_mess" placeholder="Rp. " required value="{{$payrolComponent->potongan_mess}}">
+                    <input type="number" id="mess" class="form-control datainput deduction" name="potongan_mess" placeholder="Rp. " required value="{{$payrolComponent->potongan_mess ?? 0}}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Potongan Hutang</label>
-                    <input type="number" id="hutang" class="form-control datainput deduction" name="potongan_hutang" placeholder="Rp. " required value="{{$payrolComponent->potongan_hutang}}">
+                    <input type="number" id="hutang" class="form-control datainput deduction" name="potongan_hutang" placeholder="Rp. " required value="{{$payrolComponent->potongan_hutang ?? 0}}">
                 </div>
                 <div class="col-md-6">
                     <label for="kode_karyawan" class="form-label">Potongan Lain Lain</label>
-                    <input type="number" id="lain" class="form-control datainput deduction" name="potongan_lain" placeholder="Rp. " required value="{{$payrolComponent->potongan_lain}}">
+                    <input type="number" id="lain" class="form-control datainput deduction" name="potongan_lain" placeholder="Rp. " required value="{{$payrolComponent->potongan_lain ?? 0}}">
                 </div>
                 <div class="col-md-6">
                     <label for="kode_karyawan" class="form-label">Take Home Pay</label>

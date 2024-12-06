@@ -21,7 +21,10 @@
                                 $dates = explode(' - ', $dataPayslip[0]['periode']);
                                 $startDate = date('j M Y', strtotime($dates[0]));
                                 $endDate = date('j M Y', strtotime($dates[1]));
-                            $employee = \App\Employee::where('nik', $dataPayslip[0]['employee_code'])->first();
+                                $employee = \App\Employee::where('nik', $dataPayslip[0]['employee_code'])->first();
+                                $unitbisnis = $employee->unit_bisnis;
+                                $allowance = json_decode($dataPayslip[0]['allowances']);
+                                $dailysalary = \App\PayrolComponent_NS::where('employee_code', $dataPayslip[0]['employee_code'])->select('daily_salary')->first();
                         @endphp
                         <div class="row">
                             <div class="col-md-12">
@@ -68,19 +71,19 @@
                                                 <span>Daily Salary</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($dataPayslip[0]['daily_salary'], 0, ',', '.') }}</span>
+                                                <span class="text-right mb-4">@if($unitbisnis === 'Run') Rp. {{ number_format($dailysalary->daily_salary, 0, ',', '.') }} @else Rp. {{ number_format($dataPayslip[0]['daily_salary'], 0, ',', '.') }} @endif</span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span></span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right text-muted mb-4">{{ $dataPayslip[0]['total_absen'] }} Hari</span>
+                                                <span class="text-right text-muted mb-4">@if($unitbisnis === 'Run') {{ $allowance->total_absence}} Hari @else {{ $dataPayslip[0]['total_absen'] }} Hari @endif</span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span></span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($dataPayslip[0]['total_daily'], 0, ',', '.') }}</span>
+                                                <span class="text-right mb-4"> @if($unitbisnis === 'Run') Rp. {{ number_format($dataPayslip[0]['basic_salary'], 0, ',', '.') }} @else Rp. {{ number_format($dataPayslip[0]['total_daily'], 0, ',', '.') }} @endif</span>
                                             </div>
                                         </div>
                                         <div class="row mb-2">
@@ -88,21 +91,22 @@
                                                 <span>Lembur</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($dataPayslip[0]['lembur_salary'], 0, ',', '.') }}</span>
+                                                <span class="text-right mb-4">@if($unitbisnis === 'Run') Rp. {{ number_format($allowance->lembur, 0, ',', '.') }}  @else Rp. {{ number_format($dataPayslip[0]['lembur_salary'], 0, ',', '.') }} @endif</span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span></span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right text-muted mb-4">{{ $dataPayslip[0]['jam_lembur'] }} Jam</span>
+                                                <span class="text-right text-muted mb-4">@if($unitbisnis === 'Run') {{$allowance->total_overtime_hours}} Jam @else {{ $dataPayslip[0]['jam_lembur'] }} Jam @endif</span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span></span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($dataPayslip[0]['total_lembur'], 0, ',', '.') }}</span>
+                                                <span class="text-right mb-4">@if($unitbisnis === 'Run') Rp. {{ number_format($allowance->total_overtime_pay, 0, ',', '.') }} @else Rp. {{ number_format($dataPayslip[0]['total_lembur'], 0, ',', '.') }} @endif </span>
                                             </div>
                                         </div>
+                                        @if(!$unitbisnis === 'Run')
                                         <div class="row mb-2">
                                             <div class="col-md-6">
                                                 <span>Uang Makan</span>
@@ -119,6 +123,7 @@
                                                 <span class="text-right">Rp. {{ number_format($dataPayslip[0]['uang_kerajinan'], 0, ',', '.') }}</span>
                                             </div>
                                         </div>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="row mb-2">
@@ -157,6 +162,7 @@
                             <div class="table-responsive">
                                 <table class="table">
                                     <tbody>
+                                         @if(!$unitbisnis === 'Run')
                                         <tr>
                                             <td class="text-bold-800">Total Allowences</td>
                                             <td class="text-bold-800 text-end text-success"> Rp. {{ number_format($totalallowence, 0, ',', '.') }} </td>
@@ -165,6 +171,7 @@
                                             <td class="text-bold-800">Total Deductions</td>
                                             <td class="text-bold-800 text-end text-danger"> Rp. {{ number_format($totalDeductions, 0, ',', '.') }} </td>
                                         </tr>
+                                        @endif
                                         <tr style="font-size: 18px; font-weight: 800;">
                                             <td class="text-bold-800">Take Home Pay</td>
                                             <td class="text-bold-800 text-end"> Rp. {{ number_format($dataPayslip[0]['thp'], 0, ',', '.') }}</td>
@@ -218,7 +225,7 @@
                             Daily Salary
                         </span>
                         <span>
-                            Rp. {{ number_format($dataPayslip[0]['daily_salary'], 0, ',', '.') }}
+                            @if($unitbisnis === 'Run') Rp. {{ number_format($dailysalary->daily_salary, 0, ',', '.') }} @else Rp. {{ number_format($dataPayslip[0]['daily_salary'], 0, ',', '.') }} @endif
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
@@ -226,7 +233,7 @@
                             Works Days
                         </span>
                         <span>
-                            {{$dataPayslip[0]['total_absen']}} Days
+                            @if($unitbisnis === 'Run') {{ $allowance->total_absence}} Hari @else {{ $dataPayslip[0]['total_absen'] }} Hari @endif
                         </span>
                     </div>
                 </div>
@@ -243,7 +250,7 @@
                             Overtime / Hours
                         </span>
                         <span>
-                            Rp. {{ number_format($dataPayslip[0]['lembur_salary'], 0, ',', '.') }}
+                            @if($unitbisnis === 'Run') Rp. {{ number_format($allowance->lembur, 0, ',', '.') }}  @else Rp. {{ number_format($dataPayslip[0]['lembur_salary'], 0, ',', '.') }} @endif
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
@@ -251,7 +258,7 @@
                             Overtime
                         </span>
                         <span>
-                            {{$dataPayslip[0]['jam_lembur']}} Hours
+                            @if($unitbisnis === 'Run') {{$allowance->total_overtime_hours}} Jam @else {{ $dataPayslip[0]['jam_lembur'] }} Jam @endif
                         </span>
                     </div>
                 </div>
@@ -267,7 +274,7 @@
                             Daily Salary
                         </span>
                         <span>
-                            Rp. {{ number_format($dataPayslip[0]['total_daily'], 0, ',', '.') }}
+                            @if($unitbisnis === 'Run') Rp. {{ number_format($dataPayslip[0]['basic_salary'], 0, ',', '.') }} @else Rp. {{ number_format($dataPayslip[0]['total_daily'], 0, ',', '.') }} @endif
                         </span>
                     </div>
                     <div class="details-earning d-flex justify-content-between mb-2">
@@ -275,9 +282,10 @@
                             Overtime
                         </span>
                         <span>
-                            Rp. {{ number_format($dataPayslip[0]['total_lembur'], 0, ',', '.') }}
+                            @if($unitbisnis === 'Run') Rp. {{ number_format($allowance->total_overtime_pay, 0, ',', '.') }} @else Rp. {{ number_format($dataPayslip[0]['total_lembur'], 0, ',', '.') }} @endif 
                         </span>
                     </div>
+                    @if(!$unitbisnis === 'Run')
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <span>
                             Uang Makan
@@ -294,13 +302,16 @@
                         Rp. {{ number_format($dataPayslip[0]['uang_kerajinan'], 0, ',', '.') }}
                         </span>
                     </div>
+                    @endif
                 </div>
+                @if(!$unitbisnis === 'Run')
                 <div class="card-header text-center">
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <h4>Total Earnings</h4>
                         <h4 id="totalAmount">Rp. {{ number_format($totalallowence, 0, ',', '.') }}</h4>
                     </div>
                 </div>
+                @endif
             </div>
 
             <!-- Deductions -->
@@ -334,12 +345,14 @@
                         </span>
                     </div>
                 </div>
+                @if(!$unitbisnis === 'Run')
                 <div class="card-header text-center">
                     <div class="details-earning d-flex justify-content-between mb-2">
                         <h4>Total Deductions</h4>
                         <h4>Rp. {{ number_format($totalDeductions, 0, ',', '.') }} </h4>
                     </div>
                 </div>
+                @endif
             </div>
 
             <!-- THP -->

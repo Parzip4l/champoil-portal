@@ -229,7 +229,7 @@
                         @endif
                         @if($employee && $employee->unit_bisnis == 'Run')
                         <li class="nav-item">
-                            <a href="{{ route('payroll.ns') }}" class="nav-link {{ active_class(['payroll.ns']) }}">Payrol Frontline</a>
+                            <a href="{{ route('urbanica-payroll.index') }}" class="nav-link {{ active_class(['urbanica-payroll.index']) }}">Payrol Frontline</a>
                         </li>
                         @endif
                         @if($employee && $employee->unit_bisnis == 'Kas')

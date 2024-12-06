@@ -126,6 +126,7 @@
                                 <tbody>
                                     @foreach ($datans as $data)
                                     @php 
+                                    
                                         $dateParts = explode(" - ", $data->periode);
                                         $startDate = \Carbon\Carbon::parse($dateParts[0])->format('j F Y');
                                         $endDate = \Carbon\Carbon::parse($dateParts[1])->format('j F Y');

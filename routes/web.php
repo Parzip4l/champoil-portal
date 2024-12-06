@@ -246,6 +246,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
     Route::get('export-employee', [App\Http\Controllers\Employee\EmployeeController::class, 'exportEmployee'])->name('export.employee');
 
+    Route::resource('urbanica-payroll', App\Http\Controllers\Urbanica\PayrolUrban::class);
+
     // Thr Routes
     Route::resource('thr-component', App\Http\Controllers\THR\ThrComponentController::class);
     Route::resource('component-data-thr', App\Http\Controllers\THR\ThrDataComponent::class);

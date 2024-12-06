@@ -23,8 +23,11 @@
                                 $endDate = date('j M Y', strtotime($dates[1]));
                                 $employee = \App\Employee::where('nik', $dataPayslip[0]['employee_code'])->first();
                                 $unitbisnis = $employee->unit_bisnis;
-                                $allowance = json_decode($dataPayslip[0]['allowances']);
-                                $dailysalary = \App\PayrolComponent_NS::where('employee_code', $dataPayslip[0]['employee_code'])->select('daily_salary')->first();
+                                if($unitbisnis->unit_bisnis ==='Run'){
+                                    $allowance = json_decode($dataPayslip[0]['allowances']);
+                                    $dailysalary = \App\PayrolComponent_NS::where('employee_code', $dataPayslip[0]['employee_code'])->select('daily_salary')->first();
+                                }
+                                
                         @endphp
                         <div class="row">
                             <div class="col-md-12">

@@ -34,9 +34,6 @@
                                         {{ strtoupper(date('F', mktime(0, 0, 0, $month, 10))) }}-{{ $currentYear }}
                                     </option>
                                 @endforeach
-                                <option value="JANUARY-2025">
-                                    JANUARY-2025
-                                </option>
                             </select>
                         </form>
                     </div>

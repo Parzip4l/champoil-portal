@@ -212,7 +212,7 @@ class ScheduleControllers extends Controller
 
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(public_path('ScheduleImport/'.$namaFIle));
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-            $periode = Carbon::now()->addMonth()->format('F-Y');
+            $periode = date('F-Y');
             $data = [
                 'records' => $sheetData,
                 'file_name' => $namaFIle,

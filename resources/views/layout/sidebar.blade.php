@@ -168,9 +168,9 @@
                             <li class="nav-item">
                                 <a href="{{ route('medis') }}" class="nav-link {{ active_class(['medis']) }}">Medis Result</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a href="{{ route('logbook-tamu') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Training Data</a>
-                            </li> -->
+                            <li class="nav-item">
+                                <a href="{{ route('training-skip') }}" class="nav-link {{ active_class(['logbook-tamu']) }}">Pending Training</a>
+                            </li>
                             <li class="nav-item">
                                 <a href="{{ route('penempatan') }}" class="nav-link {{ active_class(['penempatan']) }}">Penempatan</a>
                             </li>

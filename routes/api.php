@@ -23,6 +23,8 @@ use App\Http\Controllers\Api\Schedular\DailyContrtoller;
 use App\Http\Controllers\Api\Emergency\EmergencyApi;
 use App\Http\Controllers\Api\Emergency\FirebaseTokenController;
 use App\Http\Controllers\Api\VoiceOfController;
+use App\Http\Controllers\Api\Recruitments\TrainingController;
+
 
 Route::prefix('v1')->group(function () {
 
@@ -206,7 +208,8 @@ Route::prefix('v1')->group(function () {
 
 
     Route::post('dashboard-patroli', [PatroliController::class, 'dashboard_analytic']);
-      
+    Route::get('/skip-training', [TrainingController::class, 'index'])->name('skip-training');
+    
 
 
 

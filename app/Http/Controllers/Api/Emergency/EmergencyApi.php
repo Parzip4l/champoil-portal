@@ -195,7 +195,17 @@ class EmergencyApi extends Controller
                 'longitude' => $request->longitude,
                 'distance' => $formattedDistance,
                 'time_estimate' => $timeEstimateMinutes . ' minutes',
-                'firebase_responses' => $firebaseResponse 
+                'firebase_responses' =>
+                 [ 
+                    'title' => 'Darurat!', 
+                    'body' => 'Ada permintaan darurat dekat lokasi Anda.', 
+                    'data' => [ 
+                        'emergency_id' => $emergency->id, 
+                        'category' => $request->kategori, 
+                        'distance' => $formattedDistance, 
+                        'time_estimate' => $timeEstimateMinutes . ' minutes', 
+                    ], 
+                ],
             ], 200);
 
         } catch (\Exception $e) {

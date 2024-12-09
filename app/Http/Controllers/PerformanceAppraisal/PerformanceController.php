@@ -311,11 +311,30 @@ class PerformanceController extends Controller
         $kategoriPa = KategoriModel::where('company', $company->unit_bisnis)->where('level', $company->golongan)->get();
         $totalKategori = $kategoriPa->count();
         $faktor = FaktorModel::where('company', $company->unit_bisnis)->get();
-        $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
-        ->where('resign_status', 0)
-        ->where('divisi',$company->divisi)
-        ->where('nik', '!=', $company->nik)  // Kecualikan diri sendiri
-        ->get();
+
+        if($company->golongan === 'F') {
+            $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
+                ->where('resign_status', 0)
+                ->whereIn('golongan', ['D', 'E', 'F'])
+                ->where('nik', '!=', $company->nik)
+                ->get();
+        }elseif($company->golongan === 'E' || $company->golongan === 'D'){
+            $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
+                ->where('resign_status', 0)
+                ->where(function ($query) use ($company) {
+                    $query->whereIn('golongan', ['D', 'E', 'F'])
+                        ->orWhere('divisi', $company->divisi);
+                })
+                ->where('nik', '!=', $company->nik)
+                ->get();
+        }else{
+            $employee = Employee::where('unit_bisnis', $company->unit_bisnis)
+            ->where('resign_status', 0)
+            ->where('divisi',$company->divisi)
+            ->where('nik', '!=', $company->nik)
+            ->get();
+        }
+
         return view('pages.hc.pa.create', compact('faktor','employee','kategoriPa','totalKategori'));
     }
 
@@ -542,34 +561,34 @@ class PerformanceController extends Controller
     }
 
     public function MyPerformanceList()
-{
-    $code = Auth::user()->employee_code;
-    $employee = Employee::where('nik', $code)->first();
-    $predikats = PredikatModel::where('company', $employee->unit_bisnis)->get();
-    $paData = PaModel::where('nik', $code)->get();
+    {
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+        $predikats = PredikatModel::where('company', $employee->unit_bisnis)->get();
+        $paData = PaModel::where('nik', $code)->get();
 
-    $hasData = !$paData->isEmpty();
-$predikatName = 0;
-    if ($hasData) {
-        foreach ($paData as $pa) {
-            $nilai_keseluruhan = floatval($pa->nilai_keseluruhan);
-            $predikatName = null; // Reset for each iteration
+        $hasData = !$paData->isEmpty();
+        $predikatName = 0;
+        if ($hasData) {
+            foreach ($paData as $pa) {
+                $nilai_keseluruhan = floatval($pa->nilai_keseluruhan);
+                $predikatName = null; // Reset for each iteration
 
-            foreach ($predikats as $predikat) {
-                $minNilai = floatval($predikat->min_nilai);
-                $maxNilai = floatval($predikat->max_nilai);
+                foreach ($predikats as $predikat) {
+                    $minNilai = floatval($predikat->min_nilai);
+                    $maxNilai = floatval($predikat->max_nilai);
 
-                if ($nilai_keseluruhan >= $minNilai && $nilai_keseluruhan <= $maxNilai) {
-                    $predikatName = $predikat->name;
-                    break;
+                    if ($nilai_keseluruhan >= $minNilai && $nilai_keseluruhan <= $maxNilai) {
+                        $predikatName = $predikat->name;
+                        break;
+                    }
                 }
+                $pa->predikat_name = $predikatName;
             }
-            $pa->predikat_name = $predikatName;
         }
-    }
 
-    return view('pages.hc.pa.myperformance', compact('paData', 'employee', 'hasData', 'predikatName'));
-}
+        return view('pages.hc.pa.myperformance', compact('paData', 'employee', 'hasData', 'predikatName'));
+    }
 
 
 

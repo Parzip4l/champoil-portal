@@ -227,31 +227,11 @@ class PayrolController extends Controller
                     $payroll->unit_bisnis = $unit_bisnis;
                     $payroll->run_by = $employee->nama;
                     $payroll->save();
-
-                    // Save PDF path for each employee
-                    $directory = storage_path('app/public/payslips/');
-                    if (!File::exists($directory)) {
-                        File::makeDirectory($directory, 0755, true);
-                    }
-
-                    $pdfPath = $directory . 'payslip_' . $code . '.pdf';
-                    $pdf = PDF::loadView('pdf.payslip', compact('payroll', 'employee'));
-                    $pdf->save($pdfPath);
-
-                    $pdfPaths[$code] = $pdfPath; // Store the path in the array
                 }
             }
 
             // Send the email with the payslip PDF attachment to each user
-            foreach ($employeeCodes as $code) {
-                $employee = Employee::where('nik', $code)->first();
-                if ($employee) {
-                    $pdfPath = $pdfPaths[$code] ?? null;
-                    if ($pdfPath) {
-                        Mail::to($employee->email)->send(new PayslipEmail($employee, $pdfPath));
-                    }
-                }
-            }
+            
 
             // Commit the transaction
             DB::commit();

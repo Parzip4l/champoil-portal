@@ -10,6 +10,7 @@ use App\PayrolCM;
 use App\Payrollns;
 use Illuminate\Support\Facades\Auth;
 use App\ModelCG\Payroll;
+use App\Urbanica\PayrolUrbanica;
 
 class PayslipnsController extends Controller
 {
@@ -57,6 +58,12 @@ class PayslipnsController extends Controller
         $unit_bisnis = $employee->unit_bisnis;
         if ($unit_bisnis == 'Kas') {
             $dataPayslip = Payroll::findOrFail($id);
+        }elseif($unit_bisnis == 'Run'){
+            $dataPayslip = Payrolurbanica::findOrFail($id);
+            $dataPayslip = Payrolurbanica::where('id', $id)->get();
+
+            $totalallowence = $dataPayslip[0]['total_daily'] + $dataPayslip[0]['total_lembur'] + $dataPayslip[0]['uang_makan'] + $dataPayslip[0]['uang_kerajinan'];
+            $totalDeductions = $dataPayslip[0]['potongan_hutang'] + $dataPayslip[0]['potongan_mess'] + $dataPayslip[0]['potongan_lain'];
         } else {
             $dataPayslip = Payrollns::findOrFail($id);
 

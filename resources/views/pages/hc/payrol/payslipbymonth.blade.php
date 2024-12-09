@@ -51,7 +51,7 @@
                                         Employee not found
                                     @endif
                                 </td>
-                                <td>Rp {{ number_format($payslip->net_salary, 0, ',', '.') }}</td>
+                                <td>@if($employee->unit_bisnis === 'Run') Rp {{ number_format($payslip->thp, 0, ',', '.') }} @else Rp {{ number_format($payslip->net_salary, 0, ',', '.') }}@endif</td>
                                 <td>{{ $payslip->year }} - {{ $payslip->month }}</td>
                                 <td>
                                     <div class="dropdown">

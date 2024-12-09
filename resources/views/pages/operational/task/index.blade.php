@@ -351,6 +351,14 @@
                             <label for="" class="form-label">Filter Tanggal</label>
                             <input type="text" class="form-control" name="tanggal" required id="tanggal_report">    
                         </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Filter Jam</label>
+                            <input type="time" class="form-control" name="jam" required id="jam">    
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">&nbsp;</label>
+                            <input type="time" class="form-control" name="jam2" required id="jam2">    
+                        </div>
                         <div class="col-md-12 mb-2">
                             <label class="form-label">Pilih Jenis File</label>
                             <div>
@@ -492,39 +500,33 @@
                 tanggal: $("#tanggal_report").val(), // Example parameter
                 project_id:  project_id, // Another example parameter
                 jenis_file:jenis_file,
-                shift:shift
+                shift:shift,
+                jam1: $("#jam").val(),
+                jam2: $("#jam2").val()
             };
 
             // Send GET request using Axios
             axios.get('/api/v1/download_file_patrol', { params })
                 .then(function(response) {
                     // Handle success response
-                    const paths = response.data.paths; // Pastikan backend mengirimkan key `paths` berisi array
+                    const paths = response.data.path; // Pastikan backend mengirimkan key `paths` berisi array
         
-                    if (Array.isArray(paths) && paths.length > 0) {
-                        paths.forEach((filePath, index) => {
-                            // Buat elemen link sementara
-                            const link = document.createElement('a');
-                            link.href = filePath; // Set path dari array
-                            link.target = '_blank'; // Buka di tab baru
-                            
-                            // Tambahkan atribut download (opsional untuk mengatur nama file)
-                            link.setAttribute('download', `report_part_${index + 1}.pdf`);
+                    // Buat elemen link sementara
+                    const link = document.createElement('a');
+                    link.href = paths; // Set path dari array
+                    link.target = '_blank'; // Buka di tab baru
+                    
+                    // Tambahkan atribut download (opsional untuk mengatur nama file)
+                    link.setAttribute('download', response.data.file_name);
 
-                            // Tambahkan ke body
-                            document.body.appendChild(link);
-                            
-                            // Klik link untuk memulai unduhan
-                            link.click();
-                            
-                            // Hapus link setelah digunakan
-                            document.body.removeChild(link);
-                        });
-
-                        alert('Semua file berhasil diunduh.');
-                    } else {
-                        alert('Tidak ada file yang tersedia untuk diunduh.');
-                    }
+                    // Tambahkan ke body
+                    document.body.appendChild(link);
+                    
+                    // Klik link untuk memulai unduhan
+                    link.click();
+                    
+                    // Hapus link setelah digunakan
+                    document.body.removeChild(link);
 
                     $('#loadingBackdrop').hide();
                     alert('File downloaded successfully');
@@ -583,7 +585,5 @@
             
         }
     }); 
-
-    
 </script>
 @endpush

@@ -55,11 +55,11 @@
                                 <th colspan="5" style="text-align:center">Attendance Training</th>
                             </tr>
                             <tr>
-                                <th>SENIN</th>
-                                <th>SELASA</th>
-                                <th>RABU</th>
-                                <th>KAMIS</th>
-                                <th>JUMAT</th>
+                                <th style="text-align:center">SENIN</th>
+                                <th style="text-align:center">SELASA</th>
+                                <th style="text-align:center">RABU</th>
+                                <th style="text-align:center">KAMIS</th>
+                                <th style="text-align:center">JUMAT</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -104,11 +104,11 @@
                             <tr>
                                 <td>${record.nama || ''}<br/>${record.nik || ''}</td>
                                 <td>${record.project || ''}</td>
-                                <td>${record.training['MONDAY']}</td>
-                                <td>${record.training['TUESDAY']}</td>
-                                <td>${record.training['WEDNESDAY']}</td>
-                                <td>${record.training['THURSDAY']}</td>
-                                <td>${record.training['FRIDAY']}</td>
+                                <td style="text-align:center">${record.training['MONDAY']}</td>
+                                <td style="text-align:center">${record.training['TUESDAY']}</td>
+                                <td style="text-align:center">${record.training['WEDNESDAY']}</td>
+                                <td style="text-align:center">${record.training['THURSDAY']}</td>
+                                <td style="text-align:center">${record.training['FRIDAY']}</td>
                             </tr>
                             `;
                         }

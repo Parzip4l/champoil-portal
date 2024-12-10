@@ -424,15 +424,6 @@ class PayrolNS extends Controller
                     $totalDaysInSchedules = $schedules->count();
                     $tidakmasukkerja = 0;
 
-                    if ($totalDaysInSchedules > 0) {
-                        $rate_potongan = round($totalGaji / $totalDaysInSchedules);
-                    }
-
-                    if ($totalHari < $totalDaysInSchedules) {
-                        $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
-                        $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
-                    }
-
                     $projectIds = [$absensi->project];
                     $rate_harian = 0;
                     if (!empty($projectIds)) {
@@ -456,6 +447,15 @@ class PayrolNS extends Controller
                             $p_tkerja = $projectDetailsPPH->sum('p_tkerja');
                             $p_tkes = $projectDetailsPPH->sum('p_bpjs_ks');
                             $p_tlain = $projectDetailsPPH->sum('p_tlain');
+                        }
+
+                        if ($totalDaysInSchedules > 0) {
+                            $rate_potongan = round($totalGaji / $totalDaysInSchedules);
+                        }
+    
+                        if ($totalHari < $totalDaysInSchedules) {
+                            $potonganAbsen = $rate_potongan * ($totalDaysInSchedules - $totalWorkingDays);
+                            $tidakmasukkerja = $totalDaysInSchedules - $totalWorkingDays;
                         }
 
                         $gajiPPH = ($p_gajipokok + $p_tkerja + $p_tlain + $p_tkes + 61300 - $potonganAbsen) + $totalGajiBackup + $totalGajiLembur;

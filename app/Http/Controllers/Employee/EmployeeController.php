@@ -19,6 +19,7 @@ Use App\Organisasi\Organisasi;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
+use App\ModelCG\Referal;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
@@ -317,6 +318,16 @@ class EmployeeController extends Controller
             $payrolinfo->ptkp = $request->tanggungan;
             $payrolinfo->save();
 
+            //referal 
+            if(!empty($request->referal_code)){
+                $referal = new Referal();
+                $referal->referal_code = $request->referal_code;
+                $referal->nik = $request->nik;
+                $referal->status = 0;
+                $referal->recruitments_id = $request->recruitments_id;
+                $referal->save();
+            }
+
             // User Info
             $userinfo = new User();
             $userinfo->name = $request->nik;
@@ -353,8 +364,8 @@ And here is your login account information:
 Email: ".$request->email."
 Password: ".$request->password;
 
-            push_notif_wa($html,'','',$request->telepon,'');
-            Mail::to($request->email)->send(new NewEmployee($data));
+            // push_notif_wa($html,'','',$request->telepon,'');
+            // Mail::to($request->email)->send(new NewEmployee($data));
             DB::commit();
             return redirect()->route('employee.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }catch (ValidationException $exception) {

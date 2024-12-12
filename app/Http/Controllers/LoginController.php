@@ -30,6 +30,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $token = $request->user()->createToken('authToken')->accessToken;
+            session(['barrier' => $token]);
             // Simpan token dalam cache server selama satu jam
             Cache::put('nik' . $request->user()->name, $token, 250000);
             return redirect()->intended('dashboard')->with('token', $token);

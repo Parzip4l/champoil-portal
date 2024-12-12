@@ -226,6 +226,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
 Route::middleware(['auth', 'permission:hc_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
+    Route::view('/employee-referal','pages.hc.karyawan.referal')->name('employee-referal');
     // Component Ns
     Route::get('/component-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'createns'])->name('component.ns');
     Route::post('/store-ns', [App\Http\Controllers\Payrol\PayrolComponent::class, 'storens'])->name('componentns.store');

@@ -136,7 +136,8 @@ class EmergencyApi extends Controller
                     )
                 ) < 5", [$userLatitude, $userLongitude, $userLatitude])
                 ->get();
-
+            $formattedDistance = null;
+            $timeEstimateMinutes = null;
             foreach ($absentUsers as $absentUser) {
                 $details = new EmergencyDetails();
                 $details->emergency_id = $emergency->id;

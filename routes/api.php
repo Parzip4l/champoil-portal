@@ -93,6 +93,8 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/emergency-page', [EmergencyApi::class, 'index']);
     Route::post('/emergency-request', [EmergencyApi::class, 'EmergencyRequest']);
+    Route::put('/emergency-request/accept/{id}', [EmergencyApi::class, 'updateStatusSetuju']);
+    Route::put('/emergency-request/reject/{id}', [EmergencyApi::class, 'updateStatusRejected']);
     Route::middleware('auth:api')->post('/firebase-token', [FirebaseTokenController::class, 'store']);
 
 

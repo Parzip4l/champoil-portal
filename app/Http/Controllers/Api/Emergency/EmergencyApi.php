@@ -215,6 +215,52 @@ class EmergencyApi extends Controller
         }
     }
 
+    public function updateStatusSetuju(Request $request, $id)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+
+            $status = EmergencyDetails::where('id', $id)->firstOrFail();
+
+            if ($status->request_status !== 'Accepted') {
+                $status->request_status = 'Accepted';
+                $status->save();
+            }
+
+            return response()->json(['message' => 'Emergency Request has been Updated']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function updateStatusRejected(Request $request, $id)
+    {
+        try {
+            // Retrieve the token from the request
+            $token = $request->bearerToken();
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+
+            $employeeCode = $user->name;
+
+            $status = EmergencyDetails::where('id', $id)->firstOrFail();
+
+            if ($status->request_status !== 'Rejected') {
+                $status->request_status = 'Rejected';
+                $status->save();
+            }
+
+            return response()->json(['message' => 'Emergency Request has been Updated']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating request: ' . $e->getMessage()], 500);
+        }
+    }
+
 
     // Calculate Distance 
     protected function calculateDistance($lat1, $lon1, $lat2, $lon2)

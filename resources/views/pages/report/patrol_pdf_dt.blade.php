@@ -65,8 +65,8 @@
                     @if(!empty($row->data_history))
                         @php 
                             $img = '';
-                            if(!empty($row->data_history->image)){
-                                $img = "<img src='" . $row->data_history->image . "'>";
+                            if (!empty($row->data_history->image)) {
+                                $img = "<img src='" . asset($row->data_history->image) . "'>";
                             }
                         @endphp
                         <tr>
@@ -79,7 +79,7 @@
                             <td>{{ $row->data_history->description }}</td>
                         </tr>
                     @else
-                        <tr style="background-color:red;color:white">
+                        <tr style="background-color:#ff6f74;color:white">
                             <td>{{ $key }}</td>
                             <td>{{ date('d-m-Y', strtotime($row->tanggal_filter)) }}</td>
                             <td></td>

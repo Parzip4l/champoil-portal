@@ -583,8 +583,7 @@ class PatroliController extends Controller
                 'filter'=>$date1.' '.$jam1.' - '.$date2.' '.$jam2,
                 'project'=>$project->name
             ];
-            if($request->input('jenis_file') == "pdf"){
-                    
+            
                 
                     $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
                     $pdf->setOption('no-outline', true);
@@ -619,88 +618,8 @@ class PatroliController extends Controller
                     'file_name'=>$fileName,
                     'project'=>$project->name
                 ]);
-            }else{
-                $spreadsheet = new Spreadsheet();
-                $sheet = $spreadsheet->getActiveSheet();
-
+           
                 
-                
-
-                $sheet->getStyle('A1:H1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
-                ]);
-
-                // Output project name
-                $sheet->setCellValue('A1','REPORT PATROLI ( '.$tanggal.' )');
-                $sheet->mergeCells('A1:H1');
-
-                // Set table headers
-                $sheet->setCellValue('A2', 'Tanggal');
-                $sheet->setCellValue('B2', 'Status');
-                $sheet->setCellValue('C2', 'Description');
-                $sheet->setCellValue('D2', 'Task');
-                $sheet->setCellValue('E2', 'Point');
-                $sheet->setCellValue('F2', 'Petugas');
-
-                    // Example data writing
-                    $rowNumber = 3;
-                    $no = 1;
-                
-                    foreach ($task as $row) {
-                        if ($row->point) {
-                            $no2 = 1;
-                            foreach ($row->point as $rs) {
-                                $rowNumber++;
-                                if ($rs->list) {
-                                    foreach ($rs->list as $det) {
-                                        $nama = karyawan_bynik($det->employee_code);
-                                        if(!empty($nama)){
-                                            $employee =  $nama->nama;
-                                        }else{
-                                            $employee = $det->employee_code;
-                                        }
-                                        
-
-                                        $sheet->setCellValue('A' . $rowNumber, $det->created_at); // No need for number again
-                                        $sheet->setCellValue('B' . $rowNumber, $det->status); // No need for task again
-                                        $sheet->setCellValue('C' . $rowNumber, $det->description); // No need for date again
-                                        $sheet->setCellValue('D' . $rowNumber, $rs->task);
-                                        $sheet->setCellValue('E' . $rowNumber, $row->judul); // Replace with actual status
-                                        $sheet->setCellValue('F' . $rowNumber, $employee); // Replace with actual keterangan
-                                        
-                                        $rowNumber++;
-                                    }
-                                }
-                                $no2++;
-                            }
-                        }
-                        $rowNumber++;
-                        $no++;
-                    }
-                // Set the header for the file download
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment; filename="project_582307_report241104110534.xlsx"');
-                header('Cache-Control: max-age=0');
-                $writer = new Xlsx($spreadsheet);
-                Storage::makeDirectory('reports');
-                $fileName = 'report_'.date('ymdhis').'.xlsx'; // Example file name
-                $filePath = storage_path('app/reports/' . $fileName); // Example storage path
-
-                try {
-                    $writer->save($filePath);
-                    $publicPath = public_path('reports');
-                    if (!file_exists($publicPath)) {
-                        mkdir($publicPath, 0755, true); // Create the public directory if it doesn't exist
-                    }
-
-                    // Move the file to the public directory
-                    $newFilePath = $publicPath . '/' . $fileName;
-                    rename($filePath, $newFilePath); // Move the fil
-                } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
-                    return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
-                }
-            }
 
 
             return view('pages.report.html_view',$data);

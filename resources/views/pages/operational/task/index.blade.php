@@ -349,7 +349,11 @@
                     <div class="row">
                         <div class="col-md-12 mb-2">
                             <label for="" class="form-label">Filter Tanggal</label>
-                            <input type="text" class="form-control" name="tanggal" required id="tanggal_report">    
+                            @if(empty($project_id))
+                                <input type="text" class="form-control" name="tanggal" required id="tanggal_report">
+                            @else 
+                                <input type="date" class="form-control" name="tanggal" required id="tanggal_report">
+                            @endif
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="" class="form-label">Filter Jam</label>
@@ -359,6 +363,8 @@
                             <label for="" class="form-label">&nbsp;</label>
                             <input type="time" class="form-control" name="jam2" required id="jam2">    
                         </div>
+
+                        @if(empty($project_id))
                         <div class="col-md-12 mb-2">
                             <label class="form-label">Pilih Jenis File</label>
                             <div>
@@ -389,6 +395,8 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
+
                         <div id="project_list"></div>
                         
                         

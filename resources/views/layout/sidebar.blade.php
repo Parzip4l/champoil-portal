@@ -111,6 +111,9 @@
                                 <a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee Data</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ url('employee-referal') }}" class="nav-link {{ active_class(['employee-referal']) }}">Employee Refreral</a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ url('employee-resign') }}" class="nav-link {{ active_class(['employee-resign']) }}">Employee Resign</a>
                             </li>
                             <li class="nav-item">

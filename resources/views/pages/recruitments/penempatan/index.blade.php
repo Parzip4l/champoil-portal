@@ -32,7 +32,7 @@
                                     @if($row->nama_lengkap)
                                     <tr>
                                         <td>{{ $no }}</td>
-                                        <td>{{ $row->nama_lengkap }}</td>
+                                        <td>{{ $row->nama_lengkap }}<br/>{{ $row->kode_referal }}</td>
                                         <td>{{ $row->nomor_induk }}</td>
                                         <td>
                                             <a href="{{ route('create-truest',['id'=>$row->id]) }}" class="btn btn-primary btn-xs">Create Account</a>

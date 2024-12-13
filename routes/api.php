@@ -96,7 +96,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->post('/firebase-token', [FirebaseTokenController::class, 'store']);
 
 
-    Route::get('/referal-search/{kode_referal}', [ReferalController::class, 'search_referal']);
+    Route::get('/referal-search', [ReferalController::class, 'search_referal']);
+    Route::get('/referal-list', [ReferalController::class, 'referal_data']);
 
     // Log Absen
     Route::get('/log-absensi', [ApiLoginController::class, 'MyLogsAbsen']);

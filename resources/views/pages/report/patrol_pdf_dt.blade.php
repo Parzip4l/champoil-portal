@@ -66,7 +66,7 @@
                         @php 
                             $img = '';
                             if (!empty($row->data_history->image)) {
-                                $img = "<img src='" . asset($row->data_history->image) . "'>";
+                                $img = "<img src='" . asset($row->data_history->image) . "' style="width:200px">";
                             }
                         @endphp
                         <tr>

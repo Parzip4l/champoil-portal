@@ -546,19 +546,42 @@ class PatroliController extends Controller
                 $dateList[] = $date->format('Y-m-d');
             }
 
-            if($jam1 >= '08:00' && $jam2 <= '20:00' || $jam1 >= '09:00' && $jam2 <= '21:00'){
-                $filter_shift="SCHEDULE MALAM";
-            }else if($jam1 >= '11:00' && $jam2 <= '23:00'){
-                $filter_shift="SCHEDULE MIDDLE";
-            }else if($jam1 >= '20:00' && $jam2 <= '08:00'){
-                $filter_shift="SCHEDULE PAGI";
+            $filter_shift = [];
+
+
+            // Periksa untuk shift pagi
+            if (($jam1 >= '08:00' && $jam1 < '20:00') || ($jam1 >= '09:00' && $jam1 < '21:00') || $jam2 < '20:00') {
+                if ($jam2 >= '08:00' && $jam2 <= '20:00') {
+                    $filter_shift[] = "SCHEDULE PAGI";
+                }
             }
+
+            // Periksa untuk shift middle
+            if ($jam1 >= '11:00' && $jam1 < '23:00') {
+                if ($jam2 >= '11:00' && $jam2 <= '23:00') {
+                    $filter_shift[] = "SCHEDULE MIDDLE";
+                }
+            }
+
+            // Periksa untuk shift malam (shift malam berlaku untuk jam sebelum 08:00 atau setelah 20:00)
+            if ($jam1 < '10:00' || $jam2 <= '08:00') {
+                $filter_shift[] = "SCHEDULE MALAM";
+            }
+
+            // Jika tidak ada shift yang cocok
+            if (empty($filter_shift)) {
+                $filter_shift[] = "SHIFT TIDAK DIKENALI";
+            }
+
+
+
+            
 
             $schedule = Schedule::join('shifts', 'shifts.code', '=', 'schedules.shift')
                                 ->whereBetween('tanggal', [$date1, $date2])
                                 ->where('project', 582307)
                                 ->where('shift', '!=', 'OFF')
-                                ->where('shifts.name',$filter_shift)
+                                ->whereIn('shifts.name',$filter_shift)
                                 ->orderBy('shifts.name','asc')
                                 ->get();
 
@@ -590,7 +613,8 @@ class PatroliController extends Controller
                 'schedule'=>$this->groupBy($schedule),
                 'jam' => $jam1 . '-' . $jam2,
                 'filter'=>$date1.' '.$jam1.' - '.$date2.' '.$jam2,
-                'project'=>$project->name
+                'project'=>$project->name,
+                'shift'=>$filter_shift
             ];
             
                 
@@ -625,7 +649,8 @@ class PatroliController extends Controller
                 'message' => 'PDF files saved successfully',
                 'path' => $files,
                 'file_name'=>$fileName,
-                'project'=>$project->name
+                'project'=>$project->name,
+                'shift'=>$filter_shift
             ]);
            
                 

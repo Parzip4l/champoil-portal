@@ -501,7 +501,7 @@
                 project_id  = project;
             }
 
-            var jenis_file = $('input[name="filter_type"]:checked').val();
+            var jenis_file = $('input[name="filter_type"]:checked').val() || "pdf";
             var shift = $('input[name="shift"]:checked').val();
             
             const params = {

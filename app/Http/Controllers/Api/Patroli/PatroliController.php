@@ -546,10 +546,19 @@ class PatroliController extends Controller
                 $dateList[] = $date->format('Y-m-d');
             }
 
+            if($jam1 >= '08:00' && $jam2 <= '20:00' || $jam1 >= '09:00' && $jam2 <= '21:00'){
+                $filter_shift="SCHEDULE MALAM";
+            }else if($jam1 >= '11:00' && $jam2 <= '23:00'){
+                $filter_shift="SCHEDULE MIDDLE";
+            }else if($jam1 >= '20:00' && $jam2 <= '08:00'){
+                $filter_shift="SCHEDULE PAGI";
+            }
+
             $schedule = Schedule::join('shifts', 'shifts.code', '=', 'schedules.shift')
                                 ->whereBetween('tanggal', [$date1, $date2])
                                 ->where('project', 582307)
                                 ->where('shift', '!=', 'OFF')
+                                ->where('shifts.name',$filter_shift)
                                 ->orderBy('shifts.name','asc')
                                 ->get();
 
@@ -585,39 +594,39 @@ class PatroliController extends Controller
             ];
             
                 
-                    $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
-                    $pdf->setOption('no-outline', true);
-                    $pdf->setOption('isHtml5ParserEnabled', true);
-                    $pdf->setOption('isPhpEnabled', true);
-                    $pdf->setPaper('legal', 'portrait');
+            $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
+            $pdf->setOption('no-outline', true);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isPhpEnabled', true);
+            $pdf->setPaper('legal', 'portrait');
 
-                    // Nama file unik untuk setiap PDF
-                    $fileName = 'report_' . date('YmdHis') . ".pdf";
-                    $publicPath = public_path('reports');
+            // Nama file unik untuk setiap PDF
+            $fileName = 'report_' . date('YmdHis') . ".pdf";
+            $publicPath = public_path('reports');
 
-                    // Buat folder jika belum ada
-                    if (!is_dir($publicPath)) {
-                        mkdir($publicPath, 0755, true);
-                    }
+            // Buat folder jika belum ada
+            if (!is_dir($publicPath)) {
+                mkdir($publicPath, 0755, true);
+            }
 
-                    $filePath = $publicPath . '/' . $fileName;
+            $filePath = $publicPath . '/' . $fileName;
 
-                    // Simpan PDF
-                    $pdf->save($filePath);
+            // Simpan PDF
+            $pdf->save($filePath);
 
-                    // Tambahkan path file ke dalam array hasil
-                    $files = asset('reports/' . $fileName);
-                
+            // Tambahkan path file ke dalam array hasil
+            $files = asset('reports/' . $fileName);
+            
 
-                
+            
 
-                // Return semua path file dalam JSON response
-                return response()->json([
-                    'message' => 'PDF files saved successfully',
-                    'path' => $files,
-                    'file_name'=>$fileName,
-                    'project'=>$project->name
-                ]);
+            // Return semua path file dalam JSON response
+            return response()->json([
+                'message' => 'PDF files saved successfully',
+                'path' => $files,
+                'file_name'=>$fileName,
+                'project'=>$project->name
+            ]);
            
                 
 

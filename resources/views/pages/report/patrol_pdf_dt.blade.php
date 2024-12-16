@@ -46,6 +46,7 @@
     <table>
         <thead>
             <tr>
+                <th>NO</th>
                 <th>SHIFT</th>
                 <th>Date</th>
                 <th>Time</th>
@@ -71,6 +72,7 @@
 
                         @endphp
                         <tr>
+                            <td>{{ $no }}</td>
                             <td>{{ $key }}</td>
                             <td>{{ date('d-m-Y', strtotime($row->tanggal_filter)) }}</td>
                             <td>{{ date('H:i:s', strtotime($row->data_history->created_at)) }}</td>
@@ -81,6 +83,7 @@
                         </tr>
                     @else
                         <tr>
+                            <td>{{ $no }}</td>
                             <td>{{ $key }}</td>
                             <td>{{ date('d-m-Y', strtotime($row->tanggal_filter)) }}</td>
                             <td></td>
@@ -91,7 +94,11 @@
                         </tr>
                     @endif
                     @php 
+                        // Increment $no and reset it if it reaches jml_patrol
                         $no++;
+                        if ($no > $jml_patroli) {
+                            $no = 1;
+                        }
                     @endphp
                 @endforeach
                 @php 

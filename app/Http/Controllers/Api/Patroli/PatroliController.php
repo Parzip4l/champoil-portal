@@ -614,7 +614,8 @@ class PatroliController extends Controller
                 'jam' => $jam1 . '-' . $jam2,
                 'filter'=>$date1.' '.$jam1.' - '.$date2.' '.$jam2,
                 'project'=>$project->name,
-                'shift'=>$filter_shift
+                'shift'=>$filter_shift,
+                'jml_patroli'=>count($patroli)
             ];
             
                 

@@ -291,7 +291,7 @@ class PerformanceController extends Controller
         $dataLogin = json_decode(Auth::user()->permission);
         if (in_array('superadmin_access', $dataLogin)) {
             // Tampilkan semua data PA
-            $padata =PaModel::where('company', $company->unit_bisnis)->get()->groupBy('created_by');
+            $padata =PaModel::where('company', $company->unit_bisnis)->get();
         } elseif (in_array('dashboard_access', $dataLogin)) {
             // Tampilkan data PA berdasarkan divisi
             $padata = PaModel::where('created_by',$company->nama)->get();

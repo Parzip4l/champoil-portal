@@ -63,10 +63,9 @@
     </div>
 </div>
 <!-- End -->
-
 <!-- List Pa Record -->
 <div class="row mb-3">
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div class="card custom-card2">
             <div class="card-body">
                 <div class="form-list-wrap-pa">
@@ -112,6 +111,29 @@
                         @endforeach
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card custom-card2">
+            <div class="card-header">
+                <h6>Nilai Rata Rata PA Saya</h6>
+            </div>
+            <div class="card-body">
+                @php
+                    $averageNilai = $averageNilai ?? 0;
+                    $textClass = '';
+
+                    if ($averageNilai < 1) {
+                        $textClass = 'text-danger';
+                    } elseif ($averageNilai < 2) {
+                        $textClass = 'text-warning';
+                    } elseif ($averageNilai > 3) {
+                        $textClass = 'text-success';
+                    }
+                @endphp
+                <p class="text-muted mb-3">Nilai Saya :</p>
+                <h2 class="{{$textClass}}">{{$averageNilai ?? 0}}</h2>
             </div>
         </div>
     </div>

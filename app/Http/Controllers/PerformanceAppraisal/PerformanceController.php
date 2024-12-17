@@ -291,7 +291,7 @@ class PerformanceController extends Controller
         $dataLogin = json_decode(Auth::user()->permission);
         if (in_array('superadmin_access', $dataLogin)) {
             // Tampilkan semua data PA
-            $padata =PaModel::where('company', $company->unit_bisnis)->get();
+            $padata =PaModel::where('company', $company->unit_bisnis)->get()->groupBy('created_by');
         } elseif (in_array('dashboard_access', $dataLogin)) {
             // Tampilkan data PA berdasarkan divisi
             $padata = PaModel::where('created_by',$company->nama)->get();
@@ -567,12 +567,21 @@ class PerformanceController extends Controller
         $predikats = PredikatModel::where('company', $employee->unit_bisnis)->get();
         $paData = PaModel::where('nik', $code)->get();
 
+        // Periksa apakah data PA ada
         $hasData = !$paData->isEmpty();
+
         $predikatName = 0;
+        $averageNilai = 0; // Nilai rata-rata PA
+
         if ($hasData) {
+            // Hitung nilai rata-rata dari semua nilai_keseluruhan
+            $averageNilai = $paData->avg(function ($pa) {
+                return floatval($pa->nilai_keseluruhan);
+            });
+
             foreach ($paData as $pa) {
                 $nilai_keseluruhan = floatval($pa->nilai_keseluruhan);
-                $predikatName = null; // Reset for each iteration
+                $predikatName = null; // Reset predikat untuk setiap data
 
                 foreach ($predikats as $predikat) {
                     $minNilai = floatval($predikat->min_nilai);
@@ -587,8 +596,9 @@ class PerformanceController extends Controller
             }
         }
 
-        return view('pages.hc.pa.myperformance', compact('paData', 'employee', 'hasData', 'predikatName'));
+        return view('pages.hc.pa.myperformance', compact('paData', 'employee', 'hasData', 'predikatName', 'averageNilai'));
     }
+
 
 
 

@@ -546,76 +546,38 @@ class PatroliController extends Controller
                 $dateList[] = $date->format('Y-m-d');
             }
 
-            $filter_shift = [];
 
-
-            // Periksa untuk shift pagi
-            if (($jam1 >= '08:00' && $jam1 < '20:00') || ($jam1 >= '09:00' && $jam1 < '21:00') || $jam2 < '20:00') {
-                if ($jam2 >= '08:00' && $jam2 <= '20:00') {
-                    $filter_shift[] = "SCHEDULE PAGI";
-                }
-            }
-
-            // Periksa untuk shift middle
-            if ($jam1 >= '11:00' && $jam1 < '23:00') {
-                if ($jam2 >= '11:00' && $jam2 <= '23:00') {
-                    $filter_shift[] = "SCHEDULE MIDDLE";
-                }
-            }
-
-            // Periksa untuk shift malam (shift malam berlaku untuk jam sebelum 08:00 atau setelah 20:00)
-            if ($jam1 < '10:00' || $jam2 <= '08:00') {
-                $filter_shift[] = "SCHEDULE MALAM";
-            }
-
-            // Jika tidak ada shift yang cocok
-            if (empty($filter_shift)) {
-                $filter_shift[] = "SHIFT TIDAK DIKENALI";
-            }
-
-
-
-            
-
-            $schedule = Schedule::join('shifts', 'shifts.code', '=', 'schedules.shift')
-                                ->whereBetween('tanggal', [$date1, $date2])
-                                ->where('project', 582307)
-                                ->where('shift', '!=', 'OFF')
-                                ->whereIn('shifts.name',$filter_shift)
-                                ->orderBy('shifts.name','asc')
-                                ->get();
-
-            $patroli = Task::where('project_id',582307)->get();
-
+            $data_patrol=[];
             foreach ($dateList as $date) {
-                foreach($patroli as $patrol){
-                    $patrol->tanggal_filter=$date;
-                    $data_patrol  = Patroli::where('unix_code',$patrol->unix_code)->whereBetween('created_at',[$date1.' '.$jam1.':00', $date2.' '.$jam2.':00'])->get();
-                    $patroli_history=[];
-                    if(!empty($data_patrol)){
-                        foreach($data_patrol as $row){
-                            if($row->status != 'Baik'){
-                                $patroli_history=$row;
-                            }else{
-                                $patroli_history=$row;
-                            }
-                        }
-                    }
-                    $patrol->data_history  = $patroli_history;
-                }
+                $data_patrol  = Task::select(
+                                    'master_tasks.id', 
+                                    'master_tasks.judul', 
+                                    'patrolis.employee_code', 
+                                    'patrolis.created_at',
+                                    'patrolis.image',
+                                    'patrolis.description',
+                                    'karyawan.nama'
+                                )
+                                ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
+                                    $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
+                                        ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
+                                })
+                                ->leftJoin('karyawan','karyawan.nik','=','patrolis.employee_code')
+                                ->where('master_tasks.project_id', 582307)
+                                ->get();
+                
+            
             }
 
             $project  = Project::where('id',582307)->first();
             
             // Menyiapkan data untuk diproses lebih lanjut
             $data = [
-                'tanggal' => $patroli,
-                'schedule'=>$this->groupBy($schedule),
+                'patroli' => $data_patrol,
                 'jam' => $jam1 . '-' . $jam2,
                 'filter'=>$date1.' '.$jam1.' - '.$date2.' '.$jam2,
                 'project'=>$project->name,
-                'shift'=>$filter_shift,
-                'jml_patroli'=>count($patroli)
+                'tanggal'=>$dateList
             ];
             
                 
@@ -628,38 +590,23 @@ class PatroliController extends Controller
             // Nama file unik untuk setiap PDF
             $fileName = 'report_' . date('YmdHis') . ".pdf";
             $publicPath = public_path('reports');
-
             // Buat folder jika belum ada
             if (!is_dir($publicPath)) {
                 mkdir($publicPath, 0755, true);
             }
-
             $filePath = $publicPath . '/' . $fileName;
-
             // Simpan PDF
             $pdf->save($filePath);
-
             // Tambahkan path file ke dalam array hasil
             $files = asset('reports/' . $fileName);
-            
-
-            
-
             // Return semua path file dalam JSON response
             return response()->json([
                 'message' => 'PDF files saved successfully',
                 'path' => $files,
                 'file_name'=>$fileName,
-                'project'=>$project->name,
-                'shift'=>$filter_shift
+                'project'=>$project->name
             ]);
-           
-                
-
-
-            return view('pages.report.html_view',$data);
-
-
+            // return view('pages.report.html_view',$data);
             // return response()->json(['message' => $data]);
         }else{
             if($jml_tgl > 1){

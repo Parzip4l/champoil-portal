@@ -41,16 +41,16 @@
     </style>
 </head>
 <body>
-    <table>
+<table>
         <thead>
             <tr>
                 <th>NO</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>CODE</th>
-                <th>LOCATIONS</th>
-                <th>FINDINGS</th>
-                <th>REMARKS</th>
+                <th>Jam</th>
+                <th>Nama Anggota</th>
+                <th>Lokasi</th>
+                <th>Finding</th>
+                <th>Remarks</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -58,43 +58,27 @@
                 $no=1;
                 $no2=0;
             @endphp
-            @foreach($schedule as $key=>$val)
-                @foreach($tanggal as $row)
-                    @if(!empty($row->data_history))
-                        @php 
-                            $img = '';
-                            if(!empty($row->data_history->image)){
-                                $img = "<img src='" . $row->data_history->image . "'>";
-                            }
-                        @endphp
-                        <tr>
-                            <td>{{ $key }}</td>
-                            <td>{{ date('d-m-Y', strtotime($row->tanggal_filter)) }}</td>
-                            <td>{{ date('H:i:s', strtotime($row->data_history->created_at)) }}</td>
-                            <td>{{ $row->unix_code }}</td>
-                            <td>{{ $row->judul }}</td>
-                            <td>{!! $img !!}</td> {{-- Use {!! !!} to render HTML from variable --}}
-                            <td>{{ $row->data_history->description }}</td>
-                        </tr>
-                    @else
-                        <tr style="background-color:red;color:white">
-                            <td>{{ $key }}</td>
-                            <td>{{ date('d-m-Y', strtotime($row->tanggal_filter)) }}</td>
-                            <td></td>
-                            <td>{{ $row->unix_code }}</td>
-                            <td>{{ $row->judul }}</td>
-                            <td>{{ $row->created_at }}</td>
-                            <td></td>
-                        </tr>
-                    @endif
+                @foreach($patroli as $row)
                     @php 
+                        $img = '';
+                        if (!empty($row->image)) {
+                            $img = "<img src='" . asset($row->image) . "' style='width:50px;'>";
+                        }
+                    @endphp
+                    <tr>
+                        <td>{{ $no }}</td>
+                        <td>{{ date('H:i:s', strtotime($row->created_at)) }}</td>
+                        <td>{{ $row->nama  }}</td>
+                        <td>{{ $row->judul }}</td>
+                        <td>{!! $img !!}</td> {{-- Use {!! !!} to render HTML from variable --}}
+                        <td>{{ $row->description }}</td>
+                    </tr>
+                    @php 
+                        // Increment $no and reset it if it reaches jml_patrol
                         $no++;
                     @endphp
                 @endforeach
-                @php 
-                    $no2++;
-                @endphp
-            @endforeach
+             
         </tbody>
 
     </table>

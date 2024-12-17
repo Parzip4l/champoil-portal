@@ -41,6 +41,7 @@
     </style>
 </head>
 <body>
+    <img src="'https://hris.truest.co.id/images/companyy_logo/hilton.png">
     <h2 style="text-align:center">{{ $project }}</h2>
     <h4 style="text-align:center">{{ $filter }}</h4>
     <table>
@@ -66,15 +67,21 @@
                         if (!empty($row->image)) {
                             $img = "<img src='https://hris.truest.co.id" . $row->image. "' style='width:50px;'>";
                         }
+                        
                         $jam='';
                         if(!empty($row->jam_patrol)){
                             $jam=date('H:i:s', strtotime($row->jam_patrol));
+                        }
+
+                        $karyawan="";
+                        if(!empty($row->employee_code)){
+                            $karyawan=@karyawan_bynik($row->employee_code)->nama;
                         }
                     @endphp
                     <tr>
                         <td>{{ $no }}</td>
                         <td>{{ $jam }}</td>
-                        <td>{{ $row->nama  }}</td>
+                        <td>{{ $karyawan  }}</td>
                         <td>{{ $row->judul }}</td>
                         <td>{!! $img !!}</td> {{-- Use {!! !!} to render HTML from variable --}}
                         <td>{{ $row->description }}</td>

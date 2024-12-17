@@ -545,6 +545,9 @@ class PatroliController extends Controller
             foreach ($dates as $date) {
                 $dateList[] = $date->format('Y-m-d');
             }
+            
+            $startDateTime = Carbon::parse("$date1 $jam1:00");
+            $endDateTime = Carbon::parse("$date2 $jam2:00");
 
 
             $data_patrol=[];
@@ -555,14 +558,12 @@ class PatroliController extends Controller
                                     'patrolis.employee_code', 
                                     'patrolis.created_at as  jam_patrol',
                                     'patrolis.image',
-                                    'patrolis.description',
-                                    'karyawan.nama'
+                                    'patrolis.description'
                                 )
                                 ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
                                     $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
                                         ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
                                 })
-                                ->leftJoin('karyawan','karyawan.nik','=','patrolis.employee_code')
                                 ->where('master_tasks.project_id', 582307)
                                 ->get();
                 

@@ -66,10 +66,14 @@
                         if (!empty($row->image)) {
                             $img = "<img src='" . asset($row->image) . "' style='width:50px;'>";
                         }
+                        $jam='';
+                        if(!empty($row->jam_patrol)){
+                            $jam=date('H:i:s', strtotime($row->jam_patrol));
+                        }
                     @endphp
                     <tr>
                         <td>{{ $no }}</td>
-                        <td>{{ date('H:i:s', strtotime($row->jam_patrol)) }}</td>
+                        <td>{{ $jam }}</td>
                         <td>{{ $row->nama  }}</td>
                         <td>{{ $row->judul }}</td>
                         <td>{!! $img !!}</td> {{-- Use {!! !!} to render HTML from variable --}}

@@ -64,7 +64,7 @@
                     @php 
                         $img = '';
                         if (!empty($row->image)) {
-                            $img = "<img src='" . asset($row->image) . "' style='width:50px;'>";
+                            $img = "<img src='https://hris.truest.co.id" . $row->image. "' style='width:50px;'>";
                         }
                         $jam='';
                         if(!empty($row->jam_patrol)){

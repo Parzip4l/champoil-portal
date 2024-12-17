@@ -41,7 +41,8 @@
     </style>
 </head>
 <body>
-    <img src="'https://hris.truest.co.id/images/companyy_logo/hilton.png">
+    
+    <img src="https://hris.truest.co.id/images/company_logo/hilt2.png">
     <h2 style="text-align:center">{{ $project }}</h2>
     <h4 style="text-align:center">{{ $filter }}</h4>
     <table>

@@ -553,7 +553,7 @@ class PatroliController extends Controller
                                     'master_tasks.id', 
                                     'master_tasks.judul', 
                                     'patrolis.employee_code', 
-                                    'patrolis.created_at',
+                                    'patrolis.created_at as  jam_patrol',
                                     'patrolis.image',
                                     'patrolis.description',
                                     'karyawan.nama'

@@ -69,7 +69,7 @@
                     @endphp
                     <tr>
                         <td>{{ $no }}</td>
-                        <td>{{ date('H:i:s', strtotime($row->created_at)) }}</td>
+                        <td>{{ date('H:i:s', strtotime($row->jam_patrol)) }}</td>
                         <td>{{ $row->nama  }}</td>
                         <td>{{ $row->judul }}</td>
                         <td>{!! $img !!}</td> {{-- Use {!! !!} to render HTML from variable --}}

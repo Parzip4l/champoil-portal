@@ -42,6 +42,7 @@
                         <div class="form-group mb-2">
                             <label for="Periode">Periode</label>
                             <select name="periode" id="" class="form-control">
+                                <option value="JANUARI - JUNE">JANUARI - JUNE</option>
                                 <option value="JULY - DESEMBER">JULY - DESEMBER</option>
                             </select>
                         </div>

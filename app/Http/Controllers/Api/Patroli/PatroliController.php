@@ -552,20 +552,29 @@ class PatroliController extends Controller
 
             $data_patrol=[];
             foreach ($dateList as $date) {
-                $data_patrol  = Task::select(
-                                    'master_tasks.id', 
-                                    'master_tasks.judul', 
-                                    'patrolis.employee_code', 
-                                    'patrolis.created_at as  jam_patrol',
-                                    'patrolis.image',
-                                    'patrolis.description'
-                                )
-                                ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
-                                    $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
-                                        ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
-                                })
-                                ->where('master_tasks.project_id', 582307)
-                                ->get();
+                $data_patrol = Task::select(
+                    'master_tasks.id', 
+                    'master_tasks.judul', 
+                    'patrolis.employee_code', 
+                    'patrolis.created_at as jam_patrol',
+                    DB::raw('MIN(patrolis.image) as image'), // Menggunakan MIN sebagai contoh
+                    DB::raw('MIN(patrolis.description) as description') // Menggunakan MIN sebagai contoh
+                )
+                ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
+                    $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
+                         ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
+                })
+                ->where('master_tasks.project_id', 582307)
+                ->groupBy(
+                    'master_tasks.id',
+                    'master_tasks.judul',
+                    'patrolis.employee_code',
+                    'patrolis.created_at'
+                )
+                ->get();
+                
+
+               
                 
             
             }

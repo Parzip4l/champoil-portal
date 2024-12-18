@@ -59,43 +59,41 @@
                 @php 
                     $no = 1;
                 @endphp
-                @foreach ($padata as $createdBy => $groupedData)
-                    @foreach ($groupedData as $data)
-                        <tr>
-                            <td>{{ $data->name }}</td>
-                            <td>{{ $data->periode }}</td>
-                            <td>{{ $data->tahun }}</td>
-                            <td>{{ $data->nilai_keseluruhan }}</td>
-                            <td>{{ $data->created_by }}</td>
-                            <td>
-                                @if ($data->approve_byemployee === 'false') 
-                                    Belum di tanda tangan  
-                                @else 
-                                    Sudah ditanda tangan 
-                                @endif
-                            </td>
-                            <td>
-                                <div class="dropdown"> 
-                                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        @if ($data->approve_byemployee === 'false')
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('edit.pa', $data->id) }}">
-                                                <i data-feather="edit-2" class="icon-sm me-2"></i> 
-                                                <span class="">Edit</span>
-                                            </a>
-                                        @else
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ route('details.Mypa', $data->id) }}">
-                                                <i data-feather="eye" class="icon-sm me-2"></i> 
-                                                <span class="">Lihat</span>
-                                            </a>
-                                        @endif
-                                    </div>
+                @foreach ($padata as $data)
+                    <tr>
+                        <td>{{ $data->name }}</td>
+                        <td>{{ $data->periode }}</td>
+                        <td>{{ $data->tahun }}</td>
+                        <td>{{ $data->nilai_keseluruhan }}</td>
+                        <td>{{ $data->created_by }}</td>
+                        <td>
+                            @if ($data->approve_byemployee === 'false') 
+                                Belum di tanda tangan  
+                            @else 
+                                Sudah ditanda tangan 
+                            @endif
+                        </td>
+                        <td>
+                            <div class="dropdown"> 
+                                <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    @if ($data->approve_byemployee === 'false')
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('edit.pa', $data->id) }}">
+                                            <i data-feather="edit-2" class="icon-sm me-2"></i> 
+                                            <span class="">Edit</span>
+                                        </a>
+                                    @else
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('details.Mypa', $data->id) }}">
+                                            <i data-feather="eye" class="icon-sm me-2"></i> 
+                                            <span class="">Lihat</span>
+                                        </a>
+                                    @endif
                                 </div>
-                            </td>
-                        </tr>
-                    @endforeach
+                            </div>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
 

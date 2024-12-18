@@ -20,7 +20,7 @@
                 <img src="https://hris.truest.co.id/images/company_logo/hilt2.png" style="width: 200px;" alt="Company Logo">
             </td>
             <td style="text-align:center">
-                <h2 style="margin: 0;">DOUBLETREE <br/>By HILTON JAKARTA
+                <h2 style="margin: 0;">DOUBLETREE By HILTON <br/>JAKARTA
                 KEMAYORAN</h2>
                 <h4 style="margin: 0;">{{ $filter }}</h4>
             </td>

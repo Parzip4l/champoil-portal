@@ -567,10 +567,11 @@ class PatroliController extends Controller
                 })
                 ->where('master_tasks.project_id', 582307)
                 ->groupBy(
+                    'patrolis.created_at',
                     'master_tasks.id',
                     'master_tasks.judul',
-                    'patrolis.employee_code',
-                    'patrolis.created_at'
+                    'patrolis.employee_code'
+                    
                 )
                 ->orderBy('master_tasks.id') // Urut berdasarkan master_tasks.id
                 ->orderBy('patrolis.created_at') // Urut berdasarkan patrolis.created_at

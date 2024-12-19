@@ -31,7 +31,7 @@
         <thead>
             <tr style="background-color: #f2f2f2; text-align: left;">
                 <th>NO</th>
-                <th>Tanggal</th>
+                <!-- <th>Tanggal</th> -->
                 <th>Jam</th>
                 <th>Nama Anggota</th>
                 <th>Lokasi</th>

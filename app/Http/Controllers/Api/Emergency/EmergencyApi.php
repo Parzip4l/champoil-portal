@@ -225,7 +225,7 @@ class EmergencyApi extends Controller
 
             $employeeCode = $user->name;
 
-            $status = EmergencyDetails::where('id', $id)->firstOrFail();
+            $status = EmergencyDetails::where('emergency_id', $id)->firstOrFail();
 
             if ($status->request_status !== 'Accepted') {
                 $status->request_status = 'Accepted';
@@ -248,7 +248,7 @@ class EmergencyApi extends Controller
 
             $employeeCode = $user->name;
 
-            $status = EmergencyDetails::where('id', $id)->firstOrFail();
+            $status = EmergencyDetails::where('emergency_id', $id)->firstOrFail();
 
             if ($status->request_status !== 'Rejected') {
                 $status->request_status = 'Rejected';

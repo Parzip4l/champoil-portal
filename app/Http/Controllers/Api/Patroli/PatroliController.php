@@ -571,6 +571,8 @@ class PatroliController extends Controller
                     'patrolis.employee_code',
                     'patrolis.created_at'
                 )
+                ->orderBy('patrolis.created_at','asc')
+                ->orderBy('master_tasks.id','asc')
                 ->get();
                 
 

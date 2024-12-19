@@ -557,8 +557,8 @@ class PatroliController extends Controller
                     'master_tasks.judul', 
                     'patrolis.employee_code', 
                     'patrolis.created_at as jam_patrol',
-                    DB::raw('MIN(patrolis.image) as image'), // Menggunakan MIN sebagai contoh
-                    DB::raw('MIN(patrolis.description) as description') // Menggunakan MIN sebagai contoh
+                    DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.image ELSE NULL END) as image'),
+                    DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.description ELSE NULL END) as description')
                 )
                 ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
                     $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
@@ -571,8 +571,8 @@ class PatroliController extends Controller
                     'patrolis.employee_code',
                     'patrolis.created_at'
                 )
-                ->orderBy('patrolis.created_at','asc')
-                ->orderBy('master_tasks.id','asc')
+                ->orderBy('patrolis.created_at') // Urut berdasarkan patrolis.created_at
+                ->orderBy('master_tasks.id') // Urut berdasarkan master_tasks.id
                 ->get();
             }
 

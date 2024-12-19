@@ -31,6 +31,7 @@
         <thead>
             <tr style="background-color: #f2f2f2; text-align: left;">
                 <th>NO</th>
+                <th>Tanggal</th>
                 <th>Jam</th>
                 <th>Nama Anggota</th>
                 <th>Lokasi</th>
@@ -55,6 +56,11 @@
                         $jam = date('H:i:s', strtotime($row->jam_patrol));
                     }
 
+                    $tanggal = '';
+                    if(!empty($row->jam_patrol)){
+                        $tanggal = date('Y-m-d', strtotime($row->jam_patrol));
+                    }
+
                     $karyawan = "";
                     if(!empty($row->employee_code)){
                         $karyawan = @karyawan_bynik($row->employee_code)->nama;
@@ -62,6 +68,7 @@
                 @endphp
                 <tr style="page-break-inside: avoid;">
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $no }}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ $tanggal }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $jam }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $karyawan }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $row->judul }}</td>

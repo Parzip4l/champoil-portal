@@ -31,7 +31,6 @@
         <thead>
             <tr style="background-color: #f2f2f2; text-align: left;">
                 <th>NO</th>
-                <!-- <th>Tanggal</th> -->
                 <th>Jam</th>
                 <th>Nama Anggota</th>
                 <th>Lokasi</th>
@@ -52,11 +51,9 @@
                     }
                     
                     $jam = '';
-                    if(!empty($row->created_at)){
-                        $jam = date('H:i:s', strtotime($row->created_at));
+                    if(!empty($row->jam_patrol)){
+                        $jam = date('H:i:s', strtotime($row->jam_patrol));
                     }
-
-                    
 
                     $karyawan = "";
                     if(!empty($row->employee_code)){

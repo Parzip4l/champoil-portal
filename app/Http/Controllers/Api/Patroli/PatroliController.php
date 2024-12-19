@@ -563,7 +563,7 @@ class PatroliController extends Controller
                 )
                 ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
                     $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
-                        ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
+                         ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
                 })
                 ->where('master_tasks.project_id', 582307)
                 ->groupBy(
@@ -572,7 +572,10 @@ class PatroliController extends Controller
                     'patrolis.employee_code',
                     'patrolis.created_at'
                 )
+                ->orderBy('master_tasks.id') // Urut berdasarkan master_tasks.id
+                ->orderBy('patrolis.created_at') // Urut berdasarkan patrolis.created_at
                 ->get();
+
 
                 
 

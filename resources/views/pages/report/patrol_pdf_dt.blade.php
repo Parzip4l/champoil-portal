@@ -52,8 +52,8 @@
                     }
                     
                     $jam = '';
-                    if(!empty($row->jam_patrol)){
-                        $jam = date('H:i:s', strtotime($row->jam_patrol));
+                    if(!empty($row->created_at)){
+                        $jam = date('H:i:s', strtotime($row->created_at));
                     }
 
                     

@@ -552,37 +552,24 @@ class PatroliController extends Controller
 
             $data_patrol=[];
 
+            $patroli = Task::where('project_id',582307)->get();
+
             foreach ($dateList as $date) {
-                $data_patrol = Task::select(
-                    'master_tasks.id', 
-                    'master_tasks.judul', 
-                    'patrolis.employee_code', 
-                    'patrolis.created_at as jam_patrol',
-                    DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.image ELSE NULL END) as image'),
-                    DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.description ELSE NULL END) as description')
-                )
-                ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
-                    $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
-                         ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
-                })
-                ->where('master_tasks.project_id', 582307)
-                ->groupBy(
-                    'patrolis.created_at',
-                    'master_tasks.id',
-                    'master_tasks.judul',
-                    'patrolis.employee_code'
-                    
-                )
-                ->orderBy('master_tasks.id') // Urut berdasarkan master_tasks.id
-                ->orderBy('patrolis.created_at') // Urut berdasarkan patrolis.created_at
-                ->get();
-
-
-                
-
-               
-                
-            
+                foreach($patroli as $patrol){
+                    $patrol->tanggal_filter=$date;
+                    $data_patrol  = Patroli::where('unix_code',$patrol->unix_code)->whereBetween('created_at',[$date1.' '.$jam1.':00', $date2.' '.$jam2.':00'])->get();
+                    $patroli_history=[];
+                    if(!empty($data_patrol)){
+                        foreach($data_patrol as $row){
+                            if($row->status != 'Baik'){
+                                $patroli_history=$row;
+                            }else{
+                                $patroli_history=$row;
+                            }
+                        }
+                    }
+                    $patrol->data_history  = $patroli_history;
+                }
             }
 
             $project  = Project::where('id',582307)->first();

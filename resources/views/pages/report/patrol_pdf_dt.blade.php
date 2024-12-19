@@ -46,13 +46,13 @@
             @foreach($patroli as $row)
                 @php 
                     $img = '';
-                    if (!empty($row->image)) {
+                    if (!empty($row->data_history->image)) {
                         $img = "<img src='https://hris.truest.co.id" . $row->image. "' style='width:30px;'>";
                     }
                     
                     $jam = '';
                     if(!empty($row->jam_patrol)){
-                        $jam = date('H:i:s', strtotime($row->jam_patrol));
+                        $jam = date('Y-m-d H:i:s', strtotime($row->jam_patrol));
                     }
 
                     $karyawan = "";

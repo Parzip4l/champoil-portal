@@ -551,7 +551,6 @@ class PatroliController extends Controller
 
 
             $data_patrol=[];
-            
             foreach ($dateList as $date) {
                 $data_patrol = Task::select(
                     'master_tasks.id', 
@@ -573,12 +572,8 @@ class PatroliController extends Controller
                     'patrolis.created_at'
                 )
                 ->orderBy('patrolis.created_at','asc')
+                ->orderBy('master_tasks.id','asc')
                 ->get();
-                
-
-               
-                
-            
             }
 
             $project  = Project::where('id',582307)->first();

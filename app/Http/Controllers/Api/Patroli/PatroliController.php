@@ -541,54 +541,68 @@ class PatroliController extends Controller
 
         if($project==582307){
            
-            $dateList = [];
-            foreach ($dates as $date) {
-                $dateList[] = $date->format('Y-m-d');
-            }
-            
-            $startDateTime = Carbon::parse("$date1 $jam1:00");
-            $endDateTime = Carbon::parse("$date2 $jam2:00");
-
-
-            $data_patrol=[];
-            foreach ($dateList as $date) {
-                $data_patrol = Task::select(
-                    'master_tasks.id', 
-                    'master_tasks.judul', 
-                    'patrolis.employee_code', 
-                    'patrolis.created_at as jam_patrol',
-                    DB::raw('MIN(patrolis.image) as image'),
-                    DB::raw('MIN(patrolis.description) as description'),
-                    DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.image ELSE NULL END) as image'),
-                    DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.description ELSE NULL END) as description')
-                )
-                ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
-                    $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
-                         ->whereBetween('patrolis.created_at', [$date1.' '.$jam1.':00', $date2.' '.$jam2.':00']);
-                })
-                ->where('master_tasks.project_id', 582307)
-                ->groupBy(
-                    'master_tasks.id',
-                    'master_tasks.judul',
-                    'patrolis.employee_code',
-                    'patrolis.created_at'
-                )
-                ->orderBy('patrolis.created_at','asc')
-                ->orderBy('master_tasks.id','asc')
-                ->get();
+            $data_patrol = Task::select(
+                'master_tasks.id', 
+                'master_tasks.judul', 
+                'patrolis.employee_code', 
+                'patrolis.created_at as jam_patrol',
+                DB::raw('MIN(patrolis.image) as image'),
+                DB::raw('MIN(patrolis.description) as description'),
+                DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.image ELSE NULL END) as image'),
+                DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.description ELSE NULL END) as description')
+            )
+            ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
+                $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
+                     ->whereBetween('patrolis.created_at', ["$date1 $jam1:00", "$date2 $jam2:00"]);
+            })
+            ->where('master_tasks.project_id', 582307)
+            ->groupBy(
+                'master_tasks.id',
+                'master_tasks.judul',
+                'patrolis.employee_code',
+                'patrolis.created_at'
+            )
+            ->orderBy('master_tasks.id', 'asc') // Primary order by master_tasks.id
+            ->orderBy('patrolis.created_at', 'asc') // Secondary order by patrolis.created_at
+            ->get();
+        
+            // Re-structure data to handle date logic
+            $organized_patrols = [];
+            foreach ($data_patrol as $record) {
+                $patrol_date = date('Y-m-d', strtotime($record->jam_patrol));
+                $organized_patrols[$patrol_date][] = $record;
             }
 
+            $final_list = [];
+            foreach ($organized_patrols as $patrol_date => $patrols) {
+                foreach ($patrols as $patrol) {
+                    $final_list[] = $patrol; // Append original record
+                }
+
+                // Repeat for next day if created_at spans multiple days
+                if (strtotime($patrol_date) < strtotime($date2)) {
+                    foreach ($patrols as $patrol) {
+                        $new_record = clone $patrol; // Clone the record object
+                        $new_record->jam_patrol = date('Y-m-d H:i:s', strtotime($patrol_date . ' +1 day'));
+                        $final_list[] = $new_record; // Append the cloned record
+                    }
+                }
+            }
+
+            // Sort the final list by `created_at` (jam_patrol) ascending
+            usort($final_list, function ($a, $b) {
+                return strtotime($a->jam_patrol) <=> strtotime($b->jam_patrol);
+            });
             $project  = Project::where('id',582307)->first();
             
-            // Menyiapkan data untuk diproses lebih lanjut
+            // Prepare final data
             $data = [
-                'patroli' => $data_patrol,
-                'jam' => $jam1 . '-' . $jam2,
-                'filter'=>$date1.' '.$jam1.' - '.$date2.' '.$jam2,
-                'project'=>$project->name,
-                'tanggal'=>$dateList
+                'patroli' => $final_list,
+                'jam' => "$jam1-$jam2",
+                'filter' => "$date1 $jam1 - $date2 $jam2",
+                'project' => $project->name ?? 'Unknown Project',
+                'tanggal' => $tanggal ?? '',
             ];
-            
                 
             $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
             $pdf->setOption('no-outline', true);

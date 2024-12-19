@@ -522,7 +522,6 @@ class PatroliController extends Controller
         $jam2 = $request->input('jam2');
         $explode = explode(' to ', $tanggal);
         $jml_tgl =count($explode);
-       
 
         if ($jml_tgl > 1) {
             $date1 = $explode[0];

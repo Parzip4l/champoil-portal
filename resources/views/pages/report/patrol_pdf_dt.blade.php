@@ -52,7 +52,7 @@
                     
                     $jam = '';
                     if(!empty($row->jam_patrol)){
-                        $jam = date('Y-m-d H:i:s', strtotime($row->jam_patrol));
+                        $jam = date('H:i:s', strtotime($row->jam_patrol));
                     }
 
                     $karyawan = "";

@@ -701,6 +701,24 @@ class ApiLoginController extends Controller
 
             // Fetch attendance data for the current month
             $attendanceData = DB::table('absens')
+                ->select(
+                    DB::raw('CAST(id AS CHAR) as id'), // Mengubah id menjadi string
+                    'user_id',
+                    'nik',
+                    'tanggal',
+                    'project',
+                    'project_backup',
+                    'clock_in',
+                    'clock_out',
+                    'latitude',
+                    'longtitude',
+                    'latitude_out',
+                    'longtitude_out',
+                    'status',
+                    'created_at',
+                    'updated_at',
+                    'photo'
+                )
                 ->where('nik', $nikdata)
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->orderBy('tanggal', 'asc')

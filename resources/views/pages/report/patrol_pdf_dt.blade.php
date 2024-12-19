@@ -47,7 +47,7 @@
             @foreach($patroli as $row)
                 @php 
                     $img = '';
-                    if (!empty($row->data_history->image)) {
+                    if (!empty($row->image)) {
                         $img = "<img src='https://hris.truest.co.id" . $row->image. "' style='width:30px;'>";
                     }
                     

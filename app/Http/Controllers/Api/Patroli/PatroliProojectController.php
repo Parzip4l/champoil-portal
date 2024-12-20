@@ -30,54 +30,59 @@ class PatroliProojectController extends Controller
     // Store a new record
     public function store(Request $request)
 {
-    try {
-        // // Validate the incoming request
-        // $validated = $request->validate([
-        //     'project_id' => 'required|integer',
-        //     'judul' => 'required|string|max:255',
-        // ]);
+    // try {
+    //     // // Validate the incoming request
+    //     // $validated = $request->validate([
+    //     //     'project_id' => 'required|integer',
+    //     //     'judul' => 'required|string|max:255',
+    //     // ]);
 
-        // // Generate a random unique unix_code
-        // $unixCode = Str::random(10); // 10-character random string
-        // $validated['unix_code'] = $unixCode;
-        // $validated['created_at'] = now();
+    //     // // Generate a random unique unix_code
+    //     // $unixCode = Str::random(10); // 10-character random string
+    //     // $validated['unix_code'] = $unixCode;
+    //     // $validated['created_at'] = now();
 
-        // // Create a QR Code using the unix_code
-        // $qrCode = new QrCode($unixCode);
-        // $writer = new PngWriter();
+    //     // // Create a QR Code using the unix_code
+    //     // $qrCode = new QrCode($unixCode);
+    //     // $writer = new PngWriter();
 
-        // // Save the QR code as an image file
-        // $image = $writer->write($qrCode);
+    //     // // Save the QR code as an image file
+    //     // $image = $writer->write($qrCode);
 
-        // // Define the file path in the public directory
-        // $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
+    //     // // Define the file path in the public directory
+    //     // $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
 
-        // // Ensure the directory exists
-        // if (!file_exists(dirname($filePath))) {
-        //     mkdir(dirname($filePath), 0755, true);
-        // }
+    //     // // Ensure the directory exists
+    //     // if (!file_exists(dirname($filePath))) {
+    //     //     mkdir(dirname($filePath), 0755, true);
+    //     // }
 
-        // // Save the image to the public directory
-        // file_put_contents($filePath, $image->getString());
+    //     // // Save the image to the public directory
+    //     // file_put_contents($filePath, $image->getString());
 
-        // // Optionally save the project in the database
-        // PatroliProject::insert($validated);
+    //     // // Optionally save the project in the database
+    //     // PatroliProject::insert($validated);
 
-        // Return a success response with the file path
-        return response()->json([
-            'message' => 'QR code generated and saved successfully',
-            'qr_code_path' => asset('qr_codes/qr_code_' . $unixCode . '.png'), // URL to access the saved QR code
-        ]);
-    } catch (\Exception $e) {
-        // Log the error message for debugging
-        Log::error('Error saving QR Code: ' . $e->getMessage());
+    //     // Return a success response with the file path
+    //     return response()->json([
+    //         'message' => 'QR code generated and saved successfully',
+    //         'qr_code_path' => asset('qr_codes/qr_code_' . $unixCode . '.png'), // URL to access the saved QR code
+    //     ]);
+    // } catch (\Exception $e) {
+    //     // Log the error message for debugging
+    //     Log::error('Error saving QR Code: ' . $e->getMessage());
 
-        // Return an error response
-        return response()->json([
-            'message' => 'An error occurred while saving the QR Code.',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
+    //     // Return an error response
+    //     return response()->json([
+    //         'message' => 'An error occurred while saving the QR Code.',
+    //         'error' => $e->getMessage(),
+    //     ], 500);
+    // }
+
+    return response()->json([
+                'message' => 'QR code generated and saved successfully',
+                'qr_code_path' => "dsdds", // URL to access the saved QR code
+            ]); 
 }
 
     // Show a specific record

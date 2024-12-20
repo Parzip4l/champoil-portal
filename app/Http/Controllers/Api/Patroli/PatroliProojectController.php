@@ -29,39 +29,44 @@ class PatroliProojectController extends Controller
 
     // Store a new record
     public function store(Request $request)
-    {
-        // Validate the incoming request
-        $validated = $request->validate([
-            'project_id' => 'required|integer',
-            'judul' => 'required|string|max:255',
-        ]);
+{
+    // Validate the incoming request
+    $validated = $request->validate([
+        'project_id' => 'required|integer',
+        'judul' => 'required|string|max:255',
+    ]);
 
-        // Generate a random unique unix_code
-        $unixCode = Str::random(10); // 10-character random string
-        $validated['unix_code'] = $unixCode;
+    // Generate a random unique unix_code
+    $unixCode = Str::random(10); // 10-character random string
+    $validated['unix_code'] = $unixCode;
 
-        // Create a QR Code using the unix_code
-        $qrCode = new QrCode($unixCode);
-        $writer = new PngWriter();
+    // Create a QR Code using the unix_code
+    $qrCode = new QrCode($unixCode);
+    $writer = new PngWriter();
 
-        // Save the QR code as an image file
-        $image = $writer->write($qrCode);
-        
-        // Define the storage path (public/qr_codes)
-        $filePath = 'qr_codes/qr_code_' . $unixCode . '.png';
+    // Save the QR code as an image file
+    $image = $writer->write($qrCode);
+    
+    // Define the file path in the public directory
+    $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
 
-        // Save the image to the public directory
-        Storage::disk('public')->put($filePath, $image->getString());
-
-        // Optionally save the project in the database
-        $project = PatroliProject::create($validated);
-
-        // Return a success response with the file path
-        return response()->json([
-            'message' => 'QR code generated and saved successfully',
-            'qr_code_path' => Storage::url($filePath), // URL to access the saved QR code
-        ]);
+    // Ensure the directory exists
+    if (!file_exists(dirname($filePath))) {
+        mkdir(dirname($filePath), 0755, true);
     }
+
+    // Save the image to the public directory
+    file_put_contents($filePath, $image->getString());
+
+    // Optionally save the project in the database
+    $project = PatroliProject::create($validated);
+
+    // Return a success response with the file path
+    return response()->json([
+        'message' => 'QR code generated and saved successfully',
+        'qr_code_path' => asset('qr_codes/qr_code_' . $unixCode . '.png'), // URL to access the saved QR code
+    ]);
+}
 
     // Show a specific record
     public function show($id)
@@ -110,65 +115,69 @@ class PatroliProojectController extends Controller
 
     // Download QR code image
     public function download($unixCode){
-        // Retrieve the record from the database based on the Unix code
-        $record = PatroliProject::where('unix_code', $unixCode)->first();
+       
+    // Retrieve the record from the database based on the Unix code
+    $record = PatroliProject::where('unix_code', $unixCode)->first();
 
-        // Define the storage path for the QR code image
-        $filePath = 'qr_codes/qr_code_' . $record->unix_code . '.png'; // Relative path in public/storage
+    // Check if the record exists
+    if (!$record) {
+        return response()->json(['message' => 'Record not found'], 404);
+    }
 
-        // Get the absolute path to the image using public_path
-        $imagePath = public_path('storage/' . $filePath);
+    // Define the storage path for the QR code image
+    $filePath = 'qr_codes/qr_code_' . $record->unix_code . '.png'; // Relative path in public/
+    $imagePath = public_path($filePath); // Absolute path to the image
 
-        // Check if the image exists
-        if (!file_exists($imagePath)) {
-            return response()->json(['message' => 'QR code not found'], 404);
-        }
+    // Check if the image exists
+    if (!file_exists($imagePath)) {
+        return response()->json(['message' => 'QR code not found'], 404);
+    }
 
-        // Define the HTML content for the PDF (embedded in the controller)
-        $pdfContent = "
-        <!DOCTYPE html>
-        <html lang='en'>
-        <head>
-            <meta charset='UTF-8'>
-            <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <title>QR Code</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
-                }
-                .title {
-                    text-align: center;
-                    font-size: 18px;
-                }
-                .qr-image {
-                    display: block;
-                    margin: 20px auto;
-                    width: 150px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class='title'>
-                <small>{$record->judul}</small>
-            </div>
-            <div class='qr-image'>
-                <!-- Use the absolute path to the image -->
-                <img src='" . $imagePath . "' alt='QR Code' width='150' />
-            </div>
-        </body>
-        </html>
-        ";
+    // Define the HTML content for the PDF
+    $pdfContent = "
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>QR Code</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                text-align: center;
+            }
+            .title {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+            .qr-image img {
+                width: 150px;
+                height: auto;
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='title'>
+            {$record->judul}
+        </div>
+        <div class='qr-image'>
+            <img src='{$imagePath}' alt='QR Code' />
+        </div>
+    </body>
+    </html>
+    ";
 
-        // Generate the PDF from the inline HTML content using DomPDF
-        $pdf = Pdf::loadHTML($pdfContent);
+    // Generate the PDF from the inline HTML content using DomPDF
+    $pdf = Pdf::loadHTML($pdfContent);
 
-        // Set custom page size to 500px x 500px
-        $pdf->setPaper([0, 0, 300, 300]); // [x1, y1, x2, y2] for 500x500 px
+    // Set custom page size to 500px x 500px
+    $pdf->setPaper([0, 0, 300, 300]); // [x1, y1, x2, y2] for 500x500 px
 
-        // Return the PDF as a downloadable file
-        return $pdf->download('qr_code_' . $unixCode . '.pdf');
+    // Return the PDF as a downloadable file
+    return $pdf->download('qr_code_' . $unixCode . '.pdf');
+
     }
 
     public function project_patroli($unixCode){

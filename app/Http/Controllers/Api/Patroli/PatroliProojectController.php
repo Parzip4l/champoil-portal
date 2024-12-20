@@ -39,6 +39,7 @@ class PatroliProojectController extends Controller
     // Generate a random unique unix_code
     $unixCode = Str::random(10); // 10-character random string
     $validated['unix_code'] = $unixCode;
+    $validated['created_at'] = date('Y-m-d H:i:s');
 
     // Create a QR Code using the unix_code
     $qrCode = new QrCode($unixCode);
@@ -59,7 +60,7 @@ class PatroliProojectController extends Controller
     file_put_contents($filePath, $image->getString());
 
     // Optionally save the project in the database
-    $project = PatroliProject::create($validated);
+    $project = PatroliProject::insert($validated);
 
     // Return a success response with the file path
     return response()->json([

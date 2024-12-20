@@ -31,16 +31,16 @@ class PatroliProojectController extends Controller
     public function store(Request $request)
 {
     // try {
-    //     // // Validate the incoming request
-    //     // $validated = $request->validate([
-    //     //     'project_id' => 'required|integer',
-    //     //     'judul' => 'required|string|max:255',
-    //     // ]);
+        // Validate the incoming request
+        $validated = $request->validate([
+            'project_id' => 'required|integer',
+            'judul' => 'required|string|max:255',
+        ]);
 
-    //     // // Generate a random unique unix_code
-    //     // $unixCode = Str::random(10); // 10-character random string
-    //     // $validated['unix_code'] = $unixCode;
-    //     // $validated['created_at'] = now();
+        // Generate a random unique unix_code
+        $unixCode = Str::random(10); // 10-character random string
+        $validated['unix_code'] = $unixCode;
+        $validated['created_at'] = now();
 
     //     // // Create a QR Code using the unix_code
     //     // $qrCode = new QrCode($unixCode);
@@ -81,7 +81,7 @@ class PatroliProojectController extends Controller
 
     return response()->json([
                 'message' => 'QR code generated and saved successfully',
-                'qr_code_path' => "dsdds", // URL to access the saved QR code
+                'qr_code_path' => "asas", // URL to access the saved QR code
             ]); 
 }
 

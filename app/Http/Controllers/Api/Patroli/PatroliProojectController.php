@@ -30,7 +30,7 @@ class PatroliProojectController extends Controller
     // Store a new record
     public function store(Request $request)
 {
-    // try {
+    try {
         // Validate the incoming request
         $validated = $request->validate([
             'project_id' => 'required|integer',
@@ -57,32 +57,27 @@ class PatroliProojectController extends Controller
             mkdir(dirname($filePath), 0755, true);
         }
 
-    //     // // Save the image to the public directory
+        // Save the image to the public directory
         file_put_contents($filePath, $image->getString());
 
-    //     // // Optionally save the project in the database
-    //     // PatroliProject::insert($validated);
+        // Optionally save the project in the database
+        PatroliProject::insert($validated);
 
-    //     // Return a success response with the file path
-    //     return response()->json([
-    //         'message' => 'QR code generated and saved successfully',
-    //         'qr_code_path' => asset('qr_codes/qr_code_' . $unixCode . '.png'), // URL to access the saved QR code
-    //     ]);
-    // } catch (\Exception $e) {
-    //     // Log the error message for debugging
-    //     Log::error('Error saving QR Code: ' . $e->getMessage());
+        // Return a success response with the file path
+        return response()->json([
+            'message' => 'QR code generated and saved successfully',
+            'qr_code_path' => asset('qr_codes/qr_code_' . $unixCode . '.png'), // URL to access the saved QR code
+        ]);
+    } catch (\Exception $e) {
+        // Log the error message for debugging
+        Log::error('Error saving QR Code: ' . $e->getMessage());
 
-    //     // Return an error response
-    //     return response()->json([
-    //         'message' => 'An error occurred while saving the QR Code.',
-    //         'error' => $e->getMessage(),
-    //     ], 500);
-    // }
-
-    return response()->json([
-                'message' => 'QR code generated and saved successfully',
-                'qr_code_path' => "asas", // URL to access the saved QR code
-            ]); 
+        // Return an error response
+        return response()->json([
+            'message' => 'An error occurred while saving the QR Code.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
 }
 
     // Show a specific record

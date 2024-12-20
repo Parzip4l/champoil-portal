@@ -23,8 +23,8 @@
       </div>
 
       <!-- Hidden input fields for the unix_code and employee -->
-      <input type="text" id="unix_code" name="unix_code">
-      <input type="text" id="employee_id" name="employee_id" value="{{ $employee->nik }}">
+      <input type="hidden" id="unix_code" name="unix_code">
+      <input type="hidden" id="employee_id" name="employee_id" value="{{ $employee->nik }}">
 
       <div class="mb-3">
           <label for="camera" class="form-label">Remarks</label>

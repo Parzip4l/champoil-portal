@@ -44,7 +44,7 @@
         <form id="projectForm">
           <div class="mb-3">
             <label for="project_id" class="form-label">Project ID</label>
-            <input type="number" class="form-control" id="project_id" name="project_id" required>
+            <input type="number" class="form-control" id="project_id" name="project_id" value="582307" readonly="readonly" required>
           </div>
           <div class="mb-3">
             <label for="judul" class="form-label">Judul</label>

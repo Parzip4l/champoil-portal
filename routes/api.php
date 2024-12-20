@@ -217,7 +217,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/skip-training', [TrainingController::class, 'index'])->name('skip-training');
     
     //patrooli project
-    Route::apiResource('patroli-projects', PatroliProojectController::class);
+    Route::get('patroli-projects', [PatroliProjectController::class, 'index']); // Fetch all resources
+    Route::post('patroli-projects', [PatroliProjectController::class, 'store']); // Create a new resource
+    Route::get('patroli-projects/{id}', [PatroliProjectController::class, 'show']); // Fetch a single resource
+    Route::put('patroli-projects/{id}', [PatroliProjectController::class, 'update']); // Update a resource
+    Route::delete('patroli-projects/{id}', [PatroliProjectController::class, 'destroy']); // Delete a resource
     Route::get('patroli-projects/{unixCode}/download', [PatroliProojectController::class, 'download'])->name('patroli-projects.download');
     Route::get('project-patroli/{unixCode}', [PatroliProojectController::class, 'project_patroli'])->name('project-patroli');
     Route::post('patroli-activity', [PatroliProojectController::class, 'storeActivity']);

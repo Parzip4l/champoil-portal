@@ -320,7 +320,7 @@ class PerformanceController extends Controller
             $predikatName = null;
             $periode = null;
             $tahun = null;
-
+            $level = null;
             if (!$paData->isEmpty()) {
                 // Hitung nilai rata-rata dari semua nilai_keseluruhan
                 $averageNilai = $paData->avg(function ($pa) {
@@ -346,6 +346,7 @@ class PerformanceController extends Controller
             $performanceData[] = [
                 'employee_name' => $employee->nama,
                 'nik' => $employee->nik,
+                'level' => $employee->golongan,
                 'average_nilai' => $averageNilai,
                 'predikat_name' => $predikatName,
                 'periode' => $periode,
@@ -410,6 +411,7 @@ class PerformanceController extends Controller
             $performanceData[] = [
                 'employee_name' => $employee->nama,
                 'nik' => $employee->nik,
+                'level' => $employee->level,
                 'average_nilai' => $averageNilai,
                 'predikat_name' => $predikatName,
                 'periode' => $periode,

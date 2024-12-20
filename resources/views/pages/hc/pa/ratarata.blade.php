@@ -46,7 +46,9 @@
                 <table id="dataTableExample" class="table">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Nama</th>
+                            <th>Level</th>
                             <th>Periode</th>
                             <th>Tahun</th>
                             <th>Nilai Rata - Rata</th>
@@ -54,6 +56,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php 
+                        $no = 1;
+                        @endphp
                         @foreach ($performanceData as $data)
                             @php
                                 $backgroundClass = '';
@@ -68,9 +73,12 @@
                                 } elseif ($data['predikat_name'] === 'Kurang Sekali') {
                                     $backgroundClass = 'bg-kurang-sekali';
                                 }
+                                
                             @endphp
                             <tr class="{{ $backgroundClass }}">
+                                <td>{{$no++}}</td>
                                 <td>{{ $data['employee_name'] }}</td>
+                                <td>{{ $data['level'] }}</td>
                                 <td>{{ $data['periode'] ?? 'Tidak Tersedia' }}</td>
                                 <td>{{ $data['tahun'] ?? 'Tidak Tersedia' }}</td>
                                 <td>{{ number_format($data['average_nilai'], 2) }}</td>

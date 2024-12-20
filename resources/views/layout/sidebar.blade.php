@@ -143,6 +143,9 @@
                             </li>
                             @if(in_array('superadmin_access', $dataLogin))
                             <li class="nav-item">
+                                <a href="{{ route('pa.ratarata') }}" class="nav-link {{ active_class(['performance/rata-rata']) }}">Nilai Rata Rata </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('setting.pa') }}" class="nav-link {{ active_class(['performance-appraisal/setting']) }}">Settings</a>
                             </li>
                             @endif

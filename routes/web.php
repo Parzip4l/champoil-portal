@@ -218,6 +218,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
                 Route::put('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'updateFaktor'])->name('faktor-pa.update');
                 Route::delete('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deleteFaktor'])->name('faktor-pa.destroy');
                 Route::get('/duplikat-faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'duplicateFaktor'])->name('faktor-pa.duplikat');
+                Route::get('/performance/rata-rata', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'AllPerformanceList'])->name('pa.ratarata');
             });
     });
 

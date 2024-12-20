@@ -302,6 +302,57 @@ class PerformanceController extends Controller
         return view('pages.hc.pa.index', compact('padata'));
     }
 
+    public function AllPerformanceList()
+    {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $employees = Employee::where('unit_bisnis', $company->unit_bisnis)->where('organisasi','Management Leaders')->where('resign_status','0')->get();
+        $predikats = PredikatModel::where('company', $company->unit_bisnis)->get();
+        $performanceData = [];
+
+        foreach ($employees as $employee) {
+            $paData = PaModel::where('nik', $employee->nik)->get();
+            $averageNilai = 0; // Nilai rata-rata PA
+            $predikatName = null;
+            $periode = null;
+            $tahun = null;
+
+            if (!$paData->isEmpty()) {
+                // Hitung nilai rata-rata dari semua nilai_keseluruhan
+                $averageNilai = $paData->avg(function ($pa) {
+                    return floatval($pa->nilai_keseluruhan);
+                });
+
+                // Cari predikat berdasarkan nilai rata-rata
+                foreach ($predikats as $predikat) {
+                    $minNilai = floatval($predikat->min_nilai);
+                    $maxNilai = floatval($predikat->max_nilai);
+
+                    if ($averageNilai >= $minNilai && $averageNilai <= $maxNilai) {
+                        $predikatName = $predikat->name;
+                        break;
+                    }
+                }
+
+                // Ambil periode dan tahun dari data PA pertama
+                $periode = $paData->first()->periode;
+                $tahun = $paData->first()->tahun;
+            }
+
+            $performanceData[] = [
+                'employee_name' => $employee->nama,
+                'nik' => $employee->nik,
+                'average_nilai' => $averageNilai,
+                'predikat_name' => $predikatName,
+                'periode' => $periode,
+                'tahun' => $tahun,
+            ];
+        }
+
+        return view('pages.hc.pa.ratarata', compact('performanceData'));
+    }
+
+
     public function createPA(Request $request)
     {
         $code = Auth::user()->employee_code;

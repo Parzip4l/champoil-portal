@@ -42,23 +42,23 @@ class PatroliProojectController extends Controller
         $validated['unix_code'] = $unixCode;
         $validated['created_at'] = now();
 
-    //     // // Create a QR Code using the unix_code
-    //     // $qrCode = new QrCode($unixCode);
-    //     // $writer = new PngWriter();
+        // Create a QR Code using the unix_code
+        $qrCode = new QrCode($unixCode);
+        $writer = new PngWriter();
 
-    //     // // Save the QR code as an image file
-    //     // $image = $writer->write($qrCode);
+        // Save the QR code as an image file
+        $image = $writer->write($qrCode);
 
-    //     // // Define the file path in the public directory
-    //     // $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
+        // Define the file path in the public directory
+        $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
 
-    //     // // Ensure the directory exists
-    //     // if (!file_exists(dirname($filePath))) {
-    //     //     mkdir(dirname($filePath), 0755, true);
-    //     // }
+        // Ensure the directory exists
+        if (!file_exists(dirname($filePath))) {
+            mkdir(dirname($filePath), 0755, true);
+        }
 
     //     // // Save the image to the public directory
-    //     // file_put_contents($filePath, $image->getString());
+        file_put_contents($filePath, $image->getString());
 
     //     // // Optionally save the project in the database
     //     // PatroliProject::insert($validated);

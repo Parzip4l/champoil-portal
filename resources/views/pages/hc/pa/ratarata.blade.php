@@ -55,7 +55,21 @@
                     </thead>
                     <tbody>
                         @foreach ($performanceData as $data)
-                            <tr>
+                            @php
+                                $backgroundClass = '';
+                                if ($data['predikat_name'] === 'Baik') {
+                                    $backgroundClass = 'bg-primary text-white';
+                                } elseif ($data['predikat_name'] === 'Baik Sekali') {
+                                    $backgroundClass = 'bg-success text-white';
+                                } elseif ($data['predikat_name'] === 'Cukup') {
+                                    $backgroundClass = 'bg-warning text-white';
+                                } elseif ($data['predikat_name'] === 'Kurang') {
+                                    $backgroundClass = 'bg-warning text-white';
+                                } elseif ($data['predikat_name'] === 'Kurang Sekali') {
+                                    $backgroundClass = 'bg-danger text-white';
+                                }
+                            @endphp
+                            <tr class="{{ $backgroundClass }}">
                                 <td>{{ $data['employee_name'] }}</td>
                                 <td>{{ $data['periode'] ?? 'Tidak Tersedia' }}</td>
                                 <td>{{ $data['tahun'] ?? 'Tidak Tersedia' }}</td>
@@ -80,7 +94,34 @@
 @endpush
 
 @push('custom-scripts')
-  <script src="{{ asset('assets/js/data-table.js') }}"></script>
+<script>
+  $(function() {
+    'use strict';
+
+    // Inisialisasi DataTable
+    $('#dataTableExample').DataTable({
+      "aLengthMenu": [
+        [10, 30, 50, -1],
+        [10, 30, 50, "All"]
+      ],
+      "iDisplayLength": 10,
+      "ordering": false, // Nonaktifkan ordering
+      "language": {
+        search: ""
+      }
+    });
+
+    // Tambahkan placeholder untuk input pencarian
+    $('#dataTableExample').each(function() {
+      var datatable = $(this);
+      var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
+      search_input.attr('placeholder', 'Search');
+      search_input.removeClass('form-control-sm');
+      var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
+      length_sel.removeClass('form-control-sm');
+    });
+  });
+</script>
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
     function showDeleteDataDialog(id) {

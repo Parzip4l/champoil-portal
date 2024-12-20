@@ -47,16 +47,16 @@ class PatroliProojectController extends Controller
     // Save the QR code as an image file
     $image = $writer->write($qrCode);
     
-    // Define the file path in the public directory
-    $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
+    // // Define the file path in the public directory
+    // $filePath = public_path('qr_codes/qr_code_' . $unixCode . '.png');
 
-    // Ensure the directory exists
-    if (!file_exists(dirname($filePath))) {
-        mkdir(dirname($filePath), 0755, true);
-    }
+    // // Ensure the directory exists
+    // if (!file_exists(dirname($filePath))) {
+    //     mkdir(dirname($filePath), 0755, true);
+    // }
 
-    // Save the image to the public directory
-    file_put_contents($filePath, $image->getString());
+    // // Save the image to the public directory
+    // file_put_contents($filePath, $image->getString());
 
     // Optionally save the project in the database
     $project = PatroliProject::create($validated);

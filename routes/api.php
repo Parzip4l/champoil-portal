@@ -218,7 +218,6 @@ Route::prefix('v1')->group(function () {
     
     //patrooli project
     Route::apiResource('patroli-projects', PatroliProojectController::class);
-    Route::post('patroli-projects', PatroliProojectController::class,'store');
     Route::get('patroli-projects/{unixCode}/download', [PatroliProojectController::class, 'download'])->name('patroli-projects.download');
     Route::get('project-patroli/{unixCode}', [PatroliProojectController::class, 'project_patroli'])->name('project-patroli');
     Route::post('patroli-activity', [PatroliProojectController::class, 'storeActivity']);

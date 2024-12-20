@@ -66,6 +66,7 @@
                         $karyawan = @karyawan_bynik($row->employee_code)->nama;
                     }
                 @endphp
+                @if(!empty($tanggal) && $tanggal !='1970-01-02')
                 <tr style="page-break-inside: avoid;">
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $no }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $tanggal }}</td>
@@ -75,6 +76,7 @@
                     <td style="padding: 8px; border: 1px solid #ddd;">{!! $img !!}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $row->description }}</td>
                 </tr>
+                @endif
                 @php 
                     $no++;
                 @endphp

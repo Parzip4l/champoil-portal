@@ -217,8 +217,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/skip-training', [TrainingController::class, 'index'])->name('skip-training');
     
     //patrooli project
-    Route::get('patroli-projects', [PatroliProojectController::class, 'index']); // Fetch all resources
-    Route::post('patroli-projects', [PatroliProojectController::class, 'store']); // Create a new resource
+    Route::get('patroli-projects-get', [PatroliProojectController::class, 'index']); // Fetch all resources
+    Route::post('patroli-projects-insert', [PatroliProojectController::class, 'store']); // Create a new resource
     Route::get('patroli-projects/{id}', [PatroliProojectController::class, 'show']); // Fetch a single resource
     Route::put('patroli-projects/{id}', [PatroliProojectController::class, 'update']); // Update a resource
     Route::delete('patroli-projects/{id}', [PatroliProojectController::class, 'destroy']); // Delete a resource

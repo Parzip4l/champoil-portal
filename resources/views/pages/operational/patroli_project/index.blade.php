@@ -93,7 +93,7 @@
             processing: true,
             serverSide: true,
             ajax: function (data, callback) {
-                axios.get('/api/v1/patroli-projects')
+                axios.get('/api/v1/patroli-projects-get')
                     .then(response => {
                         const formattedData = response.data.map((item, index) => ({
                             id: index + 1,
@@ -141,8 +141,8 @@
             };
 
             const request = id
-                ? axios.put(`/api/v1/patroli-projects/${id}`, data)
-                : axios.post('/api/v1/patroli-projects', data);
+                ? axios.put(`/api/v1/patroli-projects-insert/${id}`, data)
+                : axios.post('/api/v1/patroli-projects-insert', data);
 
             request
                 .then(() => {

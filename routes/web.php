@@ -219,6 +219,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
                 Route::delete('/faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'deleteFaktor'])->name('faktor-pa.destroy');
                 Route::get('/duplikat-faktor/{id}', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'duplicateFaktor'])->name('faktor-pa.duplikat');
                 Route::get('/performance/rata-rata', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'AllPerformanceList'])->name('pa.ratarata');
+                Route::get('/performance/download', [App\Http\Controllers\PerformanceAppraisal\PerformanceController::class, 'downloadPDF'])->name('pa.download');
             });
     });
 

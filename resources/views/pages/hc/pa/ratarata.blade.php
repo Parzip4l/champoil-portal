@@ -37,7 +37,7 @@
                     <h6 class="card-title align-self-center mb-0">Performance Appraisal</h6>
                 </div>
                 <div class="tombol-pembantu d-flex">
-                    <a href="{{route('create.pa')}}" class="btn btn-primary">Create</a>
+                    <a href="{{route('pa.download')}}" class="btn btn-primary">Download Report</a>
                 </div>
             </div>
         </div>
@@ -58,15 +58,15 @@
                             @php
                                 $backgroundClass = '';
                                 if ($data['predikat_name'] === 'Baik') {
-                                    $backgroundClass = 'bg-primary text-white';
+                                    $backgroundClass = 'bg-baik';
                                 } elseif ($data['predikat_name'] === 'Baik Sekali') {
-                                    $backgroundClass = 'bg-success text-white';
+                                    $backgroundClass = 'bg-baik-sekali';
                                 } elseif ($data['predikat_name'] === 'Cukup') {
-                                    $backgroundClass = 'bg-warning text-white';
+                                    $backgroundClass = 'bg-cukup';
                                 } elseif ($data['predikat_name'] === 'Kurang') {
-                                    $backgroundClass = 'bg-warning text-white';
+                                    $backgroundClass = 'bg-kurang';
                                 } elseif ($data['predikat_name'] === 'Kurang Sekali') {
-                                    $backgroundClass = 'bg-danger text-white';
+                                    $backgroundClass = 'bg-kurang-sekali';
                                 }
                             @endphp
                             <tr class="{{ $backgroundClass }}">
@@ -187,4 +187,25 @@
         });
     @endif
 </script>
+<style>
+    .bg-baik {
+        background-color: #d4edda!important; /* Hijau muda */
+    }
+
+    .bg-baik-sekali {
+        background-color: #c3e6cb!important; /* Hijau lebih terang */
+    }
+
+    .bg-cukup {
+        background-color: #fff3cd!important; /* Kuning muda */
+    }
+
+    .bg-kurang {
+        background-color: #f8d7da!important; /* Merah muda */
+    }
+
+    .bg-kurang-sekali {
+        background-color: #f5c6cb!important; /* Merah lebih gelap */
+    }
+</style>
 @endpush

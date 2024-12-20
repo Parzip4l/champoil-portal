@@ -452,9 +452,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Pengajuan Schedule
         Route::resource('pengajuan-schedule', App\Http\Controllers\PengajuanSchedule\PengajuanController::class);
         Route::get('/schedule/details/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'showDetails'])->name('pengajuanschedule.details');
-            // Setujui Pengajuan Schedule
-            Route::post('/schedule-request/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'updateStatusSetuju'])->name('approve.requestschedule');
-            Route::post('/reject-schedule-request/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'RejectSchedule'])->name('reject.requestschedule');
+        // Setujui Pengajuan Schedule
+        Route::post('/schedule-request/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'updateStatusSetuju'])->name('approve.requestschedule');
+        Route::post('/reject-schedule-request/{project}/{periode}', [App\Http\Controllers\PengajuanSchedule\PengajuanController::class, 'RejectSchedule'])->name('reject.requestschedule');
         
         /** Report */
         Route::resource('report', App\Http\Controllers\Report\ReportController::class);
@@ -463,15 +463,15 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::resource('double', App\Http\Controllers\Report\CheckdoubleController::class);
 
         /** Recruitments */
-            Route::get('dashboard-recruitment',[App\Http\Controllers\Recruitments\DashboardController::class, 'index'])->name('dashboard-recruitment');
-            Route::resource('job-aplicant', App\Http\Controllers\Recruitments\JobAplicantController::class);
-            Route::get('/job-aplicant', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'index'])->name('job-aplicant');
-            Route::post('/save-permintaan-client', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'store'])->name('save-permintaan-client');
-            Route::get('/medis', [App\Http\Controllers\Recruitments\MedisController::class, 'index'])->name('medis');
-            Route::get('/test', [App\Http\Controllers\Recruitments\TestController::class, 'index'])->name('test');
-            Route::get('/penempatan', [App\Http\Controllers\Recruitments\PenempatanController::class, 'index'])->name('penempatan');
-            Route::get('/create-truest/{id}', [App\Http\Controllers\Recruitments\PenempatanController::class, 'create'])->name('create-truest');
-            Route::view('training-skip','pages.recruitments.training')->name('training-skip');
+        Route::get('dashboard-recruitment',[App\Http\Controllers\Recruitments\DashboardController::class, 'index'])->name('dashboard-recruitment');
+        Route::resource('job-aplicant', App\Http\Controllers\Recruitments\JobAplicantController::class);
+        Route::get('/job-aplicant', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'index'])->name('job-aplicant');
+        Route::post('/save-permintaan-client', [App\Http\Controllers\Recruitments\JobAplicantController::class, 'store'])->name('save-permintaan-client');
+        Route::get('/medis', [App\Http\Controllers\Recruitments\MedisController::class, 'index'])->name('medis');
+        Route::get('/test', [App\Http\Controllers\Recruitments\TestController::class, 'index'])->name('test');
+        Route::get('/penempatan', [App\Http\Controllers\Recruitments\PenempatanController::class, 'index'])->name('penempatan');
+        Route::get('/create-truest/{id}', [App\Http\Controllers\Recruitments\PenempatanController::class, 'create'])->name('create-truest');
+        Route::view('training-skip','pages.recruitments.training')->name('training-skip');
         
         
         Route::get('/map', [App\Http\Controllers\Map::class, 'index'])->name('map');
@@ -483,6 +483,13 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
         // voice of frontline 
         Route::resource('voice', App\Http\Controllers\CgControllers\VoiceControllers::class);
+
+        // patroli project 
+        Route::view('patroli-project','pages.operational.patroli_project.index')->name('patroli-project');
+        Route::view('scan-project','pages.operational.patroli_project.scan_project')->name('scan-project');
+        Route::view('activity-patroli/{id}','pages.operational.patroli_project.form_activity')->name('activity-patroli');
+        
+        
 
     });
 

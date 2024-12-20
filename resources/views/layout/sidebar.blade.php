@@ -288,7 +288,10 @@
                     <ul class="nav sub-menu">
                         @if($employee && $employee->unit_bisnis == 'Kas')
                         <li class="nav-item">
-                            <a href="{{ url('task') }}" class="nav-link {{ active_class(['task']) }}">Patroli</a>
+                            <a href="{{ url('task') }}" class="nav-link {{ active_class(['task']) }}">Daily Patroli</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('patroli-project') }}" class="nav-link {{ active_class(['patroli-project']) }}">Project Patroli</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Audit</a>

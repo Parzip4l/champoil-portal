@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Emergency\EmergencyApi;
 use App\Http\Controllers\Api\Emergency\FirebaseTokenController;
 use App\Http\Controllers\Api\VoiceOfController;
 use App\Http\Controllers\Api\Recruitments\TrainingController;
+use App\Http\Controllers\Api\Patroli\PatroliProojectController;
 
 
 Route::prefix('v1')->group(function () {
@@ -212,8 +213,14 @@ Route::prefix('v1')->group(function () {
 
     Route::post('dashboard-patroli', [PatroliController::class, 'dashboard_analytic']);
     Route::get('/skip-training', [TrainingController::class, 'index'])->name('skip-training');
-    
 
+    Route::get('/skip-training', [TrainingController::class, 'index'])->name('skip-training');
+    
+    //patrooli project
+    Route::apiResource('patroli-projects', PatroliProojectController::class);
+    Route::get('patroli-projects/{unixCode}/download', [PatroliProojectController::class, 'download'])->name('patroli-projects.download');
+    Route::get('project-patroli/{unixCode}', [PatroliProojectController::class, 'project_patroli'])->name('project-patroli');
+    Route::post('patroli-activity', [PatroliProojectController::class, 'storeActivity']);
 
 
 });

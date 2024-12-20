@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Emergency\FirebaseTokenController;
 use App\Http\Controllers\Api\VoiceOfController;
 use App\Http\Controllers\Api\Recruitments\TrainingController;
 use App\Http\Controllers\Api\Patroli\PatroliProojectController;
+use App\Http\Controllers\Api\Patroli\LapsitController;
 
 
 Route::prefix('v1')->group(function () {
@@ -225,6 +226,30 @@ Route::prefix('v1')->group(function () {
     Route::get('patroli-projects/{unixCode}/download', [PatroliProojectController::class, 'download'])->name('patroli-projects.download');
     Route::get('project-patroli/{unixCode}', [PatroliProojectController::class, 'project_patroli'])->name('project-patroli');
     Route::post('patroli-activity', [PatroliProojectController::class, 'storeActivity']);
+
+    // Fetch all Lapsit projects
+    Route::get('lapsit-projects-get', [LapsitController::class, 'index']); // Fetch all resources
+
+    // Create a new Lapsit project
+    Route::post('lapsit-projects-insert', [LapsitController::class, 'store']); // Create a new resource
+
+    // Fetch a single Lapsit project by ID
+    Route::get('lapsit-projects/{id}', [LapsitController::class, 'show']); // Fetch a single resource
+
+    // Update a Lapsit project by ID
+    Route::put('lapsit-projects/{id}', [LapsitController::class, 'update']); // Update a resource
+
+    // Delete a Lapsit project by ID
+    Route::delete('lapsit-projects/{id}', [LapsitController::class, 'destroy']); // Delete a resource
+
+    // Download QR code for a specific Lapsit project using its Unix code
+    Route::get('lapsit-projects/{unixCode}/download', [LapsitController::class, 'download'])->name('lapsit-projects.download');
+
+    // Get URL for a specific Lapsit activity
+    Route::get('project-lapsit/{unixCode}', [LapsitController::class, 'project_lapsit'])->name('project-lapsit');
+
+    // Store a Lapsit activity (with an image)
+    Route::post('lapsit-activity', [LapsitController::class, 'storeActivity']); // Store activity
 
 
 });

@@ -277,6 +277,16 @@
                 </a>
             </div>
             <div class="item">
+                <a href="{{ route('scan-lapsit') }}">
+                    <div class="icon text-center">
+                        <i class="icon-lg text-white" data-feather="book"></i>
+                    </div>
+                    <div class="menu-name text-center">
+                        <p class="text-muted">Lapsit</p>
+                    </div>
+                </a>
+            </div>
+            <div class="item">
                 <a href="javascript:void(0)" id="maps-update">
                     <div class="icon text-center">
                         <i class="icon-lg text-white" data-feather="map"></i>

@@ -294,6 +294,9 @@
                             <a href="{{ route('patroli-project') }}" class="nav-link {{ active_class(['patroli-project']) }}">Project Patroli</a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('lapsit-project') }}" class="nav-link {{ active_class(['lapsit-project']) }}">Lapsit</a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ url('') }}" class="nav-link {{ active_class(['']) }}">Audit</a>
                         </li>
                         @endif

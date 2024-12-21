@@ -8,10 +8,13 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use PDF;
 
 use App\ModelCG\Lapsit;
 use App\ModelCG\LapsitActivity;
+use App\ModelCG\Project;
 
 class LapsitController extends Controller
 {
@@ -243,5 +246,90 @@ class LapsitController extends Controller
 
         // Respond with success
         return response()->json(['message' => 'Activity submitted successfully!', 'file_path' => $filePath], 200);
+    }
+
+    public function download_file_patrol(Request $request){
+        try {
+            // Parse request inputs
+            $tanggal = $request->input('tanggal');
+            $project_id =  $request->input('project_id');
+            $jam1 = $request->input('jam1');
+            $jam2 = $request->input('jam2');
+
+            $explode = explode(' to ', $tanggal);
+            $jml_tgl = count($explode);
+
+            if ($jml_tgl > 1) {
+                $date1 = Carbon::parse($explode[0]);
+                $date2 = Carbon::parse($explode[1]);
+            } else {
+                $date1 = Carbon::parse($explode[0]);
+                $date2 = Carbon::parse($explode[0]);
+            }
+
+            $start = $date1->format('Y-m-d') . " $jam1";
+            $end = $date2->format('Y-m-d') . " $jam2";
+
+            // Fetch project details
+            $project = Project::find($project_id);
+
+            if (!$project) {
+                return response()->json(['error' => 'Project not found'], 404);
+            }
+
+            // Fetch patrol records
+            $records = Lapsit::select('lapsits.judul','lapsit_activities.*')
+                ->join('lapsit_activities', 'lapsit_activities.lapsit_id', '=', 'lapsits.id')
+                ->whereBetween('lapsit_activities.created_at', [$start, $end])
+                ->orderBy('lapsit_activities.created_at','asc')
+                ->get();
+
+           
+            $data = [
+                'patroli' => $records,
+                'jam' => "$jam1 - $jam2",
+                'filter' => "$date1 $jam1 - $date2 $jam2",
+                'project' => $project->name ?? 'Unknown Project',
+                'tanggal' => $tanggal ?? '',
+                'title'=>"LAPSIT"
+            ];
+
+            // Generate the PDF
+            $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);
+            $pdf->setOption('no-outline', true);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isPhpEnabled', true);
+            $pdf->setPaper('legal', 'portrait');
+
+            // Create unique file name for the PDF
+            $fileName = 'report_' . date('YmdHis') . ".pdf";
+            $publicPath = public_path('reports');
+
+            // Ensure the directory exists
+            if (!is_dir($publicPath)) {
+                mkdir($publicPath, 0755, true);
+            }
+
+            $filePath = $publicPath . '/' . $fileName;
+
+            // Save the PDF
+            $pdf->save($filePath);
+
+            $fileUrl = asset('reports/' . $fileName);
+
+            // Return JSON response with file details
+            return response()->json([
+                'message' => 'PDF file generated successfully',
+                'path' => $fileUrl,
+                'file_name' => $fileName,
+                'project' => $project->name
+            ]);
+        } catch (\Exception $e) {
+            // Handle exceptions and return error response
+            return response()->json([
+                'error' => 'Failed to generate PDF',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }

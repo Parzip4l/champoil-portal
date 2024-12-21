@@ -251,6 +251,7 @@ Route::prefix('v1')->group(function () {
 
     // Store a Lapsit activity (with an image)
     Route::post('lapsit-activity', [LapsitController::class, 'storeActivity']); // Store activity
+    Route::get('lapsit-activity-download', [LapsitController::class, 'download_file_patrol']);
 
 
 });

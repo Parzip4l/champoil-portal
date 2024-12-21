@@ -47,7 +47,7 @@
                 @php 
                     $img = '';
                     if (!empty($row->images)) {
-                        $img = "<img src='https://hris.truest.co.id/storage/app/public/" . $row->image. "' style='width:30px;'>";
+                        $img = "<img src='https://hris.truest.co.id/storage/app/public/" . $row->images. "' style='width:30px;'>";
                     }
                 @endphp
                 <tr style="page-break-inside: avoid;">

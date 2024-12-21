@@ -205,7 +205,7 @@ class LapsitController extends Controller
     {
         // Validate the incoming request
         $validated = $request->validate([
-            'images' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',  // Adjust image validation rules as necessary
+            'images' => 'required|image|mimes:jpg,jpeg,png',  // Adjust image validation rules as necessary
             'unix_code' => 'required|string',
             'employee' => 'required|string', // Validate employee_id as required
             'remarks' => 'nullable|string', // Remarks can be optional or empty

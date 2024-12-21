@@ -65,7 +65,10 @@
                     <td style="padding: 8px; border: 1px solid #ddd;">{!! $img !!}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $row->remarks }}</td>
                 </tr>
-                $no++;
+                @php 
+                    $no++;
+                @endphp
+                
             @endforeach
             
         </tbody>

@@ -9,9 +9,33 @@
 <div class="row">
     <div class="col-md-12 stretch-card">
         <div class="card">
+        <!-- <button id="addProjectBtn" class="btn btn-primary mb-3">Add Project</button> -->
+        <div class="card-header">
+            <div class="head-card d-flex justify-content-between">
+                <div class="header-title align-self-center">
+                    <h6 class="card-title align-self-center mb-0">Data Patroli Project</h6>
+                    
+                </div>
+                <div class="tombol-pembantu d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item d-flex align-items-center me-2" href="#" id="addProjectBtn">
+                                <i data-feather="plus" class="icon-sm me-2"></i> Tambah List
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#download">
+                                <i data-feather="download" class="icon-sm me-2"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
             <div class="card-body">
-                <h4 class="card-title">Patroli Project</h4>
-                <button id="addProjectBtn" class="btn btn-primary mb-3">Add Project</button>
+                
                 <table id="dataTable" class="table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -76,6 +100,45 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="download" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Filter Download</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="download_file">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label for="" class="form-label">Filter Tanggal</label>
+                                <input type="text" class="form-control" name="tanggal" required id="tanggal_report">
+                            
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">Filter Jam</label>
+                            <input type="time" class="form-control" name="jam" required id="jam">    
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="" class="form-label">&nbsp;</label>
+                            <input type="time" class="form-control" name="jam2" required id="jam2">    
+                        </div>
+
+                        
+                        <div id="project_list"></div>
+                        
+                        
+                        <div class="col-md-12 mt-2">
+                            <button class="btn btn-primary w-100" type="button" id="download_file_patrol">Download</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -243,6 +306,90 @@
                 alert('Failed to download QR code.');
             });
     }
+
+    $(document).ready(function() {
+        $('#loadingBackdrop').hide();
+        $('#download_file_patrol').on('click', function() {
+            // Define any parameters you want to send
+            $('#loadingBackdrop').show();
+            var project = 582307;
+            let project_id='';
+            if(project ===''){
+                project_id  = $("#project_id_filter").val();
+            }else{
+                project_id  = project;
+            }
+
+            var jenis_file = $('input[name="filter_type"]:checked').val() || "pdf";
+            var shift = $('input[name="shift"]:checked').val();
+            
+            const params = {
+                tanggal: $("#tanggal_report").val(), // Example parameter
+                project_id:  project_id, // Another example parameter
+                jenis_file:jenis_file,
+                shift:shift,
+                jam1: $("#jam").val(),
+                jam2: $("#jam2").val()
+            };
+
+            // Send GET request using Axios
+            axios.get('/api/v1/patroli-activity-download', { params })
+                .then(function(response) {
+                    // Handle success response
+                    const paths = response.data.path; // Pastikan backend mengirimkan key `paths` berisi array
+        
+                    // Buat elemen link sementara
+                    const link = document.createElement('a');
+                    link.href = paths; // Set path dari array
+                    link.target = '_blank'; // Buka di tab baru
+                    
+                    // Tambahkan atribut download (opsional untuk mengatur nama file)
+                    link.setAttribute('download', response.data.file_name);
+
+                    // Tambahkan ke body
+                    document.body.appendChild(link);
+                    
+                    // Klik link untuk memulai unduhan
+                    link.click();
+                    
+                    // Hapus link setelah digunakan
+                    document.body.removeChild(link);
+
+                    $('#loadingBackdrop').hide();
+                    alert('File downloaded successfully');
+                    // Optionally, you can handle the response, like redirecting to a download URL
+                    // window.location.href = response.data.downloadUrl; 
+                })
+                .catch(function(error) {
+                    // Handle error response
+                    console.error('Error downloading file', error);
+                    $('#loadingBackdrop').hide();
+                });
+        });
+    });
+
+    flatpickr("#tanggal_report", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onClose: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length === 2) {
+                const startDate = selectedDates[0];
+                const endDate = selectedDates[1];
+
+                // Calculate the difference in time and then convert to days
+                const timeDiff = endDate - startDate;
+                const dayDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
+
+                // Show alert if the difference is greater than 31 days
+                if (dayDiff > 7) {
+                    alert("MAKSIMAL 7 HARI");
+                    // Optionally clear the selected dates
+                    instance.clear(); // Uncomment if you want to clear the selection
+                    return; // Exit the function if the alert is shown
+                }
+            }
+        }
+    }); 
 
   </script>
 @endpush

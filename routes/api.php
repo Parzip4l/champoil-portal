@@ -226,6 +226,7 @@ Route::prefix('v1')->group(function () {
     Route::get('patroli-projects/{unixCode}/download', [PatroliProojectController::class, 'download'])->name('patroli-projects.download');
     Route::get('project-patroli/{unixCode}', [PatroliProojectController::class, 'project_patroli'])->name('project-patroli');
     Route::post('patroli-activity', [PatroliProojectController::class, 'storeActivity']);
+    Route::get('patroli-activity-download', [PatroliProojectController::class, 'download_file_patrol']);
 
     // Fetch all Lapsit projects
     Route::get('lapsit-projects-get', [LapsitController::class, 'index']); // Fetch all resources

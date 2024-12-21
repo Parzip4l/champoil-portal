@@ -49,12 +49,18 @@
                     if (!empty($row->images)) {
                         $img = "<img src='https://hris.truest.co.id/storage/app/public/" . $row->images. "' style='width:60px;'>";
                     }
+
+                    if($code == 'lapsit'){
+                        $employee = karyawan_bynik($row->employee)->nama;
+                    }else{
+                        $employee = karyawan_bynik($row->employee_id)->nama;
+                    }
                 @endphp
                 <tr style="page-break-inside: avoid;">
                     <td style="padding: 8px; border: 1px solid #ddd;">{{  $no }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{   date('Y-m-d',strtotime($row->created_at)) }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{   date('H:i:s',strtotime($row->created_at)) }}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{{ $row->employee_id }}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ $employee }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $row->judul }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{!! $img !!}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ $row->remarks }}</td>

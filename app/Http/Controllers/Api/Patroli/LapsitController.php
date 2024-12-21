@@ -291,7 +291,8 @@ class LapsitController extends Controller
                 'filter' => "$date1 $jam1 - $date2 $jam2",
                 'project' => $project->name ?? 'Unknown Project',
                 'tanggal' => $tanggal ?? '',
-                'title'=>"LAPSIT"
+                'title'=>"LAPSIT",
+                'code'=>'lapsit'
             ];
 
             // Generate the PDF

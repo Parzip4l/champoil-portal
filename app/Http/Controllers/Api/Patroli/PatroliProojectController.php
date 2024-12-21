@@ -288,7 +288,8 @@ class PatroliProojectController extends Controller
                 'filter' => "$date1 $jam1 - $date2 $jam2",
                 'project' => $project->name ?? 'Unknown Project',
                 'tanggal' => $tanggal ?? '',
-                'title'=>"PATROLI PROJECT"
+                'title'=>"PATROLI PROJECT",
+                'code'=>'project'
             ];
 
             // Generate the PDF

@@ -48,6 +48,8 @@ class EmployeeExport implements FromCollection, WithHeadings
             'jurusan',
             'sertifikasi',
             'expired_sertifikasi',
+            'slack_id',
+            'resign_status'
         ])
         ->get();
     }
@@ -81,6 +83,8 @@ class EmployeeExport implements FromCollection, WithHeadings
             'JURUSAN',
             'SERTIFIKASI',
             'EXPIRED DATE',
+            'SLACK ID',
+            'RESIGN STATUS'
         ];
     }
 }

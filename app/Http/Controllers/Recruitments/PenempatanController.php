@@ -45,7 +45,7 @@ class PenempatanController extends Controller
         
         $result=[];
         // dd($data['records']['records']);
-        $history = JobApplpicant::limit(2000)->orderBy('id','DESC')->get();
+        $history = JobApplpicant::limit(5000)->orderBy('id','DESC')->get();
         
         if($history){
             foreach($history as $row){

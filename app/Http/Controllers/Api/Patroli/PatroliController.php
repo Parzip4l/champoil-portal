@@ -604,30 +604,51 @@ class PatroliController extends Controller
                 'tanggal' => $tanggal ?? '',
             ];
                 
-            $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $data);
-            $pdf->setOption('no-outline', true);
-            $pdf->setOption('isHtml5ParserEnabled', true);
-            $pdf->setOption('isPhpEnabled', true);
-            $pdf->setPaper('legal', 'portrait');
+            ini_set('memory_limit', '4096M');
 
-            // Nama file unik untuk setiap PDF
-            $fileName = 'report_' . date('YmdHis') . ".pdf";
-            $publicPath = public_path('reports');
-            // Buat folder jika belum ada
-            if (!is_dir($publicPath)) {
-                mkdir($publicPath, 0755, true);
+            // Ambil data tasks dan bagi ke dalam chunks
+            $tasksArray = $data['patroli'];
+            $chunks = array_chunk($tasksArray, 500);
+            $files = []; // Array untuk menyimpan semua file yang dihasilkan
+            
+            foreach ($chunks as $index => $chunk) {
+                // Data khusus untuk setiap kelompok
+                $chunkedData = $data; // Salin data asli
+                $chunkedData['patroli'] = $chunk; // Ganti 'tasks' dengan data bagian
+            
+                // Generate PDF
+                $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $chunkedData);
+                $pdf->setOption('no-outline', true);
+                $pdf->setOption('isHtml5ParserEnabled', true);
+                $pdf->setOption('isPhpEnabled', true);
+                $pdf->setPaper('legal', 'portrait');
+            
+                // Nama file unik untuk setiap PDF
+                $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
+                $publicPath = public_path('reports');
+            
+                // Buat folder jika belum ada
+                if (!is_dir($publicPath)) {
+                    mkdir($publicPath, 0755, true);
+                }
+            
+                $filePath = $publicPath . '/' . $fileName;
+            
+                // Simpan PDF
+                $pdf->save($filePath);
+            
+                // Tambahkan path file ke dalam array hasil
+                $files[] = asset('reports/' . $fileName);
             }
-            $filePath = $publicPath . '/' . $fileName;
-            // Simpan PDF
-            $pdf->save($filePath);
-            // Tambahkan path file ke dalam array hasil
-            $files = asset('reports/' . $fileName);
+            
+                    
             // Return semua path file dalam JSON response
             return response()->json([
                 'message' => 'PDF files saved successfully',
                 'path' => $files,
                 'file_name'=>$fileName,
-                'project'=>$project->name
+                'project'=>$project->name,
+                'jml'=>count($final_list)
             ]);
             // return view('pages.report.html_view',$data);
             // return response()->json(['message' => $data]);

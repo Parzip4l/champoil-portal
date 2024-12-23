@@ -519,22 +519,25 @@
                     // Handle success response
                     const paths = response.data.path; // Pastikan backend mengirimkan key `paths` berisi array
         
-                    // Buat elemen link sementara
-                    const link = document.createElement('a');
-                    link.href = paths; // Set path dari array
-                    link.target = '_blank'; // Buka di tab baru
-                    
-                    // Tambahkan atribut download (opsional untuk mengatur nama file)
-                    link.setAttribute('download', response.data.file_name);
+                    paths.forEach((path) => {
+                        // Buat elemen link sementara untuk setiap file
+                        const link = document.createElement('a');
+                        link.href = path; // Set path untuk file
+                        link.target = '_blank'; // Buka di tab baru jika diperlukan
 
-                    // Tambahkan ke body
-                    document.body.appendChild(link);
-                    
-                    // Klik link untuk memulai unduhan
-                    link.click();
-                    
-                    // Hapus link setelah digunakan
-                    document.body.removeChild(link);
+                        // Tambahkan atribut download (opsional jika ingin memberikan nama default)
+                        const fileName = path.split('/').pop(); // Ambil nama file dari URL
+                        link.setAttribute('download', fileName);
+
+                        // Tambahkan ke body
+                        document.body.appendChild(link);
+
+                        // Klik link untuk memulai unduhan
+                        link.click();
+
+                        // Hapus link setelah digunakan
+                        document.body.removeChild(link);
+                    });
 
                     $('#loadingBackdrop').hide();
                     alert('File downloaded successfully');

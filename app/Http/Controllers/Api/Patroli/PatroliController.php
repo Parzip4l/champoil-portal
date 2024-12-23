@@ -605,6 +605,7 @@ class PatroliController extends Controller
             ];
                  
             ini_set('memory_limit', '4096M');
+            set_time_limit(0);
 
             // Ambil data tasks dan bagi ke dalam chunks
             $tasksArray = $data['patroli'];

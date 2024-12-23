@@ -306,13 +306,14 @@
                                     <label class="form-check-label">HR</label>
                                 </div>
                             </div>
-                            @if($employee->unit_bisnis === 'Kas')
+                           
                             <div class="col-md-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access">
                                     <label class="form-check-label">Area Manager</label>
                                 </div>
                             </div>
+                            @if($employee->unit_bisnis === 'Kas')
                             <div class="col-md-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access">

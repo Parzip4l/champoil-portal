@@ -690,6 +690,8 @@ class ApiLoginController extends Controller
                 return response()->json(['error' => 'Employee not found.'], 404);
             }
 
+            $employee->id = (string) $employee->id;
+
             $nikdata = $employee->nik;
 
             $today = now();

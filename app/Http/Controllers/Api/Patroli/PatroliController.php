@@ -608,7 +608,7 @@ class PatroliController extends Controller
 
             // Ambil data tasks dan bagi ke dalam chunks
             $tasksArray = $data['patroli'];
-            $chunks = array_chunk($tasksArray, 500);
+            $chunks = array_chunk($tasksArray, 300);
             $files = []; // Array untuk menyimpan semua file yang dihasilkan
             
             foreach ($chunks as $index => $chunk) {

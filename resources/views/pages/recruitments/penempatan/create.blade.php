@@ -37,9 +37,9 @@
                 <h4 class="card-title">Form Tambah Data Karyawan</h4>
                 <form method="POST" action="{{ route('employee.store') }}" enctype="multipart/form-data">
                     @csrf
-                    <input id="referal_code" class="form-control" name="referal_code" value="{{ $record['kode_referal'] }}" type="text" placeholder="John Doe">
-                    <input id="nik" class="form-control" name="nik" value="{{ $record['nomor_induk'] }}" type="text" placeholder="John Doe">
-                    <input id="recruitments_id" class="form-control" name="recruitments_id" value="{{ $record['id'] }}" type="text" placeholder="John Doe">
+                    <input id="referal_code" class="form-control" name="referal_code" value="{{ $record['kode_referal'] }}" type="hidden" placeholder="John Doe">
+                    <input id="nik" class="form-control" name="nik" value="{{ $record['nomor_induk'] }}" type="hidden" placeholder="John Doe">
+                    <input id="recruitments_id" class="form-control" name="recruitments_id" value="{{ $record['id'] }}" type="hidden" placeholder="John Doe">
                     <div class="row mb-3">
                         <div class="col">
                             <label for="name" class="form-label">Nama lengkap</label>

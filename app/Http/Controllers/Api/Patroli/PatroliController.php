@@ -603,7 +603,7 @@ class PatroliController extends Controller
                 'project' => $project->name ?? 'Unknown Project',
                 'tanggal' => $tanggal ?? '',
             ];
-                
+                 
             ini_set('memory_limit', '4096M');
 
             // Ambil data tasks dan bagi ke dalam chunks

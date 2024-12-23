@@ -569,7 +569,7 @@ class PatroliController extends Controller
             // Re-structure data to handle date logic
             $organized_patrols = [];
             foreach ($data_patrol as $record) {
-                $patrol_date = date('Y-m-d', strtotime($record->jam_patrol));
+                $patrol_date = date('Y-m-d H:i:s', strtotime($record->jam_patrol));
                 $organized_patrols[$patrol_date][] = $record;
             }
 
@@ -609,7 +609,7 @@ class PatroliController extends Controller
 
             // Ambil data tasks dan bagi ke dalam chunks
             $tasksArray = $data['patroli'];
-            $chunks = array_chunk($tasksArray, 500);
+            $chunks = array_chunk($tasksArray, 150);
             $files = []; // Array untuk menyimpan semua file yang dihasilkan
             
             foreach ($chunks as $index => $chunk) {

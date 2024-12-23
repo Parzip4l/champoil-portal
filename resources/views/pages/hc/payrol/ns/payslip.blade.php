@@ -120,7 +120,7 @@
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-md-6">
-                                                <span>Uang Kerajinan</span>
+                                                <span>Uang Tunjangan</span>
                                             </div>
                                             <div class="col-md-6 text-right">
                                                 <span class="text-right">Rp. {{ number_format($dataPayslip[0]['uang_kerajinan'], 0, ',', '.') }}</span>

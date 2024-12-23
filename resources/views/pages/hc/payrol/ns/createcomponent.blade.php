@@ -45,7 +45,7 @@
             </div>
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
-                    <label for="kode_karyawan" class="form-label">Kerajinan</label>
+                    <label for="kode_karyawan" class="form-label">Tunjangan</label>
                     <input type="number" id="t_alatkerja" class="form-control allowance" name="allowances[kerajinan][]" placeholder="Rp. " required>
                 </div>
             </div>

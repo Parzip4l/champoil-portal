@@ -307,7 +307,7 @@ class LapsitController extends Controller
             $pdf->setPaper('legal', 'portrait');
 
             // Create unique file name for the PDF
-            $fileName = 'report_' . date('YmdHis') . ".pdf";
+            $fileName = 'report_' . date('Ymd') . ".pdf";
             $publicPath = public_path('reports');
 
             // Ensure the directory exists

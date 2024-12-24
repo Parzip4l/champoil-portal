@@ -44,18 +44,20 @@ class AttendenceExport implements FromCollection, WithHeadings
         foreach ($employees as $employee) {
             $absensi = Absen::where('nik', $employee->nik)
                 ->whereBetween('tanggal', [$this->startDate, $this->endDate])
-                ->select('tanggal', 'clock_in', 'clock_out', 'status')
+                ->select('tanggal', 'clock_in', 'clock_out', 'status','project')
                 ->get();
 
             foreach ($this->getDateRange($this->startDate, $this->endDate) as $date) {
                 $absenHarian = $absensi->where('tanggal', $date->toDateString())->first();
+                
+                
                 $result->push([
                     'Nama Karyawan' => $employee->nama,
                     'Tanggal' => $date->toDateString(),
                     'Clock In' => $absenHarian ? $absenHarian->clock_in : '',
                     'Clock Out' => $absenHarian ? $absenHarian->clock_out : '',
                     'Status' => $absenHarian ? $absenHarian->status : '',
-                    'Project'=>$absenHarian ? $absenHarian->project : '',
+                    
                 ]);
             }
         }

@@ -58,6 +58,8 @@ class KoperasiController extends Controller
                             return $group->first();
                         });
         $totalSimpanan = $latestSavings->sum('totalsimpanan');
+
+        
         //Daftar Pengajuan
         $pinjamanData = Loan::where('company', $company->unit_bisnis)
                         ->where('status','waiting')        
@@ -159,7 +161,12 @@ class KoperasiController extends Controller
                                 // Get the most recent record for each employee_id
                                 return $group->first();
                             });
-        
+
+        $simpananData = Saving::where('jumlah_simpanan', '!=', 0)
+                            ->where('totalsimpanan', '!=', 0)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
         $totalPiutang = $latestPiutang->sum('sisahutang');
         // Calculate the total of `totalsimpanan` from the most recent records
         $totalSimpanan = $latestSavings->sum('totalsimpanan');
@@ -186,7 +193,7 @@ class KoperasiController extends Controller
             'formattedTotalSimpanan',
             'anggota',
             'chartData',
-            'lineLabels', 'lineData1', 'lineData2'
+            'lineLabels', 'lineData1', 'lineData2','simpananData'
         ));
     }
 

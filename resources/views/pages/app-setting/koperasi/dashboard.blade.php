@@ -116,6 +116,37 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="card custom-card2">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="dataTableExample" class="table">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Tanggal Simpan</th>
+                            <th>Jumlah Simpan</th>
+                            <th>Total Simpanan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($simpananData as $data)
+                        <tr>
+                            @php
+                                $employee = App\Employee::where('nik', $data->employee_id)->select('nama')->first();
+                            @endphp
+                            <td>{{$employee->nama}}</td>
+                            <td>{{$data->tanggal_simpan}}</td>
+                            <td>{{ 'Rp ' . number_format($data->jumlah_simpanan, 0, ',', '.') }}</td>
+                            <td>{{ 'Rp ' . number_format($data->totalsimpanan, 0, ',', '.') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('plugin-scripts')

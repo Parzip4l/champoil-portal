@@ -595,7 +595,7 @@ class ApiLoginController extends Controller
             if (strtolower($organisasi->unit_bisnis) === 'kas') {
                 $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payroll::findOrFail($id);
             }elseif(strtolower($organisasi->unit_bisnis) === 'run'){
-                $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : PayrolUrbanica::findOrFail($id);
+                $payslip = (strtolower($organisasi->organisasi) === 'Frontline Officer') ? Payrol::findOrFail($id) : PayrolUrbanica::findOrFail($id);
             } else {
                 $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payrollns::findOrFail($id);
             }

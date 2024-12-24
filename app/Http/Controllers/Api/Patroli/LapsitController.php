@@ -15,6 +15,7 @@ use PDF;
 use App\ModelCG\Lapsit;
 use App\ModelCG\LapsitActivity;
 use App\ModelCG\Project;
+use Intervention\Image\Facades\Image;
 
 class LapsitController extends Controller
 {
@@ -250,6 +251,8 @@ class LapsitController extends Controller
 
     public function download_file_patrol(Request $request){
         try {
+            ini_set('memory_limit', '4096M');
+            set_time_limit(0);
             // Parse request inputs
             $tanggal = $request->input('tanggal');
             $project_id =  $request->input('project_id');
@@ -294,6 +297,7 @@ class LapsitController extends Controller
                 'title'=>"LAPSIT",
                 'code'=>'lapsit'
             ];
+            
 
             // Generate the PDF
             $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);

@@ -34,6 +34,7 @@ class AttendenceExport implements FromCollection, WithHeadings
         $employees = Employee::where('unit_bisnis', $this->unitBisnis)
         ->where(function ($query) {
             $query->where('organisasi', 'FRONTLINE OFFICER');
+            $query->where('resign_status', '0');
         })
         ->get();
 

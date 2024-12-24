@@ -248,8 +248,7 @@ class PatroliProojectController extends Controller
     public function download_file_patrol(Request $request){
         try {
             // Parse request inputs
-            ini_set('memory_limit', '4096M');
-            set_time_limit(0);
+            
             $tanggal = $request->input('tanggal');
             $project_id =  $request->input('project_id');
             $jam1 = $request->input('jam1');
@@ -293,7 +292,8 @@ class PatroliProojectController extends Controller
                 'title'=>"PATROLI PROJECT",
                 'code'=>'project'
             ];
-
+            ini_set('memory_limit', '4096M');
+            set_time_limit(0);
             // Generate the PDF
             $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);
             $pdf->setOption('no-outline', true);

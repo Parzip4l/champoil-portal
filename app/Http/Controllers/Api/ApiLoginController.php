@@ -604,13 +604,45 @@ class ApiLoginController extends Controller
             $allowances = json_decode($payslip->allowances, true);
             $deductions = json_decode($payslip->deductions, true);
 
-            // Replace IDs with component names
-            $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
-            $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
-
-            // Update the payslip object with the new data
-            $payslip->allowances = json_encode($allowances);
-            $payslip->deductions = json_encode($deductions);
+            if (strtolower($organisasi->unit_bisnis) === 'run') {
+                // Transform allowances
+                $transformedAllowances = [];
+                foreach ($allowances as $key => $value) {
+                    // Exclude "Total overtime hours" and "Total absence"
+                    if (!in_array($key, ['total_overtime_hours', 'total_absence'])) {
+                        $transformedAllowances[] = [
+                            "name" => ucfirst(str_replace('_', ' ', $key)),
+                            "amount" => $value
+                        ];
+                    }
+                }
+    
+                // Transform deductions
+                $transformedDeductions = [];
+                foreach ($deductions as $key => $value) {
+                    $transformedDeductions[] = [
+                        "name" => ucfirst(str_replace('_', ' ', $key)),
+                        "amount" => $value
+                    ];
+                }
+    
+                // Update the payslip object with the transformed data
+                $payslip->allowances = json_encode($transformedAllowances);
+                $payslip->deductions = json_encode($transformedDeductions);
+    
+                // Add additional fields
+                $payslip->net_salary = $payslip->thp;
+                $payslip->unit_bisnis = 'CHAMPOIL';
+                unset($payslip->periode);
+            } else {
+                // For other organizations, replace component IDs with names
+                $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
+                $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
+    
+                // Update the payslip object
+                $payslip->allowances = json_encode($allowances);
+                $payslip->deductions = json_encode($deductions);
+            }
 
             // Return the payslip data as JSON
             return response()->json(['data' => $payslip], 200);

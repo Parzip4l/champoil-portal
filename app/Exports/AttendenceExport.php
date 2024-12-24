@@ -57,6 +57,7 @@ class AttendenceExport implements FromCollection, WithHeadings
                     'Clock In' => $absenHarian ? $absenHarian->clock_in : '',
                     'Clock Out' => $absenHarian ? $absenHarian->clock_out : '',
                     'Status' => $absenHarian ? $absenHarian->status : '',
+                    'Project' => $absenHarian ? $absenHarian->project : '',
                     
                 ]);
             }

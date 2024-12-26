@@ -314,7 +314,7 @@ class PayslipController extends Controller
             Payrol::where('month', $month)->where('year', $year)
             ->where('unit_bisnis',$companyData)
             ->update(['payslip_status' => 'Unpublish']);
-            return redirect()->back()->with('success', 'Payslip published successfully');
+            return redirect()->back()->with('success', 'Payslip unpublished successfully');
         } else {
             // If the payroll is not locked, display an error message
             return redirect()->back()->with('error', 'Cannot unpublish payslip. Payroll is locked.');
@@ -328,10 +328,12 @@ class PayslipController extends Controller
         $unit_bisnis = $employee->unit_bisnis;
         if ($unit_bisnis == 'Kas') {
             Payroll::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
+        }elseif($unit_bisnis == 'Run'){
+            PayrolUrbanica::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
         }else{
             Payrollns::where('periode', $periode)->update(['payrol_status' => 'Unlocked']);
         }
-        return redirect()->back()->with('success', 'Payroll locked successfully');
+        return redirect()->back()->with('success', 'Payroll Unlocked successfully');
     }
 
     public function unpublishPayslipns($periode)
@@ -351,11 +353,22 @@ class PayslipController extends Controller
                 // If the payroll is not locked, display an error message
                 return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
             }
-            
-        }else {
+        }elseif($unit_bisnis == 'Run'){
+            $isPayrollLocked = PayrolUrbanica::where('periode', $periode)->where('payrol_status', 'Unlocked')->exists();
+
+            if ($isPayrollLocked) {
+                // If the payroll is locked, update the payslip status to 'Published'
+                PayrolUrbanica::where('periode', $periode)->update(['payslip_status' => 'Unpublish']);
+                return redirect()->back()->with('success', 'Payslip Unpublised successfully');
+            } else {
+                // If the payroll is not locked, display an error message
+                return redirect()->back()->with('error', 'Cannot publish payslip. Payroll is not locked.');
+            }
+        }else{
             $isPayrollLocked = Payrollns::where('periode', $periode)->where('payrol_status', 'Unlocked')->exists();
 
             if ($isPayrollLocked) {
+                
                 // If the payroll is locked, update the payslip status to 'Published'
                 Payrollns::where('periode', $periode)->update(['payslip_status' => 'Unpublish']);
                 return redirect()->back()->with('success', 'Payslip published successfully');

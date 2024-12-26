@@ -625,7 +625,7 @@ class PatroliController extends Controller
                 $pdf->setPaper('legal', 'portrait');
             
                 // Nama file unik untuk setiap PDF
-                $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
+                $fileName = 'report_' . date('Ymd') . "_part_{$index}.pdf";
                 $publicPath = public_path('reports');
             
                 // Buat folder jika belum ada

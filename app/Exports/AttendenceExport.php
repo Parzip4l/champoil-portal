@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Absen;
 use App\Employee;
+use App\ModelCG\Project;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -32,7 +33,8 @@ class AttendenceExport implements FromCollection, WithHeadings
         // Mengambil semua karyawan dalam unit bisnis tertentu
         $employees = Employee::where('unit_bisnis', $this->unitBisnis)
         ->where(function ($query) {
-            $query->where('organisasi', 'Management Leaders');
+            $query->where('organisasi', 'FRONTLINE OFFICER');
+            $query->where('resign_status', '0');
         })
         ->get();
 
@@ -42,18 +44,21 @@ class AttendenceExport implements FromCollection, WithHeadings
         foreach ($employees as $employee) {
             $absensi = Absen::where('nik', $employee->nik)
                 ->whereBetween('tanggal', [$this->startDate, $this->endDate])
-                ->select('tanggal', 'clock_in', 'clock_out', 'status')
+                ->select('tanggal', 'clock_in', 'clock_out', 'status','project')
                 ->get();
 
             foreach ($this->getDateRange($this->startDate, $this->endDate) as $date) {
                 $absenHarian = $absensi->where('tanggal', $date->toDateString())->first();
-
+                
+                
                 $result->push([
                     'Nama Karyawan' => $employee->nama,
                     'Tanggal' => $date->toDateString(),
                     'Clock In' => $absenHarian ? $absenHarian->clock_in : '',
                     'Clock Out' => $absenHarian ? $absenHarian->clock_out : '',
                     'Status' => $absenHarian ? $absenHarian->status : '',
+                    'Project' => $absenHarian ? $absenHarian->project : '',
+                    
                 ]);
             }
         }
@@ -73,6 +78,7 @@ class AttendenceExport implements FromCollection, WithHeadings
             'Clock In',
             'Clock Out',
             'Status',
+            'Project'
         ];
     }
 

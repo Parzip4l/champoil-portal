@@ -190,18 +190,27 @@ class AbsenController extends Controller
         ]);
 
         // Tambahkan tahun ke nilai bulan
-        $selectedMonthWithYear = date('Y') . '-' . $selectedMonth;
+        $selectedMonthWithYear = date('Y') . '-' . date('m',strtotime($selectedMonth));
 
         // Konversi input bulan menjadi objek Carbon
         $selectedDate = Carbon::createFromFormat('Y-m', $selectedMonthWithYear);
 
         // Dapatkan tahun dan bulan dari input
         $year = $selectedDate->year;
-        $month = $selectedDate->month;
+        // $month = $selectedDate->month;
 
         // Dapatkan tanggal awal dan akhir periode berdasarkan bulan yang dipilih
-        $startDate = Carbon::create($year, $month, 21)->startOfMonth();
-        $endDate = $startDate->copy()->addMonth()->subDay();
+        // $startDate = Carbon::create($year, $month, 21)->startOfMonth();
+        // $endDate = $startDate->copy()->addMonth()->subDay();
+        $monthNumber = $selectedMonth;
+        $startDate = Carbon::create($year, $monthNumber, 21);
+        if ($monthNumber == 12) {
+            // Handle December case, where end date should be in the next year
+            $endDate = Carbon::create($year + 1, 1, 20);
+        } else {
+            $endDate = Carbon::create($year, $monthNumber + 1, 20);
+        }
+
 
         try {
             // Lakukan proses eksportasi seperti sebelumnya

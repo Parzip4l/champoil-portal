@@ -148,9 +148,12 @@ class ApiLoginController extends Controller
 
                     // Use Laravel's store method to handle file uploads
                     $path = $image->storeAs('images/absen', $filename, 'public');
+                    
                 }
 
-                Absen::create([
+               
+
+                $insert = Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
                     'project' => $projectData,
@@ -159,10 +162,10 @@ class ApiLoginController extends Controller
                     'latitude' => $lat,
                     'longtitude' => $long,
                     'status' => $status,
-                    'photo' => $filename,
+                    'photo' => $filename
                 ]);
                 DB::commit(); 
-                return response()->json(['message' => 'Absen Masuk Berhasil, Selamat Bekerja!']);
+                return response()->json(['message' => 'Absen Masuk Berhasil, Selamat Bekerja!','cek'=>$insert]);
             } else {
                 DB::rollBack();
                 return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);

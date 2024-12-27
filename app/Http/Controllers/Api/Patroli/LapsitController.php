@@ -236,8 +236,11 @@ class LapsitController extends Controller
         // Resize the image before storing it (e.g., resize to 800x600)
         $resizedImage = Image::make($image)->resize(800, 600);
         
-        // Store the resized image in the 'public' disk (storage/app/public)
-        $filePath = $resizedImage->store('project_lapsit', 'public');  // Store the file in 'storage/app/public/project_lapsit'
+        // Define the path to save the resized image
+        $filePath = 'project_lapsit/' . uniqid() . '.jpg';  // Unique filename with a .jpg extension
+        
+        // Save the resized image to the public storage
+        $resizedImage->save(storage_path('app/public/' . $filePath));  // Save in storage/app/public
         
         // Create a new LapsitActivity record
         $lapsitActivity = LapsitActivity::create([
@@ -246,6 +249,7 @@ class LapsitController extends Controller
             'images' => $filePath, // Path to the uploaded image
             'remarks' => $validated['remarks'] ?? null, // Optional remarks, if provided
         ]);
+        
 
         // Respond with success
         return response()->json(['message' => 'Activity submitted successfully!', 'file_path' => $filePath], 200);

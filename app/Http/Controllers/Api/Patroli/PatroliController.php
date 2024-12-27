@@ -604,7 +604,7 @@ class PatroliController extends Controller
                 'tanggal' => $tanggal ?? '',
             ];
                  
-            ini_set('memory_limit', '4096M');
+            ini_set('memory_limit', '-1');
             set_time_limit(0);
 
             // Ambil data tasks dan bagi ke dalam chunks

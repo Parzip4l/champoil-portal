@@ -31,6 +31,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Collection;
 use PDF;
+use Intervention\Image\Facades\Image;
 
 class PatroliController extends Controller
 {

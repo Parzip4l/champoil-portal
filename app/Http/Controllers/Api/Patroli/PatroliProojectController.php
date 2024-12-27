@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use PDF;
+use Intervention\Image\Facades\Image;
 
 use App\ModelCG\PatrliProject as  PatroliProject;
 use App\ModelCG\PatroliProjectAct;
@@ -204,18 +205,19 @@ class PatroliProojectController extends Controller
 
     public function storeActivity(Request $request){
         // Validate the incoming request
+        // Validate the incoming request
         $validated = $request->validate([
-            'images' => 'required|image|mimes:jpg,jpeg,png,gif',  // Adjust image validation rules as necessary
+            'images' => 'required|image|mimes:jpg,jpeg,png', // Adjust image validation rules as necessary
             'unix_code' => 'required|string',
             'employee_id' => 'required|string', // Validate employee_id as required
-            'remarks' => 'nullable|string', // Remarks can be optional or empty
+            'remarks' => 'required|string', // Remarks can be optional or empty
         ]);
 
         // Get the unix_code from the request
         $unixCode = $validated['unix_code'];
 
         // Retrieve the file from the request
-        $image = $request->file('images'); // Make sure 'image' matches the name attribute of the file input
+        $image = $request->file('images'); // Make sure 'images' matches the name attribute of the file input
 
         // Check if an image was uploaded
         if (!$image) {
@@ -230,14 +232,26 @@ class PatroliProojectController extends Controller
             return response()->json(['message' => 'Patroli project not found'], 404);
         }
 
-        // Store the image in the 'public' disk (storage/app/public)
-        $filePath = $image->store('project_patroli', 'public');  // Store the file in 'storage/app/public/project_patroli'
+        // Resize the image using Intervention Image
+        $resizedImage = Image::make($image->getRealPath())
+            ->resize(1024, 768, function ($constraint) {
+                $constraint->aspectRatio(); // Maintain aspect ratio
+                $constraint->upsize();     // Prevent upsizing smaller images
+            })
+            ->encode('jpg', 75); // Encode as JPEG with 75% quality
+
+        // Generate a unique file name
+        $fileName = uniqid('patroli_') . '.jpg';
+
+        // Save the resized image to the 'public' disk
+        $filePath = 'project_patroli/' . $fileName;
+        Storage::disk('public')->put($filePath, $resizedImage);
 
         // Create a new PatroliProjectAct record
         $patroliProjectAct = PatroliProjectAct::create([
-            'patroli_atc_id' => $patroli->id,  // Assuming PatroliProject's id is the foreign key
+            'patroli_atc_id' => $patroli->id, // Assuming PatroliProject's id is the foreign key
             'employee_id' => $validated['employee_id'], // Employee ID from the request
-            'images' => $filePath, // Path to the uploaded image
+            'images' => $filePath, // Path to the resized image
             'remarks' => $validated['remarks'] ?? null, // Optional remarks, if provided
         ]);
 

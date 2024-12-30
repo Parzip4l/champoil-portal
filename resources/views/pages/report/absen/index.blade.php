@@ -66,6 +66,7 @@
                                                     
                                                 <option value="{{ strtoupper($value).'-'.date('Y') }}" {{$checked}}>{{ $value }}</option>
                                             @endforeach
+                                            <option value="JANUARY-2025">JANUARY-2025</option>
                                         @endif
                                     </select>
                                     

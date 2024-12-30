@@ -142,17 +142,24 @@ class ApiLoginController extends Controller
             if ($distance <= $allowedRadius) {
                 $filename = null;
 
-                if ($request->hasFile('photo')) {
-                    $image = $request->file('photo');
-                    $filename = time() . '.' . $image->getClientOriginalExtension();
+                // if ($request->hasFile('photo')) {
+                //     $image = $request->file('photo');
+                //     $filename = time() . '.' . $image->getClientOriginalExtension();
 
-                    // Use Laravel's store method to handle file uploads
-                    $path = $image->storeAs('images/absen', $filename, 'public');
+                //     // Use Laravel's store method to handle file uploads
+                //     $path = $image->storeAs('images/absen', $filename, 'public');
                     
+                // }
+
+                $base64String = $request->photo;
+
+                if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
+                    $base64String = substr($base64String, strpos($base64String, ',') + 1);
                 }
-
-               
-
+            
+                // Decode the base64 string
+                $fileData = base64_decode($base64String);
+                
                 $insert = Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,

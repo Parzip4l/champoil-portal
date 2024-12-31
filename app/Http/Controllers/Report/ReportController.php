@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+
 use App\ModelCG\Project;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
@@ -12,6 +15,17 @@ use App\Absen;
 use App\Employee;
 use Carbon\Carbon;
 use App\Absen\RequestAbsen;
+
+use App\Backup\AbsenBackup;
+use App\User;
+use Carbon\CarbonPeriod;
+use App\Exports\AttendenceExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Company\CompanyModel;
+use Yajra\DataTables\Facades\DataTables;
+use App\Organisasi\Organisasi;
+use Illuminate\Support\Facades\Log;
+
 
 
 class ReportController extends Controller
@@ -200,67 +214,110 @@ class ReportController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id,$periode)
+    public function show(Request $request)
     {
-        //
-        $start = date('Y-m-d');
-        $end = date('Y-m-d');
-
-        if (!empty($periode)) {
-        $explode = explode('to', $periode);
-
-        if (!empty($explode[0])) {
-            $start = date('Y-m-d', strtotime($explode[0]));
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $project = Project::all();
+        $client_id = Auth::user()->project_id;
+        $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
+    
+        $today = now();
+        $periode = $request->input('periode');
+        Log::info('Periode dari request:', ['periode' => $periode]);
+        if ($periode) {
+            // Parsing periode
+            [$startDate, $endDate] = explode(' - ', $periode);
+            Log::info('Data hasil explode:', ['start' => $startDate, 'end' => $endDate]);
+        } else {
+            // Periode default
+            $startDate = Carbon::create($today->year, $today->month, 21)->format('Y-m-d');
+            $endDate = Carbon::create($today->year, $today->month, 20)->addMonth()->format('Y-m-d');
         }
 
-        if (!empty($explode[1])) {
-            $end = date('Y-m-d', strtotime($explode[1]));
+        Log::info('Periode dari default:', ['start' => $startDate]);
+        Log::info('Periode dari default:', ['end' => $endDate]);
+    
+        // Query absensi
+        $query = DB::table('users')
+            ->join('karyawan', 'karyawan.nik', '=', 'users.name')
+            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
+                $join->on('absens.nik', '=', 'users.name')
+                    ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+            })
+            ->select(
+                'users.id as user_id',
+                'karyawan.nik',
+                'karyawan.nama',
+                'karyawan.organisasi',
+                'karyawan.unit_bisnis',
+                DB::raw("GROUP_CONCAT(absens.tanggal ORDER BY absens.tanggal) as dates"),
+                DB::raw("GROUP_CONCAT(absens.clock_in ORDER BY absens.tanggal) as clock_ins"),
+                DB::raw("GROUP_CONCAT(absens.clock_out ORDER BY absens.tanggal) as clock_outs")
+            )
+            ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+            ->where('karyawan.resign_status', '0')
+            ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi', 'karyawan.unit_bisnis')
+            ->orderBy('karyawan.nama');
+    
+        if ($request->organisasi && $request->organisasi !== 'ALL') {
+            $query->where('karyawan.organisasi', $request->organisasi);
         }
+    
+        if ($request->project && $request->project !== 'ALL') {
+            $query->where('absens.project', $id);
         }
-
-        $records = Absen::where('project', $id)
-            ->whereBetween('tanggal', [$start, $end])
-            ->get();
-
-        foreach ($records as $record) {
-        
-            $employee = Employee::where('nik', $record->nik)->first();
-            if ($employee) {
-                $record->nama_karyawan = $employee->nama;
-            } else {
-                $record->nama_karyawan = 'Unknown';
-            }
-
-            $schedule = Schedule::where('employee', $record->nik)
-                ->whereDate('tanggal', $record->tanggal)
-                ->first();
-
-                if ($schedule) {
-                    $record->shift = $schedule->shift; 
-                } else {
-                    $record->shift = 'Unknown';
-                }
+    
+        if ($request->ajax()) {
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->editColumn('nama', function ($row) {
+                    $link = route('absen.details', ['nik' => $row->nik]);
+                    return '<a href="' . $link . '">' . htmlspecialchars($row->nama) . '</a>';
+                })
+                ->addColumn('attendance', function ($row) use ($startDate, $endDate) {
+                    $attendanceData = [];
+                    $dates = explode(',', $row->dates);
+                    $clockIns = explode(',', $row->clock_ins);
+                    $clockOuts = explode(',', $row->clock_outs);
+    
+                    $dateIndexMap = array_flip($dates);
+    
+                    foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
+                        $formattedDate = $date->format('Y-m-d');
+                        if (isset($dateIndexMap[$formattedDate])) {
+                            $index = $dateIndexMap[$formattedDate];
+                            $clockIn = $clockIns[$index] ?? '-';
+                            $clockOut = $clockOuts[$index] ?? '-';
+                        } else {
+                            $clockIn = $clockOut = '-';
+                        }
+                        $attendanceData['absens_' . $date->format('Ymd')] = [
+                            'clock_in' => $clockIn,
+                            'clock_out' => $clockOut,
+                        ];
+                    }
+    
+                    return $attendanceData;
+                })
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && $request->search['value'] !== '') {
+                        $search = strtolower($request->search['value']);
+                        $query->where(DB::raw('LOWER(karyawan.nama)'), 'LIKE', "%{$search}%");
+                    }
+                })
+                ->rawColumns(['nama'])
+                ->toJson();
         }
-
-        // if ($records) {
-        // foreach ($records as $row) {
-        //     $currentDate = Carbon::parse($start); // Use Carbon library for date manipulation
-
-        //     while ($currentDate->lte($end)) {
-        //         // Cari data absen untuk tanggal saat ini
-        //         $attendanceData = Absen::whereDate('tanggal', $currentDate->format('Y-m-d'))->first();
-
-        //         // Buat array data untuk tanggal ini
-        //         $row->tanggal = $currentDate->format('Y-m-d');
-        //         $row->clock_in = $attendanceData ? $attendanceData->clock_in : '-';
-        //         $row->clock_out = $attendanceData ? $attendanceData->clock_out : '-';
-        //         $row->status = $attendanceData ? $attendanceData->status : '-';
-
-        //         $currentDate->addDay(); // Increment the current date
-        //     }
-        // }
-        // }
-        return view('pages.report.absen.detail',compact('records'));
+    
+        // Generate daftar bulan untuk dropdown
+        $months = [];
+        for ($i = 0; $i < 13; $i++) {
+            $start = $today->copy()->startOfYear()->addYear($i >= 12 ? 1 : 0)->addMonths($i % 12)->day(21);
+            $end = $start->copy()->addMonth()->day(20);
+            $months[$start->format('Y-m-d') . ' - ' . $end->format('Y-m-d')] = $end->format('M Y');
+        }
+        return view('pages.report.absen.detail',compact('endDate', 'startDate', 'months', 'project', 'client_id', 'organisasi'));
     }
 
     /**

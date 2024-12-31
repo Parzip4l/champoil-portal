@@ -141,11 +141,15 @@
                                 <tr style="{{ $color }}">
                                     <td>{{ $no }}</td>
                                     <td>
-                                        <a href="{{ route('report-detail',['id'=>$row->id,'periode'=>isset($_GET['periode'])?$_GET['periode']:date('Y-m-d')]) }}"
-                                        style="color:black">
-                                            {{ $row->name }}
-                                        </a>
-                                    </td>
+    <a href="{{ route('report-detail', [
+        'id' => $row->id,
+        'periode' => isset($_GET['periode']) && strtotime($_GET['periode']) ? date('M Y', strtotime($_GET['periode'])) : date('m-Y')
+    ]) }}" style="color:black">
+        {{ $row->name }}
+    </a>
+</td>
+
+
                                     <td>{{ $row->schedule }}</td>
                                     <td>{{ $row->absen }}</td>
                                     <td style="text-align:right">{{ $row->persentase_absen }} %</td>

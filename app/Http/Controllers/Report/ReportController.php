@@ -263,10 +263,12 @@ class ReportController extends Controller
         if ($request->organisasi && $request->organisasi !== 'ALL') {
             $query->where('karyawan.organisasi', $request->organisasi);
         }
-    
+
         if ($request->project && $request->project !== 'ALL') {
-            $query->where('absens.project', $id);
+            $query->where('absens.project', $request->project);
         }
+    
+        
     
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -280,7 +282,6 @@ class ReportController extends Controller
                     $dates = explode(',', $row->dates);
                     $clockIns = explode(',', $row->clock_ins);
                     $clockOuts = explode(',', $row->clock_outs);
-    
                     $dateIndexMap = array_flip($dates);
     
                     foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
@@ -292,9 +293,18 @@ class ReportController extends Controller
                         } else {
                             $clockIn = $clockOut = '-';
                         }
+
+                        $sche =  Schedule::where('employee',$row->nik)->where('tanggal',$date->format('Y-m-d'))->first();
+                        if(!empty($sche)){
+                            $shift = $sche->shift;
+                        }else{
+                            $shift = "No Schedule";
+                        }
                         $attendanceData['absens_' . $date->format('Ymd')] = [
                             'clock_in' => $clockIn,
                             'clock_out' => $clockOut,
+                            'employee'=>$row->nama,
+                            'schedule'=>$shift
                         ];
                     }
     

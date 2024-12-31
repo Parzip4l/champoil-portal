@@ -133,9 +133,14 @@ $(document).ready(function () {
             columns.push({
                 data: `attendance.absens_${moment(date).format('YYYYMMDD')}`,
                 name: `attendance.absens_${moment(date).format('YYYYMMDD')}`,
-                render: data => data 
-                    ? `<span class="text-success">${data.clock_in}</span> - <span class="text-danger">${data.clock_out}</span>` 
-                    : '-'
+                render: data => {
+                    console.log(data);
+                    if (data.clock_in !=  '-') {
+                        return `<span class="text-success">${data.clock_in}</span> - <span class="text-danger">${data.clock_out}</span>`;
+                    } else{
+                        return `<span class="text-primary">${data.schedule}</span>`;
+                    }
+                }
             });
         });
 
@@ -146,6 +151,10 @@ $(document).ready(function () {
 
     function initDataTable(startDate, endDate) {
         const columns = generateTableHeader(startDate, endDate);
+        const urlSegments = window.location.pathname.split('/');
+        const segment3 = urlSegments[3]; // Adjust index based on your route
+        const segment4 = urlSegments[4]; // Adjust index based on your route
+
 
         if (table) {
             table.destroy();
@@ -155,7 +164,7 @@ $(document).ready(function () {
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route("absen.index") }}',
+                url: `/kas/report-detail/${segment3}/${segment4}`,
                 data: d => {
                     d.periode = $('#periode').val();
                     d.organisasi = $('#organisasi').val();

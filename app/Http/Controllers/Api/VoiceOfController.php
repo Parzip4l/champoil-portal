@@ -111,7 +111,7 @@ class VoiceOfController extends Controller
                 $filePath = $file->storeAs('uploads/attachments', $fileName, 'public'); // Store file in 'public/uploads/attachments'
                 
                 // Make sure the file is publicly accessible
-                $fileUrl = asset('storage/' . $filePath); // Generate the public URL for the file
+                $fileUrl = asset('storage/app/public/' . $filePath); // Generate the public URL for the file
             } else {
                 throw new \Exception("Attachment file is required.");
             }

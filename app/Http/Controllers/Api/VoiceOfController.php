@@ -128,65 +128,65 @@ class VoiceOfController extends Controller
     
             // Insert the data into the database
             $query = VoiceofGuardians::insert($insert);
-            if($query){
-                $payload = [
-                    'blocks' => [
-                        [
-                            'type' => 'divider'
-                        ],
-                        [
-                            'type' => 'header',
-                            'text' => [
-                                'type' => 'plain_text',
-                                'text' => 'Guardians Feedback',
-                                'emoji' => true
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => 'hallo @here terdapat feedback  dengan rincian seperti berikut'
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Nama Lengkap : *'.$validated['nama']
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Nomor Wa :*'.$validated['nomor_wa']
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Project :*'.project_byID($validated['project'])->name
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Keterangan :*'.$validated['pertanyaan']
-                            ]
-                        ]
-                    ]
-                ];
+            // if($query){
+            //     $payload = [
+            //         'blocks' => [
+            //             [
+            //                 'type' => 'divider'
+            //             ],
+            //             [
+            //                 'type' => 'header',
+            //                 'text' => [
+            //                     'type' => 'plain_text',
+            //                     'text' => 'Guardians Feedback',
+            //                     'emoji' => true
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => 'hallo @here terdapat feedback  dengan rincian seperti berikut'
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Nama Lengkap : *'.$validated['nama']
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Nomor Wa :*'.$validated['nomor_wa']
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Project :*'.project_byID($validated['project'])->name
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Keterangan :*'.$validated['pertanyaan']
+            //                 ]
+            //             ]
+            //         ]
+            //     ];
 
-                $client = new Client();
+            //     $client = new Client();
 
-                // Send the POST request to the webhook URL
-                $response = $client->post('https://hooks.slack.com/services/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', [
-                    'json' => $payload // Send the message as JSON
-                ]);
-            }
+            //     // Send the POST request to the webhook URL
+            //     $response = $client->post('https://hooks.slack.com/services/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', [
+            //         'json' => $payload // Send the message as JSON
+            //     ]);
+            // }
     
             // If insertion is successful, update the error flag and message
             $error = false;
@@ -227,28 +227,28 @@ class VoiceOfController extends Controller
     
             // Insert the data into the database
             $query = VoiceRellations::insert($insert);
-            if($query && $data['voice_user']==1){
-                $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
-                $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
-                $chatId = '6285624038980@c.us';
-                $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
+            // if($query && $data['voice_user']==1){
+            //     $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
+            //     $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
+            //     $chatId = '6285624038980@c.us';
+            //     $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
 
-                $client = new Client();
+            //     $client = new Client();
 
-                $response = $client->post($url, [
-                    'headers' => [
-                        'Accept' => 'application/json',
-                        'Authorization' => "Bearer $token",
-                        'Content-Type' => 'application/json',
-                    ],
-                    'json' => [
-                        'chatId' => $chatId,
-                        'message' => $message,
-                    ],
-                ]);
+            //     $response = $client->post($url, [
+            //         'headers' => [
+            //             'Accept' => 'application/json',
+            //             'Authorization' => "Bearer $token",
+            //             'Content-Type' => 'application/json',
+            //         ],
+            //         'json' => [
+            //             'chatId' => $chatId,
+            //             'message' => $message,
+            //         ],
+            //     ]);
     
-                $responseBody = json_decode($response->getBody(), true);
-            }
+            //     $responseBody = json_decode($response->getBody(), true);
+            // }
     
             // If insertion is successful, update the error flag and message
             $error = false;

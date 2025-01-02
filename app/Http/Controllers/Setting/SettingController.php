@@ -32,7 +32,7 @@ class SettingController extends Controller
 
     public function apps_version()
     {
-        $data['records']=Version::all();
+        $data['records']=Version::orderBy('id','desc')->get();
         return view('pages.app-setting.apps_versions',$data);
     }
 

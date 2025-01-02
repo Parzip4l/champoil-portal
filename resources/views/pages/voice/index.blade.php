@@ -290,6 +290,8 @@
                                     Project: ${record.project} <br>
                                     Name: ${record.nama} <br>
                                     Pertanyaan: ${record.pertanyaan || "N/A"} <br>
+                                    photo : <br>
+                                    ${record.photo ? `<img src="${record.photo}" alt="Photo" class="chat-photo">` : "N/A"}<br>
                                     Date: ${record.created_at}
                                 `;
 

@@ -69,6 +69,7 @@ class VoiceOfController extends Controller
                     "id"=>$records->id,
                     "nama"=> $records->nama,
                     "project"=>project_byID($records->project)->name,
+                    "photo"=>$records->attachment,
                     "nomor_wa"=>$records->nomor_wa,
                     "pertanyaan"=>$records->pertanyaan,
                     "created_at"=>date('d F Y H:i:s',strtotime($records->created_at)),

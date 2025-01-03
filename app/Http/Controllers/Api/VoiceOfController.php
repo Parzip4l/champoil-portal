@@ -228,28 +228,28 @@ class VoiceOfController extends Controller
     
             // Insert the data into the database
             $query = VoiceRellations::insert($insert);
-            // if($query && $data['voice_user']==1){
-            //     $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
-            //     $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
-            //     $chatId = '6285624038980@c.us';
-            //     $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
+            if($query && $data['voice_user']==1){
+                $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
+                $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
+                $chatId = '6285624038980@c.us';
+                $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
 
-            //     $client = new Client();
+                $client = new Client();
 
-            //     $response = $client->post($url, [
-            //         'headers' => [
-            //             'Accept' => 'application/json',
-            //             'Authorization' => "Bearer $token",
-            //             'Content-Type' => 'application/json',
-            //         ],
-            //         'json' => [
-            //             'chatId' => $chatId,
-            //             'message' => $message,
-            //         ],
-            //     ]);
+                $response = $client->post($url, [
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => "Bearer $token",
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'chatId' => $chatId,
+                        'message' => $message,
+                    ],
+                ]);
     
-            //     $responseBody = json_decode($response->getBody(), true);
-            // }
+                $responseBody = json_decode($response->getBody(), true);
+            }
     
             // If insertion is successful, update the error flag and message
             $error = false;

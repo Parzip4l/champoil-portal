@@ -228,7 +228,7 @@ class VoiceOfController extends Controller
 
             $record =   VoiceofGuardians::where('id',$data['voice_id'])->first();
             if($record){
-                $updatedPhoneNumber = preg_replace('/^08/', '62', $record->nomor_wa);
+                $updatedPhoneNumber = preg_replace('/^08/', '628', $record->nomor_wa);
             }
     
             // Insert the data into the database

@@ -148,12 +148,31 @@ class PatroliController extends Controller
                 $photoKey = "photo{$id}";
                 
     
+                // if ($request->hasFile($photoKey)) {
+                //     $file = $request->file($photoKey)[0];
+                //     if ($file->isValid()) {
+                //         $filename = time() . '_' . $file->getClientOriginalName();
+                //         $file->move(public_path('/images/company_logo'), $filename);
+                //         $image = '/images/company_logo/' . $filename; // Simpan path relatif ke database
+                //     } else {
+                //         return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);
+                //     }
+                // }
+
                 if ($request->hasFile($photoKey)) {
                     $file = $request->file($photoKey)[0];
                     if ($file->isValid()) {
+                        // Resize the image
                         $filename = time() . '_' . $file->getClientOriginalName();
-                        $file->move(public_path('/images/company_logo'), $filename);
-                        $image = '/images/company_logo/' . $filename; // Simpan path relatif ke database
+                        $destinationPath = public_path('/images/company_logo');
+                        $resizedImage = Image::make($file->getRealPath());
+                        $resizedImage->resize(300, 300, function ($constraint) {
+                            $constraint->aspectRatio(); // Maintain aspect ratio
+                            $constraint->upsize();      // Prevent upsizing
+                        });
+                        $resizedImage->save($destinationPath . '/' . $filename);
+        
+                        $image = '/images/company_logo/' . $filename; // Save relative path to the database
                     } else {
                         return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);
                     }

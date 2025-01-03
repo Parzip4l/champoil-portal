@@ -466,6 +466,19 @@ class AllDataController extends Controller
         $loan->installment_amount = $record->perbulan; // Use the new variable
         $loan->save();
     }
+
+    public function getImei(Request $request){
+        // Assuming the IMEI is sent in the request as a parameter
+        $imei = $request->input('imei', 'IMEI not provided');
+
+        // Or if it's sent in headers
+        $imeiFromHeader = $request->header('IMEI', 'IMEI not provided');
+
+        return response()->json([
+            'imei' => $imei,
+            'imei_from_header' => $imeiFromHeader,
+        ]);
+    }
     
     
 }

@@ -225,13 +225,18 @@ class VoiceOfController extends Controller
                 "jawaban"=>$data["jawaban"],
                 "created_at" => now(),
             ];
+
+            $record =   VoiceofGuardians::where('id',$data['voice_id'])->first();
+            if($record){
+                $updatedPhoneNumber = preg_replace('/^08/', '62', $record->nomor_wa);
+            }
     
             // Insert the data into the database
             $query = VoiceRellations::insert($insert);
             if($query && $data['voice_user']==1){
                 $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
                 $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
-                $chatId = '6285624038980@c.us';
+                $chatId = $updatedPhoneNumber.'@c.us';
                 $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
 
                 $client = new Client();

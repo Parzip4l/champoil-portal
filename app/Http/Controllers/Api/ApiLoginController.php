@@ -604,18 +604,24 @@ class ApiLoginController extends Controller
             // Determine the correct model to use based on the unit_bisnis and organisasi
             if (strtolower($organisasi->unit_bisnis) === 'kas') {
                 $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payroll::findOrFail($id);
-            }elseif(strtolower($organisasi->unit_bisnis) === 'run'){
+            } elseif (strtolower($organisasi->unit_bisnis) === 'run') {
                 $payslip = (strtolower($organisasi->organisasi) === 'Frontline Officer') ? Payrol::findOrFail($id) : PayrolUrbanica::findOrFail($id);
             } else {
                 $payslip = (strtolower($organisasi->organisasi) === 'management leaders') ? Payrol::findOrFail($id) : Payrollns::findOrFail($id);
             }
-            
-            // Decode the JSON fields
-            $allowances = json_decode($payslip->allowances, true);
-            $deductions = json_decode($payslip->deductions, true);
 
-            if (strtolower($organisasi->unit_bisnis) === 'run') {
-                // Transform allowances
+            // Handle payslip for 'CHAMPOIL' or 'Frontline Officer' without decoding and transforming allowances and deductions
+            if (strtolower($organisasi->organisasi) === 'champoil' || strtolower($organisasi->organisasi) === 'frontline officer') {
+                // No need to decode and transform allowances/deductions
+                $payslip->net_salary = $payslip->thp;
+                $payslip->unit_bisnis = 'CHAMPOIL';
+                unset($payslip->periode); // Remove the 'periode' field if required
+            } else {
+                // Decode allowances and deductions
+                $allowances = json_decode($payslip->allowances, true);
+                $deductions = json_decode($payslip->deductions, true);
+
+                // Transform allowances and deductions
                 $transformedAllowances = [];
                 foreach ($allowances as $key => $value) {
                     // Exclude "Total overtime hours" and "Total absence"
@@ -626,7 +632,7 @@ class ApiLoginController extends Controller
                         ];
                     }
                 }
-    
+
                 // Transform deductions
                 $transformedDeductions = [];
                 foreach ($deductions as $key => $value) {
@@ -635,23 +641,14 @@ class ApiLoginController extends Controller
                         "amount" => $value
                     ];
                 }
-    
+
                 // Update the payslip object with the transformed data
                 $payslip->allowances = json_encode($transformedAllowances);
                 $payslip->deductions = json_encode($transformedDeductions);
-    
+
                 // Add additional fields
                 $payslip->net_salary = $payslip->thp;
-                $payslip->unit_bisnis = 'CHAMPOIL';
-                unset($payslip->periode);
-            } else {
-                // For other organizations, replace component IDs with names
-                $allowances = $this->replaceComponentIdsWithNames($allowances, 'allowance');
-                $deductions = $this->replaceComponentIdsWithNames($deductions, 'deduction');
-    
-                // Update the payslip object
-                $payslip->allowances = json_encode($allowances);
-                $payslip->deductions = json_encode($deductions);
+                unset($payslip->periode); // Remove the 'periode' field if required
             }
 
             // Return the payslip data as JSON

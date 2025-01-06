@@ -137,11 +137,6 @@ class DailyContrtoller extends Controller
         ]);
     }
     
-    
-    
-    
-
-    
     public function seven_day() {
         // Fetch active employees in the specific business unit
         $employees = Employee::where('unit_bisnis', 'like', '%Kas%')
@@ -192,6 +187,28 @@ class DailyContrtoller extends Controller
         }
     
         return response()->json($result);
+    }
+
+    public function reminder_schedule($key,$periode){
+        $project = Project::where('company', 'like', '%' . $key . '%')->get();
+        $schedule_onperiode=[];
+        $not_scheudle=[];
+        if($project){
+            foreach($project as $record){
+                $count_schedule = Schedule::where('project',$record->id)->where('periode',$periode)->count();
+                if($count_schedule  > 0){
+                    $schedule_onperiode[]=$record;
+                }else{
+                    $not_scheudle[]=$record;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'not_scheudle' => $not_scheudle,
+            'schedule_onperiode' => $schedule_onperiode
+        ]);
     }
     
     

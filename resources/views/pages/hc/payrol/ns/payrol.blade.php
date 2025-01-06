@@ -61,7 +61,10 @@
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Year</label>
-                        <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
+                        <select name="year" class="form-control">
+                            <option value="2024" {{ date('Y') == '2024' ? 'selected' : '' }}>2024</option>
+                            <option value="2025" {{ date('Y') == '2025' ? 'selected' : '' }}>2025</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">

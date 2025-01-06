@@ -127,11 +127,12 @@ class AbsenController extends Controller
     
         // Generate daftar bulan untuk dropdown
         $months = [];
-        for ($i = 0; $i < 13; $i++) {
+        for ($i = -1; $i < 13; $i++) {
             $start = $today->copy()->startOfYear()->addYear($i >= 12 ? 1 : 0)->addMonths($i % 12)->day(21);
             $end = $start->copy()->addMonth()->day(20);
             $months[$start->format('Y-m-d') . ' - ' . $end->format('Y-m-d')] = $end->format('M Y');
         }
+
     
         return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id', 'organisasi'));
     }

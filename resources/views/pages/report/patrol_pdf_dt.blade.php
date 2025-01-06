@@ -47,7 +47,7 @@
             @foreach($patroli as $row)
                 @php 
                     $img = '';
-                    if (!empty($row->image)) {
+                    if (!empty($row->image) && $row->status == 0) {
                         $img = "<img src='https://hris.truest.co.id" . $row->image. "' style='width:30px;'>";
                     }
                     

@@ -190,7 +190,7 @@ class DailyContrtoller extends Controller
     }
 
     public function reminder_schedule($key,$periode){
-        $project = Project::where('company', 'like', '%' . $key . '%')->get();
+        $project = Project::whereNull('deleted_at')->where('company', 'like', '%' . $key . '%')->get();
         $schedule_onperiode=[];
         $not_scheudle=[];
         if($project){

@@ -108,7 +108,11 @@
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Member Status</label>
-                            <input type="text" name="member_status" class="form-control" value="{{$dataAnggota->member_status}}" placholder="" required readonly>
+                            <select name="member_status" id="" class="form-control">
+                                <option value="active">Active</option>
+                                <option value="exit">Exit</option>
+                                <option value="onhold">On Hold</option>
+                            </select>
                         </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Update Member</button>

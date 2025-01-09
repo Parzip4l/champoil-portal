@@ -223,7 +223,7 @@ class PayrolNS extends Controller
                                     $anggota->save();
                                     
                                 }
-                                if ($remainingAmount > 0) {
+                                if ($remainingAmount > 1) {
                                     $allLoansPaidOff = false;
                                 }
                             }

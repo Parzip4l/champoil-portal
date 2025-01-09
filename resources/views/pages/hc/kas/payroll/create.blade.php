@@ -52,7 +52,10 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Year</label>
-                        <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
+                        <select name="year" class="form-control">
+                            <option value="2024" {{ date('Y') == '2024' ? 'selected' : '' }}>2024</option>
+                            <option value="2025" {{ date('Y') == '2025' ? 'selected' : '' }}>2025</option>
+                        </select>
                         <input type="hidden" name="periode" id="periode" value="{{ $start_date2 }} - {{ $end_date2 }}">
                     </div>
                 </div>

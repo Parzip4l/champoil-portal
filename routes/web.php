@@ -396,6 +396,12 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
                 // history Pembayaran
                 Route::get('/history-pembayaran', [App\Http\Controllers\Koperasi\KoperasiController::class, 'historypayment'])->name('historypayment'); 
 
+                // Kontral
+                Route::get('/download-kontrak/{employee_code}', function ($employee_code) {
+                    $path = storage_path('app/public/kontrak/kontrak_' . $employee_code . '.pdf');
+                    return response()->download($path);
+                });
+
     // CG Component
     Route::group(['prefix' => 'kas'], function(){
         Route::resource('jabatan', App\Http\Controllers\CgControllers\JabatanControllers::class);

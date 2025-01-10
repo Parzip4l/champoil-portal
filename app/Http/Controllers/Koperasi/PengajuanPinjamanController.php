@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use App\Mail\Koperasi\PengajuanPinjaman;
 use App\Mail\Koperasi\PengajuanPinjamanReject;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PengajuanPinjamanController extends Controller
 {
@@ -154,6 +155,24 @@ class PengajuanPinjamanController extends Controller
                     ->update(['status' => 'approve', 'approve_by' => $code]);
 
         $records = Employee::where('nik', $employee_code)->get();
+        $loan = Loan::where('employee_code', $employee_code)->first();
+        $peminjam = Employee::where('nik', $employee_code)->first();
+        $nominalPinjaman = $loan->amount;
+        $merchandise = $loan->amount * 0.1; // Contoh persentase merchandise
+        $membership = $loan->amount * 0.05; // Contoh persentase membership
+        $totalPinjaman = $nominalPinjaman + $merchandise + $membership;
+
+        $pdf = Pdf::loadView('pages.koperasi.pks', compact(
+            'peminjam',
+            'nominalPinjaman',
+            'merchandise',
+            'membership',
+            'totalPinjaman'
+        ));
+    
+        $pdfPath = storage_path('app/public/kontrak/kontrak_' . $employee_code . '.pdf');
+        $pdf->save($pdfPath);
+
         $EmailData = Employee::where('nik', $employee_code)->first();
         $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
 

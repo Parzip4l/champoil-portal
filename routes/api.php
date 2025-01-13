@@ -254,5 +254,8 @@ Route::prefix('v1')->group(function () {
     Route::post('lapsit-activity', [LapsitController::class, 'storeActivity']); // Store activity
     Route::get('lapsit-activity-download', [LapsitController::class, 'download_file_patrol']);
 
+    Route::post('export-payroll', [AllDataController::class, 'export_payroll']);
+    Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
+
 
 });

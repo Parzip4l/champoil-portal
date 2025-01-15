@@ -43,6 +43,14 @@
                             <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"><i data-feather="upload" class="icon-sm me-2"></i> Import</a>
                             <a class="dropdown-item d-flex align-items-center me-2"  href="{{ route('export.employee') }}"><i data-feather="download" class="icon-sm me-2"></i> Export</a>
                             <a class="dropdown-item d-flex align-items-center me-2"  href="https://truest.co.id/wp-content/uploads/2024/02/Tamplate-Karyawan-1.xlsx"><i data-feather="file-text" class="icon-sm me-2"></i> Download Template</a>
+                            @if($employee->unit_bisnis == 'Kas')
+                                <a class="dropdown-item d-flex align-items-center me-2"  
+                                   href="javascript:voidd(0)"
+                                   id="download_sertifikat">
+                                   <i data-feather="file-text" class="icon-sm me-2"></i> 
+                                   Download Sertifikat
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -145,6 +153,29 @@
 
 @push('custom-scripts')
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
+  <script>
+    $(document).ready(function() {
+        $('#download_sertifikat').on('click', function() {
+            axios.get('/api/v1/download-sertifikat/{{$employee->unit_bisnis}}', {
+                userId: 123 // Ganti dengan parameter sesuai kebutuhan
+            }, {
+                responseType: 'blob' // Untuk mengunduh file biner
+            }).then(function(response) {
+                const url = response.data.url;  // URL returned from the server
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'sertifikasi.xlsx');  // Adjust file name if needed
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }).catch(function(error) {
+                console.error('Download gagal:', error);
+                alert('Gagal mengunduh sertifikat. Silakan coba lagi.');
+            });
+        });
+    });
+
+  </script>
   <script>
     function showDeleteDataDialog(id) {
         Swal.fire({

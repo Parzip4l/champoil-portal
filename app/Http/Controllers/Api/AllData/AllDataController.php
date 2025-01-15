@@ -27,6 +27,7 @@ use App\ModelCG\Birthday;
 use App\ModelCG\asset\PengajuanCicilan;
 use App\ModelCG\asset\BarangCicilan;
 use App\Loan\LoanModel;
+use App\VoltageData;
 
 class AllDataController extends Controller
 {
@@ -135,6 +136,37 @@ class AllDataController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function storeVoltage(Request $request)
+    {
+        // Validasi data yang diterima
+        $validated = $request->validate([
+            'voltage' => 'required|numeric',
+        ]);
+
+        // Simpan data ke database
+        $voltageData = VoltageData::create([
+            'voltage' => $validated['voltage'],
+        ]);
+
+        // Kembalikan respon JSON
+        return response()->json([
+            'message' => 'Voltage data received and saved successfully',
+            'data' => $voltageData,
+        ], 200);
+    }
+
+    public function getVoltageData()
+    {
+        // Ambil semua data dari tabel voltages
+        $voltageData = VoltageData::all();
+
+        // Kembalikan respon JSON dengan data
+        return response()->json([
+            'message' => 'Voltage data retrieved successfully',
+            'data' => $voltageData,
+        ], 200);
     }
     
     public function BirtdayList(Request $request)

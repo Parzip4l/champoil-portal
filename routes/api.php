@@ -254,5 +254,6 @@ Route::prefix('v1')->group(function () {
     Route::post('lapsit-activity', [LapsitController::class, 'storeActivity']); // Store activity
     Route::get('lapsit-activity-download', [LapsitController::class, 'download_file_patrol']);
 
-
+    Route::post('voltage', [AllDataController::class, 'storeVoltage']);
+    Route::get('voltages', [AllDataController::class, 'getVoltageData']);
 });

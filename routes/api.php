@@ -254,13 +254,6 @@ Route::prefix('v1')->group(function () {
     Route::post('lapsit-activity', [LapsitController::class, 'storeActivity']); // Store activity
     Route::get('lapsit-activity-download', [LapsitController::class, 'download_file_patrol']);
 
-<<<<<<< HEAD
     Route::post('voltage', [AllDataController::class, 'storeVoltage']);
     Route::get('voltages', [AllDataController::class, 'getVoltageData']);
-=======
-    Route::post('export-payroll', [AllDataController::class, 'export_payroll']);
-    Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
-
-
->>>>>>> a10e365a7accd08505885b407f750ec5541aee9e
 });

@@ -109,10 +109,13 @@ class KoperasiController extends Controller
 
         // Tambahkan saldo simpanan untuk setiap anggota
         foreach ($anggota as $dataAnggota) {
-            $dataAnggota->saldo_simpanan = Saving::where('employee_id', $dataAnggota->employee_code)
+            $lastSaving = Saving::where('employee_code', $dataAnggota->employee_code)
                 ->where('jumlah_simpanan', '!=', 0)
                 ->where('totalsimpanan', '!=', 0)
-                ->sum('totalsimpanan');
+                ->latest('created_at')
+                ->first();
+    
+            $dataAnggota->saldo_simpanan = $lastSaving ? $lastSaving->totalsimpanan : 0;
         }
 
         return view('pages.app-setting.koperasi.anggota', compact('anggota', 'filterStatus','loanStatus'));

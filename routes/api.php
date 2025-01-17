@@ -256,4 +256,5 @@ Route::prefix('v1')->group(function () {
 
     Route::post('voltage', [AllDataController::class, 'storeVoltage']);
     Route::get('voltages', [AllDataController::class, 'getVoltageData']);
+    Route::get('paklaring/{id}', [AllDataController::class, 'paklaring']);
 });

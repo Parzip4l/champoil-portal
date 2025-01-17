@@ -90,7 +90,7 @@
                                 @else
                                 <td><span class="badge bg-danger">{{$dataAnggota->member_status}}</span></td>
                                 @endif
-                                <td>Rp {{ number_format($dataAnggota->saldosimpanan, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($dataAnggota->saldo_simpanan ?? 0, 0, ',', '.') }}</td>
                                 @if($dataAnggota->loan_status === "noloan")
                                 <td><span class="badge bg-primary">{{$dataAnggota->loan_status}}</span></td>
                                 @else 

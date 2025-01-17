@@ -17,9 +17,10 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
-
+use PDF;
 // Model
 use App\Employee;
+use App\EmployeeResign;
 use App\User;
 use App\Pengumuman\Pengumuman;
 use App\News\News;
@@ -510,6 +511,62 @@ class AllDataController extends Controller
             'imei' => $imei,
             'imei_from_header' => $imeiFromHeader,
         ]);
+    }
+    public function paklaring($id){
+        try {
+            
+            // Fetch project details
+            $employee = Employee::find($id);
+
+            if (!$employee) {
+                return response()->json(['error' => 'employee not found'], 404);
+            }
+
+            $resign = EmployeeResign::where('employee_code',$employee->nik)->first();
+
+           
+            $data = [
+                'employee' => $employee,
+                'resign' => $resign
+            ];
+            
+
+            // Generate the PDF
+            $pdf = Pdf::loadView('pages.hc.karyawan_resign.paklaring', $data);
+            $pdf->setOption('no-outline', true);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isPhpEnabled', true);
+            $pdf->setPaper('A4', 'portrait');
+
+            // Create unique file name for the PDF
+            $fileName = 'paklaring' . $employee->nik . ".pdf";
+            $publicPath = public_path('paklaring');
+
+            // Ensure the directory exists
+            if (!is_dir($publicPath)) {
+                mkdir($publicPath, 0755, true);
+            }
+
+            $filePath = $publicPath . '/' . $fileName;
+
+            // Save the PDF
+            $pdf->save($filePath);
+
+            $fileUrl = asset('paklaring/' . $fileName);
+
+            // Return JSON response with file details
+            return response()->json([
+                'message' => 'PDF file generated successfully',
+                'path' => $fileUrl,
+                'file_name' => $fileName
+            ]);
+        } catch (\Exception $e) {
+            // Handle exceptions and return error response
+            return response()->json([
+                'error' => 'Failed to generate PDF',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
     
     

@@ -50,7 +50,7 @@
                     @foreach ($karyawan as $data)
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $data->nama }}</td>
+                    <td>{{ $data->nama }} <a href="{{ $data->id }}" class="btn  btn-sm btn-success" style="float:right">Download Paklaring</a></td>
                     <td>{{ $data->nik }}</td>
                     <td>{{ $data->jenis_kelamin }}</td>
                     <td>{{ $data->organisasi }}</td>

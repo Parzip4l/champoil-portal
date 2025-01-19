@@ -16,7 +16,7 @@
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
             <td>
-                <img src="https://hris.truest.co.id/images/company_logo/cityservice.png" style="width: 200px;" alt="Company Logo">
+                <img src="https://hris.truest.co.id/images/company_logo/cityservice.png" style="width: 110px;" alt="Company Logo">
             </td>
             <td style="text-align: center;">
                 <!-- Placeholder for centered text if needed -->
@@ -38,7 +38,7 @@
         </thead>
     </table>
     
-    <table style="width: 100%; margin-bottom: 40px;font-size:17px;">
+    <table style="width: 100%; margin-bottom:;font-size:17px;">
         <tr>
             <td colspan="3">
                 Dengan ini menyatakan bahwa:<br>
@@ -48,7 +48,7 @@
         <tr>
             <td>Nama<br/>Name</td>
             <td style="width:3px">:</td>
-            <td style="text-align:left">Agung Wahyudi</td>
+            <td style="text-align:left">{{$employee->nama}}</td>
         </tr>
         <tr>
             <td>NIK<br/>Badge No.</td>
@@ -76,6 +76,7 @@
             <td>PT Kharisma Adhi Sejahtera</td>
         </tr>
     </table>
+    <hr>
     <p>
         Kami mengucapkan banyak terima kasih atas jasa dan kerjasama yang saudara/i berikan ke PT Kharisma Adhi Sejahtera, 
         dan semoga keberhasilan senantiasa menyertai Anda di masa yang akan datang.<br><br>
@@ -87,15 +88,16 @@
             <td>
                 Jakarta, {{ date('d F Y') }}<br/>
                 Hormat Saya<br/>
-                <img src="https://hris.truest.co.id/images/company_logo/ttd.png" style="width: 100px; text-align: left;" alt="Company Logo">
-                <img src="https://hris.truest.co.id/images/company_logo/stampel.png" style="width: 200px;margin-top:20px;margin-left:-60px;" alt="Company Logo"><br/>
+                <br/>
+                <img src="https://hris.truest.co.id/images/company_logo/ttd.png" style="width: 90px; text-align: left;" alt="Company Logo">
+                <img src="https://hris.truest.co.id/images/company_logo/stampel.png" style="width: 110px;margin-top:20px;margin-left:-60px;" alt="Company Logo"><br/>
                 <u><strong>Moch. Firly Triyodha Kusuma, SE</strong></u><br/>
                 <p>Human Culture Manager </p>
 
             </td>
         </tr>
     </table>
-    <table style="width: 100%; margin-bottom: 10px; text-align: left; font-size: 20px;">
+    <table style="width: 100%; margin-bottom: 10px; text-align: left; font-size: 15px;">
         <tr>
             <td>
                 <img src="https://hris.truest.co.id/images/company_logo/cityservice.png" style="width: 100px;" alt="Company Logo">

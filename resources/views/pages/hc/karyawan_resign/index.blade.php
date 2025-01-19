@@ -18,6 +18,9 @@
         {{ session('error') }}
     </div>
 @endif
+<div id="loading" style="display: none; text-align: center;">
+    <img src="spinner.gif" alt="Loading..." style="width: 50px;">
+</div>
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">
@@ -184,39 +187,64 @@
         });
     @endif
     function downloadPaklaring(id) {
-        const url = `/api/v1/paklaring/${id}`; // Define the API endpoint
-        
-        // Fetch the API response
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch the file.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.path) {
-                // Create a temporary link element for the download
+    const url = `/api/v1/paklaring/${id}`; // Define the API endpoint
+    
+    Swal.fire({
+        title: 'Processing Export',
+        text: 'Please wait while the file is being generated...',
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to fetch the file.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        Swal.close();
+        if (data.path) {
+            Swal.fire({
+                title: 'Download Ready',
+                text: 'Your document is ready to download!',
+                icon: 'success',
+            }).then(() => {
                 const link = document.createElement('a');
-                link.href = data.path; // Use the file path from the API response
-                link.download = data.file_name; // Set the download attribute to the file name
+                link.href = data.path;
+                link.download = data.file_name;
                 document.body.appendChild(link);
-                link.click(); // Trigger the download
-                document.body.removeChild(link); // Clean up the temporary element
-            } else {
-                alert('Failed to download the file. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error fetching the file: ' + error.message);
+                link.click();
+                document.body.removeChild(link);
+            });
+        } else {
+            Swal.fire({
+                title: 'Download Failed',
+                text: 'Unable to download the file. Please try again.',
+                icon: 'error',
+            });
+        }
+    })
+    .catch(error => {
+        Swal.close();
+        Swal.fire({
+            title: 'Error',
+            text: 'Error fetching the file: ' + error.message,
+            icon: 'error',
         });
-    }
+    });
+}
+
+
 
 </script>
 @endpush

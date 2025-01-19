@@ -50,7 +50,7 @@
                     @foreach ($karyawan as $data)
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $data->nama }} <a href="{{ $data->id }}" class="btn  btn-sm btn-success" style="float:right">Download Paklaring</a></td>
+                    <td>{{ $data->nama }} <a href="javascript:void(0)" class="btn  btn-sm btn-success" onClick="downloadPaklaring({{$data->id}})" style="float:right">Download Paklaring</a></td>
                     <td>{{ $data->nik }}</td>
                     <td>{{ $data->jenis_kelamin }}</td>
                     <td>{{ $data->organisasi }}</td>
@@ -183,5 +183,40 @@
             text: '{{ session('error') }}',
         });
     @endif
+    function downloadPaklaring(id) {
+        const url = `/api/v1/paklaring/${id}`; // Define the API endpoint
+        
+        // Fetch the API response
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch the file.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.path) {
+                // Create a temporary link element for the download
+                const link = document.createElement('a');
+                link.href = data.path; // Use the file path from the API response
+                link.download = data.file_name; // Set the download attribute to the file name
+                document.body.appendChild(link);
+                link.click(); // Trigger the download
+                document.body.removeChild(link); // Clean up the temporary element
+            } else {
+                alert('Failed to download the file. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error fetching the file: ' + error.message);
+        });
+    }
+
 </script>
 @endpush

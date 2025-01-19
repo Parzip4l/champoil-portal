@@ -33,7 +33,7 @@
                 <td><strong>CERTIFICATE OF EMPLOYMENT</strong></td>
             </tr>
             <tr>
-                <td><em>001/HC/SKK-KAS/XII/2024</em></td>
+                <td><em>{{$nomor}}/HC/SKK-KAS/XII/{{$tahun}}</em></td>
             </tr>
         </thead>
     </table>
@@ -83,18 +83,34 @@
         and we wish you every success in the future.
     </p>
     <table style="width: 100%; margin-bottom: 10px; text-align: left; font-size: 20px;">
-    <tr>
-        <td style="border: 1px solid black;">
-            Jakarta, {{ date('d F Y') }}<br/>
-            Hormat Saya<br/>
-            <img src="https://hris.truest.co.id/images/company_logo/ttd.png" style="width: 100px; text-align: left;" alt="Company Logo">
-            <img src="https://hris.truest.co.id/images/company_logo/stampel.png" style="width: 200px;margin-top:20px;margin-left:-60px;" alt="Company Logo"><br/>
-            <u><strong>Moch. Firly Triyodha Kusuma, SE</strong></u><br/>
-            <p>Human Culture Manager </p>
+        <tr>
+            <td>
+                Jakarta, {{ date('d F Y') }}<br/>
+                Hormat Saya<br/>
+                <img src="https://hris.truest.co.id/images/company_logo/ttd.png" style="width: 100px; text-align: left;" alt="Company Logo">
+                <img src="https://hris.truest.co.id/images/company_logo/stampel.png" style="width: 200px;margin-top:20px;margin-left:-60px;" alt="Company Logo"><br/>
+                <u><strong>Moch. Firly Triyodha Kusuma, SE</strong></u><br/>
+                <p>Human Culture Manager </p>
 
-        </td>
-    </tr>
-</table>
+            </td>
+        </tr>
+    </table>
+    <table style="width: 100%; margin-bottom: 10px; text-align: left; font-size: 20px;">
+        <tr>
+            <td>
+                <img src="https://hris.truest.co.id/images/company_logo/cityservice.png" style="width: 100px;" alt="Company Logo">
+            </td>
+            <td style="text-align:center">
+            <small>PT KHARISMA ADHI SEJAHTERA<br/>
+            info@cityguard.co.id</small>
+
+            </td>
+            <td>
+            <small>021-5404964<br/> Jakarta, 14460<br/>Indonesia</small>
+
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

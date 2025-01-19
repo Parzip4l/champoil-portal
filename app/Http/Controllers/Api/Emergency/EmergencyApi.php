@@ -108,7 +108,7 @@ class EmergencyApi extends Controller
                 return response()->json([
                     'error' => 'Anda Tidak Ada Schedule Hari Ini.',
                     'message' => 'Anda Tidak Ada Schedule Hari Ini.'
-                ], 201);
+                ], 500);
             }
 
             // Simpan data emergency

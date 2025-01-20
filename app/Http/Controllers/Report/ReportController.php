@@ -65,7 +65,7 @@ class ReportController extends Controller
         $percen_50_80=0;
         $percen_80_99=0;
         $percen_100=0;
-        $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();
+        $project = Project::where('deleted_at',NULL)->where('company','Kas')->orderBy('name','asc')->get();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;

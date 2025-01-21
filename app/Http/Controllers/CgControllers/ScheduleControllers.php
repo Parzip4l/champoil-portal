@@ -35,7 +35,7 @@ class ScheduleControllers extends Controller
 
         $get_data = Schedule::with('project')
             ->select('project', 'periode', DB::raw('count(*) as schedule_count'))
-            ->where('company', Auth::user()->company);
+            ->where('company', Auth::user()->company)
             ->groupBy('project', 'periode')
             ->orderBy(DB::raw("DATE_FORMAT(STR_TO_DATE(periode, '%Y-%m'), '%M-%Y')"), 'ASC'); // Ordering by month in the format MMM-YYYY
 

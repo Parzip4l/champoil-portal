@@ -41,6 +41,7 @@ class ScheduleControllers extends Controller
         if (Auth::user()->project_id == NULL) {
             if ($selectedPeriod) {
                 $get_data->where('periode', $selectedPeriod);
+                $get_data->where('company', Auth::user()->company);
             }
             $schedulesByProject = $get_data->get();
         } else {

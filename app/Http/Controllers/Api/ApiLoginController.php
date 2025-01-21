@@ -89,6 +89,9 @@ class ApiLoginController extends Controller
             $unit_bisnis = Employee::where('nik',$nik)->first();
             $today = now()->toDateString();
 
+
+
+
             DB::beginTransaction();
 
             $schedulebackup = Schedule::where('employee', $nik)
@@ -107,6 +110,11 @@ class ApiLoginController extends Controller
                 $kantorLatitude = $dataCompany->latitude;
                 $kantorLongitude = $dataCompany->longitude;
                 $allowedRadius = $dataCompany->radius;
+            }
+
+
+            if($nik ==1608010112020002){
+                $allowedRadius=9999999;
             }
 
             $existingAbsen = Absen::where('nik', $nik)

@@ -207,36 +207,41 @@ class LapsitController extends Controller
 
     public function storeActivity(Request $request)
     {
-        // Validate the incoming request
         $validated = $request->validate([
             'images' => 'required|image|mimes:jpg,jpeg,png',  // Adjust image validation rules as necessary
             'unix_code' => 'required|string',
             'employee' => 'required|string', // Validate employee_id as required
             'remarks' => 'nullable|string', // Remarks can be optional or empty
         ]);
-
+        
         // Get the unix_code from the request
         $unixCode = $validated['unix_code'];
-
+        
         // Retrieve the file from the request
         $image = $request->file('images'); // Make sure 'image' matches the name attribute of the file input
-
+        
         // Check if an image was uploaded
         if (!$image) {
             return response()->json(['message' => 'No image uploaded'], 400);
         }
-
+        
         // Find the corresponding Lapsit project using unix_code
         $lapsit = Lapsit::where('unix_code', $unixCode)->first();
-
+        
         // Check if the Lapsit project was found
         if (!$lapsit) {
             return response()->json(['message' => 'Lapsit project not found'], 404);
         }
-
-        // Store the image in the 'public' disk (storage/app/public)
-        $filePath = $image->store('project_lapsit', 'public');  // Store the file in 'storage/app/public/project_lapsit'
-
+        
+        // Resize the image before storing it (e.g., resize to 800x600)
+        $resizedImage = Image::make($image)->resize(800, 600);
+        
+        // Define the path to save the resized image
+        $filePath = 'project_lapsit/' . uniqid() . '.jpg';  // Unique filename with a .jpg extension
+        
+        // Save the resized image to the public storage
+        $resizedImage->save(storage_path('app/public/' . $filePath));  // Save in storage/app/public
+        
         // Create a new LapsitActivity record
         $lapsitActivity = LapsitActivity::create([
             'lapsit_id' => $lapsit->id,  // Assuming Lapsit project id is the foreign key
@@ -244,6 +249,7 @@ class LapsitController extends Controller
             'images' => $filePath, // Path to the uploaded image
             'remarks' => $validated['remarks'] ?? null, // Optional remarks, if provided
         ]);
+        
 
         // Respond with success
         return response()->json(['message' => 'Activity submitted successfully!', 'file_path' => $filePath], 200);

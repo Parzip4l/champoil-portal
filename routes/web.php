@@ -92,6 +92,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
         Route::post('/attendence-request/{id}', [App\Http\Controllers\Absen\RequestControllers::class, 'updateStatusSetuju'])->name('approve.request');
         Route::post('/reject-request/{id}', [App\Http\Controllers\Absen\RequestControllers::class, 'updateStatusReject'])->name('reject.request');
         Route::get('attendence-request/{id}/download', [App\Http\Controllers\Absen\RequestControllers::class, 'download'])->name('dokumen.download');
+        Route::get('bulk-lembur', [App\Http\Controllers\Absen\RequestControllers::class, 'bulk_lembur'])->name('bulk-lembur');
     });
 
     // Component Ns
@@ -394,6 +395,12 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
                 // history Pembayaran
                 Route::get('/history-pembayaran', [App\Http\Controllers\Koperasi\KoperasiController::class, 'historypayment'])->name('historypayment'); 
+
+                // Kontral
+                Route::get('/download-kontrak/{employee_code}', function ($employee_code) {
+                    $path = storage_path('app/public/kontrak/kontrak_' . $employee_code . '.pdf');
+                    return response()->download($path);
+                });
 
     // CG Component
     Route::group(['prefix' => 'kas'], function(){

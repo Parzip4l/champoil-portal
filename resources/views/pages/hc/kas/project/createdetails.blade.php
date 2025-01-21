@@ -108,13 +108,13 @@
                                         <div class="col-md-4">
                                             <div class="form-group mb-3">
                                                 <label for="" class="form-label">Real Deduction</label>
-                                                <input type="number" name="r_deduction" class="form-control real_deduction" id="real_deduction" required>
+                                                <input type="text" name="r_deduction" class="form-control real_deduction" id="real_deduction" required>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group mb-3">
                                                 <label for="" class="form-label">Project Deduction</label>
-                                                <input type="number" name="p_deduction" class="form-control project-deduction" id="project-deduction" required>
+                                                <input type="text" name="p_deduction" class="form-control project-deduction" id="project-deduction" required>
                                             </div>
                                         </div>
                                         <div class="form-group mb-3">

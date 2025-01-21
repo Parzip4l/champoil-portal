@@ -69,6 +69,7 @@ class VoiceOfController extends Controller
                     "id"=>$records->id,
                     "nama"=> $records->nama,
                     "project"=>project_byID($records->project)->name,
+                    "photo"=>$records->attachment,
                     "nomor_wa"=>$records->nomor_wa,
                     "pertanyaan"=>$records->pertanyaan,
                     "created_at"=>date('d F Y H:i:s',strtotime($records->created_at)),
@@ -110,7 +111,7 @@ class VoiceOfController extends Controller
                 $filePath = $file->storeAs('uploads/attachments', $fileName, 'public'); // Store file in 'public/uploads/attachments'
                 
                 // Make sure the file is publicly accessible
-                $fileUrl = asset('storage/' . $filePath); // Generate the public URL for the file
+                $fileUrl = asset('storage/app/public/' . $filePath); // Generate the public URL for the file
             } else {
                 throw new \Exception("Attachment file is required.");
             }
@@ -128,65 +129,65 @@ class VoiceOfController extends Controller
     
             // Insert the data into the database
             $query = VoiceofGuardians::insert($insert);
-            if($query){
-                $payload = [
-                    'blocks' => [
-                        [
-                            'type' => 'divider'
-                        ],
-                        [
-                            'type' => 'header',
-                            'text' => [
-                                'type' => 'plain_text',
-                                'text' => 'Guardians Feedback',
-                                'emoji' => true
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => 'hallo @here terdapat feedback  dengan rincian seperti berikut'
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Nama Lengkap : *'.$validated['nama']
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Nomor Wa :*'.$validated['nomor_wa']
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Project :*'.project_byID($validated['project'])->name
-                            ]
-                        ],
-                        [
-                            'type' => 'section',
-                            'text' => [
-                                'type' => 'mrkdwn',
-                                'text' => '*Keterangan :*'.$validated['pertanyaan']
-                            ]
-                        ]
-                    ]
-                ];
+            // if($query){
+            //     $payload = [
+            //         'blocks' => [
+            //             [
+            //                 'type' => 'divider'
+            //             ],
+            //             [
+            //                 'type' => 'header',
+            //                 'text' => [
+            //                     'type' => 'plain_text',
+            //                     'text' => 'Guardians Feedback',
+            //                     'emoji' => true
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => 'hallo @here terdapat feedback  dengan rincian seperti berikut'
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Nama Lengkap : *'.$validated['nama']
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Nomor Wa :*'.$validated['nomor_wa']
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Project :*'.project_byID($validated['project'])->name
+            //                 ]
+            //             ],
+            //             [
+            //                 'type' => 'section',
+            //                 'text' => [
+            //                     'type' => 'mrkdwn',
+            //                     'text' => '*Keterangan :*'.$validated['pertanyaan']
+            //                 ]
+            //             ]
+            //         ]
+            //     ];
 
-                $client = new Client();
+            //     $client = new Client();
 
-                // Send the POST request to the webhook URL
-                $response = $client->post('https://hooks.slack.com/services/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', [
-                    'json' => $payload // Send the message as JSON
-                ]);
-            }
+            //     // Send the POST request to the webhook URL
+            //     $response = $client->post('https://hooks.slack.com/services/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', [
+            //         'json' => $payload // Send the message as JSON
+            //     ]);
+            // }
     
             // If insertion is successful, update the error flag and message
             $error = false;
@@ -224,13 +225,18 @@ class VoiceOfController extends Controller
                 "jawaban"=>$data["jawaban"],
                 "created_at" => now(),
             ];
+
+            $record =   VoiceofGuardians::where('id',$data['voice_id'])->first();
+            if($record){
+                $updatedPhoneNumber = preg_replace('/^08/', '628', $record->nomor_wa);
+            }
     
             // Insert the data into the database
             $query = VoiceRellations::insert($insert);
             if($query && $data['voice_user']==1){
                 $url = 'https://waapi.app/api/v1/instances/17816/client/action/send-message';
                 $token = 'QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08'; // Replace with your actual token
-                $chatId = '6285624038980@c.us';
+                $chatId = $updatedPhoneNumber.'@c.us';
                 $message = 'Feedback anda sudah didjawab, kliklink berikut untuk melihat jawaban \n'.route('voice-frontline-detail',['id'=>$data['voice_id']]);
 
                 $client = new Client();

@@ -208,7 +208,12 @@ class PayrolNS extends Controller
                             if ($sisaHutangSaya) {
                                 // Calculate the remaining amount to be paid
                                 $remainingAmount = $sisaHutangSaya->sisahutang - $loan->instalment;
-                
+                            
+                                // Ensure remaining amount is set to 0 if it reaches 1
+                                if ($remainingAmount === 1) {
+                                    $remainingAmount = 0;
+                                }
+                            
                                 // Only record the payment if there's remaining debt
                                 if ($sisaHutangSaya->sisahutang > 0) {
                                     $loanPayment = new LoanPayment();
@@ -218,15 +223,16 @@ class PayrolNS extends Controller
                                     $loanPayment->jumlah_pembayaran = $loan->instalment;
                                     $loanPayment->sisahutang = max($remainingAmount, 0); // Ensure sisahutang is not negative
                                     $loanPayment->save();
-
+                            
                                     $anggota->sisahutang = max($remainingAmount, 0);
                                     $anggota->save();
-                                    
                                 }
-                                if ($remainingAmount > 0) {
+                            
+                                if ($remainingAmount > 1) {
                                     $allLoansPaidOff = false;
                                 }
                             }
+                            
                         }
 
                         if ($allLoansPaidOff) {

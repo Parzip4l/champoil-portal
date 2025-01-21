@@ -29,11 +29,48 @@
                 </div>
             </div>
             <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form method="GET" action="{{ url()->current() }}" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label for="filterStatus" class="form-label">Filter Member Status</label>
+                                    <select name="member_status" id="filterStatus" class="form-control">
+                                        <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>All</option>
+                                        <option value="active" {{ $filterStatus === 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="exit" {{ $filterStatus === 'exit' ? 'selected' : '' }}>Exit</option>
+                                        <option value="onhold" {{ $filterStatus === 'onhold' ? 'selected' : '' }}>On Hold</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 align-self-end">
+                                    <button type="submit" class="btn btn-primary">Filter</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6"> 
+                        <form method="GET" action="{{ url()->current() }}" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label for="filterStatus" class="form-label">Filter Member Loan Status</label>
+                                    <select name="loan_status" id="filterStatus" class="form-control">
+                                        <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>All</option>
+                                        <option value="onloan" {{ $filterStatus === 'onloan' ? 'selected' : '' }}>On Loan</option>
+                                        <option value="noloan" {{ $filterStatus === 'noloan' ? 'selected' : '' }}>No Loan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 align-self-end">
+                                    <button type="submit" class="btn btn-primary">Filter</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
                 <div class="table-responsive">
                     <table id="dataTableAnggota" class="table">
                         <thead>
                             <tr>
-                                <th>Code</th>
                                 <th>Member Name</th>
                                 <th>Join Date</th>
                                 <th>Status</th>
@@ -46,7 +83,6 @@
                         <tbody>
                             @foreach ($anggota as $dataAnggota)
                             <tr>
-                                <td>{{$dataAnggota->id}}</td>
                                 <td>{{$dataAnggota->nama}}</td>
                                 <td>{{$dataAnggota->join_date}}</td>
                                 @if($dataAnggota->member_status === "active")
@@ -54,13 +90,13 @@
                                 @else
                                 <td><span class="badge bg-danger">{{$dataAnggota->member_status}}</span></td>
                                 @endif
-                                <td>Rp {{ number_format($dataAnggota->saldosimpanan, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($dataAnggota->saldo_simpanan ?? 0, 0, ',', '.') }}</td>
                                 @if($dataAnggota->loan_status === "noloan")
                                 <td><span class="badge bg-primary">{{$dataAnggota->loan_status}}</span></td>
                                 @else 
                                 <td><span class="badge bg-danger">{{$dataAnggota->loan_status}}</span></td>
                                 @endif
-                                <td>Rp {{ number_format($dataAnggota->sisahutang, 0, ',', '.') }}</td>
+                                <td>Rp {{ $dataAnggota->sisahutang == 1 ? '0' : number_format($dataAnggota->sisahutang, 0, ',', '.') }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -71,6 +107,12 @@
                                                 <i data-feather="edit-2" class="icon-sm me-2"></i>
                                                 <span class="">Edit</span>
                                             </a>
+                                            @if($dataAnggota->loan_status === "onloan")
+                                            <a class="dropdown-item d-flex align-items-center" href="{{ url('/download-kontrak/' . $dataAnggota->employee_code) }}">
+                                                <i data-feather="eye" class="icon-sm me-2"></i>
+                                                <span class="">Lihat Kontrak</span>
+                                            </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -108,7 +150,11 @@
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Member Status</label>
-                            <input type="text" name="member_status" class="form-control" value="{{$dataAnggota->member_status}}" placholder="" required readonly>
+                            <select name="member_status" id="" class="form-control">
+                                <option value="active">Active</option>
+                                <option value="exit">Exit</option>
+                                <option value="onhold">On Hold</option>
+                            </select>
                         </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Update Member</button>

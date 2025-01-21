@@ -17,9 +17,11 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
-
+use PDF;
 // Model
 use App\Employee;
+use App\Paklaring;
+use App\EmployeeResign;
 use App\User;
 use App\Pengumuman\Pengumuman;
 use App\News\News;
@@ -27,6 +29,7 @@ use App\ModelCG\Birthday;
 use App\ModelCG\asset\PengajuanCicilan;
 use App\ModelCG\asset\BarangCicilan;
 use App\Loan\LoanModel;
+use App\VoltageData;
 
 class AllDataController extends Controller
 {
@@ -135,6 +138,37 @@ class AllDataController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function storeVoltage(Request $request)
+    {
+        // Validasi data yang diterima
+        $validated = $request->validate([
+            'voltage' => 'required|numeric',
+        ]);
+
+        // Simpan data ke database
+        $voltageData = VoltageData::create([
+            'voltage' => $validated['voltage'],
+        ]);
+
+        // Kembalikan respon JSON
+        return response()->json([
+            'message' => 'Voltage data received and saved successfully',
+            'data' => $voltageData,
+        ], 200);
+    }
+
+    public function getVoltageData()
+    {
+        // Ambil semua data dari tabel voltages
+        $voltageData = VoltageData::all();
+
+        // Kembalikan respon JSON dengan data
+        return response()->json([
+            'message' => 'Voltage data retrieved successfully',
+            'data' => $voltageData,
+        ], 200);
     }
     
     public function BirtdayList(Request $request)
@@ -465,6 +499,96 @@ class AllDataController extends Controller
         $loan->installments = 3;
         $loan->installment_amount = $record->perbulan; // Use the new variable
         $loan->save();
+    }
+
+    public function getImei(Request $request){
+        // Assuming the IMEI is sent in the request as a parameter
+        $imei = $request->input('imei', 'IMEI not provided');
+
+        // Or if it's sent in headers
+        $imeiFromHeader = $request->header('IMEI', 'IMEI not provided');
+
+        return response()->json([
+            'imei' => $imei,
+            'imei_from_header' => $imeiFromHeader,
+        ]);
+    }
+    public function paklaring($id){
+        try {
+            
+            // Fetch project details
+            $employee = Employee::find($id);
+
+            if (!$employee) {
+                return response()->json(['error' => 'employee not found'], 404);
+            }
+
+            $resign = EmployeeResign::where('employee_code',$employee->nik)->first();
+
+            $currentYear = date('Y');
+
+            // Fetch the last `nomor` for the current year
+            $lastPaklaring = Paklaring::where('tahun', $currentYear)->orderBy('nomor', 'desc')->first();
+
+            if ($lastPaklaring) {
+                // Increment the last number
+                $newNomor = str_pad($lastPaklaring->nomor + 1, 3, '0', STR_PAD_LEFT);
+            } else {
+                // Start from 001 if no records found
+                $newNomor = '001';
+            }
+
+            // Insert the new paklaring record
+            $insert = Paklaring::insert([
+                "nomor" => $newNomor,
+                "tahun" => $currentYear
+            ]);
+
+           
+            $data = [
+                'employee' => $employee,
+                'resign' => $resign,
+                "nomor" => $newNomor,
+                "tahun" => $currentYear
+            ];
+            
+
+            // Generate the PDF
+            $pdf = Pdf::loadView('pages.hc.karyawan_resign.paklaring', $data);
+            $pdf->setOption('no-outline', true);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isPhpEnabled', true);
+            $pdf->setPaper('A4', 'portrait');
+
+            // Create unique file name for the PDF
+            $fileName = 'paklaring' . $employee->nik . ".pdf";
+            $publicPath = public_path('paklaring');
+
+            // Ensure the directory exists
+            if (!is_dir($publicPath)) {
+                mkdir($publicPath, 0755, true);
+            }
+
+            $filePath = $publicPath . '/' . $fileName;
+
+            // Save the PDF
+            $pdf->save($filePath);
+
+            $fileUrl = asset('paklaring/' . $fileName);
+
+            // Return JSON response with file details
+            return response()->json([
+                'message' => 'PDF file generated successfully',
+                'path' => $fileUrl,
+                'file_name' => $fileName
+            ]);
+        } catch (\Exception $e) {
+            // Handle exceptions and return error response
+            return response()->json([
+                'error' => 'Failed to generate PDF',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
     
     

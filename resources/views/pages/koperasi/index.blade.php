@@ -140,7 +140,7 @@
                        </div>
                     </div>
                 </div>
-                @if (empty($loan))
+                @if ($datasaya->loan_status == 'noloan')
                 <div class="persyaratan-pinjaman-wrap mt-4 mb-4">
                     <h5 class="mb-3">Loan Terms :</h5>
                     <div class="item-pesyratan d-flex justify-content-between mb-2">

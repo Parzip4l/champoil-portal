@@ -288,6 +288,7 @@ TRUEST Team```';
 
             // Update data Koperasi
             $anggota->join_date = $request->join_date;
+            $anggota->member_status = $request->member_status;
             
             // Simpan perubahan
             $anggota->save();

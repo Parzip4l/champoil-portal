@@ -96,7 +96,7 @@ class DailyContrtoller extends Controller
             ->where('company', 'Kas')
             ->get();
     
-        $date1 = "2024-11-21";
+        $date1 = "2024-12-21";
         $yesterday = Carbon::yesterday()->format('Y-m-d');
         
         $result = [];
@@ -136,11 +136,6 @@ class DailyContrtoller extends Controller
             'data' => $result
         ]);
     }
-    
-    
-    
-    
-
     
     public function seven_day() {
         // Fetch active employees in the specific business unit
@@ -192,6 +187,28 @@ class DailyContrtoller extends Controller
         }
     
         return response()->json($result);
+    }
+
+    public function reminder_schedule($key,$periode){
+        $project = Project::whereNull('deleted_at')->where('company', 'like', '%' . $key . '%')->get();
+        $schedule_onperiode=[];
+        $not_scheudle=[];
+        if($project){
+            foreach($project as $record){
+                $count_schedule = Schedule::where('project',$record->id)->where('periode',$periode)->count();
+                if($count_schedule  > 0){
+                    $schedule_onperiode[]=$record;
+                }else{
+                    $not_scheudle[]=$record;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'not_scheudle' => $not_scheudle,
+            'schedule_onperiode' => $schedule_onperiode
+        ]);
     }
     
     

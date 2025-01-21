@@ -546,9 +546,9 @@
                 })
                 .catch(function(error) {
                     // Handle error response
-                    console.error('Error downloading file', error);
+                    alert('Request Timeout');
                     $('#loadingBackdrop').hide();
-                });
+                });    
         });
     });
 

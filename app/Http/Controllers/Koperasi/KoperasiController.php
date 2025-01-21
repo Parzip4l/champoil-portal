@@ -82,17 +82,45 @@ class KoperasiController extends Controller
         //
     }
 
-    public function anggotapage()
+    public function anggotapage(Request $request)
     {
         // Cek User Login 
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        $anggota = Anggota::where('company', $company->unit_bisnis)
-                        ->where('member_status', 'active')
-                        ->get();
-        return view('pages.app-setting.koperasi.anggota',compact('anggota'));
+        // Ambil filter dari request, default ke 'all'
+        $filterStatus = $request->input('member_status', 'all');
+        $loanStatus = $request->input('loan_status', 'all');
+
+        $query = Anggota::where('company', $company->unit_bisnis)
+                        ->whereNot('member_status', 'review')
+                        ->whereNot('member_status', 'reject');
+        
+        // Terapkan filter jika bukan 'all'
+        if ($filterStatus !== 'all') {
+            $query->where('member_status', $filterStatus);
+        }
+
+        if ($loanStatus !== 'all') {
+            $query->where('loan_status', $loanStatus);
+        }
+
+        $anggota = $query->get();
+
+        // Tambahkan saldo simpanan untuk setiap anggota
+        foreach ($anggota as $dataAnggota) {
+            $lastSaving = Saving::where('employee_id', $dataAnggota->employee_code)
+                ->where('jumlah_simpanan', '!=', 0)
+                ->where('totalsimpanan', '!=', 0)
+                ->latest('created_at')
+                ->first();
+    
+            $dataAnggota->saldo_simpanan = $lastSaving ? $lastSaving->totalsimpanan : 0;
+        }
+
+        return view('pages.app-setting.koperasi.anggota', compact('anggota', 'filterStatus','loanStatus'));
     }
+
 
     public function pendinganggota()
     {

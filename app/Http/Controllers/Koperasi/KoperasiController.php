@@ -57,7 +57,7 @@ class KoperasiController extends Controller
                             // Get the most recent record for each employee_id
                             return $group->first();
                         });
-        $totalSimpanan = $latestSavings->sum('totalsimpanan');
+        $totalSimpanan = $latestSavings->sum('totalsimpanan') - 100000;
 
         
         //Daftar Pengajuan
@@ -169,7 +169,7 @@ class KoperasiController extends Controller
 
         $totalPiutang = $latestPiutang->sum('sisahutang');
         // Calculate the total of `totalsimpanan` from the most recent records
-        $totalSimpanan = $latestSavings->sum('totalsimpanan');
+        $totalSimpanan = $latestSavings->sum('totalsimpanan') - 100000;
         // count anggota
         $anggota = Anggota::where('company', $company->unit_bisnis)
         ->where('member_status', 'active')

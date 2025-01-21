@@ -292,13 +292,13 @@
                                 <label class="form-check-label">HR</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access"
                                     {{ in_array('superadmin_access', $permission) ? 'checked' : '' }}>
                                 <label class="form-check-label">Superadmin</label>
                             </div>
-                        </div>
+                        </div> -->
                         
                         <div class="col-md-4">
                             <div class="form-check">
@@ -362,12 +362,12 @@
                             <label class="form-check-label">HR</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">
                             <label class="form-check-label">Super Admin</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             @endif

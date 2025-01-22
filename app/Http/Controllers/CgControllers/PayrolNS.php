@@ -66,7 +66,7 @@ class PayrolNS extends Controller
         if($dataPayroll){
             foreach($dataPayroll  as $row){
                 $periode = explode(' - ',$row->periode);
-                $row->periode_bulan = date('F',strtotime($periode[0]));
+                $row->periode_bulan = date('F-Y',strtotime($periode[0]));
             }
 
             $dataPayroll = $dataPayroll->sortByDesc(function ($payroll) {

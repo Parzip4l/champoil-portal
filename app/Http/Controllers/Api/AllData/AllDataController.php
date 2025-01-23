@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use PDF;
 // Model
 use App\Employee;
+use App\Paklaring;
 use App\EmployeeResign;
 use App\User;
 use App\Pengumuman\Pengumuman;
@@ -524,10 +525,31 @@ class AllDataController extends Controller
 
             $resign = EmployeeResign::where('employee_code',$employee->nik)->first();
 
+            $currentYear = date('Y');
+
+            // Fetch the last `nomor` for the current year
+            $lastPaklaring = Paklaring::where('tahun', $currentYear)->orderBy('nomor', 'desc')->first();
+
+            if ($lastPaklaring) {
+                // Increment the last number
+                $newNomor = str_pad($lastPaklaring->nomor + 1, 3, '0', STR_PAD_LEFT);
+            } else {
+                // Start from 001 if no records found
+                $newNomor = '001';
+            }
+
+            // Insert the new paklaring record
+            $insert = Paklaring::insert([
+                "nomor" => $newNomor,
+                "tahun" => $currentYear
+            ]);
+
            
             $data = [
                 'employee' => $employee,
-                'resign' => $resign
+                'resign' => $resign,
+                "nomor" => $newNomor,
+                "tahun" => $currentYear
             ];
             
 

@@ -105,7 +105,10 @@ class EmergencyApi extends Controller
                 ->first();
 
             if (!$schedule) {
-                return response()->json(['error' => 'Anda Tidak Ada Schedule Hari Ini.'], 500);
+                return response()->json([
+                    'error' => 'Anda Tidak Ada Schedule Hari Ini.',
+                    'message' => 'Anda Tidak Ada Schedule Hari Ini.'
+                ], 500);
             }
 
             // Simpan data emergency

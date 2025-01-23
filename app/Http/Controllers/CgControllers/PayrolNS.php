@@ -39,9 +39,40 @@ class PayrolNS extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $dataPayroll = Payroll::all();
+        $filter="";
+        $dataPayroll = Payroll::query(); // Pastikan menggunakan query builder
+
+        // Cek apakah filter tidak kosong
+        if ($request->input('filter')) {
+            $bulan = date('m', strtotime($request->input('filter')));
+            $tahun = date('Y', strtotime($request->input('filter')));
+            $tahun2 = $tahun;
+        
+            if ($bulan == 12) {
+                $tahun2 += 1;
+                $bulan2 = 1; // Januari untuk bulan berikutnya
+            } else {
+                $bulan2 = $bulan + 1;
+            }
+        
+            $periode = sprintf("21-%02d-%d - 20-%02d-%d", $bulan, $tahun, $bulan2, $tahun2);
+            $dataPayroll->where('periode', $periode); // Pencarian langsung untuk periode tertentu
+        }
+
+        $dataPayroll = $dataPayroll->get(); // Eksekusi query dan ambil hasil
+        
+        if($dataPayroll){
+            foreach($dataPayroll  as $row){
+                $periode = explode(' - ',$row->periode);
+                $row->periode_bulan = date('F-Y',strtotime($periode[0]));
+            }
+
+            $dataPayroll = $dataPayroll->sortByDesc(function ($payroll) {
+                return strtotime($payroll->periode_bulan); // Convert to timestamp for sorting
+            });
+        }
 
         return view('pages.hc.kas.payroll.index',compact('dataPayroll'));
     }

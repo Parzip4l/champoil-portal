@@ -702,7 +702,7 @@ class AllDataController extends Controller
                     $tp_bulanan = $project_detail->tp_bulanan ?? 0;
                     $rate_harian = $project_detail->rate_harian ?? 0;
                     $lembur_rate = $project_detail->lembur_rate ?? 0;
-                    $project = $projects_name->name;
+                    $project = $projects_name->name ?? '-';
                 }
                 
                 $allowences = json_decode($p->allowences,true);

@@ -673,7 +673,7 @@ class AllDataController extends Controller
                 if(!empty($schedule->project)){
                     $projects_name = Project::where('id',$schedule->project)->first();
                     $project_detail = ProjectDetails::where('project_code',$schedule->project)->where('jabatan',karyawan_bynik($p->employee_code)->jabatan)->first();
-                    $p_gajipokok = $project_detail->thp_bulanan ?? 0;
+                    $p_gajipokok = $project_detail->tp_bulanan ?? 0;
                     $p_bpjstk = $project_detail->p_bpjstk ?? 0;
                     $p_bpjs_ks = $project_detail->p_bpjs_ks ?? 0;
                     $p_thr = $project_detail->p_thr ?? 0;

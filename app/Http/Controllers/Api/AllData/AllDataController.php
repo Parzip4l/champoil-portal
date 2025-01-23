@@ -640,7 +640,7 @@ class AllDataController extends Controller
             $result=[];
             foreach($get_payrol as $p){
                 $schedule = Schedule::where('employee',$p->employee_code)->where('tanggal',date('Y-m-d',strtotime($endDate)))->first();
-                $projects = "-";
+                $project = "-";
                 $p_gajipokok =0;
                 $p_bpjstk = 0;
                 $p_bpjs_ks = 0;

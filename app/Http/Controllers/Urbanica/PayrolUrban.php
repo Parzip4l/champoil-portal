@@ -199,8 +199,16 @@ class PayrolUrban extends Controller
                     // Convert arrays back to JSON
                     $newAllowancesData = json_encode($allowancesArray);
                     $newDeductionsData = json_encode($deductionArray);
+                    $kerajinan = isset($allowancesArray['kerajinan'][0]) ? (float)$allowancesArray['kerajinan'][0] : 0;
+                    $uangMakan = isset($allowancesArray['uang_makan'][0]) ? (float)$allowancesArray['uang_makan'][0] : 0;
                     // Calculate Net Salary
-                    $netSalary = round($totalGajiAbsen + $totalLembur + $allowancesArray['kerajinan'] + $allowancesArray['uang_makan'] - $additionalDeductionTotal);
+                    $netSalary = round(
+                        $totalGajiAbsen +
+                        $totalLembur +
+                        $kerajinan +
+                        $uangMakan -
+                        $additionalDeductionTotal
+                    );
                     // Save payroll data
                     $payroll = new PayrolUrbanica();
                     $payroll->employee_code = $code;

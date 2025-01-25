@@ -87,7 +87,7 @@
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
                     <label for="kode_karyawan" class="form-label">Kerajinan</label>
-                    <input type="number" id="Kerajinan" class="form-control datainput allowance" name="uang_kerajinan" placeholder="Rp. " required value="{{$payrolComponent->uang_kerajinan ?? 0}}">
+                    <input type="number" id="Kerajinan" class="form-control datainput allowance" name="uang_kerajinan" placeholder="Rp. " required value="{{$payrolComponent->kerajinan ?? 0}}">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Uang Makan</label>

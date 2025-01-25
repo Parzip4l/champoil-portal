@@ -97,55 +97,48 @@ class PayrolUrban extends Controller
                 $additionalAllowances = ComponentDetails::where('employee_code', $code)
                                         ->where('type', 'Allowances')
                                         ->get();
-
+            
                 $additionalDeductions = ComponentDetails::where('employee_code', $code)
                                         ->where('type', 'Deductions')
                                         ->get();
-
-                
-                
-                // Initialize arrays to store additional data
+            
                 $additionalDataArray = [];
                 $deductionDataArray = [];
                 $additionalAllowanceTotal = 0;
                 $additionalDeductionTotal = 0;
                 $totalLembur = 0;
-                $absenData = 0;
+                $absendata = 0;
                 $totalGajiAbsen = 0;
-
-                $absendata = Absen::where('nik', $code)->whereBetween('tanggal',[$startDateFormatted,$endDateFormatted])->count();
-                // Loop through additional allowances
+            
+                $absendata = Absen::where('nik', $code)
+                    ->whereBetween('tanggal', [$startDateFormatted, $endDateFormatted])
+                    ->count();
+            
                 foreach ($additionalAllowances as $additionalData) {
                     $componentName = $additionalData->component_name;
                     $nominal = $additionalData->nominal;
-                    // Add additional data to the array
                     $additionalAllowanceTotal += $nominal;
                     $additionalDataArray[$componentName] = $nominal;
                 }
-
-                // Loop through additional deductions
+            
                 foreach ($additionalDeductions as $additionalDataDeductions) {
                     $componentName = $additionalDataDeductions->component_name;
                     $nominal = $additionalDataDeductions->nominal;
-                    // Add additional data to the array
                     $additionalDeductionTotal += $nominal;
                     $deductionDataArray[$componentName] = $nominal;
                 }
-                
-                
+            
                 if ($payrollComponents) {
-                    // Get payroll component details
                     $basic_salary = $payrollComponents->daily_salary;
                     $allowancesData = $payrollComponents->allowances;
                     $deductionsData = $payrollComponents->deductions;
                     $NetSalary = $payrollComponents->net_salary;
                     $allowancesArray = json_decode($allowancesData, true);
                     $deductionArray = json_decode($deductionsData, true);
-                    
+            
                     $totalGajiAbsen = $basic_salary * $absendata;
-                    $lemburRate = isset($allowancesArray['lembur'][0]) ? (float) $allowancesArray['lembur'][0] : 0;
-                
-                    // Get overtime hours
+                    $lemburRate = isset($allowancesArray['lembur'][0]) ? (float)$allowancesArray['lembur'][0] : 0;
+            
                     $ceklembur = RequestAbsen::where('employee', $code)
                         ->where('status', 'L')
                         ->where('aprrove_status', 'Approved')
@@ -153,54 +146,53 @@ class PayrolUrban extends Controller
                         ->select('employee', DB::raw('SUM(jam_lembur) as total_lembur'))
                         ->groupBy('employee')
                         ->first();
-                    
+            
                     $totalLembur = $ceklembur ? $ceklembur->total_lembur * $lemburRate : 0;
                     $totalJamLembur = $ceklembur ? $ceklembur->total_lembur : 0;
-                
-                    // Add total overtime hours to allowances
-                    if (!isset($allowancesArray['total_overtime_hours'])) {
-                        $allowancesArray['total_overtime_hours'] = 0;
+            
+                    $allowancesArray['total_overtime_hours'] = $totalJamLembur ?? 0;
+                    $allowancesArray['total_overtime_pay'] = $totalLembur ?? 0;
+                    $allowancesArray['total_absence'] = $absendata ?? 0;
+            
+                    // Hitung ulang total allowance
+                    $totalAllowance = 0;
+                    foreach ($allowancesArray as $key => $value) {
+                        // Hanya tambahkan "uang kerajinan" dan "uang makan" ke totalAllowance
+                        if (in_array($key, ['kerajinan', 'uang_makan'])) {
+                            if (is_array($value)) {
+                                $totalAllowance += (float)($value[0] ?? 0);
+                            } elseif (is_numeric($value)) {
+                                $totalAllowance += (float)$value;
+                            }
+                        }
                     }
-                    $allowancesArray['total_overtime_hours'] += $totalJamLembur;
-
-                    if (!isset($allowancesArray['total_overtime_pay'])) {
-                        $allowancesArray['total_overtime_pay'] = 0;
+            
+                    $totalAllowance += $totalLembur;
+            
+                    // Simpan total allowance ke dalam array allowancesArray
+                    $allowancesArray['total_allowance'] = $totalAllowance;
+            
+                    // Hitung ulang total deduction
+                    $totalDeduction = 0;
+                    foreach ($deductionArray as $key => $value) {
+                        if (is_array($value)) {
+                            $totalDeduction += (float)($value[0] ?? 0);
+                        } elseif (is_numeric($value)) {
+                            $totalDeduction += (float)$value;
+                        }
                     }
-                    $allowancesArray['total_overtime_pay'] += $totalLembur;
-                
-                    // Add total absence to allowances
-                    if (!isset($allowancesArray['total_absence'])) {
-                        $allowancesArray['total_absence'] = 0;
-                    }
-                    $allowancesArray['total_absence'] += $absendata;  // Assuming $absendata contains the number of absence days
-                
-                    // Ensure 'total_allowance' and 'total_deduction' are initialized as arrays
-                    if (!is_array($allowancesArray)) {
-                        $allowancesArray = ['total_allowance' => 0];
-                    } else if (!isset($allowancesArray['total_allowance'])) {
-                        $allowancesArray['total_allowance'] = 0;
-                    }
-                
-                    if (!is_array($deductionArray)) {
-                        $deductionArray = ['total_deduction' => 0];
-                    } else if (!isset($deductionArray['total_deduction'])) {
-                        $deductionArray['total_deduction'] = 0;
-                    }
-                
-                    // Add additional totals to existing totals
-                    $allowancesArray['total_allowance'] += $additionalAllowanceTotal + $totalLembur;
-                    $deductionArray['total_deduction'] += $additionalDeductionTotal;
-                
-                    // Merge additional data with existing arrays
+            
+                    $deductionArray['total_deduction'] = $totalDeduction + $additionalDeductionTotal;
+            
                     $allowancesArray = array_merge($allowancesArray, $additionalDataArray);
                     $deductionArray = array_merge($deductionArray, $deductionDataArray);
-                    
-                    // Convert arrays back to JSON
+            
                     $newAllowancesData = json_encode($allowancesArray);
                     $newDeductionsData = json_encode($deductionArray);
-                    // Calculate Net Salary
-                    $netSalary = round($totalGajiAbsen + $totalLembur + $additionalAllowanceTotal - $additionalDeductionTotal);
-                    // Save payroll data
+            
+                    $netSalary = round($totalGajiAbsen + $totalLembur + $allowancesArray['total_allowance'] - 
+                $deductionArray['total_deduction']);
+            
                     $payroll = new PayrolUrbanica();
                     $payroll->employee_code = $code;
                     $payroll->periode = $startDateFormatted . ' - ' . $endDateFormatted;
@@ -216,6 +208,7 @@ class PayrolUrban extends Controller
                     $payroll->save();
                 }
             }
+
             // Commit the transaction
             DB::commit();
 

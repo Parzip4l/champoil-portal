@@ -33,7 +33,7 @@
                 <td><strong>CERTIFICATE OF EMPLOYMENT</strong></td>
             </tr>
             <tr>
-                <td><em>{{$nomor}}/HC/SKK-KAS/XII/{{$tahun}}</em></td>
+                <td><em>{{$nomor}}/HC/SKK-KAS/{{convertToRoman(date('m',strtotime($resign->created_at))) }}/{{ date('Y',strtotime($resign->created_at)) }}</em></td>
             </tr>
         </thead>
     </table>
@@ -86,7 +86,7 @@
     <table style="width: 100%; margin-bottom: 10px; text-align: left; font-size: 20px;">
         <tr>
             <td>
-                Jakarta, {{ date('d F Y') }}<br/>
+                Jakarta, {{ date('d F Y',strtotime($resign->created_at)) }}<br/>
                 Hormat Saya<br/>
                 <br/>
                 <img src="https://hris.truest.co.id/images/company_logo/ttd.png" style="width: 90px; text-align: left;" alt="Company Logo">

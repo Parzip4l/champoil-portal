@@ -31,6 +31,7 @@ class PayrolComponent extends Controller
             $payrol = PayrolCM::join('karyawan', 'payrol_components.employee_code', '=', 'karyawan.nik')
                 ->select('payrol_components.id', 'payrol_components.*')
                 ->where('karyawan.unit_bisnis', $unit_bisnis)
+                ->where('karyawan.resign_status','0')
                 ->get();
 
             $parolns = PayrolComponent_NS::join('karyawan', 'payrol_component_ns.employee_code', '=', 'karyawan.nik')

@@ -17,6 +17,23 @@
         <div class="card">
             <div class="card-header ">
                 <h5 class="mb-0 align-self-center">Data Payroll</h5>
+                <div class="btn-group" style="float:right; margin-left:3px;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filter Bulan
+                    </button>
+                    <ul class="dropdown-menu">
+                        @php 
+                            $year=date('Y');
+                            $last_year=$year-1;
+                        @endphp
+                        <li><a class="dropdown-item" href="?filter={{ 'DECEMBER-'.$last_year }}">{{ 'DECEMBER-'.$last_year }}</a></li>
+                        @foreach(bulan() as $bulan)
+                        <li><a class="dropdown-item" href="?filter={{ strtoupper($bulan).'-'.date('Y') }}">{{ strtoupper($bulan).'-'.date('Y') }}</a></li>
+                        <!-- Tambahkan bulan lainnya sesuai kebutuhan -->
+                         @endforeach
+                    </ul>
+                </div>
+
                 <a href="{{route('payroll-kas.create')}}" class="btn btn-sm btn-outline-primary" style="float:right;margin-left:3px;">Create Payroll</a>
                 <a href="javascript:void(0)" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#exportPayrollModal" style="float:right;">Export Payroll</a>
 
@@ -40,7 +57,8 @@
                                     $employeeName = $employee ? $employee->nama : 'Unknown';
                                 @endphp
                                 <td> <a href="{{route('payroll-kas.show', $data->id)}}">{{ $employeeName }} ({{ $data->employee_code }}) </a></td>
-                                <td> {{ $data->periode }} </td>
+                                <!-- <td> {{ $data->periode }} </td> -->
+                                <td> {{ strtoupper($data->periode_bulan) }} </td>
                                 <td>{{ 'Rp ' . number_format($data->thp, 0, ',', '.') }}</td>
                             </tr>
                             @endforeach

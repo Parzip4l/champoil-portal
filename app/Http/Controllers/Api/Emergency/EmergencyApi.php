@@ -107,7 +107,8 @@ class EmergencyApi extends Controller
             if (!$schedule) {
                 return response()->json([
                     'error' => 'Anda Tidak Ada Schedule Hari Ini.',
-                    'message' => 'Anda Tidak Ada Schedule Hari Ini.'
+                    'message' => 'Anda Tidak Ada Schedule Hari Ini.',
+                    'status'=>false
                 ], 500);
             }
 
@@ -193,6 +194,7 @@ class EmergencyApi extends Controller
 
             return response()->json([
                 'message' => 'Your emergency notification has been received. We will provide immediate assistance!',
+                'status'=>true,
                 'name' => $namaUser,
                 'project' => $namaProject,
                 'latitude' => $request->latitude,

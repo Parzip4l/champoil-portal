@@ -115,7 +115,7 @@ $(document).ready(function () {
     function generateDates(startDate, endDate) {
         const dates = [];
         let current = moment(startDate);
-        while (current.isSameOrBefore(endDate)) {
+        while (current.isSameOrBefore(endDate, 'day')) {
             dates.push(current.format('YYYY-MM-DD'));
             current.add(1, 'days');
         }
@@ -134,11 +134,10 @@ $(document).ready(function () {
                 data: `attendance.absens_${moment(date).format('YYYYMMDD')}`,
                 name: `attendance.absens_${moment(date).format('YYYYMMDD')}`,
                 render: data => {
-                    console.log(data);
-                    if (data.clock_in !=  '-') {
-                        return `<span class="text-success">${data.clock_in}</span> - <span class="text-danger">${data.clock_out}</span>`;
-                    } else{
-                        return `<span class="text-primary">${data.schedule}</span>`;
+                    if (data && data.clock_in && data.clock_in !== '-') {
+                        return `<span class="text-success">${data.clock_in}</span> - <span class="text-danger">${data.clock_out || '-'}</span>`;
+                    } else {
+                        return `<span class="text-primary">${data?.schedule || '-'}</span>`;
                     }
                 }
             });
@@ -152,11 +151,10 @@ $(document).ready(function () {
     function initDataTable(startDate, endDate) {
         const columns = generateTableHeader(startDate, endDate);
         const urlSegments = window.location.pathname.split('/');
-        const segment3 = urlSegments[3]; // Adjust index based on your route
-        const segment4 = urlSegments[4]; // Adjust index based on your route
+        const segment3 = urlSegments.length > 3 ? urlSegments[3] : '';
+        const segment4 = urlSegments.length > 4 ? urlSegments[4] : '';
 
-
-        if (table) {
+        if ($.fn.DataTable.isDataTable('#dataTableExample1')) {
             table.destroy();
         }
 
@@ -178,19 +176,27 @@ $(document).ready(function () {
         });
     }
 
-    const defaultStart = moment().startOf('month').date(21);
-    const defaultEnd = moment().startOf('month').add(1, 'month').date(19);
+    const defaultStart = moment().subtract(1, 'months').date(21);
+    const defaultEnd = moment().date(20);
 
     initDataTable(defaultStart, defaultEnd);
 
     $('#periode').change(function () {
-        const [startDate, endDate] = $(this).val().split(' - ').map(date => moment(date));
-        initDataTable(startDate, endDate);
+        const value = $(this).val();
+        if (value) {
+            const dates = value.split(' - ').map(date => moment(date, 'DD/MM/YYYY'));
+            if (dates.length === 2 && dates[0].isValid() && dates[1].isValid()) {
+                initDataTable(dates[0], dates[1]);
+            }
+        }
     });
 
     $('#organisasi, #project').change(function () {
-        table.ajax.reload();
+        if (table) {
+            table.ajax.reload();
+        }
     });
 });
+
 </script>
 @endpush

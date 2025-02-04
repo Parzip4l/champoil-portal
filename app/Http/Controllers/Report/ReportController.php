@@ -302,8 +302,8 @@ class ReportController extends Controller
                             $shift = "No Schedule";
                         }
                         $attendanceData['absens_' . $date->format('Ymd')] = [
-                            'clock_in' => $clockIn??'F',
-                            'clock_out' => $clockOut??'F',
+                            'clock_in' => $clockIn,
+                            'clock_out' => $clockOut,
                             'employee'=>$row->nama,
                             'schedule'=>$shift
                         ];

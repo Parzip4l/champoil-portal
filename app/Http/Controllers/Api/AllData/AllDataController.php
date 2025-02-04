@@ -526,6 +526,135 @@ class AllDataController extends Controller
             'imei_from_header' => $imeiFromHeader,
         ]);
     }
+
+    public function export_absen(Request $request){
+        $start = date('Y-m-d');
+        $end = date('Y-m-d');
+
+        // Handle 'periode' input
+        if (!empty($request->input('periode'))) {
+            $periode = $request->input('periode');
+            $periode_min_1_month = date('m', strtotime("-1 month", strtotime($periode)));
+            $bulan = date('m', strtotime($periode));
+
+            $start = date('Y') . '-' . $periode_min_1_month . '-21';
+            $end = date('Y') . '-' . $bulan . '-20';
+        }
+
+        // Handle 'tanggal' input
+        if (!empty($request->input('tanggal'))) {
+            $tanggal = $request->input('tanggal');
+            $explode = explode(' to ', $tanggal);
+            $start = $explode[0];
+            $end = $explode[1];
+        }
+
+        // Fetch projects
+        $projects = Project::whereNull('deleted_at')
+            ->where('company', 'Kas')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        if ($projects->isEmpty()) {
+            return response()->json(['error' => 'No projects found'], 404);
+        }
+
+        // Initialize spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->removeSheetByIndex(0); // Remove the default sheet
+
+        // Style configuration
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 12,
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '003366'],
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ];
+
+        // Define headers
+        $headers = [
+            'A1' => 'NO',
+            'B1' => 'NAMA',
+            'C1' => 'NIK',
+            'D1' => 'JABATAN',
+            'E1' => 'PROJECT',
+            'F1' => 'BPJS TK RATE',
+            'G1' => 'STATUS',
+            'H1' => 'MARITAL STATUS',
+            'I1' => 'JOIN DATE',
+            'J1' => 'RESIGN DATE',
+            'K1' => 'MONTH COUNT',
+            'L1' => 'PENDAPATAN',
+            'M1' => 'POTONGAN',
+            'N1' => 'TAKE HOME PAY',
+        ];
+
+        // Create sheets for each project
+        foreach ($projects as $project) {
+            // Create a new sheet
+            $sheet = $spreadsheet->createSheet();
+            $sheet->setTitle($project->name);
+
+            // Add headers
+            foreach ($headers as $cell => $label) {
+                $sheet->setCellValue($cell, $label);
+            }
+
+            // Apply header styles
+            $headerRange = 'A1:N1';
+            $sheet->getStyle($headerRange)->applyFromArray($headerStyle);
+
+            // Set auto size for all columns
+            foreach (range('A', 'N') as $column) {
+                $sheet->getColumnDimension($column)->setAutoSize(true);
+            }
+
+            // Example data rows (replace this with actual project data)
+            $data = [
+                ['1', 'John Doe', '12345', 'Manager', 'hh', '2%', 'Active', 'Married', '2022-01-01', null, '12', '10,000,000', '1,000,000', '9,000,000'],
+                ['2', 'Jane Smith', '67890', 'Supervisor','hh', '1.5%', 'Resigned', 'Single', '2021-06-01', '2023-05-31', '23', '8,000,000', '800,000', '7,200,000'],
+            ];
+
+            // Add data rows
+            $rowNumber = 2;
+            foreach ($data as $row) {
+                $sheet->fromArray($row, null, 'A' . $rowNumber);
+                $rowNumber++;
+            }
+        }
+
+        // Save the file
+        $fileName = 'absen_frontline.xlsx';
+        $publicDir = public_path('reports');
+        if (!file_exists($publicDir)) {
+            mkdir($publicDir, 0755, true);
+        }
+        $filePath = $publicDir . '/' . $fileName;
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filePath);
+
+        return response()->json([
+            'error' => false,
+            'url' => url('reports/' . $fileName)
+        ], 200);
+    }
+
+
     public function export_payroll(Request $request){
         try {
             $employeeCode = $request->employee;

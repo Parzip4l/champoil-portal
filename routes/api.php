@@ -258,5 +258,6 @@ Route::prefix('v1')->group(function () {
     Route::get('voltages', [AllDataController::class, 'getVoltageData']);
     Route::get('paklaring/{id}', [AllDataController::class, 'paklaring']);
     Route::post('export-payroll', [AllDataController::class, 'export_payroll']);
+    Route::post('export-absen', [AllDataController::class, 'export_absen']);
     Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
 });

@@ -5,6 +5,12 @@
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
 
+@php 
+    $user = Auth::user(); 
+    $employeeDetails = \App\Employee::where('nik', Auth::user()->employee_code)->first(); 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first();
+@endphp
+
 @section('content')
 
 @if(session('success'))
@@ -87,7 +93,8 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                <a href="{{ route('rekap-report') }}" class="btn btn-xs btn-warning" style="float:right;color:white">Rekap</a>
+                <a href="{{ route('rekap-report') }}" class="btn btn-sm btn-outline-warning" style="float:right;">Rekap</a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#exportPayrollModal" style="float:right;margin-right:3px">Export Payroll</a>
                 <table id="dataTableExample" class="table">
                     <thead>
                     <tr>
@@ -211,6 +218,44 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="exportPayrollModal" tabindex="-1" aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportPayrollModalLabel">Export Absen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="GET">
+                    <div class="form-group">
+                        <label for="" class="form-label">Absen Periode</label>
+                        <select name="month" id="month" class="form-control" required>
+                            <option value="nov-2024">November - 2024</option>
+                            <option value="dec-2024">Desember - 2024</option>
+                            <option value="jan-2025">Januari - 2025</option>
+                            <option value="feb-2025">Februari - 2025</option>
+                            <option value="mar-2025">Maret - 2025</option>
+                            <option value="apr-2025">April - 2025</option>
+                            <option value="may-2025">Mei - 2025</option>
+                            <option value="jun-2025">Juni - 2025</option>
+                            <option value="jul-2025">Juli - 2025</option>
+                            <option value="aug-2025">Agustus - 2025</option>
+                            <option value="sep-2025">September - 2025</option>
+                            <option value="oct-2025">Oktober - 2025</option>
+                            <option value="nov-2025">November - 2025</option>
+                            <option value="dec-2025">Desember - 2025</option>
+                        </select>
+
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-success btn-sm" id="exportButton" style="float:right">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('plugin-scripts')
@@ -280,5 +325,52 @@
                 console.log(dateStr); // Date range in 'Y-m-d to Y-m-d' format
             }
         });
+</script>
+
+<script>
+    document.getElementById('exportButton').addEventListener('click', function () {
+    const month = document.getElementById('month').value;
+    const employee = "{{ $employee->ktp }}";
+    
+    Swal.fire({
+        title: 'Processing Export',
+        text: 'Please wait while the export is being generated...',
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    axios.post("/api/v1/export-absen", {
+        month: month,
+        employee: employee
+    })
+    .then(function (response) {
+        Swal.close();
+        Swal.fire({
+            title: 'Export Success',
+            text: 'Your absen data export is ready!',
+            icon: 'success',
+        }).then(() => {
+            const url = response.data.url;  // URL returned from the server
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'absen.xlsx');  // Adjust file name if needed
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    })
+    .catch(function (error) {
+        Swal.close();
+        Swal.fire({
+            title: 'Export Failed',
+            text: 'An error occurred during export.',
+            icon: 'error',
+        });
+    });
+});
+
 </script>
 @endpush

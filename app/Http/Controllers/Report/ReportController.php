@@ -140,6 +140,7 @@ class ReportController extends Controller
         ];
         return view('pages.report.absen.index',$data);
     }
+    
 
     public function rekap_report(){
         $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();

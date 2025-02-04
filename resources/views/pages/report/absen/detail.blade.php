@@ -136,11 +136,11 @@ $(document).ready(function () {
                 render: data => {
                     // console.log(data);
                     if (data && Object.keys(data).length > 0) { 
-                        if (data.clock_in !== '-') {
-                            return `<span class="text-success">${data.clock_in}</span> - <span class="text-danger">${data.clock_out}</span>`;
-                        } else {
-                            return `<span class="text-primary">${data.schedule}</span>`;
-                        }
+                        if (data?.clock_in && data.clock_in !== '-') {
+            return `<span class="text-success">${data.clock_in}</span> - <span class="text-danger">${data?.clock_out || '-'}</span>`;
+        } else {
+            return `<span class="text-primary">${data?.schedule || 'No Schedule'}</span>`;
+        }
                     }
                     return '';
                 }

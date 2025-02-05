@@ -202,10 +202,21 @@
                             <tr>
                                 @php 
                                     $employeeName = \App\Employee::where('nik',$data->employee_code)->first();
+                                    $anggotadata = \App\Koperasi\Loan::where('employee_code',$data->employee_code)->first();
+                                    $instalment = $anggotadata->amount;
                                 @endphp
                                 <td>{{$employeeName->nama}}</td>
                                 <td>{{$data->join_date}}</td>
-                                <td>Rp {{ number_format($data->sisahutang, 0, ',', '.') }}</td>
+
+                                <td>
+                                    @if(empty($data->sisahutang))
+                                    Rp {{ number_format($instalment, 0, ',', '.') }}
+                                    @elseif($data->sisahutang === '1')
+                                    Rp 0
+                                    @else
+                                    Rp {{ number_format($data->sisahutang, 0, ',', '.') }}
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

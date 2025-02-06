@@ -175,7 +175,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6 grid-margin stretch-card">
+    <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header">
                 <div class="row">
@@ -203,7 +203,7 @@
                                 @php 
                                     $employeeName = \App\Employee::where('nik',$data->employee_code)->first();
                                     $anggotadata = \App\Koperasi\Loan::where('employee_code',$data->employee_code)->first();
-                                    $instalment = $anggotadata->amount;
+                                    $instalment = $anggotadata ? $anggotadata->amount : 0;
                                 @endphp
                                 <td>{{$employeeName->nama}}</td>
                                 <td>{{$data->join_date}}</td>

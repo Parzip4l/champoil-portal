@@ -20,32 +20,26 @@ class LoginController extends Controller
 
     public function proses(Request $request)
     {
+        
         $request->validate([
             'email' => 'required',
             'password' => 'required',
         ]);
 
         $credentials = $request->only('email', 'password');
-
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            $user = Auth::user();
-            if (!$user) {
-                return redirect()->back()->withErrors(['error' => 'User not found after login.']);
-            }
-
-            $token = $user->createToken('authToken')->accessToken;
+            $token = $request->user()->createToken('authToken')->accessToken;
             session(['barrier' => $token]);
-
-            Cache::put('nik_' . $user->nik, $token, now()->addMinutes(60));
-
+            // Simpan token dalam cache server selama satu jam
+            Cache::put('nik' . $request->user()->name, $token, 250000);
             return redirect()->intended('dashboard')->with('token', $token);
+        } else {
+            // Jika login gagal, tambahkan notifikasi ke flash session
+            Session::flash('error', 'Email atau password salah.');
+            return redirect()->back()->withInput();
         }
-
-        return redirect()->back()->withInput()->with('error', 'Email atau password salah.');
     }
-
 
     public function logout(Request $request)
     {

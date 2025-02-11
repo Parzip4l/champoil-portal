@@ -135,7 +135,7 @@
                             @php
                                 $employee = App\Employee::where('nik', $data->employee_id)->select('nama')->first();
                             @endphp
-                            <td>{{$employee->nama}}</td>
+                            <td>{{$employee->nama ?? 'Tidak Ditemukan Data'}}</td>
                             <td>{{$data->tanggal_simpan}}</td>
                             <td>{{ 'Rp ' . number_format($data->jumlah_simpanan, 0, ',', '.') }}</td>
                             <td>{{ 'Rp ' . number_format($data->totalsimpanan, 0, ',', '.') }}</td>

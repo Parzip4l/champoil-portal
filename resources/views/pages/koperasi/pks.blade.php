@@ -25,9 +25,6 @@
             padding-left: 20px;
         }
 
-        ol li {
-            padding-left: 30px;
-        }
         .signature {
             margin-top: 50px;
         }
@@ -43,7 +40,7 @@
 <body>
     <h3>Perjanjian Kerjasama Pinjaman</h3>
     <p>Pada hari ini, {{ now()->translatedFormat('l, d/m/Y') }}, bertempat di Gedung ESCA, Jl. Pluit Sakti No.36, RT.009/RW.007, Pluit, Kec. Penjaringan, Jakarta Utara, Daerah Khusus Ibukota Jakarta, kami yang bertanda tangan di bawah ini:</p>
-    <ol>
+    <ol class="padding-jorok">
         <li>
             <strong>KOPERASI TRUEST FUND BY KHARISMA ADHI SEJAHTERA, PT</strong>, berkedudukan di Gedung ESCA, Jl. Pluit Sakti No.36, RT.009/RW.007, Pluit, Kec. Penjaringan, Jakarta Utara, Daerah Khusus Ibukota Jakarta, yang selanjutnya dalam perjanjian ini disebut sebagai "PIHAK PERTAMA."
         </li>
@@ -99,20 +96,20 @@
     <p class="padding-jorok">2. Apabila keterlambatan melebihi 90 hari, PIHAK PERTAMA berhak untuk menempuh jalur hukum sesuai dengan peraturan perundang-undangan yang berlaku di Indonesia.</p>
 
     <h4>PASAL 6: HAK DAN KEWAJIBAN PARA PIHAK</h4>
-    <p class="padding-jorok"><strong>Hak PIHAK PERTAMA:</strong></p>
+    <p class="padding-jorok"><strong>1. Hak PIHAK PERTAMA:</strong></p>
     <ul>
         <li>Menerima pembayaran penuh atas pinjaman dari PIHAK KEDUA sesuai jadwal dan tata cara pembayaran yang telah disepakati.</li>
         <li>Menerima hasil penjualan merchandise dan atau TRUEST App Membership dan atau denda sesuai dengan ketentuan perjanjian ini.</li>
     </ul>
-    <p class="padding-jorok"><strong>Kewajiban PIHAK PERTAMA:</strong></p>
+    <p class="padding-jorok"><strong>2. Kewajiban PIHAK PERTAMA:</strong></p>
     <ul>
         <li>Mencairkan pinjaman sesuai dengan nominal yang disepakati ke rekening PIHAK KEDUA setelah perjanjian ini ditandatangani oleh PARA PIHAK.</li>
     </ul>
-    <p class="padding-jorok"><strong>Hak PIHAK KEDUA:</strong></p>
+    <p class="padding-jorok"><strong>3. Hak PIHAK KEDUA:</strong></p>
     <ul>
         <li>Menerima pencairan dana pinjaman sesuai dengan perjanjian ini.</li>
     </ul>
-    <p class="padding-jorok"><strong>Kewajiban PIHAK KEDUA:</strong></p>
+    <p class="padding-jorok"><strong>4. Kewajiban PIHAK KEDUA:</strong></p>
     <ul>
         <li>Melakukan pembayaran atas pokok pinjaman, pembelian merchandise, dan TRUEST App Membership sesuai dengan ketentuan perjanjian ini.</li>
     </ul>

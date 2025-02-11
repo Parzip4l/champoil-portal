@@ -24,7 +24,7 @@
                         <h6 class="card-title mb-0">Daftar Anggota Koperasi</h6>
                     </div>
                     <div class="col-md-6 text-right">
-                        <a href="{{url('download-excel')}}" class="btn btn-success">Download Excel</a>
+                        <a href="{{route('export.anggota')}}" class="btn btn-success">Download Excel</a>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                                                 <span class="">Edit</span>
                                             </a>
                                             @if($dataAnggota->loan_status === "onloan")
-                                            <a class="dropdown-item d-flex align-items-center" href="{{ url('/download-kontrak/' . $dataAnggota->employee_code) }}">
+                                            <a class="dropdown-item d-flex align-items-center" href="{{ url('/download-kontrak/' . $dataAnggota->employee_code) }}" target="_blank">
                                                 <i data-feather="eye" class="icon-sm me-2"></i>
                                                 <span class="">Lihat Kontrak</span>
                                             </a>

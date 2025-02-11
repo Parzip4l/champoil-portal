@@ -399,8 +399,12 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
                 // Kontral
                 Route::get('/download-kontrak/{employee_code}', function ($employee_code) {
                     $path = storage_path('app/public/kontrak/kontrak_' . $employee_code . '.pdf');
-                    return response()->download($path);
+                
+                    return response()->file($path, [
+                        'Content-Type' => 'application/pdf',
+                    ]);
                 });
+                Route::get('/export-anggota', [App\Http\Controllers\Koperasi\KoperasiController::class, 'exportAnggota'])->name('export.anggota');
 
     // CG Component
     Route::group(['prefix' => 'kas'], function(){

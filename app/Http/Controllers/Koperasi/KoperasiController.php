@@ -140,7 +140,7 @@ class KoperasiController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
 
-        //Daftar Pengajuan
+        // Daftar Pengajuan
         $pinjamanData = Loan::where('company', $company->unit_bisnis)
                         ->where('status','waiting')        
                         ->get(); 

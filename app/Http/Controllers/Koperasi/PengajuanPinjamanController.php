@@ -112,7 +112,6 @@ class PengajuanPinjamanController extends Controller
                 'approve_by' => '-',
             ]);
 
-            Anggota::where('employee_code', $code)->update(['loan_status' => 'onloan']);
             $today = Carbon::now()->format('Y-m-d');
             LoanPayment::create([
                 'loan_id' => $loanUuid,
@@ -158,6 +157,7 @@ class PengajuanPinjamanController extends Controller
         $loan = Loan::where('employee_code', $employee_code)->first();
         $peminjam = Employee::where('nik', $employee_code)->first();
         $dataSetting = Koperasi::select('merchendise','membership')->first();
+        Anggota::where('employee_code', $code)->update(['loan_status' => 'onloan']);
 
         $merchandisedata = $dataSetting->merchendise;
         $membershipdata = $dataSetting->membership;

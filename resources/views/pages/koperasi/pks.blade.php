@@ -56,10 +56,19 @@
         .label {
             white-space: nowrap;
         }
-        .value {
+        .separator {
+            width: 10px; /* Lebar untuk titik dua */
+            text-align: center;
+        }
+        .currency {
+            white-space: nowrap;
+            text-align: left;
+            width: 50px; /* Pastikan lebar tetap untuk "Rp" */
+        }
+        .amount {
             text-align: right;
             white-space: nowrap;
-            width: 150px; /* Sesuaikan lebar sesuai kebutuhan */
+            width: 150px; /* Sesuaikan agar nominal rata kanan */
             display: inline-block;
         }
     </style>
@@ -86,19 +95,27 @@
     <table class="table-format">
         <tr>
             <td class="label">Nominal Pinjaman</td>
-            <td>: <span class="value">Rp {{ number_format($nominalPinjaman, 0, ',', '.') }}</span></td>
+            <td class="separator">:</td>
+            <td class="currency">Rp</td>
+            <td class="amount">{{ number_format($nominalPinjaman, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td class="label">Pembelian Merchandise</td>
-            <td>: <span class="value">Rp {{ number_format($merchandise, 0, ',', '.') }}</span></td>
+            <td class="separator">:</td>
+            <td class="currency">Rp</td>
+            <td class="amount">{{ number_format($merchandise, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td class="label">TRUEST App Membership</td>
-            <td>: <span class="value">Rp {{ number_format($membership, 0, ',', '.') }}</span></td>
+            <td class="separator">:</td>
+            <td class="currency">Rp</td>
+            <td class="amount">{{ number_format($membership, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td class="label"><strong>Total Pinjaman</strong></td>
-            <td>: <span class="value"><strong>Rp {{ number_format($recomputedTotal, 0, ',', '.') }}</strong></span></td>
+            <td class="separator">:</td>
+            <td class="currency"><strong>Rp</strong></td>
+            <td class="amount"><strong>{{ number_format($recomputedTotal, 0, ',', '.') }}</strong></td>
         </tr>
     </table>
 

@@ -139,6 +139,7 @@
         </ol>
     </div>
     <br>
+    <br>
 
     <h4>PASAL 4: CARA PEMBAYARAN</h4>
     <div class="perjanjian-wrap padding-jorok">

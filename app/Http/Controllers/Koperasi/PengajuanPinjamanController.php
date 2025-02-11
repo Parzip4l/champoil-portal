@@ -157,7 +157,7 @@ class PengajuanPinjamanController extends Controller
         $records = Employee::where('nik', $employee_code)->get();
         $loan = Loan::where('employee_code', $employee_code)->first();
         $peminjam = Employee::where('nik', $employee_code)->first();
-        $dataSetting = Koperasi::all();
+        $dataSetting = Koperasi::select('merchendise','membership')->first();
 
         $merchandisedata = $dataSetting->merchendise;
         $membershipdata = $dataSetting->membership;

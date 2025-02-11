@@ -86,22 +86,46 @@
     </table>
 
     <h4>PASAL 2: JANGKA WAKTU PINJAMAN</h4>
-    <p class="padding-jorok">1. Jangka waktu pinjaman adalah 03 bulan, terhitung sejak tanggal {{ now()->translatedFormat('d/m/Y') }}.</p>
-    <p class="padding-jorok">2. Peminjaman tidak dapat diperpanjang hingga pinjaman dilunasi secara keseluruhan.</p>
+    <div class="perjanjian-wrap padding-jorok">
+        <ol>
+            <li>
+                Jangka waktu pinjaman adalah 03 bulan, terhitung sejak tanggal {{ now()->translatedFormat('d/m/Y') }}.
+            </li>
+            <li>
+                Peminjaman tidak dapat diperpanjang hingga pinjaman dilunasi secara keseluruhan.
+            </li>
+        </ol>
+    </div>
 
     <h4>PASAL 3: BIAYA ADMINISTRASI</h4>
-    <p class="padding-jorok">1. PIHAK KEDUA berkewajiban untuk membeli bundling merchandise sesuai yang tertuang pada PASAL 1.</p>
-    <p class="padding-jorok">2. PIHAK KEDUA juga akan dikenakan biaya TRUEST App Membership sesuai yang tertuang pada PASAL 1.</p>
+    <div class="perjanjian-wrap padding-jorok">
+        <ol>
+            <li>PIHAK KEDUA berkewajiban untuk membeli bundling merchandise sesuai yang tertuang pada PASAL 1.</li>
+            <li>PIHAK KEDUA juga akan dikenakan biaya TRUEST App Membership sesuai yang tertuang pada PASAL 1.</li>
+        </ol>
+    </div>
     <br>
 
     <h4>PASAL 4: CARA PEMBAYARAN</h4>
-    <p class="padding-jorok">1. PIHAK KEDUA wajib melakukan pembayaran pinjaman sesuai dengan jadwal pembayaran yang telah ditetapkan, yaitu pada akhir tanggal setiap bulan selama periode perjanjian serta dipotong melalui pembayaran gaji.</p>
-    <p class="padding-jorok">2. Untuk satu dan lain hal pembayaran pinjaman dapat ditransfer ke rekening:</p>
-    <p class="padding-jorok">BCA<br>5380333335<br>KHARISMA ADHI SEJAHTERA PT</p>
+    <div class="perjanjian-wrap padding-jorok">
+        <ol>
+            <li>PIHAK KEDUA wajib melakukan pembayaran pinjaman sesuai dengan jadwal pembayaran yang telah ditetapkan, yaitu pada akhir tanggal setiap bulan selama periode perjanjian serta dipotong melalui pembayaran gaji.</li>
+            <li>Untuk satu dan lain hal pembayaran pinjaman dapat ditransfer ke rekening:</li>
+            <ul>
+                <li>BCA</li>
+                <li>5380333335</li>
+                <li>KHARISMA ADHI SEJAHTERA PT</li>
+            </ul>
+        </ol>
+    </div>
 
     <h4>PASAL 5: SANKSI ATAS KETERLAMBATAN PEMBAYARAN</h4>
-    <p class="padding-jorok">1. Apabila PIHAK KEDUA terlambat melakukan pembayaran, maka PIHAK KEDUA akan dikenakan denda keterlambatan sebesar 1% per hari dari jumlah pinjaman yang belum dibayar.</p>
-    <p class="padding-jorok">2. Apabila keterlambatan melebihi 90 hari, PIHAK PERTAMA berhak untuk menempuh jalur hukum sesuai dengan peraturan perundang-undangan yang berlaku di Indonesia.</p>
+    <div class="perjanjian-wrap padding-jorok">
+        <ol>
+            <li>Apabila PIHAK KEDUA terlambat melakukan pembayaran, maka PIHAK KEDUA akan dikenakan denda keterlambatan sebesar 1% per hari dari jumlah pinjaman yang belum dibayar.</li>
+            <li>Apabila keterlambatan melebihi 90 hari, PIHAK PERTAMA berhak untuk menempuh jalur hukum sesuai dengan peraturan perundang-undangan yang berlaku di Indonesia.</li>
+        </ol>
+    </div>
 
     <h4>PASAL 6: HAK DAN KEWAJIBAN PARA PIHAK</h4>
     <p class="padding-jorok margin-custom"><strong>1. Hak PIHAK PERTAMA:</strong></p>
@@ -135,9 +159,13 @@
     <br>
     <br>
     <h4>PASAL 7: PENYELESAIAN SENGKETA</h4>
-    <p class="padding-jorok">1. Apabila terjadi sengketa dalam pelaksanaan perjanjian ini, PARA PIHAK akan menyelesaikannya secara musyawarah untuk mufakat.</p>
-    <p class="padding-jorok">2. Jika musyawarah tidak mencapai kesepakatan, sengketa akan diselesaikan melalui hukum yang berlaku di Indonesia.</p>
-
+    <div class="perjanjian-wrap padding-jorok">
+        <ol>
+            <li>Apabila terjadi sengketa dalam pelaksanaan perjanjian ini, PARA PIHAK akan menyelesaikannya secara musyawarah untuk mufakat.</li>
+            <li>Jika musyawarah tidak mencapai kesepakatan, sengketa akan diselesaikan melalui hukum yang berlaku di Indonesia.</li>
+        </ol>
+    </div>
+    
     <h4>PASAL 8: PENUTUP</h4>
     <p class="padding-jorok">Perjanjian ini dibuat dalam dua rangkap, masing-masing memiliki kekuatan hukum yang sama, dan berlaku sejak tanggal ditandatanganinya perjanjian ini oleh PARA PIHAK.</p>
 

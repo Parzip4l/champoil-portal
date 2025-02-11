@@ -45,6 +45,23 @@
         .margin-custom {
             margin-bottom : 0!important;
         }
+
+        .table-format {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-format td {
+            padding: 5px;
+        }
+        .label {
+            white-space: nowrap;
+        }
+        .value {
+            text-align: right;
+            white-space: nowrap;
+            width: 150px; /* Sesuaikan lebar sesuai kebutuhan */
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -66,22 +83,22 @@
 
     <h4>PASAL 1: OBJEK PERJANJIAN</h4>
     <p>PIHAK PERTAMA setuju untuk memberikan pinjaman uang kepada PIHAK KEDUA dengan rincian sebagai berikut:</p>
-    <table>
+    <table class="table-format">
         <tr>
-            <td>Nominal Pinjaman</td>
-            <td>: Rp {{ number_format($nominalPinjaman, 0, ',', '.') }}</td>
+            <td class="label">Nominal Pinjaman</td>
+            <td>: <span class="value">Rp {{ number_format($nominalPinjaman, 0, ',', '.') }}</span></td>
         </tr>
         <tr>
-            <td>Pembelian Merchandise</td>
-            <td>: Rp {{ number_format($merchandise, 0, ',', '.') }}</td>
+            <td class="label">Pembelian Merchandise</td>
+            <td>: <span class="value">Rp {{ number_format($merchandise, 0, ',', '.') }}</span></td>
         </tr>
         <tr>
-            <td>TRUEST App Membership</td>
-            <td>: Rp {{ number_format($membership, 0, ',', '.') }}</td>
+            <td class="label">TRUEST App Membership</td>
+            <td>: <span class="value">Rp {{ number_format($membership, 0, ',', '.') }}</span></td>
         </tr>
         <tr>
-            <td>Total Pinjaman</td>
-            <td>: Rp {{ number_format($recomputedTotal, 0, ',', '.') }}</td>
+            <td class="label"><strong>Total Pinjaman</strong></td>
+            <td>: <span class="value"><strong>Rp {{ number_format($recomputedTotal, 0, ',', '.') }}</strong></span></td>
         </tr>
     </table>
 
@@ -165,7 +182,7 @@
             <li>Jika musyawarah tidak mencapai kesepakatan, sengketa akan diselesaikan melalui hukum yang berlaku di Indonesia.</li>
         </ol>
     </div>
-    
+
     <h4>PASAL 8: PENUTUP</h4>
     <p class="padding-jorok">Perjanjian ini dibuat dalam dua rangkap, masing-masing memiliki kekuatan hukum yang sama, dan berlaku sejak tanggal ditandatanganinya perjanjian ini oleh PARA PIHAK.</p>
 

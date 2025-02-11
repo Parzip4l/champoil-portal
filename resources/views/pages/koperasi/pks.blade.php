@@ -65,7 +65,7 @@
         </tr>
         <tr>
             <td>Total Pinjaman:</td>
-            <td>Rp {{ number_format($totalPinjaman, 0, ',', '.') }}</td>
+            <td>Rp {{ number_format($recomputedTotal, 0, ',', '.') }}</td>
         </tr>
     </table>
 

@@ -157,17 +157,31 @@ class PengajuanPinjamanController extends Controller
         $records = Employee::where('nik', $employee_code)->get();
         $loan = Loan::where('employee_code', $employee_code)->first();
         $peminjam = Employee::where('nik', $employee_code)->first();
-        $nominalPinjaman = $loan->amount;
-        $merchandise = $loan->amount * 0.1; // Contoh persentase merchandise
-        $membership = $loan->amount * 0.05; // Contoh persentase membership
-        $totalPinjaman = $nominalPinjaman + $merchandise + $membership;
+        $dataSetting = Koperasi::all();
+
+        $merchandisedata = $dataSetting->merchendise;
+        $membershipdata = $dataSetting->membership;
+
+        $totalPinjaman = $loan->amount; // Ini sudah termasuk merchandise dan membership
+        $persentaseMerchandise = $merchandisedata / 100; 
+        $persentaseMembership = $membershipdata / 100; 
+
+        // Menghitung nominal pinjaman awal
+        $nominalPinjaman = $totalPinjaman / (1 + $persentaseMerchandise + $persentaseMembership);
+
+        // Menghitung kembali merchandise dan membership
+        $merchandise = $nominalPinjaman * $persentaseMerchandise;
+        $membership = $nominalPinjaman * $persentaseMembership;
+
+        // Pastikan jumlahnya sama dengan totalPinjaman
+        $recomputedTotal = $nominalPinjaman + $merchandise + $membership;
 
         $pdf = Pdf::loadView('pages.koperasi.pks', compact(
             'peminjam',
             'nominalPinjaman',
             'merchandise',
             'membership',
-            'totalPinjaman'
+            'recomputedTotal'
         ));
     
         $pdfPath = storage_path('app/public/kontrak/kontrak_' . $employee_code . '.pdf');

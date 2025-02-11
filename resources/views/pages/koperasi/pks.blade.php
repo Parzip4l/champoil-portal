@@ -24,6 +24,10 @@
         ol {
             padding-left: 20px;
         }
+
+        ol li {
+            padding-left: 30px;
+        }
         .signature {
             margin-top: 50px;
         }
@@ -32,7 +36,7 @@
             padding: 30px 0;
         }
         .padding-jorok {
-            padding-left:15px;
+            padding-left: 25px;
         }
     </style>
 </head>
@@ -78,6 +82,8 @@
     <br>
     <br>
     <br>
+    <br>
+    <br>
 
     <h4>PASAL 3: BIAYA ADMINISTRASI</h4>
     <p class="padding-jorok">1. PIHAK KEDUA berkewajiban untuk membeli bundling merchandise sesuai yang tertuang pada PASAL 1.</p>
@@ -86,7 +92,7 @@
     <h4>PASAL 4: CARA PEMBAYARAN</h4>
     <p class="padding-jorok">1. PIHAK KEDUA wajib melakukan pembayaran pinjaman sesuai dengan jadwal pembayaran yang telah ditetapkan, yaitu pada akhir tanggal setiap bulan selama periode perjanjian serta dipotong melalui pembayaran gaji.</p>
     <p class="padding-jorok">2. Untuk satu dan lain hal pembayaran pinjaman dapat ditransfer ke rekening:</p>
-    <p>BCA<br>5380333335<br>KHARISMA ADHI SEJAHTERA PT</p>
+    <p class="padding-jorok">BCA<br>5380333335<br>KHARISMA ADHI SEJAHTERA PT</p>
 
     <h4>PASAL 5: SANKSI ATAS KETERLAMBATAN PEMBAYARAN</h4>
     <p class="padding-jorok">1. Apabila PIHAK KEDUA terlambat melakukan pembayaran, maka PIHAK KEDUA akan dikenakan denda keterlambatan sebesar 1% per hari dari jumlah pinjaman yang belum dibayar.</p>

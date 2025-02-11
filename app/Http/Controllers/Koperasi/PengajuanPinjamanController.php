@@ -112,6 +112,7 @@ class PengajuanPinjamanController extends Controller
                 'approve_by' => '-',
             ]);
 
+            Anggota::where('employee_code', $code)->update(['loan_status' => 'onloan']);
             $today = Carbon::now()->format('Y-m-d');
             LoanPayment::create([
                 'loan_id' => $loanUuid,
@@ -157,7 +158,6 @@ class PengajuanPinjamanController extends Controller
         $loan = Loan::where('employee_code', $employee_code)->first();
         $peminjam = Employee::where('nik', $employee_code)->first();
         $dataSetting = Koperasi::select('merchendise','membership')->first();
-        Anggota::where('employee_code', $code)->update(['loan_status' => 'onloan']);
 
         $merchandisedata = $dataSetting->merchendise;
         $membershipdata = $dataSetting->membership;
@@ -187,29 +187,29 @@ class PengajuanPinjamanController extends Controller
         $pdfPath = storage_path('app/public/kontrak/kontrak_' . $employee_code . '.pdf');
         $pdf->save($pdfPath);
 
-//         $EmailData = Employee::where('nik', $employee_code)->first();
-//         $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
+        $EmailData = Employee::where('nik', $employee_code)->first();
+        $html = '```Halo ```' .strtoupper($employee->nama). '``` yang terhormat,
 
-// Kami dengan senang hati menginformasikan bahwa pengajuan pinjaman Anda di TRUEST telah disetujui. Selamat! Anda sekarang dapat menggunakan dana pinjaman sesuai dengan ketentuan yang telah disepakati.
+Kami dengan senang hati menginformasikan bahwa pengajuan pinjaman Anda di TRUEST telah disetujui. Selamat! Anda sekarang dapat menggunakan dana pinjaman sesuai dengan ketentuan yang telah disepakati.
 
-// Berikut adalah beberapa langkah yang perlu Anda ikuti untuk mengakses dana pinjaman Anda:
+Berikut adalah beberapa langkah yang perlu Anda ikuti untuk mengakses dana pinjaman Anda:
 
-// 1. Login ke akun TRUEST Anda.
-// 2. Periksa saldo pinjaman Anda yang telah ditambahkan.
-// 3. Ikuti instruksi lebih lanjut yang tersedia di aplikasi untuk penggunaan dana.
+1. Login ke akun TRUEST Anda.
+2. Periksa saldo pinjaman Anda yang telah ditambahkan.
+3. Ikuti instruksi lebih lanjut yang tersedia di aplikasi untuk penggunaan dana.
 
-// Jika Anda memiliki pertanyaan atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi tim dukungan kami.
+Jika Anda memiliki pertanyaan atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi tim dukungan kami.
 
-// Terima kasih atas kepercayaan Anda kepada TRUEST.
+Terima kasih atas kepercayaan Anda kepada TRUEST.
 
-// Salam hormat,
+Salam hormat,
 
-// TRUEST Team```';
+TRUEST Team```';
 
-//         foreach($records as $row){
-//             push_notif_wa($html,'','',$row->telepon,'');
-//         }
-//         Mail::to($EmailData->email)->send(new PengajuanPinjaman($EmailData));
+        foreach($records as $row){
+            push_notif_wa($html,'','',$row->telepon,'');
+        }
+        Mail::to($EmailData->email)->send(new PengajuanPinjaman($EmailData));
 
         return redirect()->back()->with('success', 'Data has been update');
     }

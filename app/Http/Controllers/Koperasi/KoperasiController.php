@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Exports\AnggotaKoperasoExport;
+use Illuminate\Support\Facades\DB;
 
 class KoperasiController extends Controller
 {
@@ -44,10 +45,16 @@ class KoperasiController extends Controller
                         ->where('member_status', 'active')
                         ->count();
         
-        $anggotaOnLoan = Anggota::where('company', $company->unit_bisnis)
+                        $anggotaOnLoan = Anggota::where('company', $company->unit_bisnis)
                         ->where('member_status', 'active')
                         ->where('loan_status', 'onloan')
-                        ->get();
+                        ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                  ->from('pengajuan_pinjaman')
+                                  ->whereColumn('pengajuan_pinjaman.employee_code', 'anggota_koperasi.employee_code')
+                                  ->where('pengajuan_pinjaman.status', 'approve');
+                        })
+                    ->get();
         
         $latestSavings = Saving::select('employee_id', 'totalsimpanan')
                         ->orderBy('created_at', 'desc')

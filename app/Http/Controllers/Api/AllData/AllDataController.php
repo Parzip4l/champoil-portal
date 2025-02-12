@@ -1233,7 +1233,7 @@ class AllDataController extends Controller
             
             $token_reset = ResetPassword::create($create);
 
-            $resetLink = url('/form-forgot-password/{$random_token}');
+            $resetLink = url('/form-forgot-password/' . $random_token);
 
             // Kirim email
             Mail::to($check->email)->send(new ForgotPasswordMail($resetLink));

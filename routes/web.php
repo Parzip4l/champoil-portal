@@ -19,6 +19,9 @@ Route::view('/pengajuan-asset-form','pages.asset-management.pengajuan_hp_form')-
 Route::view('voice-frontline', 'pages.voice.form')->name('voice-frontline');
 Route::view('voice-frontline-detail/{id}', 'pages.voice.detail')->name('voice-frontline-detail');
 
+Route::view('forgot-password','pages.auth.forgot_password')->name('forgot-password');
+Route::view('form-forgot-password/{id}','pages.auth.form_forgot_password')->name('form-forgot-password');
+
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 

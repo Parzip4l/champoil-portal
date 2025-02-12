@@ -37,7 +37,9 @@
                     <i class="btn-icon-prepend" data-feather="log-in"></i>
                     Login
                   </button>
+                  
                 </div>
+                <a href="{{  route('forgot-password') }}" class="btn btn-sm btn-outline-primary w-100 btn-icon-text">Lupa Password</a>
               </form>
             </div>
           </div>

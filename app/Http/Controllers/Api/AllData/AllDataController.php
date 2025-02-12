@@ -21,12 +21,16 @@ use Carbon\CarbonPeriod;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Mail\ForgotPasswordMail;
 use PDF;
 // Model
 use App\Employee;
 use App\Paklaring;
 use App\EmployeeResign;
 use App\User;
+use App\ResetPassword;
 use App\Pengumuman\Pengumuman;
 use App\News\News;
 use App\ModelCG\Birthday;
@@ -1213,6 +1217,92 @@ class AllDataController extends Controller
             'url' => url('reports/' . $fileName) // URL accessible from the web
         ], 200);
     }
-    
+
+    public function forgotPassword(Request $request){
+
+
+        $check = User::where('email', strtolower($request->email))->first();
+
+        if (!empty($check)) {
+            $random_token = Str::random(60); // Generate token acak
+
+            $create = [
+                'token_reset' => $random_token,
+                'email_user' => $request->email, // Sesuaikan dengan sumber email
+            ];
+            
+            $token_reset = ResetPassword::create($create);
+
+            $resetLink = url('/form-forgot-password/{$random_token}');
+
+            // Kirim email
+            Mail::to($check->email)->send(new ForgotPasswordMail($resetLink));
+
+
+
+            $error =false;
+            $message =$check;
+        } else {
+            $error =true;
+            $message ="Email Tidak Terdaftar";
+        }
+
+        return response()->json([
+            'error' => $error,
+            'message' => $message
+        ], 200);
+    }
+
+    public function submitforgotPassword(Request $request){
+        // Validasi input
+    $validator = Validator::make($request->all(), [
+        'token' => 'required|string',
+        'password' => 'required|string|min:8|confirmed', // password harus dikonfirmasi
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'error' => true,
+            'message' => $validator->errors()->first()
+        ], 400);
+    }
+
+    // Cek token
+    $check = ResetPassword::where('token_reset', $request->token)
+        ->where('status', 0)
+        ->first();
+
+    if (!$check) {
+        return response()->json([
+            'error' => true,
+            'message' => "Token tidak valid atau sudah digunakan."
+        ], 200);
+    }
+
+    // Cek apakah token masih berlaku (5 menit)
+    if (Carbon::parse($check->created_at)->addMinutes(5)->isPast()) {
+        // Update status menjadi kadaluarsa (status = 3)
+        $check->update(['status' => 3]);
+
+        return response()->json([
+            'error' => true,
+            'message' => "Token reset password telah kadaluarsa. Silakan minta ulang."
+        ], 410);
+    }
+
+    // Update password user
+    $user = User::where('email', $check->email_user)->firstOrFail();
+    $user->update([
+        'password' => Hash::make($request->password),
+    ]);
+
+    // Tandai token sebagai telah digunakan (status = 1)
+    $check->update(['status' => 1]);
+
+    return response()->json([
+        'error' => false,
+        'message' => "Password berhasil direset. Silakan login dengan password baru."
+    ], 200);
+    }
     
 }

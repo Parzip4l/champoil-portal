@@ -33,6 +33,9 @@ Route::prefix('v1')->group(function () {
     // Authentication
     Route::post('/login', [ApiLoginController::class, 'login']);
     Route::post('/logout', [ApiLoginController::class, 'logout']);
+    Route::post('/forgot-password', [AllDataController::class, 'forgotPassword']);
+    Route::post('/submit-forgot-password', [AllDataController::class, 'submitforgotPassword']);
+
     Route::post('/oauth/token', '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken');
 
     // Employee

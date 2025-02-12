@@ -195,7 +195,7 @@ class DailyContrtoller extends Controller
         $not_scheudle=[];
         if($project){
             foreach($project as $record){
-                $count_schedule = Schedule::where('project',$record->id)->where('periode',$periode)->count();
+                $count_schedule = Schedule::where('project',$record->id)->where('periode','like','%'.$periode.'%')->count();
                 if($count_schedule  > 0){
                     $schedule_onperiode[]=$record;
                 }else{

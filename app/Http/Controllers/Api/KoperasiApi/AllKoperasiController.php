@@ -46,7 +46,7 @@ class AllKoperasiController extends Controller
             if (!$anggota) {
                 $koperasi = Koperasi::where('company', $unitBisnis)->get();
                 return response()->json([
-                    'success' => true,
+                    'success' => false,
                     'message' => 'You are not a cooperative member.',
                     'status_anggota' => 'Not Member',
                     'data' => $koperasi

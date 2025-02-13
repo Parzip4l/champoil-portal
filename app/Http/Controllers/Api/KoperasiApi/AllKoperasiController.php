@@ -45,6 +45,11 @@ class AllKoperasiController extends Controller
             // If not a member, return available cooperative data for the business unit
             if (!$anggota) {
                 $koperasi = Koperasi::where('company', $unitBisnis)->get();
+                if(!empty($koperasi)){
+                    foreach($koperasi as $key){
+                        $key->tenor = (string)$key->tenor;
+                    }
+                }
                 return response()->json([
                     'success' => false,
                     'status'=>false,

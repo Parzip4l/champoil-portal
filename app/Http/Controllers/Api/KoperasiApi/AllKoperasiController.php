@@ -57,7 +57,7 @@ class AllKoperasiController extends Controller
             // If user is a cooperative member, fetch their savings data
             $datasaya = Saving::where('employee_id', $employeeCode)->get();
             if(!empty($datasaya)){
-                foreach($dataSaya as $key){
+                foreach($datasaya as $key){
                     $key->jumlah_simpanan = (string)$key->jumlah_simpanan;
                 }
             }

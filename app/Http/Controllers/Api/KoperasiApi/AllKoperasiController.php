@@ -47,6 +47,7 @@ class AllKoperasiController extends Controller
                 $koperasi = Koperasi::where('company', $unitBisnis)->get();
                 return response()->json([
                     'success' => false,
+                    'status'=>false,
                     'message' => 'You are not a cooperative member.',
                     'status_anggota' => 'Not Member',
                     'data' => $koperasi
@@ -98,6 +99,7 @@ class AllKoperasiController extends Controller
                 // If eligible for a loan, return loan application requirements
                 return response()->json([
                     'success' => true,
+                    'status'=>true,
                     'syarat1' => $isMemberForThreeMonths,
                     'syarat2' => $hasNoOutstandingLoan,
                     'syarat3' => $hadFullAttendance,
@@ -157,6 +159,7 @@ class AllKoperasiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'status'=>true,
                 'message' => 'Loan data retrieved.',
                 'status_anggota' => $anggotaStatus->member_status,
                 'status_pinjaman' => $loan->status,

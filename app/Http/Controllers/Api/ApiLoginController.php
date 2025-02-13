@@ -113,7 +113,7 @@ class ApiLoginController extends Controller
             }
 
 
-            if($nik ==1608010112020002){
+            if($unit_bisnis->jabatan =='DRIVER'){
                 $allowedRadius=9999999;
             }
 

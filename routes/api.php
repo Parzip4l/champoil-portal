@@ -200,6 +200,8 @@ Route::prefix('v1')->group(function () {
     // Pengumuman
     Route::get('pengumuman', [AllDataController::class, 'ListPengumuman']);
         Route::get('pengumuman/{id}', [AllDataController::class, 'showPengumuman']);
+        Route::post('exportAbsens', [AllDataController::class, 'exportAbsens']);
+        
     // Berita
     Route::get('berita', [AllDataController::class, 'ListBerita']);
         Route::get('berita/{id}', [AllDataController::class, 'showBerita']);

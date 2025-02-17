@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Response as ResponseXls;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -1255,54 +1256,239 @@ class AllDataController extends Controller
 
     public function submitforgotPassword(Request $request){
         // Validasi input
-    $validator = Validator::make($request->all(), [
-        'token' => 'required|string',
-        'password' => 'required|string|min:8|confirmed', // password harus dikonfirmasi
-    ]);
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string',
+            'password' => 'required|string|min:8|confirmed', // password harus dikonfirmasi
+        ]);
 
-    if ($validator->fails()) {
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+
+        // Cek token
+        $check = ResetPassword::where('token_reset', $request->token)
+            ->where('status', 0)
+            ->first();
+
+        if (!$check) {
+            return response()->json([
+                'error' => true,
+                'message' => "Token tidak valid atau sudah digunakan."
+            ], 200);
+        }
+
+        // Cek apakah token masih berlaku (5 menit)
+        if (Carbon::parse($check->created_at)->addMinutes(5)->isPast()) {
+            // Update status menjadi kadaluarsa (status = 3)
+            $check->update(['status' => 3]);
+
+            return response()->json([
+                'error' => true,
+                'message' => "Token reset password telah kadaluarsa. Silakan minta ulang."
+            ], 410);
+        }
+
+        // Update password user
+        $user = User::where('email', $check->email_user)->firstOrFail();
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Tandai token sebagai telah digunakan (status = 1)
+        $check->update(['status' => 1]);
+
         return response()->json([
-            'error' => true,
-            'message' => $validator->errors()->first()
-        ], 400);
-    }
-
-    // Cek token
-    $check = ResetPassword::where('token_reset', $request->token)
-        ->where('status', 0)
-        ->first();
-
-    if (!$check) {
-        return response()->json([
-            'error' => true,
-            'message' => "Token tidak valid atau sudah digunakan."
+            'error' => false,
+            'message' => "Password berhasil direset. Silakan login dengan password baru."
         ], 200);
     }
 
-    // Cek apakah token masih berlaku (5 menit)
-    if (Carbon::parse($check->created_at)->addMinutes(5)->isPast()) {
-        // Update status menjadi kadaluarsa (status = 3)
-        $check->update(['status' => 3]);
+    public function exportAbsens(Request $request) {
+        try {
+            $company = $request->company;
+            if (!$company) {
+                return response()->json(['error' => 'Unauthorized: Company not found'], 401);
+            }
 
-        return response()->json([
-            'error' => true,
-            'message' => "Token reset password telah kadaluarsa. Silakan minta ulang."
-        ], 410);
+            $projects = Project::select('id','name')->where('company',$company)->whereNull('deleted_at')->get();
+            $monthYear = date('m-Y',strtotime($request->month));
+            $fomatPeriode = date('F-Y',strtotime($request->month));
+
+            // Parse the month and year
+            list($month, $year) = explode('-', $monthYear);
+
+            // Create a Carbon instance for the 1st day of the current month
+            $startDate = Carbon::create($year, $month, 1);
+
+            // Set the start date to the 21st of the previous month
+            $startDate = $startDate->subMonth()->day(21);
+
+            // Set the end date to the 20th of the current month
+            $endDate = $startDate->copy()->addMonth()->day(20);
+
+            // Generate the array of dates in d-m-Y format
+            $datesArray = [];
+            $dateSchedule=[];
+            $currentDate = $startDate->copy();
+
+            while ($currentDate <= $endDate) {
+                $datesArray[] = $currentDate->format('d-m-Y');
+                $dateSchedule[] = $currentDate->format('Y-m-d');
+                $currentDate->addDay(); // Move to the next day
+            }
+    
+            // Initialize Spreadsheet
+            $spreadsheet = new Spreadsheet();
+
+            // Loop through the companies and create a worksheet for each
+            foreach ($projects as $index => $company) {
+
+                // get employee
+                $employeeProject = Schedule::select('employee', DB::raw('COUNT(*) as schedule_count'))
+                                            ->where('project',$company->id)
+                                            ->where('periode', strtoupper($fomatPeriode))
+                                            ->groupBy('employee')
+                                            ->get();
+
+
+                // Create a new worksheet for each company
+                if ($index > 0) {
+                    $spreadsheet->createSheet();
+                }
+
+                $headers['A6'] = 'NAMA LENGKAP';
+                $headers['B6'] = 'NIK';
+                $headers['C6'] = 'EMAIL';
+                
+                
+                // Adding days from $days_array into the headers
+                $columnIndex = 4; // Starting at column D (index 4)
+                foreach ($datesArray as $day) {
+                    $column = $this->getExcelColumn($columnIndex); // Get the correct Excel column letter(s)
+                    $headers["{$column}6"] = $day;
+                    $columnIndex++;
+                }
+
+
+
+                // Set the current sheet
+                $sheet = $spreadsheet->setActiveSheetIndex($index);
+                $sheetTitle = substr($company->name, 0, 31);
+                // Set title as the company's name
+                $sheet->setTitle($sheetTitle);
+
+                $headerStyle = [
+                    'font' => [
+                        'bold' => true,
+                        'color' => ['rgb' => 'FFFFFF'],  // White text color
+                        'size' => 12,
+                    ],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => '003366'],  // Green background color
+                    ],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],  // Black border color
+                        ],
+                    ],
+                ];
+                
+                foreach ($headers as $cell => $label) {
+                    // Set header text
+                    $sheet->setCellValue($cell, $label);
+                    
+                    // Apply style to header
+                    $sheet->getStyle($cell)->applyFromArray($headerStyle);
+                    $columnLetter = preg_replace('/[0-9]/', '', $cell); // Remove digits to get column letter
+                    // Set auto size for columns
+                    $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
+                }
+
+                $rowIndex = 7;
+                foreach ($employeeProject as $employee) {
+                    
+                    // Assuming employee columns 'employee', 'nik', 'email' need to be added
+                    if(!empty(karyawan_bynik($employee->employee)->nama)){
+                        $sheet->setCellValue("A{$rowIndex}", karyawan_bynik($employee->employee)->nama ?? '-') // Employee name
+                        ->setCellValue("B{$rowIndex}", "'".$employee->employee)        // NIK
+                        ->setCellValue("C{$rowIndex}", karyawan_bynik($employee->employee)->email);     // Email
+                    }
+                    
+                    $getSchedule = Schedule::whereIn('tanggal',$dateSchedule)->where('employee',$employee->employee)->get();
+
+                    // Insert schedule counts for each day in the row
+                    $columnIndex = 4; // Start from column D for the schedule counts
+                    foreach ($datesArray as $day) {
+                        $formattedDate = date('Y-m-d', strtotime($day)); // Ensure the date is in Y-m-d format
+
+    // Find the schedule for the given employee and date
+    $scheduleForDay = $getSchedule->firstWhere('tanggal', $formattedDate);
+                        // Check if there is a schedule for the day, and display the shift
+                        if ($scheduleForDay) {
+                            $shift = $scheduleForDay->shift; // Assuming `shift` column exists
+                            $sheet->setCellValue("{$column}{$rowIndex}", $shift); // Display shift in the cell
+                        } else {
+                            $sheet->setCellValue("{$column}{$rowIndex}", 'No Shift'); // If no schedule exists for this day
+                        }
+
+                        $columnIndex++;
+                    }
+
+                    // Move to the next row
+                    $rowIndex++;
+                }
+            }
+
+            // Set the active sheet back to the first sheet
+            $spreadsheet->setActiveSheetIndex(0);
+    
+            // Define file path
+            $fileName = 'absensi_frontline.xlsx';
+            $publicDir = public_path('reports');
+    
+            if (!file_exists($publicDir)) {
+                mkdir($publicDir, 0755, true);
+            }
+    
+            $filePath = $publicDir . '/' . $fileName;
+    
+            // Hapus output buffer sebelum menyimpan file
+            ob_clean();
+    
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filePath);
+    
+            return response()->json([
+                'error' => false,
+                'project'=>$getSchedule,
+                'url' => url('reports/' . $fileName)
+            ], 200);
+        } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+            return response()->json(['error' => 'Failed to process export: ' . $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error processing request: ' . $e->getMessage()], 500);
+        }
     }
 
-    // Update password user
-    $user = User::where('email', $check->email_user)->firstOrFail();
-    $user->update([
-        'password' => Hash::make($request->password),
-    ]);
-
-    // Tandai token sebagai telah digunakan (status = 1)
-    $check->update(['status' => 1]);
-
-    return response()->json([
-        'error' => false,
-        'message' => "Password berhasil direset. Silakan login dengan password baru."
-    ], 200);
+    
+    function getExcelColumn($index) {
+        $column = '';
+        while ($index > 0) {
+            $index--;
+            $column = chr($index % 26 + 65) . $column;
+            $index = floor($index / 26);
+        }
+        return $column;
     }
+    
     
 }

@@ -77,7 +77,7 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header">
-                <h6 class="">Employees Attendance</h6>
+                <h6 class="">Employees Attendance <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#export-attendance" class="btn btn-success btn xs" style="float:right">Export</a></h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -94,11 +94,51 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="export-attendance" tabindex="-1" aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- <div class="modal-header">
+                <h5 class="modal-title" id="exportPayrollModalLabel">Export Absen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div> -->
+            <div class="modal-body">
+                <form action="" method="GET">
+                    <div class="form-group">
+                        <label for="" class="form-label">Absen Periode</label>
+                        <select name="month" id="month" class="form-control" required>
+                            <option value="nov-2024">November - 2024</option>
+                            <option value="dec-2024">Desember - 2024</option>
+                            <option value="jan-2025">Januari - 2025</option>
+                            <option value="feb-2025">Februari - 2025</option>
+                            <option value="mar-2025">Maret - 2025</option>
+                            <option value="apr-2025">April - 2025</option>
+                            <option value="may-2025">Mei - 2025</option>
+                            <option value="jun-2025">Juni - 2025</option>
+                            <option value="jul-2025">Juli - 2025</option>
+                            <option value="aug-2025">Agustus - 2025</option>
+                            <option value="sep-2025">September - 2025</option>
+                            <option value="oct-2025">Oktober - 2025</option>
+                            <option value="nov-2025">November - 2025</option>
+                            <option value="dec-2025">Desember - 2025</option>
+                        </select>
+
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-success btn-sm" id="exportButton" style="float:right">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('plugin-scripts')
 <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
 <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
 @push('custom-scripts')
@@ -218,5 +258,60 @@ $(document).ready(function () {
 </script>
 
 
+<script>
+    document.getElementById('exportButton').addEventListener('click', function () {
+        let selectedMonth = $("#month").val(); // Ambil value dari dropdown
+        let company = "{{ $employee->unit_bisnis }}"; // Ambil company dari Blade
 
+        // Pastikan pengguna telah memilih bulan
+        if (!selectedMonth) {
+            Swal.fire({
+                icon: "warning",
+                title: "Oops...",
+                text: "Silakan pilih periode absen!",
+            });
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Processing Export',
+            text: 'Please wait while the export is being generated...',
+            icon: 'info',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        axios.post("/api/v1/exportAbsens", {
+            month: selectedMonth,
+            company: company
+        })
+        .then(function (response) {
+            Swal.close();
+            Swal.fire({
+                title: 'Export Success',
+                text: 'Absensi data export is ready!',
+                icon: 'success',
+            }).then(() => {
+                const url = response.data.url;  // URL returned from the server
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'absensi_frontline.xlsx');  // Adjust file name if needed
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        })
+        .catch(function (error) {
+            Swal.close();
+            Swal.fire({
+                title: 'Export Failed',
+                text: 'An error occurred during export.',
+                icon: 'error',
+            });
+        });
+    });
+
+</script>
 @endpush

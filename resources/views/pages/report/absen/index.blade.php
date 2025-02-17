@@ -94,7 +94,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                 <a href="{{ route('rekap-report') }}" class="btn btn-sm btn-outline-warning" style="float:right;">Rekap</a>
-                <a href="javascript:void(0)" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#exportPayrollModal" style="float:right;margin-right:3px">Export Payroll</a>
+                <!-- <a href="javascript:void(0)" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#exportPayrollModal" style="float:right;margin-right:3px">Export Payroll</a> -->
                 <table id="dataTableExample" class="table">
                     <thead>
                     <tr>

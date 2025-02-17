@@ -48,6 +48,7 @@ use App\Koperasi\Koperasi;
 use App\Koperasi\Anggota;
 use App\Koperasi\Loan;
 use App\VoltageData;
+use App\Absen;
 
 class AllDataController extends Controller
 {
@@ -1312,74 +1313,82 @@ class AllDataController extends Controller
             if (!$company) {
                 return response()->json(['error' => 'Unauthorized: Company not found'], 401);
             }
-
-            $projects = Project::select('id','name')->where('company',$company)->whereNull('deleted_at')->get();
-            $monthYear = date('m-Y',strtotime($request->month));
-            $fomatPeriode = date('F-Y',strtotime($request->month));
-
+        
+            // Fetch projects for the company
+            $projects = Project::select('id', 'name')
+                ->where('company', $company)
+                ->whereNull('deleted_at')
+                ->get();
+        
+            // Validate and format the month input
+            if (!$request->month || !strtotime($request->month)) {
+                return response()->json(['error' => 'Invalid month provided'], 400);
+            }
+        
+            $monthYear = date('m-Y', strtotime($request->month));
+            $formatPeriod = date('F-Y', strtotime($request->month));
+        
             // Parse the month and year
             list($month, $year) = explode('-', $monthYear);
-
+        
             // Create a Carbon instance for the 1st day of the current month
             $startDate = Carbon::create($year, $month, 1);
-
+        
             // Set the start date to the 21st of the previous month
             $startDate = $startDate->subMonth()->day(21);
-
+        
             // Set the end date to the 20th of the current month
             $endDate = $startDate->copy()->addMonth()->day(20);
-
-            // Generate the array of dates in d-m-Y format
+        
+            // Generate the array of dates in d-m-Y and Y-m-d formats
             $datesArray = [];
-            $dateSchedule=[];
+            $dateSchedule = [];
             $currentDate = $startDate->copy();
-
+        
             while ($currentDate <= $endDate) {
                 $datesArray[] = $currentDate->format('d-m-Y');
                 $dateSchedule[] = $currentDate->format('Y-m-d');
-                $currentDate->addDay(); // Move to the next day
+                $currentDate->addDay();
             }
-    
+        
             // Initialize Spreadsheet
             $spreadsheet = new Spreadsheet();
-
-            // Loop through the companies and create a worksheet for each
-            foreach ($projects as $index => $company) {
-
-                // get employee
-                $employeeProject = Schedule::select('employee', DB::raw('COUNT(*) as schedule_count'))
-                                            ->where('project',$company->id)
-                                            ->where('periode', strtoupper($fomatPeriode))
-                                            ->groupBy('employee')
-                                            ->get();
-
-
-                // Create a new worksheet for each company
+        
+            // Loop through the projects and create a worksheet for each
+            foreach ($projects as $index => $project) {
+                // Get employees for the project
+                $employeeProject = Schedule::select('employee',DB::raw('COUNT(*) as schedule_count'))
+                    ->where('project', $project->id)
+                    ->where('periode', strtoupper($formatPeriod))
+                    ->groupBy('employee')
+                    ->get();
+        
+                // Create a new worksheet for each project
                 if ($index > 0) {
                     $spreadsheet->createSheet();
                 }
-
-                $headers['A6'] = 'NAMA LENGKAP';
-                $headers['B6'] = 'NIK';
-                $headers['C6'] = 'EMAIL';
-                
-                
-                // Adding days from $days_array into the headers
+        
+                // Set headers
+                $headers = [
+                    'A6' => 'NAMA LENGKAP',
+                    'B6' => 'NIK',
+                    'C6' => 'EMAIL',
+                ];
+        
+                // Add days from $datesArray into the headers
                 $columnIndex = 4; // Starting at column D (index 4)
                 foreach ($datesArray as $day) {
                     $column = $this->getExcelColumn($columnIndex); // Get the correct Excel column letter(s)
                     $headers["{$column}6"] = $day;
                     $columnIndex++;
                 }
-
-
-
+        
                 // Set the current sheet
                 $sheet = $spreadsheet->setActiveSheetIndex($index);
-                $sheetTitle = substr($company->name, 0, 31);
-                // Set title as the company's name
+                $sheetTitle = substr($project->name, 0, 31); // Limit sheet title to 31 characters
                 $sheet->setTitle($sheetTitle);
-
+        
+                // Define header style
                 $headerStyle = [
                     'font' => [
                         'bold' => true,
@@ -1388,7 +1397,7 @@ class AllDataController extends Controller
                     ],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => '003366'],  // Green background color
+                        'startColor' => ['rgb' => '003366'],  // Dark blue background color
                     ],
                     'alignment' => [
                         'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -1401,76 +1410,90 @@ class AllDataController extends Controller
                         ],
                     ],
                 ];
-                
+        
+                // Apply headers and styles
                 foreach ($headers as $cell => $label) {
-                    // Set header text
                     $sheet->setCellValue($cell, $label);
-                    
-                    // Apply style to header
                     $sheet->getStyle($cell)->applyFromArray($headerStyle);
                     $columnLetter = preg_replace('/[0-9]/', '', $cell); // Remove digits to get column letter
-                    // Set auto size for columns
                     $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
                 }
-
+        
+                // Populate employee data
                 $rowIndex = 7;
                 foreach ($employeeProject as $employee) {
-                    
-                    // Assuming employee columns 'employee', 'nik', 'email' need to be added
-                    if(!empty(karyawan_bynik($employee->employee)->nama)){
-                        $sheet->setCellValue("A{$rowIndex}", karyawan_bynik($employee->employee)->nama ?? '-') // Employee name
-                        ->setCellValue("B{$rowIndex}", "'".$employee->employee)        // NIK
-                        ->setCellValue("C{$rowIndex}", karyawan_bynik($employee->employee)->email);     // Email
+                    $employeeData = karyawan_bynik($employee->employee);
+        
+                    if (!empty($employeeData->nama)) {
+                        $sheet->setCellValue("A{$rowIndex}", $employeeData->nama ?? '-')
+                            ->setCellValue("B{$rowIndex}", "'" . $employee->employee) // NIK with leading apostrophe
+                            ->setCellValue("C{$rowIndex}", $employeeData->email); // Email
                     }
-                    
-                    $getSchedule = Schedule::whereIn('tanggal',$dateSchedule)->where('employee',$employee->employee)->get();
-
+        
+                    // Fetch schedules for the employee
+                    $getSchedule = Schedule::whereIn('tanggal', $dateSchedule)
+                        ->where('employee', $employee->employee)
+                        ->get();
+        
                     // Insert schedule counts for each day in the row
                     $columnIndex = 4; // Start from column D for the schedule counts
                     foreach ($datesArray as $day) {
                         $formattedDate = date('Y-m-d', strtotime($day)); // Ensure the date is in Y-m-d format
-
-    // Find the schedule for the given employee and date
-    $scheduleForDay = $getSchedule->firstWhere('tanggal', $formattedDate);
+        
+                        // Find the schedule for the given employee and date
+                        $scheduleForDay = $getSchedule->firstWhere('tanggal', $formattedDate);
+                        $column = $this->getExcelColumn($columnIndex);
+        
                         // Check if there is a schedule for the day, and display the shift
                         if ($scheduleForDay) {
-                            $shift = $scheduleForDay->shift; // Assuming `shift` column exists
-                            $sheet->setCellValue("{$column}{$rowIndex}", $shift); // Display shift in the cell
+                            $cekAbsen = Absen::where('nik',$employee->employee)->where('tanggal',$formattedDate)->first();
+                            if(!empty($cekAbsen)){
+                                if(!empty($cekAbsen->clock_in)){
+                                    $shift = $cekAbsen->clock_in .' - '.$cekAbsen->clock_out; // Assuming `shift` column exists
+                                }else{
+                                    $shift = $cekAbsen->status;
+                                }
+                                
+                                $sheet->setCellValue("{$column}{$rowIndex}", $shift); // Display shift in the cell
+                            }else{
+                                $shift = $scheduleForDay->shift; // Assuming `shift` column exists
+                                $sheet->setCellValue("{$column}{$rowIndex}", $shift); // Display shift in the cell
+                            }
+                            
                         } else {
                             $sheet->setCellValue("{$column}{$rowIndex}", 'No Shift'); // If no schedule exists for this day
                         }
-
+        
                         $columnIndex++;
                     }
-
-                    // Move to the next row
+        
                     $rowIndex++;
                 }
             }
-
+        
             // Set the active sheet back to the first sheet
             $spreadsheet->setActiveSheetIndex(0);
-    
+        
             // Define file path
             $fileName = 'absensi_frontline.xlsx';
             $publicDir = public_path('reports');
-    
+        
             if (!file_exists($publicDir)) {
                 mkdir($publicDir, 0755, true);
             }
-    
+        
             $filePath = $publicDir . '/' . $fileName;
-    
-            // Hapus output buffer sebelum menyimpan file
+        
+            // Clear output buffer before saving the file
             ob_clean();
-    
+        
+            // Save the spreadsheet
             $writer = new Xlsx($spreadsheet);
             $writer->save($filePath);
-    
+        
             return response()->json([
                 'error' => false,
-                'project'=>$getSchedule,
-                'url' => url('reports/' . $fileName)
+                'url' => url('reports/' . $fileName),
             ], 200);
         } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
             return response()->json(['error' => 'Failed to process export: ' . $e->getMessage()], 500);

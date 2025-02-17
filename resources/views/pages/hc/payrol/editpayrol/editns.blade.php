@@ -25,7 +25,9 @@
   <div class="col-lg-12 grid-margin stretch-card">
     <div class="card custom-card2">
       <div class="card-body">
+        
         @php 
+            
             $employee = \App\Employee::where('nik', $payrolComponent->employee_code)->first();
             if($employee->unit_bisnis==='Run'){
                 $dailysalary = \App\PayrolComponent_NS::where('employee_code', $payrolComponent->employee_code)->select('daily_salary')->first();
@@ -48,7 +50,7 @@
                 <div class="col-md-6">
                     <label for="name" class="form-label">Karyawan</label>
                     <input type="hidden" name="employee_code" value="{{$payrolComponent->employee_code}}">
-                    <input type="text" class="form-control" value="{{$employee->nama}}" readonly>
+                    <input type="text" class="form-control" value="{{$employee->nama}}-{{$payrolComponent['kerajinan']}}" readonly>
                     <input type="hidden" name="periode" value="{{$payrolComponent->periode}}">
                 </div>
                 <div class="col-md-6">

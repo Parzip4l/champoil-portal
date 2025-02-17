@@ -130,6 +130,7 @@ class AllKoperasiController extends Controller
                         ->orderBy('created_at', 'desc')
                         ->get()
                         ->toArray();
+            $historyPinjaman->jumlah_pembayaran = (string)$historyPinjaman->jumlah_pembayaran;
 
             // Mendapatkan informasi anggota untuk sisahutang
             $anggota = Anggota::where('employee_code', $employeeCode)->first();

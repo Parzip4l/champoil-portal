@@ -38,6 +38,8 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         //
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         $start = date('Y-m-d');
         $end = date('Y-m-d');
         if(!empty($request->input('periode'))){
@@ -65,7 +67,7 @@ class ReportController extends Controller
         $percen_50_80=0;
         $percen_80_99=0;
         $percen_100=0;
-        $project = Project::where('deleted_at',NULL)->where('company','Kas')->orderBy('name','asc')->get();
+        $project = Project::where('deleted_at',NULL)->where('company',$company->unit_bisnis)->orderBy('name','asc')->get();
         if($project){
             foreach($project as $row){
                 $row->persentase_backup=0;

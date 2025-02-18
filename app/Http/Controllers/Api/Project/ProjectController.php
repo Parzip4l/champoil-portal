@@ -30,4 +30,10 @@ class ProjectController extends Controller
  
         return response()->json($records);
     }
+
+    public function projectDetail(Request $request){
+        $records = Project::where('id',$request->id)->first();
+ 
+        return response()->json($records);
+    }
 }

@@ -927,8 +927,8 @@ class ApiLoginController extends Controller
                         ->select('organisasi','unit_bisnis')
                         ->first();
         
-            if ($organisasi->unit_bisnis === 'CHAMPOIL') {
-                $slackChannel = Slack::where('channel', 'Request')->first();
+            if ($organisasi->unit_bisnis === 'CHAMPOIL' ||  $organisasi->unit_bisnis === 'RUN') {
+                $slackChannel = Slack::where('channel', 'Request')->where('company',strtoupper($organisasi->unit_bisnis))->first();
                 $slackWebhookUrl = $slackChannel->url;
                 $today = now()->toDateString();
 

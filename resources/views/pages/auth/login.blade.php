@@ -4,12 +4,12 @@
 <div class="page-content d-flex align-items-center justify-content-center">
 
   <div class="row w-100 mx-0 auth-page">
-    <div class="col-md-4 col-xl-4 mx-auto">
-      <div class="card">
+    <div class="col-md-4 col-xl-3 mx-auto">
+      <div class="card" style="border-radius:15px;">
         <div class="row">
           <div class="col-md-12 ps-md-0">
-            <div class="auth-form-wrapper px-4 py-5">
-              <a href="#" class="noble-ui-logo d-block mb-2 text-center">TRUE<span>ST</span></a>
+            <div class="auth-form-wrapper px-5 py-5">
+              <a href="#" class="noble-ui-logo d-block mb-2 text-center"><img src="{{ url('assets/images/logo/logodesktop.png') }}" alt="TRUEST logo" style="width:35%;"></a>
               <h5 class="text-muted fw-normal mb-4 text-center">Welcome back to TRUEST HRIS.</h5>
               <form class="forms-sample" action="{{url('login/proses')}}" method="POST">
               @csrf
@@ -39,7 +39,7 @@
                   </button>
                   
                 </div>
-                <a href="{{  route('forgot-password') }}" class="btn btn-sm btn-outline-primary w-100 btn-icon-text">Lupa Password</a>
+                <a href="{{  route('forgot-password') }}" class="btn btn-sm btn-outline-primary w-100 btn-icon-text mt-2" style="border-radius:10px;">Lupa Password</a>
               </form>
             </div>
           </div>

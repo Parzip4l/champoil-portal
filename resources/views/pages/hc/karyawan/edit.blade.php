@@ -173,6 +173,7 @@
                         <option value="SMP" {{$employee->pendidikan_trakhir == 'SMP' ? 'selected' : ''}}>SMP</option>
                         <option value="SMA" {{$employee->pendidikan_trakhir == 'SMA' ? 'selected' : ''}}>SMA</option>
                         <option value="DIPLOMA" {{$employee->pendidikan_trakhir == 'DIPLOMA' ? 'selected' : ''}}>DIPLOMA</option>
+                        <option value="SARJANA" {{$employee->pendidikan_trakhir == 'SARJANA' ? 'selected' : ''}}>SARJANA</option>
                         <option value="MAGISTER" {{$employee->pendidikan_trakhir == 'MAGISTER' ? 'selected' : ''}}>MAGISTER</option>
                         <option value="DOCTOR" {{$employee->pendidikan_trakhir == 'DOCTOR' ? 'selected' : ''}}>DOCTOR</option>
                         <option value="OTHERS" {{$employee->pendidikan_trakhir == 'OTHERS' ? 'selected' : ''}}>OTHERS</option>

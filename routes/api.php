@@ -41,6 +41,7 @@ Route::prefix('v1')->group(function () {
     // Employee
     Route::get('/user', [ApiLoginController::class, 'getUser']);
     Route::get('/employee', [EmployeeController::class, 'ApiEmployee']);
+    Route::get('/employee-lastabsen', [ApiEmployee::class, 'lastAbsen']);
     Route::get('/mySlip', [ApiLoginController::class, 'payslipuser']);
     Route::get('/Payslip/{id}', [ApiLoginController::class, 'PayslipDetails']);
     Route::get('/employee/{nik}', [ApiLoginController::class, 'getEmployeeByNik']);
@@ -176,6 +177,8 @@ Route::prefix('v1')->group(function () {
      * Project
      */
     Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
+    Route::get('/get-project', [ProjectController::class, 'projectList']);
+    Route::get('/get-project-detail', [ProjectController::class, 'projectDetail']);
     Route::get('/absen_daily', [DailyContrtoller::class, 'daily_absen']);
     Route::get('/schedule-reminder/{key}/{periode}', [DailyContrtoller::class, 'reminder_schedule']);
     Route::get('/report-absens-qc', [DailyContrtoller::class, 'report_absen']);
@@ -199,6 +202,8 @@ Route::prefix('v1')->group(function () {
     // Pengumuman
     Route::get('pengumuman', [AllDataController::class, 'ListPengumuman']);
         Route::get('pengumuman/{id}', [AllDataController::class, 'showPengumuman']);
+        Route::post('exportAbsens', [AllDataController::class, 'exportAbsens']);
+        
     // Berita
     Route::get('berita', [AllDataController::class, 'ListBerita']);
         Route::get('berita/{id}', [AllDataController::class, 'showBerita']);

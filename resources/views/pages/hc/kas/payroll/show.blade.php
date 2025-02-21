@@ -147,6 +147,7 @@
                                             <div class="col-md-6">
                                                 <span>Potongan Hutang</span>
                                             </div>
+                                            
                                             <div class="col-md-6 text-right">
                                                 <span class="text-right">Rp. {{ number_format($deductionData->hutang_koperasi ?? 0, 0, ',', '.') }}</span>
                                             </div>
@@ -172,7 +173,8 @@
                                                 <span>Potangan Lain Lain</span>
                                             </div>
                                             <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($deductionData->additional_deductions ?? 0, 0, ',', '.') }}</span>
+                                                <span class="text-right">Rp. {{ number_format(($deductionData->additional_deductions ?? 0) + ($deductionData->potongan_hutang ?? 0), 0, ',', '.') }}
+                                                </span>
                                             </div>
                                         </div>
                                     </td>

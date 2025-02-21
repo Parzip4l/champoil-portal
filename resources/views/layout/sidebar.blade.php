@@ -84,7 +84,7 @@
                             @if($user->project_id == NULL)
                                 <li class="nav-item"><a href="{{ route('shift.index') }}" class="nav-link {{ active_class(['shift']) }}">Shift</a></li>
                             @endif
-                            @if($employee && $employee->unit_bisnis == 'Kas'  && $user->project_id == NULL)
+                            @if($employee && $user->project_id == NULL)
                                 <li class="nav-item"><a href="{{ url(route('report.index') . '?periode='.date('M-Y')) }}" class="nav-link {{ active_class(['kas/report']) }}">Report</a></li>
                             @endif
                             @if(in_array('pic_access', $dataLogin) || in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('admin_access', $dataLogin) || in_array('client_access', $dataLogin))

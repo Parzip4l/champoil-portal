@@ -45,8 +45,14 @@ class AllKoperasiController extends Controller
             // If not a member, return available cooperative data for the business unit
             if (!$anggota) {
                 $koperasi = Koperasi::where('company', $unitBisnis)->get();
+                if(!empty($koperasi)){
+                    foreach($koperasi as $key){
+                        $key->tenor = (string)$key->tenor;
+                    }
+                }
                 return response()->json([
                     'success' => false,
+                    'status'=>false,
                     'message' => 'You are not a cooperative member.',
                     'status_anggota' => 'Not Member',
                     'data' => $koperasi
@@ -55,6 +61,12 @@ class AllKoperasiController extends Controller
 
             // If user is a cooperative member, fetch their savings data
             $datasaya = Saving::where('employee_id', $employeeCode)->get();
+            if(!empty($datasaya)){
+                foreach($datasaya as $key){
+                    $key->jumlah_simpanan = (string)$key->jumlah_simpanan;
+                }
+            }
+            
             $saldosaya = Saving::where('employee_id', $employeeCode)
                                 ->select('totalsimpanan')
                                 ->orderBy('created_at', 'desc')
@@ -98,6 +110,7 @@ class AllKoperasiController extends Controller
                 // If eligible for a loan, return loan application requirements
                 return response()->json([
                     'success' => true,
+                    'status'=>true,
                     'syarat1' => $isMemberForThreeMonths,
                     'syarat2' => $hasNoOutstandingLoan,
                     'syarat3' => $hadFullAttendance,
@@ -117,7 +130,9 @@ class AllKoperasiController extends Controller
                         ->orderBy('created_at', 'desc')
                         ->get()
                         ->toArray();
-
+            foreach ($historyPinjaman as &$item) {
+                $item['jumlah_pembayaran'] = (string) $item['jumlah_pembayaran'];
+            }
             // Mendapatkan informasi anggota untuk sisahutang
             $anggota = Anggota::where('employee_code', $employeeCode)->first();
 
@@ -157,6 +172,7 @@ class AllKoperasiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'status'=>true,
                 'message' => 'Loan data retrieved.',
                 'status_anggota' => $anggotaStatus->member_status,
                 'status_pinjaman' => $loan->status,

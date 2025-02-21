@@ -39,7 +39,11 @@
                   </button>
                   
                 </div>
+<<<<<<< HEAD
                 <a href="{{  route('forgot-password') }}" class="btn btn-sm btn-outline-primary w-100 btn-icon-text mt-2" style="border-radius:10px;">Lupa Password</a>
+=======
+                <a href="{{  route('forgot-password') }}" class="btn btn-sm btn-outline-primary w-100 btn-icon-text mt-3">Lupa Password</a>
+>>>>>>> 7a1ee398a9f4253c59aa5b420c56d6d8039bfa52
               </form>
             </div>
           </div>

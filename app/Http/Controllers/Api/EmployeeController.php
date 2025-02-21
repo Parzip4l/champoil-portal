@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\EmployeeResign;
+use App\Koperasi\Anggota;
 use App\Absen;
 use App\ModelCG\Project;
 use App\Employee;
@@ -50,6 +52,60 @@ class EmployeeController extends Controller
             'error'=>false,
             'result'=>$result    
         ]);
+    }
+
+    public function lastAbsen(Request  $request){
+
+        $result = [];
+
+        $company="Kas";
+        // Ambil semua data karyawan
+        $employees = Employee::where('unit_bisnis',$company)->get();
+
+        foreach ($employees as $employee) {
+            // Hitung jumlah absen dalam 90 hari terakhir
+            $absenCount = Absen::where('nik', $employee->nik)
+                ->where('tanggal', '>=', Carbon::now()->subDays(90)) // Filter tanggal
+                ->count();
+            if($absenCount==0 && $employee->jabatan != "CLIENT" && $employee->organisasi != "Management Leaders" && $employee->organisasi != "MANAGEMENT LEADERS"){
+                $result[] = [
+                    'nik' => $employee->nik,
+                    'nama' => $employee->nama,
+                    'total_absen' => $absenCount,
+                ];
+                $cekAnggota = Anggota::where('employee_code', $employee->nik)->first(); 
+                $data = [
+                    "employee_code" => $employee->nik,
+                    "nama" => $employee->nama,
+                    "ktp" => $employee->ktp,
+                    "join_date" => $employee->joindate,
+                    "meta_karyawan" => json_encode($employee),
+                    "created_at" => date('Y-m-d H:i:s'),
+                    "unit_bisnis" => $employee->unit_bisnis
+                ];
+        
+                // Insert data resign
+                $insert_resign = EmployeeResign::insertGetId($data);
+        
+                if ($insert_resign) {
+                    // Update status resign karyawan
+                    Employee::where('id', $employee->id)->update(['resign_status' => 1]);
+        
+                    // Cek apakah karyawan adalah anggota koperasi
+                    if ($cekAnggota) { // Misalnya, is_member adalah kolom yang menunjukkan keanggotaan koperasi
+                        // Ubah status anggota koperasi menjadi tidak aktif
+                        Anggota::where('employee_code', $employee->nik)->update(['member_status' => 'deactive']);
+                    }
+        
+                }
+            }
+            
+        }
+
+        return response()->json([
+            'error' => false,
+            'result' => $result
+        ]); 
     }
 
     public function all_employee(){

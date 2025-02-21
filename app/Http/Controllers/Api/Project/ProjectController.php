@@ -22,4 +22,18 @@ class ProjectController extends Controller
         
         return response()->json($records);
     }
+
+    public function projectList(Request $request){
+        $records = Project::where('company', 'like', '%' . $request->company . '%')
+                            ->whereNull('deleted_at') // Ensures only non-deleted records are retrieved
+                            ->get();
+ 
+        return response()->json($records);
+    }
+
+    public function projectDetail(Request $request){
+        $records = Project::where('id',$request->id)->first();
+ 
+        return response()->json($records);
+    }
 }

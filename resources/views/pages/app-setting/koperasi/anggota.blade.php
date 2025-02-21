@@ -152,7 +152,7 @@
                             <label for="" class="form-label">Member Status</label>
                             <select name="member_status" id="" class="form-control">
                                 <option value="active" {{ $dataAnggota->member_status === 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="exit" {{ $dataAnggota->member_status === 'exit' ? 'selected' : '' }}>Exit</option>
+                                <option value="deactive" {{ $dataAnggota->member_status === 'deactive' ? 'selected' : '' }}>Exit</option>
                                 <option value="onhold" {{ $dataAnggota->member_status === 'onhold' ? 'selected' : '' }}>On Hold</option>
                             </select>
                         </div>

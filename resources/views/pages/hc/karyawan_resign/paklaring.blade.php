@@ -89,7 +89,7 @@
                 Jakarta, {{ date('d F Y',strtotime($resign->created_at)) }}<br/>
                 Hormat Saya<br/>
                 <br/>
-                <img src="https://hris.truest.co.id/images/company_logo/ttd.png" style="width: 90px; text-align: left;" alt="Company Logo">
+                <img src="https://hris.truest.co.id/images/Bima.png" style="width: 90px; text-align: left;" alt="Company Logo">
                 <img src="https://hris.truest.co.id/images/company_logo/stampel.png" style="width: 110px;margin-top:20px;margin-left:-60px;" alt="Company Logo"><br/>
                 <u><strong>Bima Dwi Yoga Octosella</strong></u><br/>
                 <p>Human Culture Manager </p>

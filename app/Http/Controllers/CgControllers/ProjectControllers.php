@@ -81,6 +81,7 @@ class ProjectControllers extends Controller
             $longtitude = $request->input('longtitude');
             $contract_start = $request->input('contract_start');
             $end_contract = $request->input('end_contract');
+            $tanggal_deploy = $request->input('tanggal_deploy');
         
             $randomCode = $this->generateRandomCode();
 
@@ -95,6 +96,7 @@ class ProjectControllers extends Controller
             $project->contract_start = $contract_start;
             $project->end_contract = $end_contract;
             $project->company = $company->unit_bisnis;
+            $project->tanggal_deploy = $tanggal_deploy;
             $project->save();
 
             return redirect()->route('project.index')->with(['success' => 'Data Berhasil Disimpan!']);
@@ -118,7 +120,7 @@ class ProjectControllers extends Controller
         $employee = Auth::user();
         // Mengambil data proyek berdasarkan project_code
         $data['project'] = Project::where('id', $id)->first();  // Ubah sesuai dengan model dan kolom yang benar
-        $data['atasan'] = Employee::where('unit_bisnis',$employee->company)->where('resign_status',0)->get();
+        $data['atasan'] = Employee::where('unit_bisnis',$employee->company)->where('organisasi','FRONTLINE OFFICER')->where('resign_status',0)->get();
         
         if (!$data['project']) {
             return abort(404); // Handle jika proyek tidak ditemukan

@@ -24,6 +24,7 @@
                                 <th>Badan</th>
                                 <th>Start Contract</th>
                                 <th>End Contract</th>
+                                <th>Deployment Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -39,6 +40,7 @@
                                 <td> {{ $data->badan }} </td>
                                 <td> {{ $data->contract_start }} </td>
                                 <td> {{ $data->end_contract }} </td>
+                                <td> {{ $data->tanggal_deploy??'-' }} </td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -57,6 +57,12 @@
                                     <input type="date" name="end_contract" class="form-control" placeholder="Eg, 106.7594188" required>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">Tanggal Deploy</label>
+                                    <input type="date" name="tanggal_deploy" class="form-control" required>
+                                </div>
+                            </div>
                         </div>
                         <div class="add-button-wrap mb-2">
                             <button type="submit" class="btn btn-md btn-success button-biru w-100">Simpan Data</button>

@@ -34,11 +34,15 @@
                         </div>
                         <div class="project-name-wrap mb-3 d-flex justify-content-between">
                             <p>Contract Start</p>
-                            <p class="text-muted text-right">{{ $project->contract_start }}</p>
+                            <p class="text-muted text-right">{{ date('d F Y',strtotime($project->contract_start)) }}</p>
                         </div>
                         <div class="project-name-wrap mb-3 d-flex justify-content-between">
                             <p>Contract End</p>
-                            <p class="text-muted text-right">{{ $project->end_contract }}</p>
+                            <p class="text-muted text-right">{{ date('d F Y',strtotime($project->end_contract)) }}</p>
+                        </div>
+                        <div class="project-name-wrap mb-3 d-flex justify-content-between">
+                            <p>Deployment Date</p>
+                            <p class="text-muted text-right">{{ $project->tanggal_deploy??'-' }}</p>
                         </div>
                         <div class="wrap d-flex">
                             <button type="button" class="btn btn-primary mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -110,6 +114,10 @@
                                             <label for="" class="form-label">Contract End</label>
                                             <input type="date" name="end_contract" class="form-control" value="{{$project->end_contract}}" required>
                                         </div>
+                                        <div class="form-group mb-2">
+                                            <label for="" class="form-label">Deployment Date</label>
+                                            <input type="date" name="tanggal_deploy" class="form-control" value="{{$project->tanggal_deploy}}" required>
+                                        </div>
 
                                         <div class="form-group mb-2">
                                             <label for="" class="form-label">Leader PIC</label>
@@ -121,31 +129,12 @@
                                                             $check_atasan="selected";
                                                         }
                                                     @endphp
-                                                    <option value="{{$dataAtasan->nik}}" {{$check_atasan}}>{{$dataAtasan->nama}}</option>
+                                                    <option value="{{$dataAtasan->nik}}" {{$check_atasan}}>{{$dataAtasan->nama}} ({{$dataAtasan->nik}})</option>
                                                 @endforeach
                                             </select>
                                                 
                                         </div>
-                                        <label for="" class="form-label">SHIFT</label><br/>
-                                        @if($shift)
-                                            @foreach($shift as $row_shift)
-                                                @php 
-                                                    if($row_shift->count==0){
-                                                        $checked="";
-                                                    }else{
-                                                        $checked="checked";
-                                                    }
-                                                @endphp
-                                                <input class="form-check-input" 
-                                                       name="shift[]" 
-                                                       type="checkbox" 
-                                                       id="shift-{{$row_shift->id}}" 
-                                                       value="{{$row_shift->id}}"
-                                                       {{$checked}}>
-                                                <label class="form-check-label" for="shift-{{$row_shift->id}}">{{$row_shift->code}}</label><br/>
-                                               
-                                            @endforeach
-                                        @endif
+                                        
                                         <button type="submit" class="btn btn-primary w-100">Update Data Project</button>
                                     </form>
                                 </div>

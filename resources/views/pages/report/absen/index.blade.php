@@ -135,24 +135,24 @@
                                 @php 
                                     if($row->persentase_absen <= 50 ){
                                         $color="background-color:#ff6f74";
+                                        $text_color="color:white";
                                     }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
                                         $color="background-color:#fff199";
+                                        $text_color="color:black";
                                     }else{
                                         $color="";
+                                        $text_color="color:black";
                                     }
-
-                                    
-
-                                
                                 @endphp
-                                <tr style="{{ $color }}">
+                                <tr style="{{ $color }};{{$text_color}}">
                                     <td>{{ $no }}</td>
                                     <td>
                                         <a href="{{ route('report-detail', [
                                             'id' => $row->id,
                                             'periode' => isset($_GET['periode']) && strtotime($_GET['periode']) ? date('M Y', strtotime($_GET['periode'])) : date('m-Y')
-                                        ]) }}" style="color:black">
-                                            {{ $row->name }}
+                                        ]) }}" style="{{$text_color}}">
+                                            {{ $row->name }} <br/>
+                                            <small class="text-muted;{{$text_color}}">DEPLOYMENT DATE : {{ $row->tanggal_deploy ?? '-' }}</small>
                                         </a>
                                     </td>
 

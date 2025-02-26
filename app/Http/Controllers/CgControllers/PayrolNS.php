@@ -209,6 +209,7 @@ class PayrolNS extends Controller
                 // Initialize variables for contributions and loan deductions
                 $nominalSimpananWajib = 0;
                 $loanDeductions = 0;
+                $pencairan =0;
 
                 if ($anggota) {
                     // Retrieve cooperative membership details
@@ -216,11 +217,18 @@ class PayrolNS extends Controller
                     
                     if ($koperasi) {
                         // Retrieve the mandatory contribution from the Koperasi table
-                        $nominalSimpananWajib = $koperasi->iuran;
+                        if($anggota->member_status == 'deactive'){
+                            $nominalSimpananWajib = 0;
+                        }else{
+                            $nominalSimpananWajib = $koperasi->iuran;
+                        }
                     }
 
                     $saving = Saving::where('employee_id', $nik)->get();
                     $totalSimpanan = $saving->sum('jumlah_simpanan');
+                    if($anggota->member_status == 'deactive'){
+                        $pencairan =$totalSimpanan;
+                    }
 
                     // Check if the employee has an 'onloan' status
                     if ($anggota->loan_status === 'onloan') {
@@ -239,6 +247,12 @@ class PayrolNS extends Controller
                             if ($sisaHutangSaya) {
                                 // Calculate the remaining amount to be paid
                                 $remainingAmount = $sisaHutangSaya->sisahutang - $loan->instalment;
+                                $pay=$loan->instalment;
+                                if($anggota->member_status == 'deactive'){
+                                    $remainingAmount = $sisaHutangSaya->sisahutang - $sisaHutangSaya->sisahutang;
+                                    $pay = $sisaHutangSaya->sisahutang;
+                                }
+                                
                             
                                 // Ensure remaining amount is set to 0 if it reaches 1
                                 if ($remainingAmount === 1) {
@@ -251,7 +265,7 @@ class PayrolNS extends Controller
                                     $loanPayment->loan_id = $loan->id;
                                     $loanPayment->employee_code = $anggota->employee_code;
                                     $loanPayment->tanggal_pembayaran = Carbon::now();
-                                    $loanPayment->jumlah_pembayaran = $loan->instalment;
+                                    $loanPayment->jumlah_pembayaran = $pay;
                                     $loanPayment->sisahutang = max($remainingAmount, 0); // Ensure sisahutang is not negative
                                     $loanPayment->save();
                             
@@ -263,7 +277,6 @@ class PayrolNS extends Controller
                                     $allLoansPaidOff = false;
                                 }
                             }
-                            
                         }
 
                         if ($allLoansPaidOff) {
@@ -275,6 +288,10 @@ class PayrolNS extends Controller
                         $anggota->save();
                         // Calculate the total loan deductions
                         $loanDeductions = $loans->sum('instalment');
+                        if($anggota->member_status == 'deactive'){
+                            $loanDeductions = $sisaHutangSaya->sisahutang;
+                        }
+                        
                     }
                 }
 
@@ -551,7 +568,7 @@ class PayrolNS extends Controller
                     $montlySalary = $totalGaji + $totalGajiBackup;
                     $thp = $montlySalary - ($potonganlain + $totalPotonganHutang + $nominalSimpananWajib + $loanDeductions + $potonganAbsen + $PajakPendapatan + $deductionTotalAdditional - $allowanceTotalAdditional) + $totalGajiLembur;
                     $totalDeduction = $potonganAbsen + $totalPotonganHutang + $TotalGP + $potonganlain + $nominalSimpananWajib + $loanDeductions;
-                    $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup + $totalGajiLembur;
+                    $allowanceTotal = $projectAllowancesTotal + $totalGajiBackup + $totalGajiLembur + $pencairan;
 
                    
                     $allowenceData = [
@@ -563,6 +580,7 @@ class PayrolNS extends Controller
                         'totalGajiBackup' => $totalGajiBackup,
                         'totalJamLembur' => $totalJamLembur,
                         'totalrateLembur' => $totalGajiLembur,
+                        'pencairan_koperasi'=>$totalSimpanan
                     ];
 
                     $deductionData = [

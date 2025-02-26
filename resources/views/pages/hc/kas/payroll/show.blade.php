@@ -71,21 +71,47 @@
                                 $HutangData = isset($deductionData->potongan_hutang) ? $deductionData->potongan_hutang : 0;
                                 $projectAllowances = isset($allowencesData->projectAllowances) ? $allowencesData->projectAllowances : 0;
                                 $projectDeductions = isset($deductionData->projectDeductions) ? $deductionData->projectDeductions : 0;
+
+                                $gapok = $payroll->basic_salary - $allowencesData->tunjangan_lain;
                             @endphp
                             <tbody>
                                 <tr>
                                     <td>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Basic Salary</span>
+                                                <span>GAJI POKOK</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
-                                                <span class="text-right mb-4">Rp. {{ number_format($payroll->basic_salary ?? 0, 0, ',', '.') }} </span>
+                                                <span class="text-right mb-4">Rp. {{ number_format($gapok ?? 0, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Backup</span>
+                                                <span>TUNJANGAN KERJA</span>
+                                            </div>
+                                            <div class="col-md-6 text-right mb-2">
+                                                <span class="text-right mb-4">Rp. {{ number_format($allowencesData->tunjangan_lain ?? 0, 0, ',', '.') }} </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <span>TUNJANGAN LAIN-LAIN</span>
+                                            </div>
+                                            <div class="col-md-6 text-right mb-2">
+                                                <span class="text-right mb-4">Rp. {{ number_format($allowencesData->additional_allowances ?? 0, 0, ',', '.') }} </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <span>PENCAIRAN KOPERASI</span>
+                                            </div>
+                                            <div class="col-md-6 text-right mb-2">
+                                                <span class="text-right mb-4">Rp. {{number_format($allowencesData->pencairan_koperasi ?? 0, 0, ',', '.')}} </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <span>BACKUP</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
                                                 <span class="text-right text-muted mb-4"> {{$allowencesData->totalHariBackup ?? 0}} Hari</span>
@@ -99,7 +125,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Lembur</span>
+                                                <span>LEMBUR</span>
                                             </div>
                                             <div class="col-md-6 text-right mb-2">
                                                 <span class="text-right text-muted mb-4"> {{$allowencesData->totalJamLembur ?? 0}} Jam</span>
@@ -111,14 +137,7 @@
                                                 <span class="text-right mb-4">Rp. {{ number_format($allowencesData->totalrateLembur ?? 0, 0, ',', '.') }} </span>
                                             </div>
                                         </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <span>Tunjangan Lain Lain</span>
-                                            </div>
-                                            <div class="col-md-6 text-right">
-                                                <span class="text-right">Rp. {{ number_format($allowencesData->additional_allowances ?? 0, 0, ',', '.') }} </span>
-                                            </div>
-                                        </div>
+                                        
                                     </td>
                                     <td>
                                         <div class="row mb-3">
@@ -145,7 +164,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <span>Potongan Hutang</span>
+                                                <span>Hutang Koperasi</span>
                                             </div>
                                             
                                             <div class="col-md-6 text-right">

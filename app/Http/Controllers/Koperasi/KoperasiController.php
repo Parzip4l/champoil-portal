@@ -122,9 +122,22 @@ class KoperasiController extends Controller
                 ->where('totalsimpanan', '!=', 0)
                 ->latest('created_at')
                 ->first();
+
+            $loans = Loan::where('employee_code', $dataAnggota->employee_code)
+                ->where('status', 'approve')
+                ->get();
+            foreach($loans as $loan){
+                $sisaHutangSaya =  LoanPayment::where('loan_id', $loan->id)->select('sisahutang')->orderBy('created_at', 'desc')
+                                                ->first();
+                $dataAnggota->sisahutang =$sisaHutangSaya->sisahutang??0;
+            }
+            
     
             $dataAnggota->saldo_simpanan = $lastSaving ? $lastSaving->totalsimpanan : 0;
+            
         }
+
+        
 
         return view('pages.app-setting.koperasi.anggota', compact('anggota', 'filterStatus','loanStatus'));
     }

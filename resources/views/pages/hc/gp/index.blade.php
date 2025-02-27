@@ -40,7 +40,8 @@
                                 @php 
                                     // Ambil nama produk berdasarkan product_id
                                     $Employee = \App\Employee::where('nik',$data->employee_id)->first();
-                                    $endDate = $data->created_at->copy()->addMonths($data->installments);
+                                    $due_date = $data->installments-1;
+                                    $endDate = $data->created_at->copy()->addMonths($due_date);
                                 @endphp
                                 <td>{{ @$Employee->nama }}</td>
                                 <td>{{ $data->created_at->format('F Y') }}</td>

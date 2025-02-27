@@ -4,6 +4,11 @@
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
+@php 
+    $user = Auth::user();
+    $dataLogin = json_decode(Auth::user()->permission); 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+@endphp
 
 @section('content')
 <div class="row">
@@ -11,7 +16,9 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Data Shift</h5>
+                @if(in_array('superadmin_access', $dataLogin))
                 <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#JabatanModal">Tambah Shift</a>
+                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive">

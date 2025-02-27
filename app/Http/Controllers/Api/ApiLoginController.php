@@ -902,94 +902,100 @@ class ApiLoginController extends Controller
             $pengajuan->alasan = $request->input('alasan');
             $pengajuan->aprrove_status = 'Pending';
             
-
-            if ($request->hasFile('dokumen')) { 
-                $file = $request->file('dokumen');
-
-                // Mendapatkan ekstensi file
-                $extension = $file->getClientOriginalExtension();
-
-                // Mengecek apakah file adalah PDF atau JPG
-                if ($extension !== 'pdf' && $extension !== 'jpg') {
-                    return response()->json(['error' => 'Hanya file PDF dan JPG yang diizinkan.'], 400);
+            $check_schedule = Schedule::where('employee',$request->input('employee'))->where('tanggal',date('Y-m-d',strtotime($request->input('tanggal'))))->first();
+            if($check_schedule != "OFF"){
+                if ($request->hasFile('dokumen')) { 
+                    $file = $request->file('dokumen');
+    
+                    // Mendapatkan ekstensi file
+                    $extension = $file->getClientOriginalExtension();
+    
+                    // Mengecek apakah file adalah PDF atau JPG
+                    if ($extension !== 'pdf' && $extension !== 'jpg') {
+                        return response()->json(['error' => 'Hanya file PDF dan JPG yang diizinkan.'], 400);
+                    }
+    
+                    // Jika file adalah PDF atau JPG maka simpan
+                    $path = $file->store('public/files');
+                    $pengajuan->dokumen = $path;
                 }
+            
+            
 
-                // Jika file adalah PDF atau JPG maka simpan
-                $path = $file->store('public/files');
-                $pengajuan->dokumen = $path;
-            }
+                $pengajuan->save();
+                $token = $request->bearerToken();
 
-            $pengajuan->save();
-            $token = $request->bearerToken();
+                // Authenticate the user based on the token
+                $user = Auth::guard('api')->user();
+                $organisasi = Employee::where('nik',$user->employee_code)
+                            ->select('organisasi','unit_bisnis')
+                            ->first();
+            
+                if ($organisasi->unit_bisnis === 'CHAMPOIL' ||  $organisasi->unit_bisnis === 'RUN' || $organisasi->unit_bisnis === 'Run' ||  $organisasi->unit_bisnis === 'KAS' ||  $organisasi->unit_bisnis === 'Kas') {
+                    $slackChannel = Slack::where('channel', 'Request')->where('company',strtoupper($organisasi->unit_bisnis))->first();
+                    $slackWebhookUrl = $slackChannel->url;
+                    $today = now()->toDateString();
 
-            // Authenticate the user based on the token
-            $user = Auth::guard('api')->user();
-            $organisasi = Employee::where('nik',$user->employee_code)
-                        ->select('organisasi','unit_bisnis')
-                        ->first();
-        
-            if ($organisasi->unit_bisnis === 'CHAMPOIL' ||  $organisasi->unit_bisnis === 'RUN' || $organisasi->unit_bisnis === 'Run' ||  $organisasi->unit_bisnis === 'KAS' ||  $organisasi->unit_bisnis === 'Kas') {
-                $slackChannel = Slack::where('channel', 'Request')->where('company',strtoupper($organisasi->unit_bisnis))->first();
-                $slackWebhookUrl = $slackChannel->url;
-                $today = now()->toDateString();
-
-                $employeeData = Employee::where('nik', $pengajuan->employee)->first();
-                $data = [
-                    'text' => "Attendence Request From {$employeeData->nama}",
-                    'attachments' => [
-                        [
-                            'fields' => [
-                                [
-                                    'title' => 'Tanggal',
-                                    'value' => $pengajuan->tanggal,
-                                    'short' => true,
+                    $employeeData = Employee::where('nik', $pengajuan->employee)->first();
+                    $data = [
+                        'text' => "Attendence Request From {$employeeData->nama}",
+                        'attachments' => [
+                            [
+                                'fields' => [
+                                    [
+                                        'title' => 'Tanggal',
+                                        'value' => $pengajuan->tanggal,
+                                        'short' => true,
+                                    ],
+                                    [
+                                        'title' => 'Alasan',
+                                        'value' => $pengajuan->alasan,
+                                        'short' => true,
+                                    ],
+                                    [
+                                        'title' => 'Untuk Approval Silahkan Cek di Aplikasi Truest',
+                                        'short' => true,
+                                    ]
                                 ],
-                                [
-                                    'title' => 'Alasan',
-                                    'value' => $pengajuan->alasan,
-                                    'short' => true,
-                                ],
-                                [
-                                    'title' => 'Untuk Approval Silahkan Cek di Aplikasi Truest',
-                                    'short' => true,
-                                ]
                             ],
                         ],
-                    ],
-                    
-                ];
+                        
+                    ];
 
-                $data_string = json_encode($data);
+                    $data_string = json_encode($data);
 
-                $ch = curl_init($slackWebhookUrl);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen($data_string),
-                ]);
+                    $ch = curl_init($slackWebhookUrl);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($data_string),
+                    ]);
 
-                $result = curl_exec($ch);
+                    $result = curl_exec($ch);
 
-                if ($result === false) {
-                    // Penanganan kesalahan jika Curl gagal
-                    $error = curl_error($ch);
-                    // Handle the error here
-                    return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+                    if ($result === false) {
+                        // Penanganan kesalahan jika Curl gagal
+                        $error = curl_error($ch);
+                        // Handle the error here
+                        return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack: ' . $error);
+                    }
+
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                    if ($httpCode !== 200) {
+                        // Penanganan kesalahan jika Slack merespons selain status 200 OK
+                        // Handle the error here
+                        return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
+                    }
+
+                    curl_close($ch);
+
+                    return response()->json(['message' => 'Pengajuan berhasil diajukan'], 201);
                 }
-
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-                if ($httpCode !== 200) {
-                    // Penanganan kesalahan jika Slack merespons selain status 200 OK
-                    // Handle the error here
-                    return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim data ke Slack. Kode status: ' . $httpCode);
-                }
-
-                curl_close($ch);
-
-                return response()->json(['message' => 'Pengajuan berhasil diajukan'], 201);
+            }else{
+                return response()->json(['error' => 'Anda Tidak Bisa Mengajukan Schedule Karena Pada Tanggal '.date('d F Y',strtotime($request->input('tanggal'))).' Karena Schedule Off'], 500);
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Handle validation errors

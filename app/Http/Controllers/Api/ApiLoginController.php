@@ -904,7 +904,7 @@ class ApiLoginController extends Controller
             
             $check_schedule = Schedule::where('employee',$request->input('employee'))->where('tanggal',date('Y-m-d',strtotime($request->input('tanggal'))))->first();
             if($check_schedule != "OFF"){
-                return response()->json(['error' => 'Anda Tidak Bisa Mengajukan Schedule Karena Pada Tanggal '.date('d F Y',strtotime($request->input('tanggal'))).' Karena Schedule Off'], 200);
+                return response()->json(['error' => 'Pada Tanggal '.date('d F Y',strtotime($request->input('tanggal'))).' Karena Schedule Off'], 200);
             }
             if ($request->hasFile('dokumen')) { 
                 $file = $request->file('dokumen');

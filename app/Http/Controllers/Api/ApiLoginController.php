@@ -167,6 +167,11 @@ class ApiLoginController extends Controller
             
                 // Decode the base64 string
                 $fileData = base64_decode($base64String);
+
+                if(empty($projectData)){
+                    DB::rollBack();
+                    return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
+                }
                 
                 $insert = Absen::create([
                     'user_id' => $nik,

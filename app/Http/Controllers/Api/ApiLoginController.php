@@ -1260,7 +1260,7 @@ class ApiLoginController extends Controller
             if ($user) {
                 $code = $user->employee_code;
                 $company = Employee::where('nik', $code)->first();
-                $check_schedule = Schedules::where('employee',$code)->where('tangggal',date('Y-m-d'))->first();
+                $check_schedule = Schedules::where('employee',$code)->where('tanggal',date('Y-m-d'))->first();
                 // Ensure the "employee_code" property exists in the user object
                 if ($company) {
                     $requestType = RequestType::where('company', $company->unit_bisnis)->get();

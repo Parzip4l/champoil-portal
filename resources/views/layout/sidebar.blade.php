@@ -222,7 +222,7 @@
                         </li>
                     @endif
                         <li class="nav-item">
-                            <a href="{{ url('employee-loan') }}" class="nav-link {{ active_class(['employee-loan']) }}">Loan</a>
+                            <a href="{{ url('employee-loan') }}" class="nav-link {{ active_class(['employee-loan']) }}">Potongan Lain-Lain</a>
                         </li>
                         
                         <li class="nav-item">

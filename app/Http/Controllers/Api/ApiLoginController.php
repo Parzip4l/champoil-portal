@@ -901,6 +901,7 @@ class ApiLoginController extends Controller
             $pengajuan->status = $request->input('status');
             $pengajuan->alasan = $request->input('alasan');
             $pengajuan->aprrove_status = 'Pending';
+            
 
             if ($request->hasFile('dokumen')) { 
                 $file = $request->file('dokumen');
@@ -1259,9 +1260,14 @@ class ApiLoginController extends Controller
             if ($user) {
                 $code = $user->employee_code;
                 $company = Employee::where('nik', $code)->first();
+                $check_schedule = Schedules::where('employee',$code)->where('tangggal',date('Y-m-d'))->first();
                 // Ensure the "employee_code" property exists in the user object
                 if ($company) {
                     $requestType = RequestType::where('company', $company->unit_bisnis)->get();
+
+                    if($company->unit_bisnis == "Kas" && $check_schedule->shift == "OFF"){
+                        $requestType = RequestType::where('company', $company->unit_bisnis)->whereIn('code',['PA','L'])->get();
+                    }
 
                     return response()->json(['dataRequest' => $requestType], 200);
                 } else {

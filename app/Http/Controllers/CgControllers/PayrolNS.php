@@ -177,7 +177,8 @@ class PayrolNS extends Controller
                     continue; // Jika karyawan tidak ditemukan, lanjutkan ke karyawan berikutnya
                 }
                 $jabatan = $employee->jabatan;
-                $taxCode = $employee->tax_code;
+                $taxCode = $employee->tax_code ? $employee->tax_code:45363;
+                
                 // Get attendance data based on the period and employee's NIK
                 $absen = Absen::where('nik', $nik)
                     ->whereBetween('tanggal', [$startDate, $endDate])
@@ -523,6 +524,7 @@ class PayrolNS extends Controller
                                 break;
                             }
                         }
+
 
                         if ($matchingPajakDetail) {
                             // Extract and convert the persentase to a float

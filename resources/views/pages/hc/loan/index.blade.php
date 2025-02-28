@@ -41,7 +41,8 @@
                                 @php 
                                     // Ambil nama produk berdasarkan product_id
                                     $Employee = \App\Employee::where('nik',$data->employee_id)->first();
-                                    $endDate = $data->created_at->copy()->addMonths($data->installments);
+                                    $due_date = $data->installments-1;
+                                    $endDate = $data->created_at->copy()->addMonths($due_date);
                                 @endphp
                                 <td><a href="#" data-bs-toggle="modal" data-bs-target="#DetailsLoanModal{{ $data->id }}">{{ @$Employee->nama }}</a></td>
                                 <td>{{ $data->created_at->format('F Y') }}</td>
@@ -77,6 +78,50 @@
                                     </div>
                                 </td>
                             </tr>
+                            <div class="modal fade bd-example-modal-xl" id="DetailsLoanModal{{$data->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Data Pinjaman {{$Employee->nama}} {{ $data->id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('employee-loan.update', $data->id)}}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label for="" class="form-label">Nama Karyawan</label>
+                            <input type="name" name="" class="form-control" value="{{$Employee->nama}}" required>          
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="" class="form-label">Jumlah Pinjaman</label>
+                            <input type="number" name="amount" class="form-control" value="{{$data->amount}}" required>   
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="" class="form-label">Tenor Pinjaman</label>
+                            <input type="number" name="installments" class="form-control" value="{{$data->installments}}" required>   
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="" class="form-label">Sisa Pinjaman</label>
+                            <input type="number" name="remaining_amount" class="form-control" value="{{$data->remaining_amount}}" required>   
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="" class="form-label">Status Pinjaman</label>
+                            <select name="is_paid" class="form-control" id="">
+                                <option value="1" {{$data->is_paid == '1' ? 'selected' : ''}}>Lunas</option>
+                                <option value="0" {{$data->is_paid == '0' ? 'selected' : ''}}>Belum Lunas</option>
+                            </select>  
+                        </div>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <button class="btn btn-primary w-100" type="submit">Update Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
                             @endforeach
                         </tbody>
                     </table>
@@ -118,56 +163,6 @@
         </div>
     </div>
 </div>
-
-
-<!-- Modal Show Load -->
-@foreach ($Loandata as $data)
-<div class="modal fade bd-example-modal-xl" id="DetailsLoanModal{{$data->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Data Pinjaman {{$Employee->nama}}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{route('employee-loan.update', $data->id)}}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="row">
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Nama Karyawan</label>
-                            <input type="name" name="" class="form-control" value="{{$Employee->nama}}" required>          
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Jumlah Pinjaman</label>
-                            <input type="number" name="amount" class="form-control" value="{{$data->amount}}" required>   
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Tenor Pinjaman</label>
-                            <input type="number" name="installments" class="form-control" value="{{$data->installments}}" required>   
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Sisa Pinjaman</label>
-                            <input type="number" name="remaining_amount" class="form-control" value="{{$data->remaining_amount}}" required>   
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label for="" class="form-label">Status Pinjaman</label>
-                            <select name="is_paid" class="form-control" id="">
-                                <option value="1" {{$data->is_paid == '1' ? 'selected' : ''}}>Lunas</option>
-                                <option value="0" {{$data->is_paid == '0' ? 'selected' : ''}}>Belum Lunas</option>
-                            </select>  
-                        </div>
-                    </div>
-                    <div class="col-md-12 mt-2">
-                        <button class="btn btn-primary w-100" type="submit">Update Data</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-@endforeach
-<!-- End Modal -->
 
 <!-- End -->
 @endsection

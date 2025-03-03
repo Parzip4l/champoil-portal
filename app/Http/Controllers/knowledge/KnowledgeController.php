@@ -158,8 +158,10 @@ class KnowledgeController extends Controller
     }
 
     public function asign_user($id){
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
         
-        $data['records']= Employee::all();
+        $data['records']= Employee::where('unit_bisnis',$company->unit_bisnis);
         $data['id_test']=$id;
         return view('pages.hc.knowledge.asign_user',$data);
     }

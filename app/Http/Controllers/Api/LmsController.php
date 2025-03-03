@@ -249,6 +249,12 @@ class LmsController extends Controller
 
                 $row->materi = Knowledge::where('id', $row->id_test)->first();
                 $row->status_lulus = "Belum Mengisi";
+
+                foreach ($row->materi->getAttributes() as $key => $value) {
+                    if ($key !== 'id') {
+                        $row->materi->$key = (string) $value;
+                    }
+                }
         
                 if ($row->total_point < 70) {
                     $row->status_lulus = "Tidak Lulus";

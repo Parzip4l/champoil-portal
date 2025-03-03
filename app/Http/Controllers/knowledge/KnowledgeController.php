@@ -161,7 +161,7 @@ class KnowledgeController extends Controller
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
         
-        $data['records']= Employee::where('unit_bisnis',$company->unit_bisnis);
+        $data['records']= Employee::where('unit_bisnis',$company->unit_bisnis)->where('resign_status',0)->get();
         $data['id_test']=$id;
         return view('pages.hc.knowledge.asign_user',$data);
     }

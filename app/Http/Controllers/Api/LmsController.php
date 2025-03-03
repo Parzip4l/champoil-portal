@@ -230,16 +230,23 @@ class LmsController extends Controller
         $user = Auth::guard('api')->user();
 
         $records = Asign_test::where('employee_code',$user->employee_code)->get();
-        if($records){
-            foreach($records as $row){
-                $row->materi = Knowledge::where('id',$row->id_test)->first();
+        if ($records) {
+            foreach ($records as $row) {
+                $row->materi = Knowledge::where('id', $row->id_test)->first();
                 $row->status_lulus = "Belum Mengisi";
-                if($row->total_point < 70){
+        
+                if ($row->total_point < 70) {
                     $row->status_lulus = "Tidak Lulus";
-                }else if($row->total_point >= 70){
+                } else if ($row->total_point >= 70) {
                     $row->status_lulus = "Lulus";
                 }
-                
+        
+                // Ubah semua value menjadi string kecuali 'id'
+                foreach ($row->getAttributes() as $key => $value) {
+                    if ($key !== 'id') {
+                        $row->$key = (string) $value;
+                    }
+                }
             }
         }
 

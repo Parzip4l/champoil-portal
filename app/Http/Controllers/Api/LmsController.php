@@ -42,6 +42,12 @@ class LmsController extends Controller
         if($dataLearning){
             foreach($dataLearning as $row){
                 if(!empty($row->url_video) || !empty($row->file_name)){
+
+                    foreach ($row->getAttributes() as $key => $value) {
+                        if ($key !== 'id') {
+                            $row->$key = (string) $value;
+                        }
+                    }
                     $result[]=$row;
                 }
             }
@@ -232,6 +238,15 @@ class LmsController extends Controller
         $records = Asign_test::where('employee_code',$user->employee_code)->get();
         if ($records) {
             foreach ($records as $row) {
+                
+        
+                // Ubah semua value menjadi string kecuali 'id'
+                foreach ($row->getAttributes() as $key => $value) {
+                    if ($key !== 'id') {
+                        $row->$key = (string) $value;
+                    }
+                }
+
                 $row->materi = Knowledge::where('id', $row->id_test)->first();
                 $row->status_lulus = "Belum Mengisi";
         
@@ -239,13 +254,6 @@ class LmsController extends Controller
                     $row->status_lulus = "Tidak Lulus";
                 } else if ($row->total_point >= 70) {
                     $row->status_lulus = "Lulus";
-                }
-        
-                // Ubah semua value menjadi string kecuali 'id'
-                foreach ($row->getAttributes() as $key => $value) {
-                    if ($key !== 'id') {
-                        $row->$key = (string) $value;
-                    }
                 }
             }
         }

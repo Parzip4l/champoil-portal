@@ -161,7 +161,22 @@ class LmsController extends Controller
             if($soal){
                 foreach($soal as $row){
                     $jawaban = Knowledge_jawaban::where('id_soal',$row->id)->inRandomOrder()->get();
+
+                    foreach ($row->getAttributes() as $key => $value) {
+                        if ($key !== 'id') {
+                            $row->$key = (string) $value;
+                        }
+                    }
+                    
                     $row->jawaban = $jawaban;
+
+                    foreach ($row->jawaban->getAttributes() as $key => $value) {
+                        if ($key !== 'id') {
+                            $row->jawaban->$key = (string) $value;
+                        }
+                    }
+
+                    
                     $response[]=$row;
                 }
             }

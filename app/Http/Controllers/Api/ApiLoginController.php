@@ -908,7 +908,7 @@ class ApiLoginController extends Controller
             $pengajuan->aprrove_status = 'Pending';
             
             $check_schedule = Schedule::where('employee',$request->input('employee'))->where('tanggal',date('Y-m-d',strtotime($request->input('tanggal'))))->first();
-            if($check_schedule != "OFF"){
+            if($check_schedule == "OFF"){
                 return response()->json(['message' => 'Anda Tidak Bisa Mengajukan Schedule Karena Pada Tanggal '.date('d F Y',strtotime($request->input('tanggal'))).' Schedule Off'], 200);
             }
             if ($request->hasFile('dokumen')) { 

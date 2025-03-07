@@ -227,7 +227,7 @@ class PayrolNS extends Controller
 
                     $saving = Saving::where('employee_id', $nik)->get();
                     $totalSimpanan = $saving->sum('jumlah_simpanan');
-                    if($anggota->member_status == 'deactive'){
+                    if($anggota->member_status == 'deactive'  || $anggota->member_status == 'exit'){
                         $pencairan =$totalSimpanan;
                     }
 

@@ -218,7 +218,7 @@ class PayrolNS extends Controller
                     
                     if ($koperasi) {
                         // Retrieve the mandatory contribution from the Koperasi table
-                        if($anggota->member_status == 'deactive'){
+                        if($anggota->member_status == 'deactive' || $anggota->member_status == 'exit'){
                             $nominalSimpananWajib = 0;
                         }else{
                             $nominalSimpananWajib = $koperasi->iuran;

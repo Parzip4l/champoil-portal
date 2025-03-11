@@ -70,6 +70,9 @@ class ReportController extends Controller
         $project = Project::where('deleted_at',NULL)->where('company',$company->unit_bisnis)->orderBy('name','asc')->get();
         if($project){
             foreach($project as $row){
+                if($start < $row->tanggal_deploy){
+                    $start = $row->tanggal_deploy;
+                }
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;
                 $row->persentase_tanpa_clockout = 0;

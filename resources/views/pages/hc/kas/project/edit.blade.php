@@ -110,7 +110,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group mb-3">
                                                 <label for="" class="form-label">Project Deduction</label>
-                                                <input type="number" name="p_deduction" class="form-control project-deduction" id="project-deduction" required value="{{$projectDetails->rate_harian}}">
+                                                <input type="text" name="p_deduction" class="form-control project-deduction" id="project-deduction" required value="{{$projectDetails->rate_harian}}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">

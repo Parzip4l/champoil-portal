@@ -72,6 +72,8 @@ class ReportController extends Controller
             foreach($project as $row){
                 if (isset($row->tanggal_deploy) && $start < $row->tanggal_deploy) {
                     $start = $row->tanggal_deploy;
+                }else{
+                    $start = $start;
                 }
                 $row->persentase_backup=0;
                 $row->persentase_absen=0;

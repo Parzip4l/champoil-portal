@@ -81,7 +81,7 @@
                                                         if($schedules->tanggal >= date('Y-m-d')){
                                                             <button class="btn btn-primary">Update Schedule</button>
                                                         }
-
+                                                        @endphp
                                                         
                                                     </td>
                                                 </tr>

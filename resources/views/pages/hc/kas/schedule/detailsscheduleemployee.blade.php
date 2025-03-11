@@ -50,10 +50,14 @@
                                                 <tr>
                                                     @php
                                                         $projectname = \App\ModelCG\Project::find($schedules->project)->name;
+                                                        $readonly="";
+                                                        if($schedules->tanggal < date('Y-m-d')){
+                                                            $readonly="readonly";
+                                                        }
                                                     @endphp
                                                     <td><input type="number" class="form-control" value="{{$nomor++}}"></td>
                                                     <td>
-                                                        <input type="text" class="form-control" value="{{$schedules->tanggal}}">
+                                                        <input type="text" class="form-control" value="{{$schedules->tanggal}}" {{$readonly}}>
                                                         <input type="hidden" name="tanggal" value="{{$schedules->tanggal}}">
                                                     </td>
                                                     <td>
@@ -73,7 +77,12 @@
                                                         <input type="text" class="form-control" value="{{$schedules->periode}}" name="periode" readonly>
                                                     </td>
                                                     <td>
-                                                        <button class="btn btn-primary">Update Schedule</button>
+                                                        @php
+                                                        if($schedules->tanggal >= date('Y-m-d')){
+                                                            <button class="btn btn-primary">Update Schedule</button>
+                                                        }
+
+                                                        
                                                     </td>
                                                 </tr>
                                             </form>

@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('kirim:artikel')->dailyAt('08:30');
         $schedule->command('tasks:repeat')->daily();
+        $schedule->command('slack:attendance-report')->dailyAt('16:00');
     }
 
     /**

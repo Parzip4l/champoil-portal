@@ -63,7 +63,7 @@ class SendSlackAttendanceReport extends Command
         Log::info("Pesan Slack yang akan dikirim:\n" . $message);
 
         // Ambil URL Webhook Slack dari database
-        $slackChannel = Slack::where('channel', 'Testing Channel')->first();
+        $slackChannel = Slack::where('channel', 'Qc Absen')->first();
         if (!$slackChannel) {
             Log::error('Gagal mengambil webhook Slack. Channel tidak ditemukan.');
             return;

@@ -41,21 +41,45 @@
                         <div class="col-md-4">
                             <label for="organisasi" class="form-label">Organisasi</label>
                             <select name="organisasi" id="organisasi" class="form-control select2">
-                                <option value="ALL">ALL</option>
-                                @foreach($organisasi as $dataorg)
-                                <option value="{{ $dataorg->name }}">{{ $dataorg->name }}</option>
-                                @endforeach
+                                    @if($user->project_id==NULL)
+                                        <option value="ALL">ALL</option>
+                                        @foreach($organisasi as $dataorg)
+                                        <option value="{{ $dataorg->name }}">{{ $dataorg->name }}</option>
+                                        @endforeach
+                                    @else 
+                                        <option value="ALL">ALL</option>
+                                        @foreach($organisasi as $dataorg)
+                                            @if($dataorg->name == "FRONTLINE OFFICER")
+                                            <option value="{{ $dataorg->id }}">{{ $dataorg->name }}</option>
+                                            @endif
+                                        @endforeach
+
+                                    @endif
+                                
                             </select>
                         </div>
                         @if($employee->unit_bisnis === 'Kas')
                         <div class="col-md-4">
                             <label for="project" class="form-label">Project</label>
+                            @if($user->project_id==NULL)
                             <select name="project" id="project" class="form-control select2">
                                 <option value="ALL">ALL</option>
                                 @foreach($project as $dataproject)
+                                
                                 <option value="{{ $dataproject->id }}">{{ $dataproject->name }}</option>
                                 @endforeach
                             </select>
+                            @else 
+                            <select name="project" id="project" class="form-control select2">
+                                <option value="ALL">ALL</option>
+                                @foreach($project as $dataproject)
+                                @if($user->project_id==$dataproject->id)
+                                <option value="{{ $dataproject->id }}">{{ $dataproject->name }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+
+                            @endif
                         </div>
                         @endif
                         <div class="col-md-4">

@@ -1033,7 +1033,7 @@
                 </div>
             </div>
         </div>
-
+        @if($user->project_id==NULL)
         <div class="col-md-4">
             <div class="card custom-card2">
                 <div class="card-header">
@@ -1065,6 +1065,7 @@
                 </div>
             </div>
         </div>
+        
 
         <div class="col-md-4">
             <div class="card custom-card2">
@@ -1091,6 +1092,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </div>
 

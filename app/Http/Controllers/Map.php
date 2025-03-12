@@ -37,9 +37,15 @@ class Map extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
+        $client = Auth::user();
+       
 
-
-        $data['project'] = Project::all();
+        if(!empty($client->project_id)){
+            $data['project'] = Project::where('id',$client->project_id)->get();
+        }else{
+            $data['project'] = Project::all();
+        }
+        
         $records = User::select('users.*', 'karyawan.*')
                         ->join('karyawan', 'karyawan.nik', '=', 'users.name')
                         ->whereNotNull('longitude')

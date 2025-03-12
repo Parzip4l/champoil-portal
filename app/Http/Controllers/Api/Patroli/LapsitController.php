@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use PDF;
-
+use Illuminate\Support\Facades\Auth;
 use App\ModelCG\Lapsit;
 use App\ModelCG\LapsitActivity;
 use App\ModelCG\Project;
@@ -20,9 +20,11 @@ use Intervention\Image\Facades\Image;
 class LapsitController extends Controller
 {
     // List all records
-    public function index()
+    public function index($project="")
     {
-        $records = Lapsit::all();
+        
+        
+        $records = Lapsit::where('project_id',$project)->get();
         if ($records) {
             foreach ($records as $row) {
                 $row->url_file = url('storage/images/' . $row->unix_code . '.png');

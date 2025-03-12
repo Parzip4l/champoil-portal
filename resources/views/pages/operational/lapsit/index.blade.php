@@ -4,7 +4,12 @@
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
-
+@php 
+    $user = Auth::user();
+    $dataLogin = json_decode(Auth::user()->permission); 
+    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
+    
+@endphp
 @section('content')
 <div class="row">
     <div class="col-md-12 stretch-card">
@@ -151,11 +156,12 @@
 @push('custom-scripts')
   <script>
     $(document).ready(function () {
+        let project ="<?php echo  $user->project_id ?>";
         const table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: function (data, callback) {
-                axios.get('/api/v1/lapsit-projects-get')  // Changed to 'lapsit-projects-get'
+                axios.get('/api/v1/lapsit-projects-get/'+project)  // Changed to 'lapsit-projects-get'
                     .then(response => {
                         const formattedData = response.data.map((item, index) => ({
                             id: index + 1,

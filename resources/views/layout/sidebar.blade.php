@@ -110,7 +110,7 @@
                             <li class="nav-item">
                                 <a href="{{ url('employee') }}" class="nav-link {{ active_class(['employee']) }}">Employee Data</a>
                             </li>
-                            @if($employee->project_id != NULL)
+                            @if($employee->project_id == NULL)
                             <li class="nav-item">
                                 <a href="{{ url('employee-referal') }}" class="nav-link {{ active_class(['employee-referal']) }}">Employee Refreral</a>
                             </li>

@@ -7,15 +7,15 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
+    <div class="col-md-8 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">Project Details</h5>
                 <a href="{{route('project-details.show', $project->id)}}" class="btn btn-sm btn-primary">Tambah Details</a>
             </div>
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-4">
+                <div class="row mb-6">
+                    <div class="col-md-6">
                         <div class="project-name-wrap mb-3 d-flex justify-content-between">
                             <p>Project Code</p>
                             <p class="text-muted">{{ $project->id }}</p>
@@ -188,6 +188,42 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+        <div class="card custom-card2">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="mb-0 align-self-center">Project Shift</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-6">
+                    <form method="POST">
+                        @csrf   
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">SHIFT NAME</label>
+                                    <input type="text" name="time" class="form-control" placeholder="Jam Masuk" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">JAM MASUK</label>
+                                    <input type="time" name="jam_masuk" class="form-control" placeholder="Jam Masuk" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">JAM PULANG</label>
+                                    <input type="time" name="jam_pulang" class="form-control" placeholder="Jam Pulang" required>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+           
             </div>
         </div>
     </div>

@@ -269,7 +269,7 @@
             <!-- Task & Report Menu -->
             @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin) || in_array('dashboard_access', $dataLogin) || in_array('client_access', $dataLogin))
             <li class="nav-item nav-category">Task & Report </li>
-            @if($employee->project_id != NULL)
+            @if($employee->project_id == NULL)
             <li class="nav-item">
                 <a href="{{ route('knowledge_base.index') }}" class="nav-link">
                     <i class="link-icon" data-feather="book-open"></i>
@@ -372,7 +372,7 @@
                 @endif
             @endif
             <!-- Assets Management -->
-            @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR' && $employee->project_id != NULL)
+            @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR' && $employee->project_id == NULL)
                 @if(in_array('superadmin_access', $dataLogin) || in_array('am_access', $dataLogin)|| in_array('client_access', $dataLogin)|| in_array('sc_access', $dataLogin))
                 <li class="nav-item nav-category">E-SCM </li>
                 <li class="nav-item {{ active_class(['']) }}">
@@ -410,7 +410,7 @@
                 
                 @endif
             @endif
-            @if($employee && $employee->unit_bisnis != 'KAS' && $employee->project_id != NULL)
+            @if($employee && $employee->unit_bisnis != 'KAS' && $employee->project_id == NULL)
                 <li class="nav-item">
                     <a href="{{route('voice.index')}}" class="nav-link {{ active_class(['voice.index']) }}">
                         <i class="link-icon" data-feather="message-circle"></i>

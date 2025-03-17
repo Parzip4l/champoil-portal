@@ -9,6 +9,7 @@ use App\Employee;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
+use App\ModelCG\Datamaster\ProjectShift;
 use App\Absen\RequestAbsen;
 use App\Backup\AbsenBackup;
 use App\User;
@@ -296,6 +297,36 @@ class AbsenController extends Controller
                 $kantorLongtitude = $dataCompany->longitude;
                 $allowedRadius = $dataCompany->radius;
             }
+
+            $shift_fix=0;
+            $msg = "";
+            if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
+                $cek = ProjectShift::where('shift_code', $shift)
+                    ->where('project_id', $project_id)
+                    ->get();
+            
+                if ($cek->isEmpty()) {
+                    $shift_fix=0;
+                    $msg="Shift tidak ditemukan";
+                }
+            
+                $nowTime = now()->format('H:i'); // Ambil waktu sekarang (jam:menit:detik)
+
+                foreach ($cek as $row) {
+                    if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
+                        $shift_fix=1;
+                    }
+                }
+            
+                $shift_fix=0;
+                $msg="Anda tidak bisa clock in karena schedule " . $shift . ' (' . $row->jam_masuk . ' sampai ' . $row->jam_pulang . ')';
+            }
+
+            if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
+                return redirect()->back()->with('error', $msg);
+            }
+            
+
             // Fet Data From Device User
             $lat = $request->input('latitude');
             $long = $request->input('longitude');

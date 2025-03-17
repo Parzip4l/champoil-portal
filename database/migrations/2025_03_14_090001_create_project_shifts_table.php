@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('analytics_plans', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name');
-            $table->string('applicability');
+        Schema::create('project_shifts', function (Blueprint $table) {
+            $table->id();
+            $table->integer('project_id');
+            $table->time('jam_masuk');
+            $table->time('jam_pulang');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('analytics_plans');
+        Schema::dropIfExists('project_shifts');
     }
 };

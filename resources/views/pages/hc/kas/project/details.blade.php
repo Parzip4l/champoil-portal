@@ -10,7 +10,7 @@
     <div class="col-md-8 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Project Details</h5>
+                <h5 class="mb-0 align-self-center">PROJECT DETAILS</h5>
                 <a href="{{route('project-details.show', $project->id)}}" class="btn btn-sm btn-primary">Tambah Details</a>
             </div>
             <div class="card-body">
@@ -194,23 +194,29 @@
     <div class="col-md-4 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Project Shift</h5>
+                <h5 class="mb-0 align-self-center">PROJECT SHIFT</h5>
             </div>
             <div class="card-body">
                 <div class="row mb-6">
-                    <form method="POST">
+                    <form id="shiftForm">
                         @csrf   
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">SHIFT NAME</label>
-                                    <input type="text" name="time" class="form-control" placeholder="Jam Masuk" required>
+                                    <select name="shift_code" class="form-control">
+                                        <option value="">-- PILIH --</option>
+                                        @foreach($shift as $row)
+                                            <option value="{{$row->code}}">{{$row->code}}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">JAM MASUK</label>
                                     <input type="time" name="jam_masuk" class="form-control" placeholder="Jam Masuk" required>
+                                    <input type="hidden" name="project_id" value="{{ $project->id }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -219,8 +225,29 @@
                                     <input type="time" name="jam_pulang" class="form-control" placeholder="Jam Pulang" required>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <a href="javascript:void(0)" class="btn btn-outline-primary mb-3" style="float:right" id="submitBtn">Save</a>
+                            </div>
                         </div>
                     </form>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table_project_shift">
+                            <thead>
+                                <tr>
+                                    <td>SHIFT</td>
+                                    <td>JAM MASUK</td>
+                                    <td>JAM PULANG</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
            
@@ -525,4 +552,100 @@
         });
     }
 </script>
+<script>
+    $(document).ready(function () {
+        let project_id = "<?php echo  $project->id  ?>";
+        Swal.fire({
+            title: 'Loading...',
+            text: 'Mohon tunggu',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '/api/v1/project-shift/'+project_id, // Ganti dengan API kamu
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                
+
+                response.forEach(data => {
+                    $('#table_project_shift tbody').append( // Pastikan selector sesuai
+                        '<tr>'+
+                            '<td>'+data.shift_code+'</td>'+
+                            '<td>'+data.jam_masuk+'</td>'+
+                            '<td>'+data.jam_pulang+'</td>'+
+                        '</tr>'
+                    );
+                });
+                
+                Swal.close();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Data berhasil diambil',
+                });
+            },
+            error: function (xhr, status, error) {
+                Swal.close(); // Tutup loading
+                console.error('Error:', error);
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Terjadi kesalahan!',
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('submitBtn').addEventListener('click', function () {
+        const form = document.getElementById('shiftForm');
+        const formData = new FormData(form);
+
+        // Tampilkan SweetAlert2 Loading
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait while we submit your data.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        axios.post('/api/v1/create-project-shift', formData)
+            .then(response => {
+                console.log('Success:', response.data);
+                $('#table_project_shift tbody').append( // Pastikan selector sesuai
+                        '<tr>'+
+                            '<td>'+response.data.data.shift_code+'</td>'+
+                            '<td>'+response.data.data.jam_masuk+'</td>'+
+                            '<td>'+response.data.data.jam_pulang+'</td>'+
+                        '</tr>'
+                    );
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Project shift has been created successfully.'
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! Please try again.'
+                });
+            });
+    });
+
+</script>
+
+
 @endpush

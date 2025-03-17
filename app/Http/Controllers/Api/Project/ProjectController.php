@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Project;
 use App\ModelCG\Schedule;
+use App\ModelCG\Datamaster\ProjectShift;
 
 
 class ProjectController extends Controller
@@ -35,5 +36,28 @@ class ProjectController extends Controller
         $records = Project::where('id',$request->id)->first();
  
         return response()->json($records);
+    }
+
+    public function projectShift($id){
+        $records = ProjectShift::where('project_id',$id)->get();
+ 
+        return response()->json($records);
+    }
+
+    public function createProjectShift(Request $request){
+        $validated = $request->validate([
+            'project_id' => 'required',
+            'shift_code' => 'required',
+            'jam_masuk'  => 'required|date_format:H:i',
+            'jam_pulang' => 'required|date_format:H:i',
+        ]);
+
+        $record = ProjectShift::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Shift berhasil ditambahkan!',
+            'data'    => $record
+        ]);
     }
 }

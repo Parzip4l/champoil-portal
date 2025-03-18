@@ -40,110 +40,118 @@ class ReportController extends Controller
         //
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
+
         $start = date('Y-m-d');
         $end = date('Y-m-d');
-        if(!empty($request->input('periode'))){
-            $periode = $request->input('periode');
-            // Tambahkan satu bulan ke periode
-            $periode_min_1_month = date('m', strtotime("-1 month", strtotime($periode)));
 
-            // Ambil bulan dari periode yang sudah ditambahkan satu bulan
+        if (!empty($request->input('periode'))) {
+            $periode = $request->input('periode');
+            $periode_min_1_month = date('m', strtotime('-1 month', strtotime($periode)));
             $bulan = date('m', strtotime($periode));
 
-            $start = date('Y').'-'.$periode_min_1_month.'-'.'21';
-            $end = date('Y').'-'.$bulan.'-'.'20';
-
-            
+            $start = date('Y') . '-' . $periode_min_1_month . '-21';
+            $end = date('Y') . '-' . $bulan . '-20';
         }
 
-        if(!empty($request->input('tanggal'))){
+        if (!empty($request->input('tanggal'))) {
             $tanggal = $request->input('tanggal');
-            $explode = explode(' to ',$tanggal);
-            $start=$explode[0];
-            $end=$explode[1];
-           
-        }
-        $percen_50=0;
-        $percen_50_80=0;
-        $percen_80_99=0;
-        $percen_100=0;
-        $project = Project::where('deleted_at',NULL)->where('company',$company->unit_bisnis)->orderBy('name','asc')->get();
-        if($project){
-            foreach($project as $row){
-                if (isset($row->tanggal_deploy) && $start < $row->tanggal_deploy) {
-                    $start = $row->tanggal_deploy;
-                }
-                $row->persentase_backup=0;
-                $row->persentase_absen=0;
-                $row->persentase_tanpa_clockout = 0;
-                $row->schedule = Schedule::where('project',$row->id)
-                                           ->whereBetween('tanggal', [$start, $end])
-                                           ->where('shift','!=','OFF')
-                                           ->count();
-
-                $row->schedule_backup = ScheduleBackup::where('project',$row->id)->whereBetween('tanggal', [$start, $end])->count();
-              
-
-                $row->absen = Absen::where('project', $row->id)
-                                    ->whereBetween('tanggal', [$start, $end])
-                                    ->count();
-                
-                $row->tanpa_clockout = Absen::where('project', $row->id)
-                                    ->whereBetween('tanggal', [$start, $end])
-                                    ->whereNotNull('clock_in')
-                                    ->whereNull('clock_out')
-                                    ->count();
-                $row->need_approval = Schedule::join('requests_attendence','requests_attendence.employee','=','schedules.employee')
-                                                    ->where('schedules.project',$row->id)
-                                                    ->whereBetween('schedules.tanggal', [$start, $end])
-                                                    ->whereBetween('requests_attendence.tanggal', [$start, $end])
-                                                    ->where('requests_attendence.aprrove_status','Pending')
-                                                    ->count();
-                                                    
-                $row->approved = Schedule::join('requests_attendence','requests_attendence.employee','=','schedules.employee')
-                                            ->where('schedules.project',$row->id)
-                                            ->whereBetween('schedules.tanggal', [$start, $end])
-                                            ->whereBetween('requests_attendence.tanggal', [$start, $end])
-                                            ->where('requests_attendence.aprrove_status','Approved')
-                                            ->count();
-
-                // Persentase Tanpa Clockout
-                if ($row->absen > 0) {
-                    $row->persentase_tanpa_clockout = round(($row->tanpa_clockout / $row->absen) * 100, 2);
-                } else {
-                    $row->persentase_tanpa_clockout = 0;
-                }
-            
-                if($row->absen > 0 && $row->schedule > 0){
-                    $row->persentase_absen = round(($row->absen / $row->schedule) * 100,2);
-                    if($row->persentase_absen <= 50 ){
-                        $percen_50 +=1;
-                    }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
-                        $percen_50_80 +=1;
-                    }else if($row->persentase_absen >80 && $row->persentase_absen <= 99 ){
-                        $percen_80_99 +=1;
-                    }else if($row->persentase_absen >= 100 ){
-                        $percen_100 +=1;
-                    }
-                }
-                
-                $row->absen_backup = Absen::where('project_backup',$row->id)
-                                            ->whereBetween('tanggal', [$start, $end])
-                                            ->count();    
-                if($row->absen_backup > 0){
-                    $row->persentase_backup = round(($row->absen_backup / $row->schedule_backup) * 100,2);
-                }
+            $explode = explode(' to ', $tanggal);
+            if (count($explode) === 2) {
+                $start = $explode[0];
+                $end = $explode[1];
             }
         }
 
-        $data['project']=$project;
-        $data['percent']=[
+        $percen_50 = 0;
+        $percen_50_80 = 0;
+        $percen_80_99 = 0;
+        $percen_100 = 0;
+
+        $project = Project::whereNull('deleted_at')
+            ->where('company', optional($company)->unit_bisnis)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        foreach ($project as $row) {
+            // if (!empty($row->tanggal_deploy) && $start < $row->tanggal_deploy) {
+            //     $start = $row->tanggal_deploy;
+            // }
+
+            $row->persentase_backup = 0;
+            $row->persentase_absen = 0;
+            $row->persentase_tanpa_clockout = 0;
+
+            $row->schedule = Schedule::where('project', $row->id)
+                ->whereBetween('tanggal', [$start, $end])
+                ->where('shift', '!=', 'OFF')
+                ->count();
+
+            $row->schedule_backup = ScheduleBackup::where('project', $row->id)
+                ->whereBetween('tanggal', [$start, $end])
+                ->count();
+
+            $row->absen = Absen::where('project', $row->id)
+                ->whereBetween('tanggal', [$start, $end])
+                ->count();
+
+            $row->tanpa_clockout = Absen::where('project', $row->id)
+                ->whereBetween('tanggal', [$start, $end])
+                ->whereNotNull('clock_in')
+                ->whereNull('clock_out')
+                ->count();
+
+            $row->need_approval = Schedule::join('requests_attendence', 'requests_attendence.employee', '=', 'schedules.employee')
+                ->where('schedules.project', $row->id)
+                ->whereBetween('schedules.tanggal', [$start, $end])
+                ->whereBetween('requests_attendence.tanggal', [$start, $end])
+                ->where('requests_attendence.aprrove_status', 'Pending')
+                ->count();
+
+            $row->approved = Schedule::join('requests_attendence', 'requests_attendence.employee', '=', 'schedules.employee')
+                ->where('schedules.project', $row->id)
+                ->whereBetween('schedules.tanggal', [$start, $end])
+                ->whereBetween('requests_attendence.tanggal', [$start, $end])
+                ->where('requests_attendence.aprrove_status', 'Approved')
+                ->count();
+
+            // Hitung Persentase Tanpa Clockout
+            $row->persentase_tanpa_clockout = ($row->absen > 0)
+                ? round(($row->tanpa_clockout / $row->absen) * 100, 2)
+                : 0;
+
+            if ($row->absen > 0 && $row->schedule > 0) {
+                $row->persentase_absen = round(($row->absen / $row->schedule) * 100, 2);
+
+                if ($row->persentase_absen <= 50) {
+                    $percen_50++;
+                } elseif ($row->persentase_absen <= 80) {
+                    $percen_50_80++;
+                } elseif ($row->persentase_absen <= 99) {
+                    $percen_80_99++;
+                } else {
+                    $percen_100++;
+                }
+            }
+
+            $row->absen_backup = Absen::where('project_backup', $row->id)
+                ->whereBetween('tanggal', [$start, $end])
+                ->count();
+
+            if ($row->absen_backup > 0 && $row->schedule_backup > 0) {
+                $row->persentase_backup = round(($row->absen_backup / $row->schedule_backup) * 100, 2);
+            }
+        }
+
+        $data['project'] = $project;
+        $data['percent'] = [
             $percen_50,
             $percen_50_80,
             $percen_80_99,
             $percen_100
         ];
-        return view('pages.report.absen.index',$data);
+
+        return view('pages.report.absen.index', $data);
+
     }
     
 

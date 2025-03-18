@@ -48,20 +48,6 @@ class SendSlackAttendanceReport extends Command
             ->select('karyawan.nama', 'karyawan.slack_id')
             ->get();
 
-        if ($dailyreportAbsen->isEmpty()) {
-            Log::info('Semua karyawan hadir hari ini.');
-            return 'Semua karyawan hadir hari ini.';
-        }
-
-        // Membuat pesan daftar karyawan yang tidak hadir
-        $message = "*Berikut adalah daftar karyawan yang tidak melakukan absensi hari ini:*\n";
-        foreach ($dailyreportAbsen as $index => $karyawan) {
-            $mention = $karyawan->slack_id ? "<@{$karyawan->slack_id}>" : "(Tidak ada Slack ID)";
-            $message .= ($index + 1) . ". {$karyawan->nama} $mention\n";
-        }
-
-        Log::info("Pesan Slack yang akan dikirim:\n" . $message);
-
         // Ambil URL Webhook Slack dari database
         $slackChannel = Slack::where('channel', 'Qc Absen')->first();
         if (!$slackChannel) {
@@ -71,8 +57,21 @@ class SendSlackAttendanceReport extends Command
 
         $slackWebhookUrl = $slackChannel->url;
 
-        $data = ['text' => $message];
+        if ($dailyreportAbsen->isEmpty()) {
+            Log::info('Semua karyawan hadir hari ini.');
+            $message = "*Semua karyawan hadir hari ini. Tidak ada yang absen.*";
+        } else {
+            // Membuat pesan daftar karyawan yang tidak hadir
+            $message = "*Berikut adalah daftar karyawan yang tidak melakukan absensi hari ini:*\n";
+            foreach ($dailyreportAbsen as $index => $karyawan) {
+                $mention = $karyawan->slack_id ? "<@{$karyawan->slack_id}>" : "(Tidak ada Slack ID)";
+                $message .= ($index + 1) . ". {$karyawan->nama} $mention\n";
+            }
+            Log::info("Pesan Slack yang akan dikirim:\n" . $message);
+        }
 
+        // Kirim pesan ke Slack
+        $data = ['text' => $message];
         $data_string = json_encode($data);
 
         $ch = curl_init($slackWebhookUrl);
@@ -99,4 +98,5 @@ class SendSlackAttendanceReport extends Command
         Log::info('Laporan telah dikirim ke Slack.');
         return 'Laporan telah dikirim ke Slack.';
     }
+
 }

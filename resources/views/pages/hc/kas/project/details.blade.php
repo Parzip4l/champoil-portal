@@ -214,7 +214,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="" class="form-label">JAM MASUK</label>
+                                    <label for="" class="form-label">MAKSIMAL JAM MASUK</label>
                                     <input type="time" name="jam_masuk" class="form-control" placeholder="Jam Masuk" required>
                                     <input type="hidden" name="project_id" value="{{ $project->id }}">
                                 </div>
@@ -236,7 +236,7 @@
                                 <tr>
                                     <td>SHIFT</td>
                                     <td>JAM MASUK</td>
-                                    <td>JAM PULANG</td>
+                                    <td>MAKSIMAL JAM MASUK</td>
                                 </tr>
                             </thead>
                             <tbody>

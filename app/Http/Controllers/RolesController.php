@@ -64,7 +64,7 @@ class RolesController extends Controller
             return redirect()->route('roles.index')->with('success', 'Roles created successfully.');
         } catch (\Exception $e) {
             // Log error dan kembalikan error response
-            return back()->with('error', 'Failed to create role. Please try again later.');
+            return back()->with('error', 'Failed to create role. Please try again later.' . $e->getMessage());
         }
     }
 

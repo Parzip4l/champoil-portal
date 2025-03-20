@@ -154,7 +154,7 @@ class RolesController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete menu. Please try again later. ' . $e->getMessage()
+                'message' => 'Failed to delete menu. Please try again later. ',
             ], 500); // Menggunakan status code 500 jika ada error server
         }
     }

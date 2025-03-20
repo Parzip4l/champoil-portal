@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Company\CompanyModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
+// Model
+use App\Company\CompanyModel;
 use App\Employee;
+use App\Setting\Features\FeaturesModel;
+use App\Setting\Features\CompanyFeatures;
+
 
 class CompanyController extends Controller
 {
@@ -42,6 +47,102 @@ class CompanyController extends Controller
     {
         //
     }
+
+    public function editmenu($id)
+    {
+        try {
+            $company = CompanyModel::findOrFail($id);
+            $features = FeaturesModel::where('is_active',1)->get();
+
+            // Menggunakan company_name sebagai company_id
+            $enabledFeatures = CompanyFeatures::where('company_id', $company->company_name)
+                ->where('is_enabled', 1)
+                ->pluck('feature_id')
+                ->toArray();
+
+            return view('pages.company.menuset', compact('company', 'features', 'enabledFeatures'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
+        }
+    }
+
+
+    public function toggleFeature(Request $request)
+    {
+        try {
+            $request->validate([
+                'company_id' => 'required|exists:company,company_name', // Validasi menggunakan company_name
+                'feature_id' => 'required|exists:features,id',
+                'is_enabled' => 'required|boolean'
+            ]);
+
+            $companyName = $request->company_id; // Ambil company_name dari request
+            $featureId = $request->feature_id;
+            $isEnabled = $request->is_enabled;
+
+            // Periksa apakah fitur sudah ada untuk perusahaan ini
+            $companyFeature = CompanyFeatures::where('company_id', $companyName)
+                ->where('feature_id', $featureId)
+                ->first();
+
+            if ($companyFeature) {
+                // Update status fitur
+                $companyFeature->update(['is_enabled' => $isEnabled]);
+            } else {
+                // Buat fitur baru jika belum ada
+                CompanyFeatures::create([
+                    'company_id' => $companyName, // Gunakan nama perusahaan sebagai company_id
+                    'feature_id' => $featureId,
+                    'is_enabled' => $isEnabled
+                ]);
+            }
+
+            return response()->json(['message' => 'Feature updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating feature: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function bulkToggle(Request $request)
+    {
+        try {
+            $request->validate([
+                'feature_ids' => 'required|array',
+                'is_enabled' => 'required|boolean',
+                'company_id' => 'required|exists:company,company_name', // Validasi menggunakan company_name
+            ]);
+
+            $companyName = $request->company_id;
+            $featureIds = $request->feature_ids;
+            $status = $request->is_enabled;
+
+            foreach ($featureIds as $featureId) {
+                $companyFeature = CompanyFeatures::where('company_id', $companyName)
+                    ->where('feature_id', $featureId)
+                    ->first();
+
+                if ($companyFeature) {
+                    // Jika fitur sudah ada, update statusnya
+                    $companyFeature->update(['is_enabled' => $status]);
+                } else {
+                    // Jika fitur belum ada, buat entri baru
+                    CompanyFeatures::create([
+                        'company_id' => $companyName, // Gunakan company_name sebagai company_id
+                        'feature_id' => $featureId,
+                        'is_enabled' => $status
+                    ]);
+                }
+            }
+
+            return response()->json(['message' => 'Selected features updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating features: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
+
 
     function generateRandomCode($length = 6) {
         $characters = '0123456789';

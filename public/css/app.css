@@ -3298,10 +3298,10 @@ textarea.is-invalid.typeahead.tt-hint, .select2-container--default .select2-sear
 }
 
 .btn-sm, div.fc .fc-button-primary, .btn-group-sm > .btn, .wizard > .actions .btn-group-sm > a, div.tox .btn-group-sm > .tox-button, .swal2-popup .swal2-actions .btn-group-sm > button {
-  --bs-btn-padding-y: 0.391rem;
-  --bs-btn-padding-x: 0.8rem;
-  --bs-btn-font-size: 0.812rem;
-  --bs-btn-border-radius: 0.25rem;
+  --bs-btn-padding-y: .348rem;
+  --bs-btn-padding-x: .75rem;
+  --bs-btn-font-size: .7875rem;
+  --bs-btn-border-radius: .5rem;
 }
 
 .fade {

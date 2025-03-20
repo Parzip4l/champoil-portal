@@ -190,6 +190,34 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('features-management.index') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Features Setting</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('roles.index') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Roles Setting</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

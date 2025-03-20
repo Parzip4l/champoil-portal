@@ -27,7 +27,6 @@
                             <tr>
                                 <th>Company Code</th>
                                 <th>Company Name</th>
-                                <th>Company Address</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -36,7 +35,6 @@
                             <tr>
                                 <td><a href="{{ route('company.show', $data->id)}}">{{$data->company_code}}</a></td>
                                 <td>{{$data->company_name}}</td>
-                                <td>{{$data->company_address}}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -50,6 +48,10 @@
                                             <a class="dropdown-item d-flex align-items-center" data-bs-target="#CompanyModalEdit{{ $data->id }}" data-bs-toggle="modal">
                                                 <i data-feather="edit-2" class="icon-sm me-2"></i>
                                                 <span class="">Edit</span>
+                                            </a>
+                                            <a class="dropdown-item d-flex align-items-center" href="{{route('companymenu.set', $data->id)}}">
+                                                <i data-feather="menu" class="icon-sm me-2"></i>
+                                                <span class="">Feature Settings</span>
                                             </a>
                                             <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                                 @csrf @method('DELETE') 

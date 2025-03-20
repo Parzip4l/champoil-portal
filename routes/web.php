@@ -243,7 +243,15 @@ Route::middleware(['auth', 'permission:hc_access'])->group(function () {
 
 // Superadmin Access
 Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
+    // Setting App User
     Route::resource('users', UserController::class);
+    Route::resource('roles', App\Http\Controllers\RolesController::class);
+
+    // Features Menu
+    Route::resource('features-management', App\Http\Controllers\Setting\Features\FeaturesController::class);
+        Route::post('features-management/update-status/{id}', [App\Http\Controllers\Setting\Features\FeaturesController::class, 'updateStatus'])->name('features.status');
+
+        
     Route::resource('slack-account', App\Http\Controllers\Slack\SlackController::class);
     Route::resource('slack-artikel', App\Http\Controllers\Automatisasi\ArtikelController::class);
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
@@ -299,6 +307,11 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
 
     // Company Settings
     Route::resource('company', App\Http\Controllers\Company\CompanyController::class);
+    Route::get('/company/feature-company/{id}', [App\Http\Controllers\Company\CompanyController::class, 'editmenu'])->name('companymenu.set');
+    Route::post('/company/features/toggle', [App\Http\Controllers\Company\CompanyController::class, 'toggleFeature'])
+    ->name('company.features.toggle');
+    Route::post('/company/features/bulk-toggle', [App\Http\Controllers\Company\CompanyController::class, 'bulkToggle'])->name('company.features.bulkToggle');
+
 
     // Menu Settings
     Route::resource('menu', App\Http\Controllers\MenuController::class);

@@ -130,7 +130,7 @@
             @endif
             <!-- Performance Appraisal Menu -->
             @if($employee && $employee->unit_bisnis != 'NOTARIS_ITR')
-                @if(in_array('superadmin_access', $dataLogin)|| in_array('dashboard_access', $dataLogin))
+                @if(in_array('superadmin_access', $dataLogin)|| in_array('dashboard_access', $dataLogin) && $user->project_id == NULL)
                 <li class="nav-item {{ active_class(['']) }}">
                     <a class="nav-link" data-bs-toggle="collapse" href="#performance" role="button" aria-expanded="{{ is_active_route(['performance']) }}" aria-controls="performance">
                         <i class="link-icon" data-feather="file-text"></i>

@@ -47,10 +47,10 @@ class PengajuanPinjamanController extends Controller
         $saldosimpanan = $dataSaya->saldosimpanan;
 
         // Data Koperasi
-        $koperasi = Koperasi::where('company', $employee->unit_bisnis)->first();
+        $koperasi = Koperasi::where('company', 'Kas')->first();
 
         // Loan Settings
-        $loansettings = SettingLoan::where('company',$employee->unit_bisnis)->get();
+        $loansettings = SettingLoan::where('company','Kas')->get();
 
         $minsaving = 0;
         $maxsaving = 0;

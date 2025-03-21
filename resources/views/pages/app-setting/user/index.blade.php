@@ -9,14 +9,14 @@
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
+        <div class="card custom-card2">
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-6 align-self-center">
                         <h6 class="card-title mb-0">Data Users</h6>
                     </div>
                     <div class="col-md-6 text-right">
-                        <a href="#" class="btn btn-primary" data-bs-target="#usersModal" data-bs-toggle="modal">Tambah User</a>
+                        <a href="#" class="btn btn-sm btn-primary" data-bs-target="#usersModal" data-bs-toggle="modal">Tambah User</a>
                     </div>
                 </div>
             </div>

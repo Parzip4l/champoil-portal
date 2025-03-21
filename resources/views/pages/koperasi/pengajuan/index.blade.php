@@ -87,7 +87,15 @@
                         @csrf 
                         <div class="form-group mb-2">
                             <label for="jumlah" class="form-label">Masukan Jumah Pinjaman</label>
-                            <input type="number" id="jumlahPinjaman" class="form-control" name="amount" required>
+                            <input type="text" id="jumlahPinjaman" class="form-control" placeholder="Masukkan jumlah pinjaman" name="amount" required>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="jumlah" class="form-label">Pilih Tenor</label>
+                            <select name="tenor" class="form-control" id="">
+                                <option value="1">1 Bulan</option>
+                                <option value="2">2 Bulan</option>
+                                <option value="3">3 Bulan</option>
+                            </select>
                         </div>
                         <a href="" data-bs-target="#ModalPemberitahuan" id="cekSaldoButton" data-bs-toggle="modal" class="btn btn-primary w-100">Ajukan Pinjaman</a>
                     </form>
@@ -125,7 +133,7 @@
                 <hr>
                 <div class="data-keterangan d-flex justify-content-between mb-3">
                     <p class="text-muted">Jumlah Tenor</p>
-                    <p class="text-muted">{{$koperasi->tenor}} Bulan</p>
+                    <p class="text-muted" id="jumlahTenor"></p>
                 </div>
                 <div class="data-keterangan d-flex justify-content-between mb-1">
                     <h6 >Jumlah Yang Harus Dibayarkan /Bulan</h6>
@@ -174,82 +182,82 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const maxLimitText = document.getElementById('maxLimit').innerText;
-        const maxLimit = parseInt(maxLimitText.replace(/[^0-9]/g, '')); // Remove 'Rp ' and ',' to get integer value
-        const inputJumlahPinjaman = document.getElementById('jumlahPinjaman');
         const saldoDiajukan = document.getElementById('saldoDiajukan');
         const hasilKalkulasi = document.getElementById('hasilKalkulasi');
+        const pembayaranBulanan = document.getElementById('pembayaranBulanan');
+        const jumlahTenor = document.getElementById('jumlahTenor'); 
         const cekSaldoButton = document.getElementById('cekSaldoButton');
+        const selectTenor = document.querySelector('select[name="tenor"]');
+        const jumlahPinjamanInput = document.getElementById('jumlahPinjaman');
 
-        inputJumlahPinjaman.addEventListener('input', function() {
-            let inputValue = parseInt(this.value);
+        // Fungsi untuk mengubah angka ke format Rupiah
+        function formatRupiah(angka) {
+            return angka.toLocaleString('id-ID');
+        }
 
-            if (inputValue > maxLimit) {
-                this.value = maxLimit;
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Limit Tercapai',
-                    text: 'Jumlah pinjaman tidak boleh melebihi ' + maxLimitText,
-                });
-            }
+        // Fungsi untuk menghilangkan format Rupiah sebelum dikalkulasi
+        function cleanRupiah(value) {
+            return parseInt(value.replace(/[^\d]/g, '')) || 0;
+        }
+
+        // Format input otomatis ke Rupiah saat diketik
+        jumlahPinjamanInput.addEventListener('input', function() {
+            let rawValue = this.value;
+            let angka = cleanRupiah(rawValue);
+            this.value = angka ? 'Rp ' + formatRupiah(angka) : '';
         });
 
         cekSaldoButton.addEventListener('click', function() {
-            let inputValue = parseInt(inputJumlahPinjaman.value);
-            saldoDiajukan.innerText = 'Rp ' + inputValue.toLocaleString('id-ID');
-            
-            // Kalkulasi berdasarkan data yang kamu punya
-            let persentaseMembership = parseFloat("{{$koperasi->membership}}") / 100;
-            let persentaseMerchandise = parseFloat("{{$koperasi->merchendise}}") / 100;
-            let totalPersentase = persentaseMembership + persentaseMerchandise;
+            let inputValue = cleanRupiah(jumlahPinjamanInput.value);
+            let tenor = parseInt(selectTenor.value);
+            let limitPinjaman = 100000000; // Limit pinjaman Rp 100.000.000
 
-            let kalkulasi = inputValue * totalPersentase;
-            let TotalPinjaman = inputValue + kalkulasi;
+            if (inputValue <= 0 || isNaN(inputValue)) {
+                Swal.fire({ icon: 'error', title: 'Input Salah', text: 'Masukkan jumlah pinjaman yang benar!' });
+                return;
+            }
 
-            hasilKalkulasi.innerText = 'Rp ' + TotalPinjaman.toLocaleString('id-ID');
+            if (inputValue > limitPinjaman) {
+                Swal.fire({ icon: 'error', title: 'Limit Terlampaui', text: 'Maksimal pinjaman adalah Rp 100.000.000!' });
+                return;
+            }
 
-            // Hitung pembayaran bulanan berdasarkan tenor
-            let tenor = parseInt("{{$koperasi->tenor}}");
-            let pembayaranPerBulan = Math.round(TotalPinjaman / tenor);
+            if (isNaN(tenor) || tenor <= 0) {
+                Swal.fire({ icon: 'error', title: 'Tenor Tidak Valid', text: 'Silakan pilih tenor yang benar!' });
+                return;
+            }
+
+            saldoDiajukan.innerText = 'Rp ' + formatRupiah(inputValue);
+            jumlahTenor.innerText = tenor + ' Bulan'; 
+
+            let membershipPersen = parseFloat("{{$koperasi->membership ?? 0}}") / 100;
+            let merchandisePersen = parseFloat("{{$koperasi->merchendise ?? 0}}") / 100;
+            let merchandise2FullPersen = parseFloat("{{$koperasi->merchandise2 ?? 0}}") / 100;
+            let merchandise2Persen = (merchandise2FullPersen / 3) * tenor;
+
+            let totalPersentase = membershipPersen + merchandisePersen + merchandise2Persen;
+            let biayaTambahan = inputValue * totalPersentase;
+            let totalPinjaman = inputValue + biayaTambahan;
+
+            hasilKalkulasi.innerText = 'Rp ' + formatRupiah(totalPinjaman);
+            let pembayaranPerBulan = Math.round(totalPinjaman / tenor);
+            pembayaranBulanan.innerText = 'Rp ' + formatRupiah(pembayaranPerBulan);
+
+            // Kirim nilai dalam format angka biasa (tanpa Rp dan titik)
             document.getElementById('instalment').value = pembayaranPerBulan;
-            document.getElementById('amount').value = TotalPinjaman;
+            document.getElementById('amount').value = totalPinjaman;
             document.getElementById('tenor').value = tenor;
-            pembayaranBulanan.innerText = 'Rp ' + pembayaranPerBulan.toLocaleString('id-ID');
-        });
-    });
-</script>
-<!-- Clear Cache -->
-<script>
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('success') }}',
-        });
-    @endif
 
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: '{{ session('error') }}',
+            // Debugging Console
+            console.log("Membership:", membershipPersen);
+            console.log("Merchandise:", merchandisePersen);
+            console.log("Merchandise2 Full:", merchandise2FullPersen);
+            console.log("Merchandise2 Adjusted:", merchandise2Persen);
+            console.log("Total Persentase:", totalPersentase);
+            console.log("Biaya Tambahan:", biayaTambahan);
+            console.log("Total Pinjaman:", totalPinjaman);
+            console.log("Pembayaran Per Bulan:", pembayaranPerBulan);
         });
-    @endif
-
-    document.getElementById('clear-cache-link').addEventListener('click', function(event) {
-        event.preventDefault();
-        fetch('/clear-cache')
-            .then(response => response.text())
-            .then(data => {
-                Swal.fire({
-                    icon: 'success', // Ganti menjadi 'success' atau 'error' berdasarkan hasil permintaan
-                    title: 'Clear Cache',
-                    text: data, // Menampilkan pesan hasil dalam SweetAlert
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
     });
 </script>
 @endpush

@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
-        $users = User::all();
+        $users = User::where('company', $company->unit_bisnis)->get();
         $employee = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
         return view('pages.app-setting.user.index', compact('users','employee'));
     }

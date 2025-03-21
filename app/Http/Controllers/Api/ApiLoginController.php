@@ -1054,11 +1054,10 @@ class ApiLoginController extends Controller
                         ->get();
                 }
 
-                // Remove Absen Button
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
-
+                
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
                         $alreadyClockIn = true;
@@ -1069,20 +1068,21 @@ class ApiLoginController extends Controller
                         $isSameDay = $lastClockOut->isSameDay($today);
                     }
                 }
-
+                
                 // Cek Button
                 if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
                 
+                    // **Pastikan tanggal 21 tidak mengambil jadwal tanggal 20 jika tidak ada**
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $yesterday)
                         ->first();
-
-                    if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 ){
+                
+                    if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
                         $alreadyClockIn = true;
                         $logs = Absen::where('user_id', $user->employee_code)
-                                ->whereDate('tanggal', $yesterday)
-                                ->get();
-
+                            ->whereDate('tanggal', $yesterday)
+                            ->get();
+                
                         if ($logs->isEmpty()) {
                             // Jika belum ada log absen, set tombol ke clock in
                             $alreadyClockIn = false;
@@ -1103,17 +1103,16 @@ class ApiLoginController extends Controller
                                 // Jika yang terakhir adalah clock out, set tombol ke clock in
                                 $alreadyClockIn = false;
                                 $alreadyClockOut = false;
-                                
+                
                                 $today = Carbon::today();
                                 $logs = Absen::where('user_id', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->get();
-                                
-                                
+                                    ->whereDate('tanggal', $today)
+                                    ->get();
+                
                                 $logsHarinini = Absen::where('user_id', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->first();
-                                
+                                    ->whereDate('tanggal', $today)
+                                    ->first();
+                
                                 if ($logsHarinini !== null) {
                                     if ($logsHarinini->clock_in !== null) {
                                         $alreadyClockIn = true;
@@ -1128,16 +1127,14 @@ class ApiLoginController extends Controller
                                             ->get();
                                     }
                                 } else {
-                                    // Handle ketika $logsHarinini adalah null, misalnya memberikan pesan atau tindakan lainnya
+                                    // Jika tidak ada log absensi hari ini, buat koleksi kosong agar tidak error
                                     $alreadyClockIn = false;
                                     $alreadyClockOut = false;
-                                    $logs = collect(); // Menggunakan koleksi kosong untuk menghindari error jika dibutuhkan
+                                    $logs = collect();
                                 }
-                                
                             }
                         }
                     }
-                    
                 }
                 
 

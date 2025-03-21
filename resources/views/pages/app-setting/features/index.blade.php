@@ -94,11 +94,11 @@
                                                     <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item d-flex align-items-center" href="{{route('features-management.edit', $data->id)}}" ><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                                                    <a class="dropdown-item d-flex align-items-center" href="{{route('features-management.edit', $child->id)}}" ><i data-feather="edit-2" class="icon-sm me-2"></i> <span class="">Edit</span></a>
                                                     
                                                     <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
                                                         @csrf @method('DELETE') 
-                                                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
+                                                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $child->id }}')">
                                                             <i data-feather="trash" class="icon-sm me-2"></i>
                                                             <span class="">Delete</span>
                                                         </a>

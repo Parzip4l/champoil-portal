@@ -77,7 +77,7 @@
                                                         <input type="text" class="form-control" value="{{$schedules->periode}}" name="periode" readonly>
                                                     </td>
                                                     <td>
-                                                    @if($schedules->tanggal >= date('Y-m-d'))
+                                                    @if($schedules->tanggal < date('Y-m-d'))
                                                         <button class="btn btn-primary">Update Schedule</button>
                                                     @endif
                                                         

@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\VersionController;
 use App\Http\Controllers\Api\Analytics\AnalyticsController;
 use App\Http\Controllers\Api\Analytics\EmployeeAnalytics;
 use App\Http\Controllers\Api\AllData\AllDataController;
+use App\Http\Controllers\Api\AllData\AttendanceController;
 use App\Http\Controllers\Api\Schedules\ScheduleController;
 use App\Http\Controllers\Api\AllData\TaskManagementApi;
 use App\Http\Controllers\Api\KoperasiApi\AllKoperasiController;
@@ -271,4 +272,6 @@ Route::prefix('v1')->group(function () {
     Route::post('export-payroll', [AllDataController::class, 'export_payroll']);
     Route::post('export-absen', [AllDataController::class, 'export_absen']);
     Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
+    Route::get('attendance-records', [AttendanceController::class, 'index']);
+    
 });

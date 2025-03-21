@@ -69,18 +69,25 @@
                             </a>
                             <div class="collapse {{ show_class(['data']) }}" id="subitem{{ $menu->id }}">
                                 <ul class="nav sub-menu">
-                                    @foreach($menu->children as $child)
-                                        @if($child->is_active === 1)
-                                            @php
-                                                $childRoleIds = is_string($child->roles) ? json_decode($child->roles, true) : $child->roles;
-                                            @endphp
-                                            @if(is_array($childRoleIds) && array_intersect($dataLogin, $childRoleIds))
-                                                <li class="nav-item {{ Request::routeIs($child->url) ? 'active' : '' }}">
+                                @foreach($menu->children as $child)
+                                    @if($child->is_active === 1)
+                                        @php
+                                            $childRoleIds = is_string($child->roles) ? json_decode($child->roles, true) : $child->roles;
+                                        @endphp
+                                        @if(is_array($childRoleIds) && array_intersect($dataLogin, $childRoleIds))
+                                            <li class="nav-item {{ Request::routeIs($child->url) ? 'active' : '' }}">
+                                                @if($child->title === 'Reports')
+                                                    <a class="nav-link" href="{{ route($child->url) . '?periode=' . now()->format('M-Y') }}">
+                                                        {{ $child->title }}
+                                                    </a>
+                                                @else
                                                     <a class="nav-link" href="{{ route($child->url) }}">{{ $child->title }}</a>
-                                                </li>
-                                            @endif
+                                                @endif
+                                            </li>
                                         @endif
-                                    @endforeach
+                                    @endif
+                                @endforeach
+
                                 </ul>
                             </div>
                         </li>

@@ -905,6 +905,7 @@ class ApiLoginController extends Controller
             $pengajuan->clock_out = $request->input('clock_out');
             $pengajuan->status = $request->input('status');
             $pengajuan->alasan = $request->input('alasan');
+            $pengajuan->jam_lembur = $request->input('jam_lembur');
             $pengajuan->aprrove_status = 'Pending';
             
             $check_schedule = Schedule::where('employee',$request->input('employee'))->where('tanggal',date('Y-m-d',strtotime($request->input('tanggal'))))->first();

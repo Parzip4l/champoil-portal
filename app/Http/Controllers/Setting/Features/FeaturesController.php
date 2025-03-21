@@ -20,7 +20,7 @@ class FeaturesController extends Controller
             return $query->where('title', 'like', '%' . $search . '%');
         })
         ->orderBy('order', 'asc')
-        ->paginate(15);
+        ->paginate(100);
 
         // Jika permintaan AJAX, kembalikan hanya bagian tampilan yang perlu diperbarui
         if ($request->ajax()) {

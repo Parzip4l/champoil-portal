@@ -273,5 +273,7 @@ Route::prefix('v1')->group(function () {
     Route::post('export-absen', [AllDataController::class, 'export_absen']);
     Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
     Route::get('attendance-records', [AttendanceController::class, 'index']);
+    Route::get('export-absensi', [AttendanceController::class, 'exportAbsensi']);
+    
     
 });

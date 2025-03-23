@@ -210,7 +210,7 @@ $(document).ready(function () {
     });
 
     exportData =function(organisasi, project, start, end) {
-        let url = `/api/export-absensi?organisasi=${organisasi}&project_id=${project}&start=${start}&end=${end}`;
+        let url = `/api/v1/export-absensi?organisasi=${organisasi}&project_id=${project}&start=${start}&end=${end}`;
         $.ajax({
             url: url,
             type: 'GET',

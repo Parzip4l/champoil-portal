@@ -9,7 +9,14 @@ use App\Employee;
 use App\ModelCG\Schedule;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
+use App\Absen\RequestAbsen;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -90,4 +97,261 @@ class AttendanceController extends Controller
             
     }
 
+    public function exportAbsensi(Request $request)
+    {
+        $project = $request->project_id ?? "All";
+        $data = Schedule::select('employee', 'project', DB::raw('COUNT(*) as total_schedules'))
+            ->whereBetween('tanggal', [$request->start, $request->end]);
+
+        if ($project != "ALL") {
+            $data->whereIn('project', $project);
+        }
+
+        $data = $data->groupBy('employee', 'project')->get();
+        $start_date = $request->start;
+        $end_date = $request->end;
+
+        $result = []; // Initialize an array to store the final data
+        $dates = []; // Collect all unique dates for headers
+
+        foreach ($data as $row) {
+            $employee = karyawan_bynik($row->employee);
+
+            if (!$employee) {
+                continue; // Skip if employee data is not found
+            }
+
+            $employeeData = [
+                'Employee NIK' => $row->employee,
+                'Employee Name' => $employee->nama,
+                'Project Name' => project_byID($row->project)->name ?? '-',
+                'Total Schedules' => $row->total_schedules
+            ];
+
+            $schedules = Schedule::where('employee', $row->employee)
+                ->whereBetween('tanggal', [$start_date, $end_date])
+                ->get();
+
+            foreach ($schedules as $schedule) {
+                $absen = Absen::where('nik', $row->employee)
+                    ->where('tanggal', $schedule->tanggal)
+                    ->first();
+
+                $employeeData[$schedule->tanggal] = [
+                    'Shift' => $schedule->shift,
+                    'Project' => $absen->project->name ?? '-',
+                    'Clock In' => $absen->clock_in ?? '-',
+                    'Clock Out' => $absen->clock_out ?? '-',
+                    'Status' => $absen->status ?? '-'
+                ];
+
+                if (!in_array($schedule->tanggal, $dates)) {
+                    $dates[] = $schedule->tanggal; // Add unique dates to the list
+                }
+            }
+
+            $result[] = $employeeData; // Add the employee data to the result array
+        }
+
+        if (empty($result)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data not found'
+            ], 404);
+        }
+
+        // Create a new Spreadsheet
+        $spreadsheet = new Spreadsheet();
+
+        // Sheet 1: Schedules
+        $sheet1 = $spreadsheet->getActiveSheet();
+        $sheet1->setTitle('Schedules');
+
+        // Set the header row for Schedules
+        $headers = ['Employee NIK', 'Employee Name', 'Project Name', 'Total Schedules','Total Masuk','Total Off', ...$dates];
+        $sheet1->fromArray($headers, null, 'A1');
+
+        // Populate the data rows for Schedules
+        $rowIndex = 2;
+        foreach ($result as $row) {
+            $totalMasuk=0;
+            $totalOff=0;
+            foreach ($dates as $date) {
+                $schedule = $row[$date] ?? ['Shift' => '-', 'Clock In' => '-', 'Clock Out' => '-'];
+                if($schedule['Shift']=='OFF'){
+                    $totalOff++;
+                }else{
+                    $totalMasuk++;
+                }
+            }
+
+            $rowData = [
+                "'{$row['Employee NIK']}", // Add single quote to preserve formatting
+                $row['Employee Name'],
+                $row['Project Name'],
+                $row['Total Schedules'],
+                $totalMasuk,
+                $totalOff
+            ];
+
+
+
+            foreach ($dates as $date) {
+                $schedule = $row[$date] ?? ['Shift' => '-', 'Clock In' => '-', 'Clock Out' => '-'];
+                $rowData[] = $schedule['Shift'];
+            }
+
+            $sheet1->fromArray($rowData, null, "A$rowIndex");
+            $rowIndex++;
+        }
+
+        // Sheet 2: Attendance
+        $sheet2 = $spreadsheet->createSheet();
+        $sheet2->setTitle('Attendance');
+
+        // Set the header row for Attendance
+        $attendanceHeaders = ['Employee NIK', 'Employee Name', 'Project Name', 'Total Schedules', ...$dates];
+        $sheet2->fromArray($attendanceHeaders, null, 'A1');
+
+        // Populate the data rows for Attendance
+        $rowIndex = 2;
+        foreach ($result as $row) {
+            $rowData = [
+                "'{$row['Employee NIK']}", // Add single quote to preserve formatting
+                $row['Employee Name'],
+                $row['Project Name'],
+                $row['Total Schedules']
+            ];
+
+            foreach ($dates as $date) {
+                $schedule = $row[$date] ?? ['Shift' => '-', 'Clock In' => '-', 'Clock Out' => '-', 'Status' => '-'];
+                $rowData[] = $schedule['Status'];
+            }
+
+            $sheet2->fromArray($rowData, null, "A$rowIndex");
+            $rowIndex++;
+        }
+
+        // Sheet 3: Schedule Backup
+        $sheet3 = $spreadsheet->createSheet();
+        $sheet3->setTitle('Schedule Backup');
+
+        // Set the header row for Schedule Backup
+        $backupHeader = [
+            'Nama Menggantikan', 
+            'Jabatan Yang Menggantikan', 
+            'Project Menggantikan', 
+            'Nama Digantikan',
+            'Jabatan Yang Digantikan',
+            'Project Digantikan',
+            'Tanggal Backup',
+        ];
+        $sheet3->fromArray($backupHeader, null, 'A1');
+
+        // Fetch and populate Schedule Backup data
+        $scheduleBackupData = ScheduleBackup::whereBetween('tanggal',[$request->start, $request->end])->get(); // Replace with appropriate query
+        $rowIndex = 2;
+        foreach ($scheduleBackupData as $backup) {
+            $project_menggantikan = Schedule::where('employee',$backup->employee)->where('tanggal',$backup->tanggal)->first();
+            if($project_menggantikan){
+                $project_menggantikan = $project_menggantikan->project;
+            }else{
+                $project_menggantikan = '-';
+            }
+            $sheet3->fromArray([
+                karyawan_bynik($backup->employee)->nama ?? '-',
+                karyawan_bynik($backup->employee)->jabatan ?? '-',
+                project_byID($project_menggantikan)->name ?? '-',
+                karyawan_bynik($backup->man_backup)->nama ?? '-',
+                karyawan_bynik($backup->man_backup)->jabatan ?? '-',
+                project_byID($backup->project)->name ?? '-',
+                $backup->tanggal ?? '-',
+            ], null, "A$rowIndex");
+            $rowIndex++;
+        }
+
+        // Sheet 4: Attendance Backup
+        $sheet4 = $spreadsheet->createSheet();
+        $sheet4->setTitle('Attendance Backup');
+
+        // Set the header row for Attendance Backup
+        $attendanceBackupHeader = ['Employee NIK', 'Employee Name', 'Project Name Backup', 'Status', 'Tanggal Backup'];
+        $sheet4->fromArray($attendanceBackupHeader, null, 'A1');
+
+        // Fetch and populate Attendance Backup data
+        $attendanceBackupData = ScheduleBackup::join('absens', function ($join) {
+            $join->on('absens.nik', '=', 'schedule_backups.employee')
+                 ->whereColumn('absens.project_backup', '=', 'schedule_backups.project');
+        })
+        ->whereBetween('schedule_backups.tanggal', [$request->start, $request->end])
+        ->get();
+    
+        $rowIndex = 2;
+        foreach ($attendanceBackupData as $backup) {
+            $sheet4->fromArray([
+                "'{$backup->nik}'", // Add single quote to preserve formatting
+                karyawan_bynik($backup->nik)->nama ?? '-',
+                project_byID($backup->project_backup)->name ?? '-',
+                $backup->status ?? '-',
+                $backup->tanggal ?? '-',
+            ], null, "A$rowIndex");
+            $rowIndex++;
+        }
+
+        $sheet5 = $spreadsheet->createSheet();
+        $sheet5->setTitle('Overtime');
+
+        // Set the header row for Attendance
+        $attendanceLembur = [
+            'Nama', 
+            'Jabatan', 
+            'Project', 
+            'Tanggal', 
+            'Jam Masuk Lembur', 
+            'Jam Keluar Lembur', 
+            'Jam Lembur', 
+            'Nominal Lembur'
+        ];        
+        $sheet5->fromArray($attendanceLembur, null, 'A1');
+        $overTime = RequestAbsen::whereBetween('tanggal',[$request->start,$request->end])
+                    ->where('status','Lembur')
+                    ->where('aprrove_status','Approved')
+                    ->get();
+    
+        $rowIndex = 2;
+        foreach ($overTime as $lembur) {
+            $clockIn = $lembur->clock_in ? Carbon::parse($lembur->clock_in) : null;
+            $clockOut = $lembur->clock_out ? Carbon::parse($lembur->clock_out) : null;
+
+            $totalHours = ($clockIn && $clockOut) ? $clockIn->diffInHours($clockOut) : '-'; 
+            $sheet5->fromArray([
+                karyawan_bynik($lembur->employee)->nama ?? '-', // Add single quote to preserve formatting
+                karyawan_bynik($lembur->employee)->jabatan ?? '-',
+                project_byID($lembur->project)->name ?? '-',
+                $lembur->tanggal ?? '-',
+                $lembur->clock_in ?? '-',
+                $lembur->clock_out ?? '-',
+                $totalHours ?? '-',
+            ], null, "A$rowIndex");
+            $rowIndex++;
+        }
+        // Ensure the 'exports' directory exists
+        $exportsPath = storage_path('app/exports');
+        if (!File::exists($exportsPath)) {
+            File::makeDirectory($exportsPath, 0755, true);
+        }
+
+        // Save the Excel file to storage
+        $filename = "attendance_export_" . now()->format('Ymd') . ".xlsx";
+        $filePath = "exports/$filename";
+        $writer = new Xlsx($spreadsheet);
+        $writer->save(storage_path("app/$filePath"));
+
+        // Return the download link
+        return response()->json([
+            'status' => 'success',
+            'message' => 'File exported successfully',
+            'download_url' => Storage::url($filePath)
+        ]);
+    }
 }

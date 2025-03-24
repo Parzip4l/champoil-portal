@@ -124,6 +124,7 @@ class AttendanceController extends Controller
             $employeeData = [
                 'Employee NIK' => $row->employee,
                 'Employee Name' => $employee->nama,
+                'Jabatan' => $employee->jabatan,
                 'Project Name' => project_byID($row->project)->name ?? '-',
                 'Total Schedules' => $row->total_schedules
             ];
@@ -168,7 +169,7 @@ class AttendanceController extends Controller
         $sheet1->setTitle('Schedules');
 
         // Set the header row for Schedules
-        $headers = ['Employee NIK', 'Employee Name', 'Project Name', 'Total Schedules','Total Masuk','Total Off', ...$dates];
+        $headers = ['Employee NIK', 'Employee Name', 'Jabatan', 'Project Name', 'Total Schedules','Total Masuk','Total Off', ...$dates];
         $sheet1->fromArray($headers, null, 'A1');
 
         // Populate the data rows for Schedules
@@ -189,6 +190,7 @@ class AttendanceController extends Controller
                 "'{$row['Employee NIK']}", // Add single quote to preserve formatting
                 $row['Employee Name'],
                 $row['Project Name'],
+                $row['Jabatan'],
                 $row['Total Schedules'],
                 $totalMasuk,
                 $totalOff

@@ -48,7 +48,13 @@ class ApiLoginController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-
+        $cek = Employee::where('email', $request->email)->where('resign_status',0)->first();
+        if(!$cek){
+            return response()->json([
+                'success' => false,
+                'message' => 'Login Failed!',
+            ]);
+        }
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {

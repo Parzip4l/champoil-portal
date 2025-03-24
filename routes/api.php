@@ -43,6 +43,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/user', [ApiLoginController::class, 'getUser']);
     Route::get('/employee', [EmployeeController::class, 'ApiEmployee']);
     Route::get('/employee-lastabsen', [ApiEmployee::class, 'lastAbsen']);
+    Route::get('/unresign/{id}', [ApiEmployee::class, 'unResign']);
     Route::get('/mySlip', [ApiLoginController::class, 'payslipuser']);
     Route::get('/Payslip/{id}', [ApiLoginController::class, 'PayslipDetails']);
     Route::get('/employee/{nik}', [ApiLoginController::class, 'getEmployeeByNik']);

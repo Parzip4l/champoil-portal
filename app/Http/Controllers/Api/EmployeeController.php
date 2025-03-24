@@ -164,4 +164,15 @@ Thank you for your attention and cooperation. If you have any questions or issue
 
         return response()->json($result);
     }
+
+    public function unResign($id){
+        $records = Employee::where('id',$id)->update(['resign_status'=>0]);
+        $result=[
+            "records"=>$records,
+            "message"=>"success",
+            "error"=>false
+        ];
+
+        return response()->json($result);
+    }
 }

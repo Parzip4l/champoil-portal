@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Cache;
+use App\Employee;
 
 class LoginController extends Controller
 {
@@ -25,6 +26,13 @@ class LoginController extends Controller
             'email' => 'required',
             'password' => 'required',
         ]);
+        $cek = Employee::where('email', $request->email)->where('resign_status',0)->first();
+        if(!$cek){
+            return response()->json([
+                'success' => false,
+                'message' => 'Login Failed!',
+            ]);
+        }
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {

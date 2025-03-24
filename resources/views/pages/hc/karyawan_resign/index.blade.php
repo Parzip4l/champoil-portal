@@ -51,9 +51,20 @@
                         $no = 1;
                     @endphp
                     @foreach ($karyawan as $data)
-                <tr>
+                <tr id="tr{{$data->id}}">
                     <td>{{ $no++ }}</td>
-                    <td>{{ $data->nama }} <a href="javascript:void(0)" class="btn  btn-sm btn-success" onClick="downloadPaklaring({{$data->id}})" style="float:right">Download Paklaring</a></td>
+                    <td>{{ $data->nama }} 
+                    <div class="btn-group float-right" role="group" style="float: right;">
+                        <a href="javascript:void(0)" 
+                        class="btn btn-sm btn-success" 
+                        onClick="downloadPaklaring({{$data->id}})">Download Paklaring</a>
+                        
+                        <a href="javascript:void(0)" 
+                        class="btn btn-sm btn-danger" 
+                        onClick="unResign({{$data->id}})">Unresign</a>
+                    </div>
+
+                    </td>
                     <td>{{ $data->nik }}</td>
                     <td>{{ $data->jenis_kelamin }}</td>
                     <td>{{ $data->organisasi }}</td>
@@ -187,62 +198,111 @@
         });
     @endif
     function downloadPaklaring(id) {
-    const url = `/api/v1/paklaring/${id}`; // Define the API endpoint
-    
-    Swal.fire({
-        title: 'Processing Export',
-        text: 'Please wait while the file is being generated...',
-        icon: 'info',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+        const url = `/api/v1/paklaring/${id}`; // Define the API endpoint
+        
+        Swal.fire({
+            title: 'Processing Export',
+            text: 'Please wait while the file is being generated...',
+            icon: 'info',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch the file.');
-        }
-        return response.json();
-    })
-    .then(data => {
-        Swal.close();
-        if (data.path) {
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch the file.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.close();
+            if (data.path) {
+                Swal.fire({
+                    title: 'Download Ready',
+                    text: 'Your document is ready to download!',
+                    icon: 'success',
+                }).then(() => {
+                    const link = document.createElement('a');
+                    link.href = data.path;
+                    link.download = data.file_name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            } else {
+                Swal.fire({
+                    title: 'Download Failed',
+                    text: 'Unable to download the file. Please try again.',
+                    icon: 'error',
+                });
+            }
+        })
+        .catch(error => {
+            Swal.close();
             Swal.fire({
-                title: 'Download Ready',
-                text: 'Your document is ready to download!',
-                icon: 'success',
-            }).then(() => {
-                const link = document.createElement('a');
-                link.href = data.path;
-                link.download = data.file_name;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-        } else {
-            Swal.fire({
-                title: 'Download Failed',
-                text: 'Unable to download the file. Please try again.',
+                title: 'Error',
+                text: 'Error fetching the file: ' + error.message,
                 icon: 'error',
             });
-        }
-    })
-    .catch(error => {
-        Swal.close();
-        Swal.fire({
-            title: 'Error',
-            text: 'Error fetching the file: ' + error.message,
-            icon: 'error',
         });
-    });
-}
+    }
+    function unResign(id) {
+        const url = `/api/v1/unresign/${id}`;
+
+        Swal.fire({
+            title: 'Processing Unresign',
+            text: 'Please wait while the request is being processed...',
+            icon: 'info',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include' // Menjaga sesi jika perlu
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+
+            if (data.error === false) { // Perbaikan kondisi sukses
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message || 'Unresign process completed!',
+                    icon: 'success',
+                }).then(() => {
+                    $("tbody #tr"+id).remove();
+                });
+            } else {
+                throw new Error(data.message || 'Unable to process your request.');
+            }
+        })
+        .catch(error => {
+            Swal.close();
+            Swal.fire({
+                title: 'Error',
+                text: 'An error occurred: ' + error.message,
+                icon: 'error',
+            });
+        });
+    }
+
+
+
+
 
 
 

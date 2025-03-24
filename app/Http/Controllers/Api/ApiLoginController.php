@@ -901,6 +901,22 @@ class ApiLoginController extends Controller
                 'alasan' => 'required',
             ]);
 
+            
+            $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
+            $employee = $request->input('employee');
+
+            // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve
+            $existingRequest = RequestAbsen::where('employee', $employee)
+                ->where('tanggal', $tanggal)
+                ->whereIn('aprrove_status', ['Pending', 'Approved'])
+                ->exists();
+
+            if ($existingRequest) {
+                return response()->json([
+                    'message' => 'Anda sudah memiliki pengajuan absen untuk tanggal ' . date('d F Y', strtotime($tanggal)) . ' dengan status Pending atau Approve. Anda hanya bisa mengajukan ulang jika statusnya Ditolak.'
+                ], 400);
+            }
+
             $randomNumber = mt_rand(100000, 999999);
 
             $pengajuan = new RequestAbsen();
@@ -933,8 +949,6 @@ class ApiLoginController extends Controller
                 $path = $file->store('public/files');
                 $pengajuan->dokumen = $path;
             }
-        
-        
 
             $pengajuan->save();
             $token = $request->bearerToken();

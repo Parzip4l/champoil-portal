@@ -53,7 +53,7 @@
                             <div id="lembur-input" class="col-md-6" style="display: none;">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">Jam Lembur</label>
-                                    <input type="number" name="jam_lembur" class="form-control" required>
+                                    <input type="number" name="jam_lembur" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">

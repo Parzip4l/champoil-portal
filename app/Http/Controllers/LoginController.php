@@ -47,7 +47,7 @@ class LoginController extends Controller
             Session::flash('error', 'Email atau password salah.');
             return redirect()->back()->withInput();
         }
-    }
+    }  
 
     public function logout(Request $request)
     {

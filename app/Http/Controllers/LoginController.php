@@ -28,10 +28,8 @@ class LoginController extends Controller
         ]);
         $cek = Employee::where('email', $request->email)->where('resign_status',0)->first();
         if(!$cek){
-            return response()->json([
-                'success' => false,
-                'message' => 'Login Failed!',
-            ]);
+            Session::flash('error', 'Email ada berada d  employee resign.');
+            return redirect()->back()->withInput();
         }
 
         $credentials = $request->only('email', 'password');

@@ -26,6 +26,7 @@ use App\Pajak\PajakDetails;
 use Illuminate\Support\Facades\DB;
 Use App\Activities\Log;
 use App\Mail\PayslipEmail;
+use App\Absen\RequestAbsen;
 
 use App\Imports\PayrollImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -68,6 +69,80 @@ class PayrolController extends Controller
 
         return view('pages.hc.payrol.ns.payrol', compact('payrol'));
     }
+
+    public function checkAttendance(Request $request)
+    {
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        // Ambil awal dan akhir bulan dari start_date yang dipilih
+        $firstDayOfMonth = \Carbon\Carbon::parse($start_date)->startOfMonth()->toDateString();
+        $lastDayOfMonth = \Carbon\Carbon::parse($start_date)->endOfMonth()->toDateString();
+
+        // Ambil semua karyawan yang ada di payroll
+        $payrol = PayrolComponent_NS::join('karyawan', 'payrol_component_ns.employee_code', '=', 'karyawan.nik')
+                    ->where('karyawan.unit_bisnis', 'CHAMPOIL')
+                    ->where('karyawan.resign_status', 0)
+                    ->select('payrol_component_ns.*') 
+                    ->get();
+
+        $data = [];
+
+        foreach ($payrol as $item) {
+            $nik = $item->employee_code;
+
+            // Total hari kerja dalam minggu yang dipilih
+            $totalHariKerjaMingguan = \Carbon\Carbon::parse($start_date)->diffInDays(\Carbon\Carbon::parse($end_date)) + 1;
+
+            // Total kehadiran dalam minggu yang dipilih
+            $totalHadirMingguan = Absen::join('karyawan', 'absens.user_id', '=', 'karyawan.nik')
+                ->where('karyawan.unit_bisnis', 'CHAMPOIL')
+                ->where('karyawan.nik', $nik) 
+                ->whereBetween('absens.tanggal', [$start_date, $end_date])
+                ->count();
+
+            // Total hari kerja dalam satu bulan penuh
+            $totalHariKerjaBulanan = 0;
+            $currentDate = \Carbon\Carbon::parse($firstDayOfMonth);
+
+            while ($currentDate->lte(\Carbon\Carbon::parse($lastDayOfMonth))) {
+                if ($currentDate->isWeekday()) { // Hanya hitung Senin - Jumat
+                    $totalHariKerjaBulanan++;
+                }
+                $currentDate->addDay();
+            }
+
+            // Total kehadiran dalam satu bulan penuh
+            $totalHadirBulanan = Absen::join('karyawan', 'absens.user_id', '=', 'karyawan.nik')
+                ->where('karyawan.unit_bisnis', 'CHAMPOIL')
+                ->where('karyawan.nik', $nik) 
+                ->whereBetween('absens.tanggal', [$firstDayOfMonth, $lastDayOfMonth])
+                ->count();
+
+            // Hitung total jam lembur dalam minggu yang dipilih
+            $totalLembur = (int) RequestAbsen::where('employee', $nik)
+                ->whereBetween('tanggal', [$start_date, $end_date])
+                ->where('aprrove_status', 'Approved')
+                ->sum('jam_lembur');
+
+            // Hitung hari bolos dalam 1 bulan
+            $totalBolosBulanan = $totalHariKerjaBulanan - $totalHadirBulanan;
+
+            // Tentukan uang kerajinan (jika bolos <= 3 hari dalam sebulan, maka dapat uang kerajinan
+            $uangKerajinan = ($totalBolosBulanan <= 3) ? 200000 : 0;
+
+            $data[$nik] = [
+                'employee_code' => $nik,
+                'uang_makan' => $totalHadirMingguan == $totalHariKerjaMingguan - 2 ? 50000 : 0,
+                'total_lembur' => $totalLembur ?? 0,
+                'total_hari_kerja' => $totalHadirMingguan,
+                'uang_kerajinan' => $uangKerajinan
+            ];
+        }
+
+        return response()->json(['data' => $data]);
+    }
+
 
     public function getWeeks(Request $request)
     {
@@ -252,6 +327,7 @@ class PayrolController extends Controller
     {
         $code = Auth::user()->employee_code;
         $employee = Employee::where('nik', $code)->first();
+
         // Mendapatkan input dari request
         $employeeCodes = $request->input('employee_code');
         $lembur_jam = $request->input('lembur_jam');
@@ -294,7 +370,7 @@ class PayrolController extends Controller
     
                 // Hitung total daily salary
                 $daily_salary = $payrollComponents->daily_salary;
-                $totaldaily = $totalAbsen * $daily_salary;
+                $totaldaily = $totalAbsen - 2 * $daily_salary;
     
                 // Hitung total potongan
                 $dataDeductions = json_decode($payrollComponents->deductions, true);
@@ -324,6 +400,7 @@ class PayrolController extends Controller
                 $payroll->payrol_status = 'Unlocked';
                 $payroll->payslip_status = 'Unpublish';
                 $payroll->run_by = $employee->nama;
+                $payroll->company = $employee->unit_bisnis;
                 $payroll->save();
             }
         }

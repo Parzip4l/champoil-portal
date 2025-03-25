@@ -16,6 +16,11 @@ class Absen extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'user_id', 'nik');
+    }
+
     protected $attributes = [
         'clock_in' => '07:00',
     ];

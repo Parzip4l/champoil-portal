@@ -23,12 +23,7 @@
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">
       <div class="card-body">
-        <div class="head-card d-flex justify-content-between mb-3">
-            <h6 class="card-title align-self-center mb-0">Payroll Frontline Officer</h6>
-            <a href="https://docs.google.com/spreadsheets/d/1EQAvYmzQCDbcPFgSyboi5NjUw9ogIx4S/edit?usp=sharing&ouid=111710735971754386652&rtpof=true&sd=true" target="blank" class="btn btn-success">Download Payrol Tamplate</a>
-        </div>
-        <hr>
-        <form action="{{route('payroll.import.post')}}" method="POST" enctype="multipart/form-data">
+        <form action="{{route('payrollns.store')}}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-4 mb-3">
@@ -64,20 +59,8 @@
                         <input type="number" name="year" class="form-control" value="{{ date('Y') }}" readonly>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="form-group mb-3">
-                        <label for="" class="form-label">Import Data</label>
-                        <input type="file" name="file" required class="form-control">
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="form-group mb-3">
-                        <label for="" class="form-label mb-3"></label>
-                        <button type="submit" class="btn btn-primary w-100 mt-2">Run Payroll</button>
-                    </div>
-                </div>
                 
-                <!-- <div class="col-md-12">
+                <div class="col-md-12">
                     <div class="form-group mb-3">
                         <label for="" class="form-label">Select Employee</label>
                     </div>
@@ -99,7 +82,7 @@
                 </div>
                 <div class="col-md-12">
                     <button type="submit" class="btn btn-primary">Run Payroll</button>
-                </div> -->
+                </div>
             </div>
         </form>
       </div>
@@ -146,102 +129,155 @@
     <script src="{{ asset('assets/js/select2.js') }}"></script>
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
-<script>
-   $(document).ready(function() {
-    // Memuat daftar minggu saat halaman pertama kali dimuat
-    loadWeeks();
-
-    // Memuat daftar minggu saat bulan dipilih
-    $('#month').change(function() {
+    <script>
+    $(document).ready(function() {
+        // Memuat daftar minggu saat halaman pertama kali dimuat
         loadWeeks();
-    });
 
-    function loadWeeks() {
-        const selectedMonth = $('#month').val();
+        // Memuat daftar minggu saat bulan dipilih
+        $('#month').change(function() {
+            loadWeeks();
+        });
 
-        // Kirim permintaan AJAX untuk mendapatkan daftar minggu berdasarkan bulan yang dipilih
-        $.ajax({
-            url: '/get-weeks',
-            method: 'GET',
-            data: { month: selectedMonth },
-            success: function(response) {
-                const weeks = response.weeks;
-                const weekSelect = $('#week');
-                weekSelect.empty(); // Hapus opsi sebelumnya
+        function loadWeeks() {
+            const selectedMonth = $('#month').val();
 
-                // Tambahkan opsi week yang baru
-                for (const week of weeks) {
-                    const matches = week.match(/Week \d+ \((\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})\)/);
-                    if (matches && matches.length === 3) {
-                        const weekStart = matches[1];
-                        const weekEnd = matches[2];
-                        weekSelect.append(`<option value="${weekStart} - ${weekEnd}">${week}</option>`);
-                    } else {
-                        console.error('Invalid week format:', week);
+            // Kirim permintaan AJAX untuk mendapatkan daftar minggu berdasarkan bulan yang dipilih
+            $.ajax({
+                url: '/get-weeks',
+                method: 'GET',
+                data: { month: selectedMonth },
+                success: function(response) {
+                    const weeks = response.weeks;
+                    const weekSelect = $('#week');
+                    weekSelect.empty(); // Hapus opsi sebelumnya
+
+                    // Tambahkan opsi week yang baru
+                    for (const week of weeks) {
+                        const matches = week.match(/Week \d+ \((\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})\)/);
+                        if (matches && matches.length === 3) {
+                            const weekStart = matches[1];
+                            const weekEnd = matches[2];
+                            weekSelect.append(`<option value="${weekStart} - ${weekEnd}">${week}</option>`);
+                        } else {
+                            console.error('Invalid week format:', week);
+                        }
                     }
                 }
+            });
+        }
+    });
+
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#week').change(function() {
+                const selectedWeek = $('#week').val();
+                if (!selectedWeek) return;
+
+                const [startDate, endDate] = selectedWeek.split(' - ');
+
+                // Cek apakah ini minggu terakhir dalam bulan
+                const isLastWeek = checkIfLastWeek(endDate);
+
+                $.ajax({
+                    url: '/check-attendance',
+                    method: 'GET',
+                    data: { start_date: startDate, end_date: endDate },
+                    success: function(response) {
+                        const data = response.data;
+
+                        $('#EmployeeTable tbody tr').each(function() {
+                            const employeeCode = $(this).find('select[name="employee_code[]"]').val();
+                            if (data[employeeCode]) {
+                                // Set nilai uang makan
+                                $(this).find('input[name="uang_makan[]"]').val(data[employeeCode].uang_makan);
+
+                                // Set nilai jam lembur
+                                $(this).find('input[name="lembur_jam[]"]').val(data[employeeCode].total_lembur);
+
+                                // Set Uang Kerajinan hanya jika minggu terakhir
+                                if (isLastWeek) {
+                                    $(this).find('input[name="uang_kerajinan[]"]').val(data[employeeCode].uang_kerajinan);
+                                } else {
+                                    $(this).find('input[name="uang_kerajinan[]"]').val(0);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            function checkIfLastWeek(endDate) {
+                const end = new Date(endDate);
+                const lastDayOfMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0); // Ambil hari terakhir bulan
+                return end.getDate() >= (lastDayOfMonth.getDate() - 6); // Jika dalam 7 hari terakhir, dianggap minggu terakhir
             }
         });
-    }
-});
 
-</script>
-<!-- Payroll -->
-<script>
-    function addProductRow() {
-        const employeeTableBody = document.querySelector('#EmployeeTable tbody');
+    </script>
 
-        @foreach ($payrol as $data)
-        @php
-            $employee = \App\Employee::where('nik', $data->employee_code)
-                    ->where('unit_bisnis', 'CHAMPOIL') 
-                    ->first();
-        @endphp
-            const newRow{{ $data->employee_code }} = `
-                <tr>
-                    <td>
-                        <select class="form-control" name="employee_code[]">
-                            <option value="{{ $data->employee_code ?? 'Tidak Terdaftar' }}">{{ $employee->nama ?? 'Tidak Terdaftar' }}</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
-                    </td>
-                    <td>
-                        <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
-                    </td> 
-                    <td class="purchase-uom-td">
-                        <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
-                    </td>
-                </tr>
-            `;
 
-            employeeTableBody.insertAdjacentHTML('beforeend', newRow{{ $data->employee_code }});
-        @endforeach
+    <!-- Payroll -->
+    <script>
+        function addProductRow() {
+            const employeeTableBody = document.querySelector('#EmployeeTable tbody');
 
-        updateProductCategory(document.querySelector('#EmployeeTable tbody').lastElementChild.querySelector('.form-select'));
-    }
+            @foreach ($payrol as $data)
+                @php
+                    $employee = \App\Employee::where('nik', $data->employee_code)
+                            ->where('unit_bisnis', 'CHAMPOIL')
+                            ->where('resign_status', 0)
+                            ->first();
+                @endphp
 
-    function removeProductRow(button) {
-        const row = button.closest('tr');
-        row.remove();
-    }
+                @if ($employee) 
+                    var newRow = `
+                        <tr>
+                            <td>
+                                <select class="form-control" name="employee_code[]">
+                                    <option value="{{ $data->employee_code }}">{{ $employee->nama }}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="lembur_jam[]" placeholder="1" class="form-control">
+                            </td>
+                            <td>
+                                <input type="number" name="uang_makan[]" placeholder="1" class="form-control">  
+                            </td> 
+                            <td class="purchase-uom-td">
+                                <input type="number" name="uang_kerajinan[]" placeholder="1" class="form-control">  
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(this)">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
 
-    function selectAll() {
-        const allRows = document.querySelectorAll('#EmployeeTable tbody tr');
-        allRows.forEach(row => {
-            const inputFields = row.querySelectorAll('input');
-            inputFields.forEach(input => {
-                input.value = 0;
+                    employeeTableBody.insertAdjacentHTML('beforeend', newRow);
+                @endif
+            @endforeach
+        }
+
+
+
+        function removeProductRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+
+        function selectAll() {
+            const allRows = document.querySelectorAll('#EmployeeTable tbody tr');
+            allRows.forEach(row => {
+                const inputFields = row.querySelectorAll('input');
+                inputFields.forEach(input => {
+                    input.value = 0;
+                });
             });
-        });
-    }
+        }
 
-    document.getElementById('addProduct').addEventListener('click', addProductRow);
-    document.getElementById('addProduct').addEventListener('click', selectAll);
-</script>
-
+        document.getElementById('addProduct').addEventListener('click', addProductRow);
+        document.getElementById('addProduct').addEventListener('click', selectAll);
+    </script>
 @endpush

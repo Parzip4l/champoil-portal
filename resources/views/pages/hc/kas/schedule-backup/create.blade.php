@@ -29,9 +29,10 @@
                                     <label for="" class="form-label">Shift</label>
                                     <select class="form-control shift-backup" data-width="100%" name="shift[]" required>
                                         <option disabled selected>Select Shift</option>
-                                        <option value="NS-P">Backup Pagi</option>
-                                        <option value="NS-M">Backup Middle</option>
-                                        <option value="NS-ML">Backup Malam</option>
+                                        <option value="PG">Backup Pagi</option>
+                                        <option value="MD">Backup Middle</option>
+                                        <option value="ML">Backup Malam</option>
+                                        <option value="NS">Backup Non Shift</option>
                                     </select>
                                 </div>
                             </div>

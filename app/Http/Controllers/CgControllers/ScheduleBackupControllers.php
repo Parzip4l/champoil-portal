@@ -41,6 +41,11 @@ class ScheduleBackupControllers extends Controller
 
         $current_month = $today->format('F');
         $current_year = $today->format('Y');
+        if ($today->day >= 21) {
+            $next_month = $today->copy()->addMonth();
+            $current_month = $next_month->format('F'); // Update nama bulan
+            $current_year = $next_month->format('Y'); // Update tahun jika berubah
+        }
 
         return view('pages.hc.kas.schedule-backup.create', compact('employee','project','project2','shift','schedule','current_month','current_year'));
     }

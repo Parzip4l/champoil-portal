@@ -32,6 +32,7 @@
                     <li class="nav-item">
                         <a class="nav-link" id="contact-line-tab" data-bs-toggle="tab" data-bs-target="#Payslip" role="tab" aria-controls="Payslip" aria-selected="false">Payslip</a>
                     </li>
+                    
                 </ul>
                 <div class="tab-content mt-3" id="lineTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-line-tab">
@@ -112,6 +113,12 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <h5 style="padding:25px !important">History</h5>
+                                <div id="content">
+                                    <ul class="timeline" style="margin-left:0px !important">
+                                        {!!$html!!}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -335,6 +342,7 @@
                     <div class="tab-pane fade" id="Payslip" role="tabpanel" aria-labelledby="Payslip-line-tab">
                         <!-- Payslip Info -->
                     </div>
+                    
                 </div>
             </div>
         </div>

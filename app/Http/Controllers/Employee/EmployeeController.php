@@ -17,6 +17,7 @@ use App\ModelCG\Jabatan;
 use App\Divisi\Divisi;
 Use App\Organisasi\Organisasi;
 use App\ModelCG\Schedule;
+use App\ModelCG\ScheuleParent;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
 use App\ModelCG\Referal;
@@ -456,9 +457,51 @@ Password: ".$request->password;
         
         //count Request
         $CountRequest = count($requestAbsen);
+
+        $history = Schedule::select(
+            'employee',
+            'project',
+            'periode',
+            DB::raw('MAX(id) as latest_id')
+        )
+        ->where('employee', $nikdata)
+        ->groupBy('employee', 'project', 'periode')
+        ->orderBy('latest_id', 'DESC')
+        ->get();
+        $html = ''; // Pastikan string kosong
+
+        $first_absen = Absen::where('nik', $nikdata)->orderBy('tanggal', 'asc')->first();
+
+        if (!$history->isEmpty()) { // Cek apakah data tidak kosong
+            $no1=count($history);
+            $no2=1;
+            foreach ($history as $value) {
+                $cek = ScheuleParent::where('employee_code', $value->employee)->where('project_id', $value->project)->where('periode', $value->periode)->first();
+                $stop_schedule='';
+                if($cek){
+                    $stop_schedule = "Sampai dengan Tanggal ".date('d F Y',strtotime($cek->created_at));
+                }
+                $absen='';
+                if($no1==$no2){
+                    $absen ='Absen Pertama Tanggal : '.date('d F Y',strtotime($first_absen->tanggal));
+                }
+                
+
+                $project_data = Project::where('id', $value->project)->first();
+                $html .= '<li class="event" data-date="'.$value->periode.'">
+                            <h3 class="title">' . htmlspecialchars($project_data->name) . '</h3>
+                            <p>'.$stop_schedule.'<br/>'.$absen.'</p>
+                        </li>';
+
+                $no2++;
+            }
+        }
+        $html .='<li class="event" data-date="'.date('d F Y',strtotime($employee->joindate)).'">
+                            <h3 class="title">JOIN DATE</h3>
+                        </li>';
         
 
-        return view('pages.hc.karyawan.details', compact('employee', 'attendanceData', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin','startDate', 'endDate'));
+        return view('pages.hc.karyawan.details', compact('employee', 'attendanceData','html', 'daysWithoutAttendance','daysWithClockInNoClockOut','daysWithAttendance','sakit','requestAbsen','CountRequest','izin','startDate', 'endDate'));
     }
 
     /**

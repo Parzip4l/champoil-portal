@@ -84,7 +84,7 @@
         <div class="card custom-card2">
             <div class="card-header">
                 <h6 class="">Employees Attendance 
-                    <a href="javascript:void(0)" id="btn-export" class="btn btn-success btn-xs" style="float:right">Export</a>
+                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#export-attendance" class="btn btn-success btn-xs" style="float:right">Export</a>
                 </h6>
             </div>
             <div class="card-body">
@@ -108,6 +108,28 @@
     </div>
 </div>
 
+<div class="modal fade" id="export-attendance" tabindex="-1" aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form action="" method="GET">
+                    <div class="form-group">
+                        <label for="month" class="form-label">Absen Periode</label>
+                        <select name="month" id="month" class="form-control" required>
+                            @foreach(['nov-2024' => 'November - 2024', 'dec-2024' => 'Desember - 2024', 
+                                      'jan-2025' => 'Januari - 2025', 'feb-2025' => 'Februari - 2025'] as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" id="exportButton">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('plugin-scripts')
@@ -121,7 +143,6 @@
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
 <script>
 $(document).ready(function () {
-    $('#btn-export').hide();
     function fetchData() {
         let organisasi = $('#organisasi').val();
         let project = $('#project').val();
@@ -131,15 +152,6 @@ $(document).ready(function () {
         let periodeSplit = periode ? periode.split(' - ') : ['', ''];
         let start = periodeSplit[0] || '';
         let end = periodeSplit[1] || '';
-
-        Swal.fire({
-            title: 'Loading...',
-            text: 'Fetching data, please wait.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
 
         $.ajax({
             url: '/api/v1/attendance-records',
@@ -152,17 +164,13 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                Swal.close(); // Close the loading indicator
                 if (response.status === 'success' && response.data.length > 0) {
                     updateTable(response.data);
-                    $('#btn-export').show();
-                    $('#btn-export').attr('onClick', `exportData('${organisasi}', '${project}', '${start}', '${end}')`);
                 } else {
                     Swal.fire('Info', 'No data available', 'info');
                 }
             },
             error: function (xhr) {
-                Swal.close(); // Close the loading indicator
                 Swal.fire('Error', xhr.responseJSON?.message || 'Failed to fetch data', 'error');
             }
         });
@@ -209,26 +217,18 @@ $(document).ready(function () {
         fetchData();
     });
 
-    exportData =function(organisasi, project, start, end) {
-        let url = `/api/v1/export-absensi?organisasi=${organisasi}&project_id=${project}&start=${start}&end=${end}`;
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                Swal.close(); // Close the loading indicator
-                if (response.status === 'success' && response.data.length > 0) {
-                    Swal.fire('Success', 'Data exported successfully', 'success');
-                } else {
-                    Swal.fire('Info', 'No data available', 'info');
-                }
-            },
-            error: function (xhr) {
-                Swal.close(); // Close the loading indicator
-                Swal.fire('Error', xhr.responseJSON?.message || 'Failed to fetch data', 'error');
-            }
-        });
-    }
+    // Tombol export
+    $('#exportButton').on('click', function () {
+        let organisasi = $('#organisasi').val();
+        let project = $('#project').val();
+        let periode = $('#periode').val();
+        let periodeSplit = periode ? periode.split(' - ') : ['', ''];
+        let start = periodeSplit[0] || '';
+        let end = periodeSplit[1] || '';
+
+        let url = `/api/v1/attendance-records/export?organisasi=${organisasi}&project_id=${project}&start=${start}&end=${end}`;
+        window.location.href = url;
+    });
 });
 </script>
 

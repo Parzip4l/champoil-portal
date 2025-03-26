@@ -52,7 +52,7 @@ class ApiLoginController extends Controller
         if(!$cek){
             return response()->json([
                 'success' => false,
-                'message' => 'Login Failed!',
+                'message' => 'Login Failed! Anda berstatus resign!',
             ]);
         }
         $user = User::where('email', $request->email)->first();

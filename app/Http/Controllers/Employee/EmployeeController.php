@@ -470,27 +470,60 @@ Password: ".$request->password;
         ->get();
         $html = ''; // Pastikan string kosong
 
-        $first_absen = Absen::where('nik', $nikdata)->orderBy('tanggal', 'asc')->first();
+        
 
         if (!$history->isEmpty()) { // Cek apakah data tidak kosong
             $no1=count($history);
             $no2=1;
             foreach ($history as $value) {
-                $cek = ScheuleParent::where('employee_code', $value->employee)->where('project_id', $value->project)->where('periode', $value->periode)->first();
+                $cek = ScheuleParent::where('employee_code', $value->employee)
+                                    ->where('project_id', $value->project)
+                                    ->where('periode', $value->periode)
+                                    ->orderBy('id','ASC')
+                                    ->first();
+
+
+                
+                $periode = $value->periode; // Contoh: "JANUARY-2025"
+
+                // Pecah periode menjadi bulan dan tahun
+                list($bulan_text, $tahun) = explode('-', $periode);
+                
+                // Konversi nama bulan ke format angka
+                $bulan_map = [
+                    'JANUARY' => 1, 'FEBRUARY' => 2, 'MARCH' => 3, 'APRIL' => 4, 
+                    'MAY' => 5, 'JUNE' => 6, 'JULY' => 7, 'AUGUST' => 8, 
+                    'SEPTEMBER' => 9, 'OCTOBER' => 10, 'NOVEMBER' => 11, 'DECEMBER' => 12
+                ];
+                
+                $bulan = $bulan_map[strtoupper($bulan_text)]; // Konversi ke angka bulan
+                
+                // Hitung tanggal awal dan akhir berdasarkan aturan
+                $start_date = date('Y-m-d', strtotime(($bulan == 1 ? ($tahun - 1) : $tahun) . '-' . ($bulan == 1 ? 12 : $bulan - 1) . '-21'));
+                $end_date = date('Y-m-d', strtotime("$tahun-$bulan-20"));
+                
+                // Query absen berdasarkan range tanggal yang sudah ditentukan
+                $absen_awal = Absen::where('nik', $value->employee)
+                    ->where('project', $value->project)
+                    ->whereBetween('tanggal', [$start_date, $end_date]) // Filter berdasarkan tanggal
+                    ->orderBy('id', 'ASC')
+                    ->first();
+                
+                $absen_akhir = Absen::where('nik', $value->employee)
+                    ->where('project', $value->project)
+                    ->whereBetween('tanggal', [$start_date, $end_date]) // Filter berdasarkan tanggal
+                    ->orderBy('id', 'DESC')
+                    ->first();
                 $stop_schedule='';
                 if($cek){
                     $stop_schedule = "Sampai dengan Tanggal ".date('d F Y',strtotime($cek->created_at));
-                }
-                $absen='';
-                if($no1==$no2){
-                    $absen ='Absen Pertama Tanggal : '.date('d F Y',strtotime($first_absen->tanggal));
                 }
                 
 
                 $project_data = Project::where('id', $value->project)->first();
                 $html .= '<li class="event" data-date="'.$value->periode.'">
                             <h3 class="title">' . htmlspecialchars($project_data->name) . '</h3>
-                            <p>'.$stop_schedule.'<br/>'.$absen.'</p>
+                            <p>'.$stop_schedule.'<br/> Absen Pertama : '.date('d F Y',strtotime($absen_awal->tanggal)).'<br/>Absen Terakhir : '.date('d F Y',strtotime($absen_akhir->tanggal)).'</p>
                         </li>';
 
                 $no2++;

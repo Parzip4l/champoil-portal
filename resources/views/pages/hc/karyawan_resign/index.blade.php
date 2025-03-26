@@ -44,6 +44,7 @@
                     <th>Organisasi</th>
                     <th>Jabatan</th>
                     <th>Status Karyawan</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -70,6 +71,7 @@
                     <td>{{ $data->organisasi }}</td>
                     <td>{{ $data->jabatan }}</td>
                     <td><span class="@if($data->status_kontrak == 'Permanent') badge rounded-pill bg-primary @else badge rounded-pill bg-success @endif">{{ $data->status_kontrak }}</span></td>
+                    <td><a href="{{route('employee.show', $data->id)}}" class="btn btn-sm btn-secondary">Detail</a></td>
                     
                 </tr>
                 <div class="modal fade" id="resign-{{ $data->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

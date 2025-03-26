@@ -77,8 +77,8 @@
                                         $shiftname = \App\ModelCG\Shift::where('code',$mybackup->shift)->first();
                                     @endphp
                                         <td>{{ \Carbon\Carbon::parse($mybackup->tanggal)->locale('id_ID')->isoFormat('dddd, D MMMM YYYY') }}</td>
-                                        <td>{{$projectname}}</td>
-                                        <td>{{$shiftname->name}}</td>
+                                        <td>{{ @$projectname}}</td>
+                                        <td>{{ @$shiftname->name}}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

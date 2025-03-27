@@ -1327,12 +1327,11 @@ class ApiLoginController extends Controller
                 $requestAbsen=[];
                 if($request_absen){
                     foreach($request_absen as $row){
-                        $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20');
+                        $query = Schedule::whereDate('schedules.tanggal','>','2024-06-20');
                                 if(!empty($get_project)){
-                                    $cek->where('project',$get_project->project);
+                                    $query->where('project',$get_project->project);
                                 }
-
-                                $cek->where('employee',$row->employee)->count();
+                        $cek=$query->where('employee',$row->employee)->count();
                         if($cek > 0){
                             $requestAbsen[]=$row;
                         }

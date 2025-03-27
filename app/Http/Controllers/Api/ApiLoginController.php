@@ -1473,7 +1473,8 @@ class ApiLoginController extends Controller
                         ->whereDate('tanggal', $yesterday)
                         ->first();
     
-                    if (strcasecmp($scheduleKasYesterday->shift, 'ML') == 0 || empty($scheduleKasYesterday->shift)){
+                    if (empty($scheduleKasYesterday->shift) || strcasecmp($scheduleKasYesterday->shift, 'ML') === 0) {
+
                         $alreadyClockIn = true;
                         $logs = AbsenBackup::where('nik', $user->employee_code)
                                 ->whereDate('tanggal', $yesterday)

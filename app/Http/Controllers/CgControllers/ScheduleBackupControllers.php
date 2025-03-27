@@ -21,7 +21,7 @@ class ScheduleBackupControllers extends Controller
      */
     public function index()
     {
-        $schedulesByProject = ScheduleBackup::orderBy('created_at','DESC')->get();
+        $schedulesByProject = ScheduleBackup::orderBy('id','DESC')->get();
         return view('pages.hc.kas.schedule-backup.index', compact('schedulesByProject'));
     }
 

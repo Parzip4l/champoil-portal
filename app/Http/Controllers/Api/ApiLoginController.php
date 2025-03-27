@@ -1334,7 +1334,7 @@ class ApiLoginController extends Controller
                                             ->orderBy('requests_attendence.tanggal', 'desc')
                                             ->get();
                 $requestAbsen=[];
-                if($request_absen){
+                if(!empty($request_absen) && !empty($get_project)){
                     foreach($request_absen as $row){
                         $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20')
                                 ->where('project',$get_project->project)

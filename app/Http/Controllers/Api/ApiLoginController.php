@@ -1331,7 +1331,6 @@ class ApiLoginController extends Controller
                                 if(!empty($get_project)){
                                     $cek->where('project',$get_project->project);
                                 }
-                                $cek->where('project',$get_project->project);
 
                                 $cek->where('employee',$row->employee)->count();
                         if($cek > 0){

@@ -52,7 +52,7 @@ class ApiLoginController extends Controller
         if(!$cek){
             return response()->json([
                 'success' => false,
-                'message' => 'Login Failed! Anda berstatus resign!',
+                'message' => 'Login Failed!',
             ]);
         }
         $user = User::where('email', $request->email)->first();
@@ -547,13 +547,6 @@ class ApiLoginController extends Controller
 
                 // Ensure employeeCode is not null before accessing the database
                 if ($employeeCode) {
-                    $cacheKey = 'payslips:' . $employeeCode;
-
-                    // Check if data is already in cache
-                    $cachedData = Cache::get($cacheKey);
-                    if ($cachedData) {
-                        return response()->json(['payslips' => $cachedData]);
-                    }
 
                     $dataKaryawan = Employee::where('nik', $employeeCode)->first();
 
@@ -584,8 +577,6 @@ class ApiLoginController extends Controller
                         // Modify the response to return JSON data
                         $payslipsData = $payslips->toArray();
 
-                        // Store data in cache for future requests
-                        Cache::put($cacheKey, $payslipsData, 60); // Set expiration time in minutes
 
                         return response()->json([
                             'payslips' => $payslips->items(),
@@ -1334,12 +1325,15 @@ class ApiLoginController extends Controller
                                             ->orderBy('requests_attendence.tanggal', 'desc')
                                             ->get();
                 $requestAbsen=[];
-                if(!empty($request_absen) && !empty($get_project)){
+                if($request_absen){
                     foreach($request_absen as $row){
-                        $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20')
-                                ->where('project',$get_project->project)
-                                ->where('employee',$row->employee)
-                                ->count();
+                        $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20');
+                                if(!empty($get_project)){
+                                    $cek->where('project',$get_project->project);
+                                }
+                                $cek->where('project',$get_project->project);
+
+                                $cek->where('employee',$row->employee)->count();
                         if($cek > 0){
                             $requestAbsen[]=$row;
                         }

@@ -379,6 +379,7 @@ class AbsenController extends Controller
     {   
         $user = Auth::user();
         $nik = Auth::user()->employee_code;
+        $unit_bisnis = Employee::where('nik',$nik)->first();
 
         $today = Carbon::now()->format('Y-m-d');
 

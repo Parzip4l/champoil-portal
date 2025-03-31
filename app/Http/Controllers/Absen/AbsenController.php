@@ -298,6 +298,10 @@ class AbsenController extends Controller
                 $allowedRadius = $dataCompany->radius;
             }
 
+            if($unit_bisnis->jabatan =='DRIVER'){
+                $allowedRadius=9999999;
+            }
+
             $shift_fix=0;
             $msg = "";
             if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
@@ -408,6 +412,10 @@ class AbsenController extends Controller
         $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
 
         $allowedRadius = 5;
+
+        if($unit_bisnis->jabatan =='DRIVER'){
+            $allowedRadius=9999999;
+        }
 
         if ($distance <= $allowedRadius) {
             $absensi = new absen();

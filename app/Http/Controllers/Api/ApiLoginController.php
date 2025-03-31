@@ -183,7 +183,7 @@ class ApiLoginController extends Controller
                     'user_id' => $nik,
                     'nik' => $nik,
                     'project' => $projectData,
-                    'tanggal' => now()->toDateString(),
+                    'tanggal' => date('Y-m-d'),
                     'clock_in' => now()->format('H:i'),
                     'latitude' => $lat,
                     'longtitude' => $long,

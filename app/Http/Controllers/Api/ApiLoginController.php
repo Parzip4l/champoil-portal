@@ -123,6 +123,34 @@ class ApiLoginController extends Controller
                 $allowedRadius=9999999;
             }
 
+            $shift_fix=0;
+            $msg = "";
+            if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
+                $cek = ProjectShift::where('shift_code', $shift)
+                    ->where('project_id', $project_id)
+                    ->get();
+            
+                if ($cek->isEmpty()) {
+                    $shift_fix=0;
+                    $msg="Shift tidak ditemukan";
+                }
+            
+                $nowTime = now()->format('H:i'); // Ambil waktu sekarang (jam:menit:detik)
+
+                foreach ($cek as $row) {
+                    if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
+                        $shift_fix=1;
+                    }
+                }
+            
+                $shift_fix=0;
+                $msg="Anda tidak bisa clock in karena schedule " . $shift . ' (' . $row->jam_masuk . ' sampai ' . $row->jam_pulang . ')';
+            }
+
+            if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
+                return response()->json(['message' => $msg]);
+            }
+
             $existingAbsen = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $today)
                 ->first();

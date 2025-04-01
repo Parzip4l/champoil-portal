@@ -89,7 +89,7 @@ class ApiLoginController extends Controller
     // Absen Masuk
     public function clockin(Request $request)
     {
-        try {
+        // try {
             $token = $request->bearerToken();
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
@@ -126,31 +126,7 @@ class ApiLoginController extends Controller
 
             $shift_fix=0;
             $msg = "";
-            // if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
-            //     $cek = ProjectShift::where('shift_code', $shift)
-            //         ->where('project_id', $schedulebackup->project)
-            //         ->get();
             
-            //     if ($cek->isEmpty()) {
-            //         $shift_fix=0;
-            //         $msg="Shift tidak ditemukan";
-            //     }
-            
-            //     $nowTime = now()->format('H:i'); // Ambil waktu sekarang (jam:menit:detik)
-
-            //     foreach ($cek as $row) {
-            //         if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
-            //             $shift_fix=1;
-            //         }
-            //     }
-            
-            //     $shift_fix=0;
-            //     $msg="Anda tidak bisa clock in karena schedule " . $shift . ' (' . $row->jam_masuk . ' sampai ' . $row->jam_pulang . ')';
-            // }
-
-            if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
-                return response()->json(['message' => $msg]);
-            }
 
             $existingAbsen = Absen::where('nik', $nik)
                 ->whereDate('tanggal', $today)
@@ -207,6 +183,36 @@ class ApiLoginController extends Controller
                     DB::rollBack();
                     return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
                 }
+
+                if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
+                    $cek = ProjectShift::where('shift_code', $schedulebackup->shift)
+                        ->where('project_id', $schedulebackup->project)
+                        ->get();
+                
+                        if ($cek->isEmpty()) {
+                            $shift_fix=0;
+                            $msg="Shift tidak ditemukan";
+                        }
+                    
+                        $nowTime = now()->format('H:i'); // Ambil waktu sekarang (jam:menit:detik)
+                        $jam_masuk = "";
+                        $jam_pulang = "";
+                        foreach ($cek as $row) {
+                            if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
+                                $shift_fix=1;
+                                
+                            }
+                            $jam_masuk = $row->jam_masuk;
+                            $jam_pulang = $row->jam_pulang;
+                        }
+                    
+                        $shift_fix=0;
+                        $msg="Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . ' (' . $jam_masuk . ' sampai ' . $jam_pulang . ')';
+                }
+    
+                if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
+                    return response()->json(['message' => $msg]);
+                }
                 
                 $insert = Absen::create([
                     'user_id' => $nik,
@@ -225,11 +231,11 @@ class ApiLoginController extends Controller
                 DB::rollBack();
                 return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
             }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            // Log the error or handle it appropriately
-            return response()->json(['message' => 'An error occurred while processing the request.']);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     // Log the error or handle it appropriately
+        //     return response()->json(['message' => 'An error occurred while processing the request.']);
+        // }
     }
 
 

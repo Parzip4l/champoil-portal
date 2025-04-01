@@ -149,7 +149,7 @@ class ApiLoginController extends Controller
             }
 
             if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
-                return response()->json(['message' => $msg]);
+                return response()->json(['message' => "Shift Tidak Cocok"]);
             }
 
             $existingAbsen = Absen::where('nik', $nik)

@@ -185,7 +185,7 @@ class ApiLoginController extends Controller
                 }
 
                 if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
-                    $cek = ProjectShift::where('shift_code', $schedulebackup->shift)
+                    $cek = ProjectShift::where('shift_cod', $schedulebackup->shift)
                         ->where('project_id', $schedulebackup->project)
                         ->get();
                 
@@ -930,6 +930,14 @@ class ApiLoginController extends Controller
             
             $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
             $employee = $request->input('employee');
+            $cek_absen = Absen::where('nik', $employee)
+                ->whereDate('tanggal', $tanggal)
+                ->first();
+            if ($cek_absen) {
+                return response()->json([
+                    'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
+                ], 400);
+            }
 
             // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve
             $existingRequest = RequestAbsen::where('employee', $employee)

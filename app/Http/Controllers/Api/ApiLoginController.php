@@ -35,6 +35,7 @@ use App\ModelCG\Shift;
 use App\Backup\AbsenBackup;
 use App\Payrol\Component;
 use App\Urbanica\PayrolUrbanica;
+use App\ModelCG\Datamaster\ProjectShift;
 
 class ApiLoginController extends Controller
 {

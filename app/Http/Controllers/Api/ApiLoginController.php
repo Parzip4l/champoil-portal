@@ -128,7 +128,7 @@ class ApiLoginController extends Controller
             $msg = "";
             if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
                 $cek = ProjectShift::where('shift_code', $shift)
-                    ->where('project_id', $project_id)
+                    ->where('project_id', $schedulebackup->project)
                     ->get();
             
                 if ($cek->isEmpty()) {

@@ -936,7 +936,7 @@ class ApiLoginController extends Controller
             if ($cek_absen) {
                 return response()->json([
                     'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
-                ], 400);
+                ], 200);
             }
 
             // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve
@@ -948,7 +948,7 @@ class ApiLoginController extends Controller
             if ($existingRequest) {
                 return response()->json([
                     'message' => 'Anda sudah memiliki pengajuan absen untuk tanggal ' . date('d F Y', strtotime($tanggal)) . ' dengan status Pending atau Approve. Anda hanya bisa mengajukan ulang jika statusnya Ditolak.'
-                ], 400);
+                ], 200);
             }
 
             $randomNumber = mt_rand(100000, 999999);

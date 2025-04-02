@@ -591,21 +591,21 @@ class ApiLoginController extends Controller
                         if (strtolower($karyawan['organisasi']) === 'management leaders') {
                             $payslips = Payrol::where('employee_code', $employeeCode)
                                 ->where('payslip_status', 'Published')
-                                ->paginate(10);
+                                ->get();
                         } else {
                             $unit_bisnis = $dataKaryawan->unit_bisnis;
                             if ($unit_bisnis == 'Kas') {
                                 $payslips = Payroll::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->paginate(10);
+                                            ->get();
                             }elseif($unit_bisnis == 'Run'){
                                 $payslips = PayrolUrbanica::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->paginate(10);
+                                            ->get();
                             } else {
                                 $payslips = Payrollns::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->paginate(10);
+                                            ->get();
                             }
                         }
 
@@ -614,11 +614,8 @@ class ApiLoginController extends Controller
 
 
                         return response()->json([
-                            'payslips' => $payslips->items(),
-                            'current_page' => $payslips->currentPage(),
-                            'per_page' => $payslips->perPage(),
-                            'total' => $payslips->total(),
-                            'success' => true,
+                            'payslips' => $payslipsData,
+                            'total' => count($payslips),
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);

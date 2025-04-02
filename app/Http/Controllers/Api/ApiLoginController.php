@@ -194,17 +194,33 @@ class ApiLoginController extends Controller
                         $nowTime = now()->format('H:i');
                         $jam_masuk = "";
                         $jam_pulang = "";
+                        $shift_fix = 0;  // Jangan reset setelah looping
+                        
                         foreach ($cek as $row) {
-                            if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
-                                $shift_fix=1;
-                                
-                            }
                             $jam_masuk = $row->jam_masuk;
                             $jam_pulang = $row->jam_pulang;
+                        
+                            // Jika jam pulang lebih kecil dari jam masuk, berarti shift melewati tengah malam
+                            if ($jam_pulang < $jam_masuk) {
+                                // Cek apakah jam ayeuna berada dalam rentang shift yang melewati tengah malam
+                                if ($nowTime >= $jam_masuk || $nowTime <= $jam_pulang) {
+                                    $shift_fix = 1;
+                                    break;
+                                }
+                            } else {
+                                // Shift normal dalam satu hari
+                                if ($nowTime >= $jam_masuk && $nowTime <= $jam_pulang) {
+                                    $shift_fix = 1;
+                                    break;
+                                }
+                            }
                         }
-                    
-                        $shift_fix=0;
-                        $msg="Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . ' (' . $jam_masuk . ' sampai ' . $jam_pulang . ')';
+                        
+                        // Jika shift tidak ditemukan, kembalikan pesan error
+                        if ($shift_fix == 0) {
+                            $msg = "Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . " (" . $jam_masuk . " sampai " . $jam_pulang . ")";
+                            return response()->json(['message' => $msg]);
+                        }
                 }
     
                 if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){

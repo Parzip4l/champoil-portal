@@ -591,21 +591,21 @@ class ApiLoginController extends Controller
                         if (strtolower($karyawan['organisasi']) === 'management leaders') {
                             $payslips = Payrol::where('employee_code', $employeeCode)
                                 ->where('payslip_status', 'Published')
-                                ->get();
+                                ->paginate(10);
                         } else {
                             $unit_bisnis = $dataKaryawan->unit_bisnis;
                             if ($unit_bisnis == 'Kas') {
                                 $payslips = Payroll::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->get();
+                                            ->paginate(10);
                             }elseif($unit_bisnis == 'Run'){
                                 $payslips = PayrolUrbanica::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->get();
+                                            ->paginate(10);
                             } else {
                                 $payslips = Payrollns::where('employee_code', $employeeCode)
                                             ->where('payslip_status', 'Published')
-                                            ->get();
+                                            ->paginate(10);
                             }
                         }
 

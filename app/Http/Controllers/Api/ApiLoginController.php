@@ -703,6 +703,11 @@ class ApiLoginController extends Controller
                 $payslip->deductions = json_encode($deductions);
             }
 
+            if (!empty($payslip)) {
+                // Ensure 'basic_salary' and 'net_salary' exist before converting
+                $payslip['basic_salary'] = isset($payslip['basic_salary']) ? (string) $payslip['basic_salary'] : '0';
+                $payslip['net_salary'] = isset($payslip['net_salary']) ? (string) $payslip['net_salary'] : '0';
+            }
             // Return the payslip data as JSON
             return response()->json(['data' => $payslip], 200);
         } catch (ModelNotFoundException $e) {

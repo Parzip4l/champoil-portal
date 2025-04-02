@@ -618,6 +618,7 @@ class ApiLoginController extends Controller
                             'current_page' => $payslips->currentPage(),
                             'per_page' => $payslips->perPage(),
                             'total' => $payslips->total(),
+                            'success' => true,
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);

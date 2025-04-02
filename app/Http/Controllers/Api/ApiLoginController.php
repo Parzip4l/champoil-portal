@@ -96,9 +96,6 @@ class ApiLoginController extends Controller
             $unit_bisnis = Employee::where('nik',$nik)->first();
             $today = now()->toDateString();
 
-
-
-
             DB::beginTransaction();
 
             $schedulebackup = Schedule::where('employee', $nik)
@@ -185,7 +182,7 @@ class ApiLoginController extends Controller
                 }
 
                 if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
-                    $cek = ProjectShift::where('shift_cod', $schedulebackup->shift)
+                    $cek = ProjectShift::where('shift_code', $schedulebackup->shift)
                         ->where('project_id', $schedulebackup->project)
                         ->get();
                 

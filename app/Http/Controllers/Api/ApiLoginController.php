@@ -194,20 +194,17 @@ class ApiLoginController extends Controller
                         $nowTime = now()->format('H:i');
                         $jam_masuk = "";
                         $jam_pulang = "";
-                        $shift_fix = 0;
                         foreach ($cek as $row) {
                             if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
-                                $shift_fix = 1;
-                                $jam_masuk = $row->jam_masuk;
-                                $jam_pulang = $row->jam_pulang;
-                                break; 
+                                $shift_fix=1;
+                                
                             }
+                            $jam_masuk = $row->jam_masuk;
+                            $jam_pulang = $row->jam_pulang;
                         }
-                        
-                        if ($shift_fix == 0) {
-                            $msg = "Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . ' (' . $jam_masuk . ' sampai ' . $jam_pulang . ')';
-                            return response()->json(['message' => $msg]);
-                        }
+                    
+                        $shift_fix=0;
+                        $msg="Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . ' (' . $jam_masuk . ' sampai ' . $jam_pulang . ')';
                 }
     
                 if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
@@ -611,17 +608,13 @@ class ApiLoginController extends Controller
 
                         // Modify the response to return JSON data
                         $payslipsData = $payslips->toArray();
-                        if($payslipsData){
-                            foreach ($payslipsData as $key => $payslip) {
-                                $payslipsData[$key]['basic_salary'] = (string) $payslip['basic_salary']; // Convert ID to string
-                                $payslipsData[$key]['net_salary'] = (string) $payslip['net_salary'];
-                            }
-                        }
 
 
                         return response()->json([
-                            'payslips' => $payslipsData,
-                            'total' => count($payslips),
+                            'payslips' => $payslips->items(),
+                            'current_page' => $payslips->currentPage(),
+                            'per_page' => $payslips->perPage(),
+                            'total' => $payslips->total(),
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
@@ -703,11 +696,6 @@ class ApiLoginController extends Controller
                 $payslip->deductions = json_encode($deductions);
             }
 
-            if (!empty($payslip)) {
-                // Ensure 'basic_salary' and 'net_salary' exist before converting
-                $payslip['basic_salary'] = isset($payslip['basic_salary']) ? (string) $payslip['basic_salary'] : '0';
-                $payslip['net_salary'] = isset($payslip['net_salary']) ? (string) $payslip['net_salary'] : '0';
-            }
             // Return the payslip data as JSON
             return response()->json(['data' => $payslip], 200);
         } catch (ModelNotFoundException $e) {

@@ -191,20 +191,23 @@ class ApiLoginController extends Controller
                             $msg="Shift tidak ditemukan";
                         }
                     
-                        $nowTime = now()->format('H:i'); // Ambil waktu sekarang (jam:menit:detik)
+                        $nowTime = now()->format('H:i');
                         $jam_masuk = "";
                         $jam_pulang = "";
+                        $shift_fix = 0;
                         foreach ($cek as $row) {
                             if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
-                                $shift_fix=1;
-                                
+                                $shift_fix = 1;
+                                $jam_masuk = $row->jam_masuk;
+                                $jam_pulang = $row->jam_pulang;
+                                break; 
                             }
-                            $jam_masuk = $row->jam_masuk;
-                            $jam_pulang = $row->jam_pulang;
                         }
-                    
-                        $shift_fix=0;
-                        $msg="Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . ' (' . $jam_masuk . ' sampai ' . $jam_pulang . ')';
+                        
+                        if ($shift_fix == 0) {
+                            $msg = "Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . ' (' . $jam_masuk . ' sampai ' . $jam_pulang . ')';
+                            return response()->json(['message' => $msg]);
+                        }
                 }
     
                 if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){

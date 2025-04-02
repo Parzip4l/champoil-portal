@@ -611,6 +611,12 @@ class ApiLoginController extends Controller
 
                         // Modify the response to return JSON data
                         $payslipsData = $payslips->toArray();
+                        if($payslipsData){
+                            foreach ($payslipsData as $key => $payslip) {
+                                $payslipsData[$key]['basic_salary'] = (string) $payslip['basic_salary']; // Convert ID to string
+                                $payslipsData[$key]['net_salary'] = (string) $payslip['net_salary'];
+                            }
+                        }
 
 
                         return response()->json([

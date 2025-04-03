@@ -1139,9 +1139,9 @@ class ApiLoginController extends Controller
                 // Cek Button
                 if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
                 
-                    // Ambil jadwal shift malam kemarin
+                    // Ambil jadwal shift malam kemarin (tanggal 3)
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
-                        ->whereDate('tanggal', $yesterday)
+                        ->whereDate('tanggal', $yesterday) // $yesterday = tanggal 3
                         ->first();
                 
                     if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
@@ -1149,31 +1149,41 @@ class ApiLoginController extends Controller
                         $alreadyClockOut = false;
                         $logs = collect(); // Kosongkan logs awalnya
                 
-                        // Cek absensi kemarin
+                        // Cek absensi shift malam kemarin (tanggal 3)
                         $logsYesterday = Absen::where('user_id', $user->employee_code)
-                            ->whereDate('tanggal', $yesterday)
+                            ->whereDate('tanggal', $yesterday) // Ambil log tanggal 3
                             ->get();
                 
                         if ($logsYesterday->isNotEmpty()) {
                             $lastLogYesterday = $logsYesterday->last();
+                            $now = now();
                 
-                            // Jika user sudah clock-in kemarin tapi belum clock-out, reset status (jangan tampilkan log kemarin)
-                            if ($lastLogYesterday->clock_out === null) {
+                            // Cek apakah sekarang sudah lewat jam 10 pagi tanggal 4
+                            $isAfter10AM = $now->hour >= 10; 
+                
+                            // Jika user sudah clock-in kemarin (tanggal 3) tapi belum clock-out & sudah lewat jam 10 pagi (tanggal 4)
+                            if ($lastLogYesterday->clock_out === null && $isAfter10AM) {
+                                // Reset untuk absen hari ini (tanggal 4)
                                 $alreadyClockIn = false;
                                 $alreadyClockOut = false;
-                                $logs = collect(); // Kosongkan log agar tidak tampil
+                                $logs = collect(); // Kosongkan log kemarin agar tidak muncul
+                            } else {
+                                // Jika masih dalam shift malam atau belum lewat 10 pagi, tetap gunakan log kemarin
+                                $alreadyClockIn = true;
+                                $alreadyClockOut = ($lastLogYesterday->clock_out !== null);
+                                $logs = $logsYesterday;
                             }
                         }
                 
-                        // Cek absensi hari ini
+                        // Cek absensi hari ini (tanggal 4)
                         $logsToday = Absen::where('user_id', $user->employee_code)
-                            ->whereDate('tanggal', Carbon::today())
+                            ->whereDate('tanggal', Carbon::today()) // Ambil log tanggal 4
                             ->get();
                 
                         if ($logsToday->isNotEmpty()) {
                             $lastLogToday = $logsToday->last();
                 
-                            // Jika user sudah clock-in hari ini
+                            // Jika user sudah clock-in hari ini (tanggal 4)
                             if ($lastLogToday->clock_in !== null) {
                                 $alreadyClockIn = true;
                                 $alreadyClockOut = ($lastLogToday->clock_out !== null);
@@ -1181,7 +1191,8 @@ class ApiLoginController extends Controller
                             }
                         }
                     }
-                }                
+                }
+                                
                 
 
                 // Greating

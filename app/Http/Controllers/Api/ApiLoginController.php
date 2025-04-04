@@ -1448,71 +1448,51 @@ class ApiLoginController extends Controller
                     }
                 }
 
-                // Cek Button
+                // Cek jika unit bisnis adalah Kasir dan Organisasi adalah FRONTLINE OFFICER
                 if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
-                
-                    $scheduleKasYesterday = ScheduleBackup::where('employee', $nik)
-                        ->whereDate('tanggal', $yesterday)
-                        ->first();
-    
-                    if (empty($scheduleKasYesterday->shift) || strcasecmp($scheduleKasYesterday->shift, 'ML') === 0) {
-
-                        $alreadyClockIn = true;
-                        $logs = AbsenBackup::where('nik', $user->employee_code)
-                                ->whereDate('tanggal', $yesterday)
-                                ->get();
-
-                        if ($logs->isEmpty()) {
-                            // Jika belum ada log absen, set tombol ke clock in
-                            $alreadyClockIn = false;
-                            $alreadyClockOut = false;
-                        } else {
-                            // Jika sudah ada log absen, cek apakah yang terakhir adalah clock in atau clock out
-                            $lastLog = $logs->last();
                     
-                            if ($lastLog->clock_out === null) {
-                                // Jika yang terakhir adalah clock in, set tombol ke clock out
+                    // Ambil jadwal shift malam kemarin (tanggal 3)
+                    $scheduleKasYesterday = ScheduleBackup::where('employee', $nik)
+                        ->whereDate('tanggal', $yesterday) // $yesterday = tanggal 3
+                        ->first();
+
+                    if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
+                        // Cek absensi shift malam kemarin (tanggal 3)
+                        $logsYesterday = AbsenBackup::where('user_id', $user->employee_code)
+                            ->whereDate('tanggal', $yesterday) // Ambil log tanggal 3
+                            ->get();
+
+                        if ($logsYesterday->isNotEmpty()) {
+                            $lastLogYesterday = $logsYesterday->last();
+                            $now = now();
+                            $isAfter10AM = $now->hour >= 10; 
+
+                            // Jika user sudah clock-in kemarin (tanggal 3) 
+                            if ($lastLogYesterday->clock_in !== null) {
+                                // Cek apakah user sudah clock-out atau belum
                                 $alreadyClockIn = true;
-                                $alreadyClockOut = false;
-                            } else {
-                                // Jika yang terakhir adalah clock out, set tombol ke clock in
+                                $alreadyClockOut = ($lastLogYesterday->clock_out !== null);
+                                $logs = $logsYesterday;
+                            }
+                        }
+
+                        // Cek shift malam hari ini (tanggal 4)
+                        $scheduleKasToday = ScheduleBackup::where('employee', $nik)
+                            ->whereDate('tanggal', Carbon::today())
+                            ->first();
+
+                        if ($scheduleKasToday && strcasecmp($scheduleKasToday->shift, 'ML') == 0) {
+                            $now = now();
+                            $isAfter10AM = $now->hour >= 10;
+
+                            // Jika sudah lewat jam 10 pagi, reset tombol Clock-In
+                            if ($isAfter10AM) {
                                 $alreadyClockIn = false;
                                 $alreadyClockOut = false;
-                                
-                                $today = Carbon::today();
-                                $logs = AbsenBackup::where('nik', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->get();
-                                
-                                
-                                $logsHarinini = AbsenBackup::where('nik', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->first();
-                                
-                                if ($logsHarinini !== null) {
-                                    if ($logsHarinini->clock_in !== null) {
-                                        $alreadyClockIn = true;
-                                        $logs = AbsenBackup::where('nik', $user->employee_code)
-                                            ->whereDate('tanggal', $today)
-                                            ->get();
-                                    } else {
-                                        $alreadyClockIn = false;
-                                        $alreadyClockOut = false;
-                                        $logs = AbsenBackup::where('nik', $user->employee_code)
-                                            ->whereDate('tanggal', $today)
-                                            ->get();
-                                    }
-                                } else {
-                                    // Handle ketika $logsHarinini adalah null, misalnya memberikan pesan atau tindakan lainnya
-                                    $alreadyClockIn = false;
-                                    $alreadyClockOut = false;
-                                    $logs = collect(); // Menggunakan koleksi kosong untuk menghindari error jika dibutuhkan
-                                }
-                                
+                                $logs = collect(); // Kosongkan log hari ini agar tidak muncul
                             }
                         }
                     }
-                    
                 }
                 
 

@@ -367,9 +367,7 @@ class ApiLoginController extends Controller
                 $periode = $databackup->periode;
             }
 
-            if($unit_bisnis->jabatan =='DRIVER'){
-                $allowedRadius=9999999;
-            }
+            
 
             $dataProject = Project::where('id', $project_id)->first();
 
@@ -388,6 +386,10 @@ class ApiLoginController extends Controller
             
             $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
             $allowedRadius = 3;
+
+            if($unit_bisnis->jabatan =='DRIVER'){
+                $allowedRadius=9999999;
+            }
 
             if ($distance <= $allowedRadius) {
                 $filename = null;

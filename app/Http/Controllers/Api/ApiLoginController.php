@@ -1114,6 +1114,21 @@ class ApiLoginController extends Controller
                             ->whereDate('tanggal', Carbon::today())
                             ->first();
 
+                        $logsToday = Absen::where('user_id', $user->employee_code)
+                            ->whereDate('tanggal', Carbon::today())
+                            ->get();
+                            
+                        // Jika sudah ada log absensi hari ini, set tombol ke clock-out
+                        if ($logsToday->isNotEmpty()) {
+                            $lastLogToday = $logsToday->last();
+
+                            if ($lastLogToday->clock_in !== null) {
+                                $alreadyClockIn = true;
+                                $alreadyClockOut = ($lastLogToday->clock_out !== null);
+                                $logs = $logsToday; // Prioritaskan log hari ini
+                            }
+                        }
+
                         if ($scheduleKasToday && strcasecmp($scheduleKasToday->shift, 'ML') == 0) {
                             $now = now();
                             $isAfter10AM = $now->hour >= 10;
@@ -1127,9 +1142,6 @@ class ApiLoginController extends Controller
                         }
                     }
                 }
-
-                                
-                
 
                 // Greating
                 date_default_timezone_set('Asia/Jakarta'); // Set timezone sesuai dengan lokasi Anda

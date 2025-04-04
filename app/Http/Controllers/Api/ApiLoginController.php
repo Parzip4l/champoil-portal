@@ -351,6 +351,7 @@ class ApiLoginController extends Controller
             $token = $request->bearerToken();
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
 
             $today = Carbon::now()->format('Y-m-d');
 
@@ -364,6 +365,10 @@ class ApiLoginController extends Controller
                 $tanggal_backup = $databackup->tanggal;
                 $shift = $databackup->shift;
                 $periode = $databackup->periode;
+            }
+
+            if($unit_bisnis->jabatan =='DRIVER'){
+                $allowedRadius=9999999;
             }
 
             $dataProject = Project::where('id', $project_id)->first();

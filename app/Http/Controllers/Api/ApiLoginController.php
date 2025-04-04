@@ -1118,16 +1118,6 @@ class ApiLoginController extends Controller
                             ->whereDate('tanggal', Carbon::today())
                             ->get();
                             
-                        // Jika sudah ada log absensi hari ini, set tombol ke clock-out
-                        if ($logsToday->isNotEmpty()) {
-                            $lastLogToday = $logsToday->last();
-
-                            if ($lastLogToday->clock_in !== null) {
-                                $alreadyClockIn = true;
-                                $alreadyClockOut = ($lastLogToday->clock_out !== null);
-                                $logs = $logsToday; // Prioritaskan log hari ini
-                            }
-                        }
 
                         if ($scheduleKasToday && strcasecmp($scheduleKasToday->shift, 'ML') == 0) {
                             $now = now();
@@ -1138,6 +1128,17 @@ class ApiLoginController extends Controller
                                 $alreadyClockIn = false;
                                 $alreadyClockOut = false;
                                 $logs = collect(); // Kosongkan log hari ini agar tidak muncul
+                            }
+                        }
+
+                        // Jika sudah ada log absensi hari ini, set tombol ke clock-out
+                        if ($logsToday->isNotEmpty()) {
+                            $lastLogToday = $logsToday->last();
+
+                            if ($lastLogToday->clock_in !== null) {
+                                $alreadyClockIn = true;
+                                $alreadyClockOut = ($lastLogToday->clock_out !== null);
+                                $logs = $logsToday; // Prioritaskan log hari ini
                             }
                         }
                     }

@@ -1410,14 +1410,14 @@ class ApiLoginController extends Controller
             
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
-                $lastAbsensi = AbsenBackup::where('tanggal',$hariini)
+                $lastAbsensi = Absen::where('tanggal',$hariini)
                 ->where('nik', $user->employee_code)
                 ->first();
                 // Get Data Karyawan
                 $userId = $user->id;
                 $today = now();
                 // Get Log Absensi
-                $logs = AbsenBackup::where('nik', $user->employee_code)
+                $logs = Absen::where('nik', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
                     ->get();
                 
@@ -1432,14 +1432,14 @@ class ApiLoginController extends Controller
                 $bulan = $request->input('bulan');
                 // Get logs for the month
                 if($bulan) {
-                    $logsmonths = AbsenBackup::where('nik', $user->employee_code)
+                    $logsmonths = Absen::where('nik', $user->employee_code)
                         ->whereMonth('tanggal', '=', date('m', strtotime($bulan)))
                         ->whereYear('tanggal', '=', date('Y', strtotime($bulan)))
                         ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                         ->orderBy('tanggal')
                         ->get();
                 } else {
-                    $logsmonths = AbsenBackup::where('nik', $user->employee_code)
+                    $logsmonths = Absen::where('nik', $user->employee_code)
                         ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
                         ->orderBy('tanggal')
                         ->get();
@@ -1471,7 +1471,7 @@ class ApiLoginController extends Controller
 
                     if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
                         // Cek absensi shift malam kemarin (tanggal 3)
-                        $logsYesterday = AbsenBackup::where('user_id', $user->employee_code)
+                        $logsYesterday = Absen::where('user_id', $user->employee_code)
                             ->whereDate('tanggal', $yesterday) // Ambil log tanggal 3
                             ->get();
 
@@ -1529,7 +1529,7 @@ class ApiLoginController extends Controller
                 $startDate = now()->day >= 21 ? now()->copy()->day(20) : now()->copy()->subMonth()->day(21);
                 $endDate = now()->day >= 21 ? now()->copy()->addMonth()->day(20) : now()->copy()->day(20);
 
-                $BackupPeriodeLog = AbsenBackup::where('nik', $user->employee_code)
+                $BackupPeriodeLog = Absen::where('nik', $user->employee_code)
                             ->whereBetween('tanggal', [$startDate, $endDate])
                             ->get();
                 // Calculate the total weekdays in the current month (excluding weekends)

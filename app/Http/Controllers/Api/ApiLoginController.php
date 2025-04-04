@@ -393,7 +393,7 @@ class ApiLoginController extends Controller
 
             if ($distance <= $allowedRadius) {
                 $filename = null;
-                $absensi = new AbsenBackup();
+                $absensi = new Absen();
                 $absensi->user_id = $nik;
                 $absensi->nik = $nik;
                 $absensi->tanggal = now()->toDateString();
@@ -409,7 +409,7 @@ class ApiLoginController extends Controller
                     $path = $image->storeAs('images/absen', $filename, 'public');
                 }
                 $absensi->photo = $filename;
-                $absensi->project = $project_id;
+                $absensi->project_backup = $project_id;
                 $absensi->save();
                 return response()->json(['message' => 'Clockin success, Happy Working Day!']);
             } else {
@@ -470,7 +470,7 @@ class ApiLoginController extends Controller
                         ], 404);
                     }
                 }else{
-                    $absensi = AbsenBackup::where('nik', $nik)
+                    $absensi = Absen::where('nik', $nik)
                         ->whereDate('tanggal', $currentDate)
                         ->orderBy('clock_in', 'desc')
                         ->first();

@@ -1062,7 +1062,7 @@ class ApiLoginController extends Controller
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
-                
+
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
                         $alreadyClockIn = true;
@@ -1073,63 +1073,54 @@ class ApiLoginController extends Controller
                         $isSameDay = $lastClockOut->isSameDay($today);
                     }
                 }
-                
-                // Cek Button
+
+                // Cek jika unit bisnis adalah Kasir dan Organisasi adalah FRONTLINE OFFICER
                 if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
-                
+                    
                     // Ambil jadwal shift malam kemarin (tanggal 3)
                     $scheduleKasYesterday = Schedule::where('employee', $nik)
                         ->whereDate('tanggal', $yesterday) // $yesterday = tanggal 3
                         ->first();
-                
+
                     if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
-                        $alreadyClockIn = false;
-                        $alreadyClockOut = false;
-                        $logs = collect(); // Kosongkan logs awalnya
-                
                         // Cek absensi shift malam kemarin (tanggal 3)
                         $logsYesterday = Absen::where('user_id', $user->employee_code)
                             ->whereDate('tanggal', $yesterday) // Ambil log tanggal 3
                             ->get();
-                
+
                         if ($logsYesterday->isNotEmpty()) {
                             $lastLogYesterday = $logsYesterday->last();
                             $now = now();
-                
-                            // Cek apakah sekarang sudah lewat jam 10 pagi tanggal 4
                             $isAfter10AM = $now->hour >= 10; 
-                
-                            // Jika user sudah clock-in kemarin (tanggal 3) tapi belum clock-out & sudah lewat jam 10 pagi (tanggal 4)
-                            if ($lastLogYesterday->clock_out === null && $isAfter10AM) {
-                                // Reset untuk absen hari ini (tanggal 4)
-                                $alreadyClockIn = false;
-                                $alreadyClockOut = false;
-                                $logs = collect(); // Kosongkan log kemarin agar tidak muncul
-                            } else {
-                                // Jika masih dalam shift malam atau belum lewat 10 pagi, tetap gunakan log kemarin
+
+                            // Jika user sudah clock-in kemarin (tanggal 3) 
+                            if ($lastLogYesterday->clock_in !== null) {
+                                // Cek apakah user sudah clock-out atau belum
                                 $alreadyClockIn = true;
                                 $alreadyClockOut = ($lastLogYesterday->clock_out !== null);
                                 $logs = $logsYesterday;
                             }
                         }
-                
-                        // Cek absensi hari ini (tanggal 4)
-                        $logsToday = Absen::where('user_id', $user->employee_code)
-                            ->whereDate('tanggal', Carbon::today()) // Ambil log tanggal 4
-                            ->get();
-                
-                        if ($logsToday->isNotEmpty()) {
-                            $lastLogToday = $logsToday->last();
-                
-                            // Jika user sudah clock-in hari ini (tanggal 4)
-                            if ($lastLogToday->clock_in !== null) {
-                                $alreadyClockIn = true;
-                                $alreadyClockOut = ($lastLogToday->clock_out !== null);
-                                $logs = $logsToday; // Prioritaskan log hari ini
+
+                        // Cek shift malam hari ini (tanggal 4)
+                        $scheduleKasToday = Schedule::where('employee', $nik)
+                            ->whereDate('tanggal', Carbon::today())
+                            ->first();
+
+                        if ($scheduleKasToday && strcasecmp($scheduleKasToday->shift, 'ML') == 0) {
+                            $now = now();
+                            $isAfter10AM = $now->hour >= 10;
+
+                            // Jika sudah lewat jam 10 pagi, reset tombol Clock-In
+                            if ($isAfter10AM) {
+                                $alreadyClockIn = false;
+                                $alreadyClockOut = false;
+                                $logs = collect(); // Kosongkan log hari ini agar tidak muncul
                             }
                         }
                     }
                 }
+
                                 
                 
 

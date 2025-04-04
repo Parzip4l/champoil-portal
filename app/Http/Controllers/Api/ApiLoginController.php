@@ -351,6 +351,7 @@ class ApiLoginController extends Controller
             $token = $request->bearerToken();
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
+            $unit_bisnis = Employee::where('nik',$nik)->first();
 
             $today = Carbon::now()->format('Y-m-d');
 
@@ -365,6 +366,8 @@ class ApiLoginController extends Controller
                 $shift = $databackup->shift;
                 $periode = $databackup->periode;
             }
+
+            
 
             $dataProject = Project::where('id', $project_id)->first();
 
@@ -383,6 +386,10 @@ class ApiLoginController extends Controller
             
             $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
             $allowedRadius = 3;
+
+            if($unit_bisnis->jabatan =='DRIVER'){
+                $allowedRadius=9999999;
+            }
 
             if ($distance <= $allowedRadius) {
                 $filename = null;

@@ -483,8 +483,9 @@ class AbsenController extends Controller
         $lat2 = $request->input('latitude_out');
         $long2 = $request->input('longitude_out');
         $currentDate = now()->format('Y-m-d');
+
         $absensi = Absen::where('nik', $nik)
-            ->whereDate('clock_in', $currentDate) // Filter berdasarkan tanggal saat ini
+            ->whereDate('tanggal', $currentDate)
             ->orderBy('clock_in', 'desc')
             ->first();
         

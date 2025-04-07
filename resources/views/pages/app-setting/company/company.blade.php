@@ -146,6 +146,14 @@
                                                         <label class="form-label">Radius (KM)</label>
                                                         <input type="number" name="radius" class="form-control" value="{{ old('radius', $settings['radius_value'] ?? '') }}">
                                                     </div>
+
+                                                    <div class="col-12">
+                                                        <small class="text-muted">
+                                                            ℹ️ Cara mendapatkan koordinat: Buka 
+                                                            <a href="https://www.google.com/maps" target="_blank">Google Maps</a>, klik kanan di lokasi, lalu pilih 
+                                                            <em>“Apa di sini?”</em> → Koordinat akan muncul di bawah.
+                                                        </small>
+                                                    </div>
                                                 </div>
 
                                                 <!-- Cuti -->
@@ -392,6 +400,8 @@
                 display : none;
             }
         }
+
+        
     </style>
     <script>
         function togglePPH21Options() {

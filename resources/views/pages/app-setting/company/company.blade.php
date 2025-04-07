@@ -125,20 +125,26 @@
                                                 </div>
 
                                                 <!-- Titik Koordinat -->
+                                                @php
+                                                    $coordinates = is_string($settings['gps_coordinates'] ?? null)
+                                                        ? json_decode($settings['gps_coordinates'], true)
+                                                        : ($settings['gps_coordinates'] ?? []);
+                                                @endphp
+
                                                 <div class="row g-3 mt-2" id="radius-settings" style="display: none;">
                                                     <div class="col-md-4">
                                                         <label class="form-label">Latitude</label>
-                                                        <input type="text" name="latitude" class="form-control" value="{{ $settings['latitude'] ?? '' }}">
+                                                        <input type="text" name="latitude" class="form-control" value="{{ old('latitude', $coordinates['latitude'] ?? '') }}">
                                                     </div>
 
                                                     <div class="col-md-4">
                                                         <label class="form-label">Longitude</label>
-                                                        <input type="text" name="longitude" class="form-control" value="{{ $settings['longitude'] ?? '' }}">
+                                                        <input type="text" name="longitude" class="form-control" value="{{ old('longitude', $coordinates['longitude'] ?? '') }}">
                                                     </div>
 
                                                     <div class="col-md-4">
                                                         <label class="form-label">Radius (KM)</label>
-                                                        <input type="number" name="radius" class="form-control" value="{{ $settings['radius'] ?? '' }}">
+                                                        <input type="number" name="radius" class="form-control" value="{{ old('radius', $settings['radius_value'] ?? '') }}">
                                                     </div>
                                                 </div>
 

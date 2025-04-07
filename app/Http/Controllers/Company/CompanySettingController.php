@@ -40,6 +40,22 @@ class CompanySettingController extends Controller
             }
         }
 
+        // Jika menggunakan radius, gabungkan latitude dan longitude
+        if ($request->input('use_radius')) {
+            $request->merge([
+                'gps_coordinates' => json_encode([
+                    'latitude' => $request->input('latitude'),
+                    'longitude' => $request->input('longitude'),
+                ]),
+                'radius_value' => $request->input('radius'), // ambil nilai radius
+            ]);
+        } else {
+            $request->merge([
+                'gps_coordinates' => null,
+                'radius_value' => null,
+            ]);
+        }
+
         // Ambil semua data yang akan disimpan
         $data = $request->only([
             'use_shift',

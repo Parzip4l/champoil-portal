@@ -141,9 +141,6 @@ class CompanyController extends Controller
     }
 
 
-
-
-
     function generateRandomCode($length = 6) {
         $characters = '0123456789';
         $code = '';

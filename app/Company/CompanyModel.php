@@ -22,4 +22,9 @@ class CompanyModel extends Model
         'cutoff_start',
         'cutoff_end',
     ];
+
+    public function settings()
+    {
+        return $this->hasMany(CompanySetting::class, 'company_id');
+    }
 }

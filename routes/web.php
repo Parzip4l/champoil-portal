@@ -313,6 +313,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     ->name('company.features.toggle');
     Route::post('/company/features/bulk-toggle', [App\Http\Controllers\Company\CompanyController::class, 'bulkToggle'])->name('company.features.bulkToggle');
 
+    Route::get('/company-settings/{company}/edit', [App\Http\Controllers\Company\CompanySettingController::class, 'edit'])->name('company-settings.edit');
+    Route::put('/company-settings/{company}', [App\Http\Controllers\Company\CompanySettingController::class, 'update'])->name('company-settings.update');
+
 
     // Menu Settings
     Route::resource('menu', App\Http\Controllers\MenuController::class);
@@ -572,6 +575,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::post('/save-golongan', [App\Http\Controllers\Setting\SettingController::class, 'StoreGolongan'])->name('golongan.store');
         Route::put('/update-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'UpdateGolongan'])->name('golongan.update');
         Route::delete('/delete-golongan/{id}', [App\Http\Controllers\Setting\SettingController::class, 'DeleteGolongan'])->name('golongan.delete');
+
+        Route::get('/payroll-cutoff-settings', [App\Http\Controllers\Setting\Cutoff\PayrollCutoffController::class, 'edit'])->name('payroll.cutoff.edit');
+        Route::put('/payroll-cutoff-settings', [App\Http\Controllers\Setting\Cutoff\PayrollCutoffController::class, 'update'])->name('payroll.cutoff.update');
     });
 
     

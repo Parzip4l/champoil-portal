@@ -218,6 +218,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('payroll.cutoff.edit') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="calendar"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Payroll Setting</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -7,6 +7,32 @@
 @endpush
 
 @section('content')
+
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
@@ -86,53 +112,27 @@
                 <form action="{{route('company.store')}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
+                        <!-- Sisa modal tetap, hanya ini yang berubah -->
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Company Name</label>
-                            <input type="text" name="company_name" class="form-control" placholder="e.g Indolumas Grease, PT" required>
+                            <input type="text" name="company_name" class="form-control" required>
                         </div>
+
                         <div class="col-md-12 mb-3">
                             <label for="" class="form-label">Company Address</label>
-                            <textarea name="company_address" id="" cols="30" rows="10" class="form-control"></textarea>
+                            <textarea name="company_address" class="form-control"></textarea>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Use Schedule</label>
-                            <select name="use_scedule" class="form-control" id="">
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
-                            </select>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="" class="form-label">Email Admin (Akses Login)</label>
+                            <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Schedule Type</label>
-                            <select name="schedule_type" class="form-control" id="">
-                                <option value="No">No</option>
-                                <option value="Daily">Daily</option>
-                                <option value="Monthly">Monthly</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Cut Off Start</label>
-                            <input type="number" name="cutoff_start" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Cut Off End</label>
-                            <input type="number" name="cutoff_end" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Latitude</label>
-                            <input type="text" name="latitude" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Longitude</label>
-                            <input type="text" name="longitude" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="" class="form-label">Radius(KM)</label>
-                            <input type="number" name="radius" class="form-control" required>
-                        </div>
+
                         <div class="col-md-6 mb-3">
                             <label for="" class="form-label">Company Logo</label>
-                            <input type="file" name="logo" class="form-control" required>
+                            <input type="file" name="logo" class="form-control">
                         </div>
+
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary w-100 mt-2">Add Company</button>
                         </div>

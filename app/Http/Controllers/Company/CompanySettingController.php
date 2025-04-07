@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Company\CompanyModel;
 use App\Company\CompanySetting;
 use App\Employee;
+use Illuminate\Support\Facades\Auth;
 
 class CompanySettingController extends Controller
 {
@@ -23,8 +24,8 @@ class CompanySettingController extends Controller
 
     public function update(Request $request, $company_id)
     {
+        $employee = Auth::user()->employee_code;
         $company = CompanyModel::findOrFail($company_id);
-
         // Set nilai default untuk checkbox yang tidak tercentang
         $checkboxKeys = [
             'use_shift',
@@ -91,7 +92,10 @@ class CompanySettingController extends Controller
 
             CompanySetting::updateOrCreate(
                 ['company_id' => $company->id, 'key' => $key],
-                ['value' => $value]
+                [
+                    'value' => $value,
+                    'updated_by' => $employee,
+                ]
             );
         }
 

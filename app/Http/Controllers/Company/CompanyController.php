@@ -6,12 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewCompanyAdmin;
 
 // Model
 use App\Company\CompanyModel;
 use App\Employee;
 use App\Setting\Features\FeaturesModel;
 use App\Setting\Features\CompanyFeatures;
+use App\Company\CompanySetting;
+use App\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 
 class CompanyController extends Controller
@@ -162,43 +168,152 @@ class CompanyController extends Controller
         $request->validate([
             'company_name' => 'required|string|max:255',
             'company_address' => 'required|string',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'radius' => 'required|numeric',
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'email' => 'required|email|unique:users,email',
         ]);
 
-        try {
-            // Proses menyimpan data ke dalam database
-            $company = new CompanyModel; // Ganti dengan nama model yang sesuai
+        DB::beginTransaction();
 
+        try {
+            // 1. Simpan data company
+            $company = new CompanyModel();
             $company->company_code = $this->generateRandomCode();
             $company->company_name = $request->input('company_name');
             $company->company_address = $request->input('company_address');
-            $company->use_scedule = $request->input('use_scedule');
-            $company->schedule_type = $request->input('schedule_type');
-            $company->cutoff_start = $request->input('cutoff_start');
-            $company->cutoff_end = $request->input('cutoff_end');
-            $company->latitude = $request->input('latitude');
-            $company->longitude = $request->input('longitude');
-            $company->radius = $request->input('radius');
 
-            // Upload logo
+            // 2. Upload logo / fallback dummy
             if ($request->hasFile('logo')) {
-                $image = $request->file('logo');
-                $filename = time() . '.' . $image->getClientOriginalExtension();
-                $destinationPath = public_path('/images/company_logo');
-                $image->move($destinationPath, $filename);
-                $company->logo = $filename;
+                $logo = $request->file('logo');
+                $filename = time() . '.' . $logo->getClientOriginalExtension();
+                $logo->move(public_path('/images/company_logo'), $filename);
+            } else {
+                $filename = 'default-logo.png'; // pastikan file ini tersedia di folder public/images/company_logo
             }
-
+            $company->logo = $filename;
             $company->save();
 
-            return redirect()->route('company.index')->with('success', 'Data berhasil disimpan');
+            $companyId = $company->id;
+
+            $defaultTitles = ['Dashboard', 'App Setting'];
+            $defaultFeatures = FeaturesModel::whereIn('title', $defaultTitles)->get();
+
+            // Default Features
+            foreach ($defaultFeatures as $feature) {
+                CompanyFeatures::create([
+                    'company_id' => $company->company_name,
+                    'feature_id' => $feature->id,
+                    'is_enabled' => true
+                ]);
+            }
+
+            // 3. Buat user administrator untuk company tersebut
+            $user = new User();
+            $user->name = $company->company_code;
+            $user->email = $request->input('email');
+            $password = Str::random(8);
+            $user->password = Hash::make($password);
+            $user->employee_code = $company->company_code;
+            $user->company = $company->company_name;
+            $user->permission = json_encode(['hr_access','dashboard_access']);
+            $user->save();
+
+            if (!$user->save()) {
+                throw new \Exception('Gagal menyimpan user administrator.');
+            }
+
+            // Employee Data
+
+            $employee = new Employee();
+            $employee->nama = $company->company_name . ' Admin';
+            $employee->ktp = $company->company_code;
+            $employee->nik = $company->company_code;
+            $employee->referal_code = null;
+            $employee->alamat_ktp = null;
+            $employee->alamat = $company->company_address;
+            $employee->divisi = 'Administrasi';
+            $employee->pendidikan_trakhir = 'S1';
+            $employee->jurusan = 'Manajemen';
+            $employee->sertifikasi = null;
+            $employee->expired_sertifikasi = null;
+            $employee->telepon_darurat = null;
+            $employee->jabatan = 'Administrator';
+            $employee->organisasi = $company->company_name;
+            $employee->status_kontrak = 'permanent';
+            $employee->joindate = now();
+            $employee->berakhirkontrak = null;
+            $employee->email = $user->email;
+            $employee->telepon = '0';
+            $employee->status_pernikahan = 'belum menikah';
+            $employee->tanggungan = 0;
+            $employee->agama = 'Islam';
+            $employee->tanggal_lahir = '1990-01-01';
+            $employee->tempat_lahir = 'Jakarta';
+            $employee->jenis_kelamin = 'Laki-laki';
+            $employee->unit_bisnis = $company->company_name;
+            $employee->manager = null;
+            $employee->slack_id = null;
+
+            $employee->save();
+
+            $defaultSettings = [
+                // General
+                ['category' => 'general', 'key' => 'timezone', 'value' => 'Asia/Jakarta'],
+                ['category' => 'general', 'key' => 'language', 'value' => 'id'],
+            
+                // Absensi
+                ['category' => 'absensi', 'key' => 'absensi_mode', 'value' => 'gps'],
+                ['category' => 'absensi', 'key' => 'gps_radius', 'value' => '0.5'], // dalam KM
+                ['category' => 'absensi', 'key' => 'default_jam_masuk', 'value' => '08:00'],
+                ['category' => 'absensi', 'key' => 'default_jam_pulang', 'value' => '17:00'],
+                ['category' => 'absensi', 'key' => 'toleransi_keterlambatan', 'value' => '10'], // menit
+                ['category' => 'absensi', 'key' => 'toleransi_pulang_cepat', 'value' => '10'],
+            
+                // Cuti
+                ['category' => 'cuti', 'key' => 'kuota_cuti_tahunan', 'value' => '12'],
+                ['category' => 'cuti', 'key' => 'cuti_bisa_akumulasi', 'value' => 'yes'],
+                ['category' => 'cuti', 'key' => 'cuti_bisa_konversi', 'value' => 'no'],
+            
+                // Payroll
+                ['category' => 'payroll', 'key' => 'payroll_type', 'value' => 'monthly'],
+                ['category' => 'payroll', 'key' => 'pph21_mode', 'value' => 'nett'],
+            
+                // Hari Kerja
+                ['category' => 'absensi', 'key' => 'hari_kerja', 'value' => json_encode(['Senin','Selasa','Rabu','Kamis','Jumat'])],
+            ];
+            
+
+            // 4. Buat default company setting
+            foreach ($defaultSettings as $setting) {
+                CompanySetting::create([
+                    'company_id' => $companyId,
+                    'key' => $setting['key'],
+                    'value' => $setting['value'],
+                    'updated_by' => $user->employee_code,
+                ]);
+            }
+
+            // 5. Kirim email ke admin baru
+            if ($user && $company) {
+                \Log::info('User and company OK', ['user' => $user, 'company' => $company]);
+                Mail::to($user->email)->send(new NewCompanyAdmin($user, $company, $password));
+            }
+
+            // 6. Tambahkan notifikasi setup awal
+            // Notification::create([
+            //     'title' => 'Setup Awal Dibutuhkan',
+            //     'description' => 'Lengkapi data perusahaan ' . $company->company_name,
+            //     'type' => 'setup',
+            //     'company_code' => $company->company_code,
+            // ]);
+
+            DB::commit();
+
+            return redirect()->route('company.index')->with('success', 'Company berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Display the specified resource.

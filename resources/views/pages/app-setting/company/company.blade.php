@@ -65,7 +65,7 @@
                                 <p>{{$company->radius}} KM</p>
                             </div>
                         </div>
-                        <div class="col-lg-8">
+                        <div class="col-lg-12 ps-0">
                             <form method="POST" action="{{ route('company-settings.update', $company->id) }}">
                                 @csrf
                                 @method('PUT')
@@ -360,7 +360,25 @@
 
                         </div>
                     </div>
-                    
+                    @php
+                        $latestUpdate = \App\Company\CompanySetting::where('company_id', $company->id)
+                            ->orderBy('updated_at', 'desc')
+                            ->with('updatedBy')
+                            ->first();
+
+                    @endphp
+
+                    @if($latestUpdate)
+                        <div class="alert alert-danger mt-3">
+                            <small>
+                                Terakhir diubah oleh:
+                                <strong >{{ $latestUpdate->updatedBy->nama ?? 'User tidak ditemukan' }}</strong>
+                                pada
+                                <strong>{{ $latestUpdate->updated_at->format('d M Y H:i') }}</strong>
+                            </small>
+                        </div>
+                    @endif
+
                     
                 </div>
                 <!-- Company Statistic -->

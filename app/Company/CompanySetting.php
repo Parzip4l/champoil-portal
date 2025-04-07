@@ -4,12 +4,13 @@ namespace App\Company;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Employee;
 
 class CompanySetting extends Model
 {
     use HasFactory;
     protected $table = 'company_settings';
-    protected $fillable = ['company_id', 'key', 'value'];
+    protected $fillable = ['company_id', 'key', 'value','updated_by'];
 
     public function company()
     {
@@ -27,4 +28,10 @@ class CompanySetting extends Model
     {
         $this->attributes['value'] = is_array($value) ? json_encode($value) : $value;
     }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(Employee::class, 'updated_by', 'nik');
+    }
+
 }

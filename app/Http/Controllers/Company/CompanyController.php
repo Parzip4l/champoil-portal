@@ -214,7 +214,7 @@ class CompanyController extends Controller
             $user->password = Hash::make($password);
             $user->employee_code = $company->company_code;
             $user->company = $company->company_name;
-            $user->permission = json_encode(['hr_access','dashboard_access']);
+            $user->permission = json_encode(['hc_access','dashboard_access']);
             $user->save();
 
             if (!$user->save()) {

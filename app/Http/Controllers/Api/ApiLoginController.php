@@ -529,7 +529,7 @@ class ApiLoginController extends Controller
 
     public function payslipuser(Request $request)
     {
-        try {
+        // try {
             // Retrieve the token from the request
             $token = $request->bearerToken();
 
@@ -569,13 +569,17 @@ class ApiLoginController extends Controller
 
                         // Modify the response to return JSON data
                         $payslipsData = $payslips->toArray();
+                        if(count($payslipsData) > 0) {
+                            foreach ($payslipsData as $key => $payslip) {
+                                $payslipsData[$key]['basic_salary'] = (string)$payslip['basic_salary'];
+                                $payslipsData[$key]['net_salary'] = (string)$payslip['net_salary'];
+                            }
+                        }
 
 
                         return response()->json([
-                            'payslips' => $payslips->items(),
-                            'current_page' => $payslips->currentPage(),
-                            'per_page' => $payslips->perPage(),
-                            'total' => $payslips->total(),
+                            'payslips' => $payslipsData,
+                            'total' => count($payslips),
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
@@ -586,10 +590,10 @@ class ApiLoginController extends Controller
             } else {
                 return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
             }
-        } catch (\Exception $e) {
-            // Handle general errors
-            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     // Handle general errors
+        //     return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        // }
     }
 
     // Details Payslip

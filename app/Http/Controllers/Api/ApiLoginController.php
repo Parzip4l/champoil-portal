@@ -529,7 +529,7 @@ class ApiLoginController extends Controller
 
     public function payslipuser(Request $request)
     {
-        try {
+        // try {
             // Retrieve the token from the request
             $token = $request->bearerToken();
 
@@ -569,13 +569,17 @@ class ApiLoginController extends Controller
 
                         // Modify the response to return JSON data
                         $payslipsData = $payslips->toArray();
+                        if(count($payslipsData) > 0) {
+                            foreach ($payslipsData as $key => $payslip) {
+                                $payslipsData[$key]['basic_salary'] = (string)$payslip['basic_salary'];
+                                $payslipsData[$key]['net_salary'] = (string)$payslip['net_salary'];
+                            }
+                        }
 
 
                         return response()->json([
-                            'payslips' => $payslips->items(),
-                            'current_page' => $payslips->currentPage(),
-                            'per_page' => $payslips->perPage(),
-                            'total' => $payslips->total(),
+                            'payslips' => $payslipsData,
+                            'total' => count($payslips),
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
@@ -586,10 +590,10 @@ class ApiLoginController extends Controller
             } else {
                 return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
             }
-        } catch (\Exception $e) {
-            // Handle general errors
-            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     // Handle general errors
+        //     return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        // }
     }
 
     // Details Payslip
@@ -655,6 +659,12 @@ class ApiLoginController extends Controller
                 // Update the payslip object
                 $payslip->allowances = json_encode($allowances);
                 $payslip->deductions = json_encode($deductions);
+            }
+
+            if (!empty($payslip)) {
+                // Ensure 'basic_salary' and 'net_salary' exist before converting
+                $payslip['basic_salary'] = isset($payslip['basic_salary']) ? (string) $payslip['basic_salary'] : '0';
+                $payslip['net_salary'] = isset($payslip['net_salary']) ? (string) $payslip['net_salary'] : '0';
             }
 
             // Return the payslip data as JSON

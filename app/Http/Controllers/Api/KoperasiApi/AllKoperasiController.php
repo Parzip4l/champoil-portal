@@ -405,6 +405,12 @@ class AllKoperasiController extends Controller
                     break;
                 }
             }
+
+            if($koperasi){
+                foreach($koperasi as $key){
+                    $key->tenor = (string)$key->tenor;
+                }
+            }
     
             // Kembalikan response JSON sukses
             return response()->json([

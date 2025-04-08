@@ -330,7 +330,6 @@ class AbsenController extends Controller
             // Hitung jarak
             if ($useRadius) {
                 $distance = $this->calculateDistance($kantorLat, $kantorLong, $lat, $long);
-                dd($distance);
                 if ($distance > $allowedRadius) {
                     return back()->with('error', 'Clockin Rejected, Anda diluar radius.');
                 }

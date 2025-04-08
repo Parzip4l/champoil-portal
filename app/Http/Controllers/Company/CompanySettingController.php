@@ -9,6 +9,7 @@ use App\Company\CompanyModel;
 use App\Company\CompanySetting;
 use App\Employee;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class CompanySettingController extends Controller
 {
@@ -57,35 +58,11 @@ class CompanySettingController extends Controller
             ]);
         }
 
-        // Ambil semua data yang akan disimpan
-        $data = $request->only([
-            'use_shift',
-            'use_schedule',
-            'late_cut_enabled',
-            'late_minutes_threshold',
-            'late_cut_amount',
-            'payroll_type',
-            'payroll_structure',
-            'cutoff_start',
-            'cutoff_end',
-            'use_pph21',
-            'pph21_method',
-            'npwp_required',
-            'use_radius',
-            'radius_value',
-            'gps_coordinates',
-            'attendance_mode',
-            'default_work_hours',
-            'late_tolerance',
-            'working_days',
-            'annual_leave_quota',
-            'max_leave_accumulation',
-            'allow_leave_conversion',
-            'leave_conversion_amount',
-        ]);
+        // Ambil semua data dari config
+        $rules = config('company_settings.validation_rules');
+        $data = $request->validate($rules);
 
         foreach ($data as $key => $value) {
-            // Jika array (contoh: working_days atau gps_coordinates), encode ke JSON
             if (is_array($value)) {
                 $value = json_encode($value);
             }

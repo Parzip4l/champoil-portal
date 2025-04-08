@@ -72,59 +72,65 @@
             <div class="card custom-card2 mobile">
                 <div class="card-body">
                     <div class="button-absen">
-                        @if (Auth::check())
-                            @php
-                                $user = Auth::user();
-                                $today = \Carbon\Carbon::now()->format('Y-m-d');
-                                $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $user->employee_code)
-                                        ->whereDate('tanggal', $today)
-                                        ->exists();
-                                $clockin = \App\Absen::where('nik', $user->employee_code)
-                                    ->whereDate('tanggal', $today)
-                                    ->first();
-                                $karyawanLogin = \App\Employee::where('nik', $user->employee_code)
-                                    ->select('unit_bisnis','organisasi')
-                                    ->first();
-                            @endphp
-                            @if($karyawanLogin->organisasi === 'Management Leaders' || $karyawanLogin->unit_bisnis === 'CHAMPOIL' || ($hasScheduleForToday))
-                                @if ($clockin)
+                    @if (Auth::check())
+                        @php
+                            $user = Auth::user();
+                            $today = \Carbon\Carbon::now()->format('Y-m-d');
+                            $nik = $user->employee_code;
+
+                            $karyawanLogin = \App\Employee::where('nik', $nik)->select('unit_bisnis','organisasi')->first();
+                            $companyId = \App\Company\CompanyModel::where('company_name', $karyawanLogin->unit_bisnis)->value('id');
+
+                            $useSchedule = \App\Helpers\CompanySettingHelper::get($companyId, 'use_schedule', false);
+                            $workdays = \App\Helpers\CompanySettingHelper::get($companyId, 'workdays', []);
+
+                            $todayName = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
+                            $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $nik)
+                                ->whereDate('tanggal', $today)
+                                ->exists();
+
+                            $clockin = \App\Absen::where('nik', $nik)
+                                ->whereDate('tanggal', $today)
+                                ->first();
+
+                            $bolehAbsen = in_array($todayName, $workdays) && ($useSchedule ? $hasScheduleForToday : true);
+                        @endphp
+
+                        @if($bolehAbsen || $karyawanLogin->organisasi === 'Management Leaders' || $karyawanLogin->unit_bisnis === 'CHAMPOIL')
+                            @if ($clockin)
                                 <form action="{{ route('clockout') }}" method="POST" id="form-absen2">
-                                @csrf   
+                                    @csrf   
                                     <input type="hidden" name="latitude_out" id="latitude_out">
                                     <input type="hidden" name="longitude_out" id="longitude_out">
                                     <input type="hidden" name="status" value="H">
                                     <a href="#" class="btn btn-lg btn-danger btn-icon-text mb-2 mb-md-0 w-100" id="btnout">Clock Out</a>
                                 </form>
-                                @else
-                                <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen" enctype="multipart/form-data">
-                                    @csrf
-                                        <!-- Add an input for taking a photo -->
-                                        <div class="card custom-card2 mb-3">
-                                            <div class="card-body">
-                                                <div class="photo-take d-flex">
-                                                    <label for="photo" class="custom-file-upload">
-                                                        <i class="icon-lg" data-feather="camera"></i>
-                                                        <input type="file" name="photo" class="form-control custom-file-upload" accept="image/*" capture="camera" id="photoInput">
-                                                    </label>
-                                                    <p class="text-muted">Take Selfie</p>
-                                                </div>
-                                                <div id="photoPreview"></div>
-                                            </div>
-                                        </div>
-                                        <!-- Add a preview container for the captured photo -->
-                                        
-                                        <input type="hidden" name="latitude" id="latitude">
-                                        <input type="hidden" name="longitude" id="longitude">
-                                        <input type="hidden" name="status" value="H">
-                                        <button type="submit" class="btn btn-lg btn-primary btn-icon-text mb-2 mb-md-0 w-100 button-biru" id="btn-absen" onClick="requestLocation()">
-                                            Clock IN
-                                        </button>
-                                </form>
-                                @endif
                             @else
+                            <form action="{{ route('clockin') }}" method="POST" class="me-1" id="form-absen" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card custom-card2 mb-3">
+                                    <div class="card-body">
+                                        <div class="photo-take d-flex">
+                                            <label for="photo" class="custom-file-upload" id="openCamera">
+                                                <i class="icon-lg" data-feather="camera"></i>
+                                                <input type="file" name="photo" id="photoInput" class="form-control d-none" accept="image/*" capture="environment">
+                                            </label>
+                                            <p class="text-muted">Take Selfie</p>
+                                        </div>
+                                        <div id="photoPreview" class="mt-2"></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="latitude" id="latitude">
+                                <input type="hidden" name="longitude" id="longitude">
+                                <input type="hidden" name="status" value="H">
+                                <button type="button" class="btn btn-lg btn-primary w-100" id="btn-absen">Clock IN</button>
+                            </form>
+                            @endif
+                        @else
                             <h6 class="text-center text-danger">Enjoy Off The Rest Of The Day !</h6>
                         @endif
                     @endif
+
                         <div class="log-absen-today mt-2">
                             <div class="card custom-card2">
                                 <div class="card-header text-center bg-custom-biru" style="border-radius:12px 12px 0 0">
@@ -1746,6 +1752,44 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert.classList.add('d-none');
             }
         }, 10000);
+    </script>
+    <script>
+        const clockInBtn = document.getElementById('btn-absen');
+        const photoInput = document.getElementById('photoInput');
+        const form = document.getElementById('form-absen');
+
+        clockInBtn.addEventListener('click', function() {
+            photoInput.click(); // Trigger camera
+        });
+
+        photoInput.addEventListener('change', function() {
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').innerHTML = `
+                        <img src="${e.target.result}" class="img-fluid rounded" style="max-height: 150px;" />
+                    `;
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+
+                // Tunggu sebentar (optional), lalu submit form
+                setTimeout(() => {
+                    form.submit();
+                }, 1000);
+            }
+        });
+
+        function requestLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                });
+            }
+        }
+
+        // Dapatkan lokasi otomatis saat halaman dibuka
+        window.onload = requestLocation;
     </script>
 
 @endpush

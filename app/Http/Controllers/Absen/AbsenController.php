@@ -23,6 +23,11 @@ use App\Company\CompanyModel;
 use Yajra\DataTables\Facades\DataTables;
 use App\Organisasi\Organisasi;
 use Illuminate\Support\Facades\Log;
+
+// helper
+use App\Helpers\CompanySettingHelper;
+
+
 class AbsenController extends Controller
 {
     /**
@@ -259,6 +264,7 @@ class AbsenController extends Controller
         return view('pages.absen.backup.index', compact('datakaryawan','databackup'));
     }
 
+    // Absen Masuk
 
     public function clockin(Request $request)
     {   
@@ -266,114 +272,168 @@ class AbsenController extends Controller
             $user = Auth::user();
             $nik = Auth::user()->employee_code;
             $unit_bisnis = Employee::where('nik',$nik)->first();
-
+            $companyId = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->value('id');
             $today = Carbon::now()->format('Y-m-d');
+            $nowTime = now()->format('H:i');
+            $todayName = now()->locale('id')->isoFormat('dddd');
+            
+            // Ambil setting dari company_setting
+            $useRadius = CompanySettingHelper::get($companyId, 'use_radius');
+            $radiusValue = CompanySettingHelper::get($companyId, 'radius_value', 5);
+            $gpsCoordinates = CompanySettingHelper::get($companyId, 'gps_coordinates', ['latitude' => null, 'longitude' => null]);
+            $useShift = CompanySettingHelper::get($companyId, 'use_shift');
+            $useSchedule = CompanySettingHelper::get($companyId, 'use_schedule');
+            $defaultInTime = CompanySettingHelper::get($companyId, 'default_in_time');
+            $defaultOutTime = CompanySettingHelper::get($companyId, 'default_out_time');
+            $lateTolerance = CompanySettingHelper::get($companyId, 'late_tolerance', 0);
+            $workdays = CompanySettingHelper::get($companyId, 'workdays', []);
 
-            $schedulebackup = Schedule::where('employee', $nik)
-                ->whereDate('tanggal', $today)
-                ->get();
-
-            $project_id = null;
-            foreach($schedulebackup as $databackup)
-            {
-                $project_id = $databackup->project;
-                $tanggal_backup = $databackup->tanggal;
-                $shift = $databackup->shift;
-                $periode = $databackup->periode;
-            }
-            
-            if ($project_id !== null) {
-                $dataProject = Project::where('id', $project_id)->first();
-                $latitudeProject = $dataProject->latitude;
-                $longtitudeProject = $dataProject->longtitude;
-            
-                $kantorLatitude = $latitudeProject;
-                $kantorLongtitude = $longtitudeProject;
-                $allowedRadius = 5;
-            } else {
-                $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-            
-                $kantorLatitude = $dataCompany->latitude;
-                $kantorLongtitude = $dataCompany->longitude;
-                $allowedRadius = $dataCompany->radius;
+            // Validasi hari kerja
+            $todayName = now()->locale('id')->isoFormat('dddd');
+            if (!in_array($todayName, $workdays)) {
+                return redirect()->back()->with('error', 'Clockin Rejected, Hari ini bukan hari kerja.');
             }
 
-            if($unit_bisnis->jabatan =='DRIVER'){
-                $allowedRadius=9999999;
+            // Validasi duplikat absen
+            if (Absen::where('nik', $nik)->whereDate('tanggal', $today)->exists()) {
+                return back()->with('error', 'Clockin Rejected, Anda sudah absen hari ini.');
             }
 
-            $shift_fix=0;
-            $msg = "";
-            if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
-                $cek = ProjectShift::where('shift_code', $shift)
-                    ->where('project_id', $project_id)
-                    ->get();
-            
-                if ($cek->isEmpty()) {
-                    $shift_fix=0;
-                    $msg="Shift tidak ditemukan";
-                }
-            
-                $nowTime = now()->format('H:i'); // Ambil waktu sekarang (jam:menit:detik)
+            // Ambil data lokasi user
+            $lat  = $request->input('latitude');
+            $long = $request->input('longitude');
 
-                foreach ($cek as $row) {
-                    if ($nowTime >= $row->jam_masuk && $nowTime <= $row->jam_pulang) {
-                        $shift_fix=1;
+            // Validasi lokasi
+            $kantorLat = $gpsCoordinates['latitude'];
+            $kantorLong = $gpsCoordinates['longitude'];
+
+            // Ambil dari schedule jika aktif
+            $projectId = null;
+            $shift = null;
+            if ($useSchedule) {
+                $schedule = Schedule::where('employee', $nik)->whereDate('tanggal', $today)->first();
+                if ($schedule) {
+                    $projectId = $schedule->project;
+                    $shift = $schedule->shift;
+
+                    if ($projectId) {
+                        $project = Project::find($projectId);
+                        $kantorLat = $project->latitude;
+                        $kantorLong = $project->longtitude;
                     }
                 }
-            
-                $shift_fix=0;
-                $msg="Anda tidak bisa clock in karena schedule " . $shift . ' (' . $row->jam_masuk . ' sampai ' . $row->jam_pulang . ')';
             }
 
-            if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
-                return redirect()->back()->with('error', $msg);
-            }
-            
+            // Driver bisa absen bebas
+            $allowedRadius = strtoupper($unit_bisnis->jabatan) === 'DRIVER' ? 9999999 : $radiusValue;
 
-            // Fet Data From Device User
-            $lat = $request->input('latitude');
-            $long = $request->input('longitude');
-            $status = $request->input('status');
-            
-            // Hitung Radius
-            $distance = $this->calculateDistance($kantorLatitude, $kantorLongtitude, $lat, $long);
-
-            $existingAbsen = Absen::where('nik', $nik)
-                ->whereDate('tanggal', $today)
-                ->first();
-
-            if ($existingAbsen) {
-                return redirect()->back()->with('error', 'Clockin Rejected, Already Clocked In for Today!');
-            }
-
-            if ($distance <= $allowedRadius) {
-                // Simpan Data
-                $absensi = new absen();
-                $absensi->user_id = $nik;
-                $absensi->nik = $nik;
-                $absensi->tanggal = now()->toDateString();
-                $absensi->clock_in = now()->format('H:i');
-                $absensi->latitude = $kantorLatitude;
-                $absensi->longtitude = $kantorLongtitude;
-                $absensi->status = $status;
-                if ($request->hasFile('photo')) {
-                    $image = $request->file('photo');
-                    $filename = time() . '.' . $image->getClientOriginalExtension();
-                    $destinationPath = public_path('/images/absen');
-                    $image->move($destinationPath, $filename);
-                    $absensi->photo = $filename;
+            // Hitung jarak
+            if ($useRadius) {
+                $distance = $this->calculateDistance($kantorLat, $kantorLong, $lat, $long);
+                dd($distance);
+                if ($distance > $allowedRadius) {
+                    return back()->with('error', 'Clockin Rejected, Anda diluar radius.');
                 }
-                $absensi->save();
-                return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
-            } else {
-                return redirect()->back()->with('error', 'Clockin Rejected, Anda Diluar Radius');
             }
+
+            // Validasi Jam Masuk (tanpa shift dan schedule)
+            if (!$useShift && !$useSchedule && $defaultInTime) {
+                $toleransiMasuk = Carbon::createFromFormat('H:i', $defaultInTime)->addMinutes($lateTolerance)->format('H:i');
+                if ($nowTime > $toleransiMasuk) {
+                    return back()->with('error', 'Clockin Rejected, Melebihi waktu masuk dan toleransi.');
+                }
+            }
+
+            // Validasi khusus company "Kas"
+            if (strtoupper($unit_bisnis->unit_bisnis) === 'KAS') {
+                $shiftData = ProjectShift::where('shift_code', $shift)
+                    ->where('project_id', $projectId)
+                    ->first();
+
+                if (!$shiftData) {
+                    return back()->with('error', 'Shift tidak ditemukan.');
+                }
+
+                if (!($nowTime >= $shiftData->jam_masuk && $nowTime <= $shiftData->jam_pulang)) {
+                    return back()->with('error', 'Anda tidak bisa clock in karena schedule ' . $shift . ' (' . $shiftData->jam_masuk . ' - ' . $shiftData->jam_pulang . ')');
+                }
+            }
+
+            // Simpan absen
+            $absen = new Absen();
+            $absen->user_id = $nik;
+            $absen->nik = $nik;
+            $absen->tanggal = $today;
+            $absen->clock_in = $nowTime;
+            $absen->latitude = $lat;
+            $absen->longtitude = $long;
+            $absen->status = $request->input('status');
+            $absen->project = $projectId;
+
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/images/absen');
+                $image->move($destinationPath, $filename);
+                $absen->photo = $filename;
+            }
+
+            $absen->save();
+
+            return back()->with('success', 'Clockin success, Happy Working Day!');
         } catch (\Exception $e) {
             // Handle the exception here
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+
+    // Absen Balik
+    public function clockout(Request $request)
+    {
+        try {
+            $nik = Auth::user()->employee_code;
+            $lat2 = $request->input('latitude_out');
+            $long2 = $request->input('longitude_out');
+            $currentDate = now()->format('Y-m-d');
+
+            // Ambil unit bisnis & company_id
+            $employee = Employee::where('nik', $nik)->first();
+            $companyId = CompanyModel::where('company_name', $employee->unit_bisnis)->value('id');
+
+            // Ambil jam pulang dari setting
+            $defaultOutTime = CompanySettingHelper::get($companyId, 'default_out_time');
+
+            // Cek clockout tidak boleh sebelum default_out_time
+            if ($defaultOutTime) {
+                $jamPulang = \Carbon\Carbon::createFromFormat('H:i', $defaultOutTime);
+                $nowTime = now();
+
+                if ($nowTime->lt($jamPulang)) {
+                    return redirect()->back()->with('error', 'Belum waktunya pulang, Jam Pulang ('. $defaultOutTime .') WIB');
+                }
+            }
+
+            // Ambil absen hari ini
+            $absensi = Absen::where('nik', $nik)
+                ->whereDate('tanggal', $currentDate)
+                ->orderBy('clock_in', 'desc')
+                ->first();
+
+            if ($absensi) {
+                $absensi->clock_out = now()->format('H:i');
+                $absensi->latitude_out = $lat2;
+                $absensi->longtitude_out = $long2;
+                $absensi->save();
+
+                return redirect()->back()->with('success', 'Clockout success!, Selamat Beristirahat!');
+            }
+        } catch (\Exception $e) {
+            // Tampilkan pesan kesalahan atau log pengecualian
+            dd($e->getMessage());
+        }
+    }
+
+    // Absen Backup masuk
 
     public function clockinbackup(Request $request)
     {   
@@ -435,47 +495,7 @@ class AbsenController extends Controller
         }
     }
 
-    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
-    {
-        $earthRadius = 6371; 
-
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLon = deg2rad($lon2 - $lon1);
-
-        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-        $distance = $earthRadius * $c; 
-
-        return $distance;
-    }
-
-    public function clockout(Request $request)
-    {
-        try {
-            $nik = Auth::user()->employee_code;
-            $lat2 = $request->input('latitude_out');
-            $long2 = $request->input('longitude_out');
-            $currentDate = now()->format('Y-m-d');
-
-            $absensi = Absen::where('nik', $nik)
-                ->whereDate('tanggal', $currentDate)
-                ->orderBy('clock_in', 'desc')
-                ->first();
-
-            if ($absensi) {
-                $absensi->clock_out = now()->format('H:i');
-                $absensi->latitude_out = $lat2;
-                $absensi->longtitude_out = $long2;
-                $absensi->save();
-
-                return redirect()->back()->with('success', 'Clockout success!, Selamat Beristirahat!');
-            }
-        } catch (\Exception $e) {
-            // Tampilkan pesan kesalahan atau log pengecualian
-            dd($e->getMessage());
-        }
-    }
+    // Absen Backup Balik
 
     public function clockoutbackup(Request $request)
     {
@@ -501,23 +521,23 @@ class AbsenController extends Controller
         return redirect()->back()->with('error', 'No clockin record found.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    // Hitung Jarak Radius
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
-        //
+        $earthRadius = 6371; 
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c; 
+
+        return $distance;
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($nik)
     {
         $absensi = Absen::where('nik', $nik)->get();
@@ -651,39 +671,7 @@ class AbsenController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    // Delete Absen
 
     public function deleteAttendance($date, $nik)
     {

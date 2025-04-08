@@ -39,32 +39,6 @@
                 <hr>
                 <div class="data-company p-3">
                     <div class="row">
-                        <div class="col-lg-4 ps-0 ">
-                            <div class="data-company-details d-flex justify-content-between mb-2">
-                                <h6 class="mb-2 text-muted">Employee Total</h6>
-                                <p>{{$employeeTotal}} Employee</p>
-                            </div>
-                            <div class="data-company-details d-flex justify-content-between mb-2">
-                                <h6 class="mb-2 text-muted">Use Schedule For Attendence</h6>
-                                <p>{{$company->use_scedule}}</p>
-                            </div>
-                            <div class="data-company-details d-flex justify-content-between mb-2">
-                                <h6 class="mb-2 text-muted">Schedule Type</h6>
-                                <p>{{$company->schedule_type}} Schedule</p>
-                            </div>
-                            <div class="data-company-details d-flex justify-content-between mb-2">
-                                <h6 class="mb-2 text-muted">Latitude</h6>
-                                <p>{{$company->latitude}}</p>
-                            </div>
-                            <div class="data-company-details d-flex justify-content-between mb-2">
-                                <h6 class="mb-2 text-muted">Longitude</h6>
-                                <p>{{$company->longitude}}</p>
-                            </div>
-                            <div class="data-company-details d-flex justify-content-between mb-2">
-                                <h6 class="mb-2 text-muted">Allowence Radius</h6>
-                                <p>{{$company->radius}} KM</p>
-                            </div>
-                        </div>
                         <div class="col-lg-12 ps-0">
                             <form method="POST" action="{{ route('company-settings.update', $company->id) }}">
                                 @csrf
@@ -206,7 +180,10 @@
                                                     <label class="form-label">Hari Kerja Aktif</label>
                                                     @php
                                                         $workdays_raw = $settings['workdays'] ?? '[]';
-                                                        $workdays = is_array($workdays_raw) ? $workdays_raw : json_decode($workdays_raw, true);
+                                                        $workdays = collect(is_array($workdays_raw) ? $workdays_raw : json_decode($workdays_raw, true) ?? explode(',', $workdays_raw))
+                                                            ->map(fn($day) => trim($day))
+                                                            ->all();
+
                                                         $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
                                                     @endphp
                                                     <div class="row">

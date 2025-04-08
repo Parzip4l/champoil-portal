@@ -41,6 +41,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::resource('dashboard', DashboardController::class);
+    Route::post('/checklist/toggle', [App\Http\Controllers\DashboardController::class, 'toggle'])->name('checklist.toggle');
     Route::resource('/', DashboardController::class);
 
     // Payslip

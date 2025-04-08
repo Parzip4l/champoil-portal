@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\DB;
 use App\Pengumuman\Pengumuman;
 Use App\Organisasi\Organisasi;
 use App\News\News;
+use App\Company\CompanySetupChecklist;
+use App\Company\CompanyModel;
 
 // Task
 use App\TaskManagement\TaskMaster;
@@ -34,12 +36,17 @@ use App\TaskManagement\Subtask;
 use App\TaskManagement\TaskUser;
 use App\TaskManagement\TaskComment;
 
+// config
+
+use Illuminate\Support\Facades\Config;
+
 class DashboardController extends Controller
 {
     public function index()
     {   
         $code = Auth::user()->employee_code;
         $company = Employee::where('nik', $code)->first();
+        $companyId = CompanyModel::where('company_name', $company->unit_bisnis)->value('company_code');
 
         // Greeting
         $today = now();
@@ -417,13 +424,25 @@ class DashboardController extends Controller
                                             ->get(['karyawan.nama', 'karyawan.gambar', 'karyawan.nik']);
         }
 
+        // Checlist New Company
+
+        $labels = Config::get('company_checklist');
+        $steps = CompanySetupChecklist::where('company_code', $companyId)->get()->keyBy('key');
+
+        $total = count($labels);
+        $done = collect($labels)->keys()->filter(function ($k) use ($steps) {
+            return isset($steps[$k]) && $steps[$k]->is_completed;
+        })->count();
+
+        $progress = $total > 0 ? round(($done / $total) * 100) : 0;
+
         $compactVariables = [
             'karyawan', 'alreadyClockIn', 'alreadyClockOut', 'isSameDay', 'datakaryawan', 'logs', 'hariini',
             'asign_test', 'dataRequest', 'pengajuanSchedule', 'dataAbsenByDay', 'DataTotalKehadiran',
             'ChartKaryawan', 'kontrakKaryawan', 'karyawanTidakAbsenHariIni', 'managementData', 'frontlineData',
             'managementData2', 'frontlineData2', 'pengumuman', 'news', 'upcomingBirthdays', 'greeting', 'hariini2',
             'DataManagement', 'DataFrontline', 'totalValue', 'percentageChange', 'percentageChangeManagement','percentageChangeFrontline',
-            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress','UserSlack','data_bpjs'
+            'percentageChangeAll','totalTasks','completedTasks','inProgressTasks','overdueTasks','TaskOnprogress','UserSlack','data_bpjs','labels', 'steps', 'progress'
         ];
         
         return view('dashboard', compact(...$compactVariables));
@@ -480,5 +499,55 @@ class DashboardController extends Controller
         Mail::to($userEmail)->send(new PayslipEmail());
 
         return redirect()->back()->with('success', 'Email Has Been Send');
+    }
+
+    public function toggle(Request $request)
+    {
+        $request->validate([
+            'key' => 'required|string',
+        ]);
+
+        $key = $request->input('key');
+        $checklistLabels = Config::get('company_checklist');
+
+        if (!array_key_exists($key, $checklistLabels)) {
+            return response()->json(['success' => false, 'message' => 'Invalid checklist key.'], 400);
+        }
+
+        // Ambil company ID dari NIK user
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+        $companyId = CompanyModel::where('company_name', $company->unit_bisnis)->value('company_code');
+
+        // Toggle checklist
+        $step = CompanySetupChecklist::firstOrNew([
+            'company_code' => $companyId,
+            'key' => $key,
+        ]);
+
+        $step->is_completed = !$step->is_completed ?? false;
+        $step->save();
+
+        // Ambil semua step
+        $steps = CompanySetupChecklist::where('company_code', $companyId)->get()->keyBy('key');
+
+        // Hitung progress
+        $total = count($checklistLabels);
+        $done = collect($checklistLabels)->keys()->filter(function ($k) use ($steps) {
+            return isset($steps[$k]) && $steps[$k]->is_completed;
+        })->count();
+
+        $progress = $total > 0 ? round(($done / $total) * 100) : 0;
+
+        return response()->json([
+            'success' => true,
+            'progress' => $progress,
+            'steps' => $steps->map(function ($step) {
+                return [
+                    'key' => $step->key,
+                    'is_completed' => $step->is_completed,
+                ];
+            })->values()
+        ]);
     }
 }

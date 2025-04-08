@@ -11,6 +11,7 @@ use App\Mail\NewCompanyAdmin;
 
 // Model
 use App\Company\CompanyModel;
+use App\Company\CompanySetupChecklist;
 use App\Employee;
 use App\Setting\Features\FeaturesModel;
 use App\Setting\Features\CompanyFeatures;
@@ -288,6 +289,15 @@ class CompanyController extends Controller
                     'key' => $setting['key'],
                     'value' => $setting['value'],
                     'updated_by' => $user->employee_code,
+                ]);
+            }
+
+            // Checklist Company
+            foreach (CompanySetupChecklist::defaultSteps() as $key => $label) {
+                CompanySetupChecklist::create([
+                    'company_code' => $company->company_code,
+                    'key' => $key,
+                    'is_completed' => false,
                 ]);
             }
 

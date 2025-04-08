@@ -16,6 +16,9 @@
     $feedback = \App\Feedback::where('name', Auth::user()->name)->first();
     $dataLogin = json_decode(Auth::user()->permission);
     $user = Auth::user();
+
+    $steps = \App\Company\CompanySetupChecklist::where('company_code', auth()->user()->company)->get()->keyBy('key');
+    $labels = \App\Company\CompanySetupChecklist::defaultSteps();
 @endphp
 <!-- Mobile Wrap -->
 <div class="absen-wrap mb-2 mobile">
@@ -521,6 +524,49 @@
         <p class="text-muted">It's {{$hariini2->format('D')}}, {{$hariini2->format('d M Y')}}</p>
     </div>
 </div>
+
+@if ($progress < 100)
+<div id="checklist-card" class="card p-4 mb-4 custom-card2 desktop">
+    <div class="flex justify-between items-center mb-2">
+        <h4 class="text-lg font-semibold">Checklist Setup Perusahaan</h4>
+    </div>
+
+    <div class="progress mb-3" style="height: 10px;">
+        <div id="checklist-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: {{ $progress }}%;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <p id="checklist-progress-text" class="text-sm text-muted mb-3">Progress: {{ $progress }}%</p>
+
+    <ul id="checklist-list" class="list-unstyled space-y-2">
+        @foreach ($labels as $key => $label)
+            @php
+                $step = $steps->get($key);
+                $completed = $step ? $step->is_completed : false;
+            @endphp
+            <li class="d-flex align-items-center justify-content-between">
+                <div>
+                    <input type="checkbox" class="form-check-input checklist-toggle" data-key="{{ $key }}" {{ $completed ? 'checked' : '' }}>
+                    <label class="form-check-label {{ $completed ? 'text-success text-decoration-line-through' : '' }}">
+                        {{ $label }}
+                    </label>
+                </div>
+            </li>
+        @endforeach
+    </ul>
+</div>
+
+{{-- Alert jika selesai --}}
+<div id="checklist-success-alert" class="alert alert-success d-none mt-3" role="alert">
+    ✅ Perusahaan Siap Digunakan! Semua setup awal telah diselesaikan.
+</div>
+
+@else
+<div id="checklist-success-alert" class="alert alert-success mt-3" role="alert">
+    ✅ Perusahaan Siap Digunakan! Semua setup awal telah diselesaikan.
+</div>
+@endif
+
+
+
 
 @if(in_array('superadmin_access', $dataLogin))
 @if($user->company != 'NOTARIS_ITR')
@@ -1650,4 +1696,56 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #fff;
         }
     </style>
+    <script>
+        document.querySelectorAll('.checklist-toggle').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const key = this.dataset.key;
+                const formData = new FormData();
+                formData.append('key', key);
+
+                fetch("{{ route('checklist.toggle', ['key' => 'dummy']) }}".replace('dummy', key), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data); 
+                    if (data.success) {
+                        const progress = data.progress;
+                        document.getElementById('checklist-progress-bar').style.width = progress + '%';
+                        document.getElementById('checklist-progress-text').textContent = 'Progress: ' + progress + '%';
+
+                        document.querySelectorAll('.checklist-toggle').forEach(cb => {
+                            const label = cb.nextElementSibling;
+                            if (cb.checked) {
+                                label.classList.add('text-success', 'text-decoration-line-through');
+                            } else {
+                                label.classList.remove('text-success', 'text-decoration-line-through');
+                            }
+                        });
+
+                        if (progress === 100) {
+                            document.getElementById('checklist-card')?.remove();
+                            document.getElementById('checklist-success-alert')?.classList.remove('d-none');
+                        }
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+        });
+
+    </script>
+    <script>
+        // Sembunyikan alert setelah 10 detik
+        setTimeout(() => {
+            const alert = document.getElementById('checklist-success-alert');
+            if (alert) {
+                alert.classList.add('d-none');
+            }
+        }, 10000);
+    </script>
+
 @endpush

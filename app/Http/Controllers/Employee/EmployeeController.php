@@ -35,6 +35,8 @@ use App\Mail\NewEmployee;
 use Illuminate\Support\Facades\Mail;
 use App\Koperasi\Anggota;
 use App\Company\CompanyModel;
+use App\Company\CompanySetting;
+use App\Company\WorkLocation;
 
 class EmployeeController extends Controller
 {
@@ -248,7 +250,19 @@ class EmployeeController extends Controller
         $golongan = GolonganModel::where('company', $company->unit_bisnis)->get();
         $atasan = Employee::where('unit_bisnis',$company->unit_bisnis)->where('resign_status',0)->where('organisasi', 'Management Leaders')->get();
 
-        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project','golongan','atasan'));
+        $companyId = CompanyModel::where('company_name', $company->unit_bisnis)->value('id');
+
+        $useMultilocation = CompanySetting::where('company_id', $companyId)
+            ->where('key', 'use_multilocation')
+            ->value('value') == '1';
+
+        $locations = [];
+
+        if ($useMultilocation) {
+            $locations = WorkLocation::where('company_id', $companyId)->get();
+        }
+
+        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project','golongan','atasan','companyId', 'useMultilocation', 'locations'));
     }
 
     /**
@@ -299,6 +313,7 @@ class EmployeeController extends Controller
             $data->golongan = $request->level;
             $data->manager = $request->manager;
             $data->slack_id = $request->slack_id;
+            $data->slack_id = $request->work_location_id;
             $data->referal_code = $this->generateCodeVisitor("karyawan","id", 5, "CITY");
 
             if ($request->hasFile('gambar')) {
@@ -559,9 +574,21 @@ Password: ".$request->password;
         $jabatan = Jabatan::where('parent_category',$employee->unit_bisnis)->get();
         $organisasi = Organisasi::where('company',$employee->unit_bisnis)->get();
         $user = User::where('name',$id)->first();
+
+        $companyId = CompanyModel::where('company_name', $employee->unit_bisnis)->value('id');
+
+        $useMultilocation = CompanySetting::where('company_id', $companyId)
+            ->where('key', 'use_multilocation')
+            ->value('value') == '1';
+
+        $locations = [];
+
+        if ($useMultilocation) {
+            $locations = WorkLocation::where('company_id', $companyId)->get();
+        }
         
 
-        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan','user'));
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan','user','companyId', 'useMultilocation', 'locations'));
         
     }
 
@@ -644,6 +671,7 @@ Password: ".$request->password;
             $request->validate([
                 'nama' => 'required|string|max:255',
                 'ktp' => 'required|numeric',
+                'work_location_id' => 'nullable|exists:company_work_location,id',
             ]);
             $code = Auth::user()->employee_code;
             $company = Employee::where('nik', $code)->first();
@@ -685,6 +713,7 @@ Password: ".$request->password;
             $employee->golongan = $request->input('golongan');
             $employee->manager = $request->input('atasan_langsung');
             $employee->slack_id = $request->input('slack_id');
+            $employee->work_location_id = $request->input('work_location_id');
             
 
             // Update the employee's photo if a new one is provided

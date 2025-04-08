@@ -317,6 +317,21 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::get('/company-settings/{company}/edit', [App\Http\Controllers\Company\CompanySettingController::class, 'edit'])->name('company-settings.edit');
     Route::put('/company-settings/{company}', [App\Http\Controllers\Company\CompanySettingController::class, 'update'])->name('company-settings.update');
 
+    // Multi Location
+    Route::prefix('company/{company}/work-locations')->middleware('auth')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Company\WorkLocationController::class, 'index'])->name('company.work-locations.index');
+        Route::get('create', [\App\Http\Controllers\Company\WorkLocationController::class, 'create'])->name('company.work-locations.create');
+        Route::post('/', [\App\Http\Controllers\Company\WorkLocationController::class, 'store'])->name('company.work-locations.store');
+        
+        // 🔧 Tambahkan yang ini
+        Route::get('{id}/edit', [\App\Http\Controllers\Company\WorkLocationController::class, 'edit'])->name('company.work-locations.edit');
+        Route::put('{id}', [\App\Http\Controllers\Company\WorkLocationController::class, 'update'])->name('company.work-locations.update');
+        
+        Route::delete('{id}', [\App\Http\Controllers\Company\WorkLocationController::class, 'destroy'])->name('company.work-locations.destroy');
+    });
+    
+    
+
 
     // Menu Settings
     Route::resource('menu', App\Http\Controllers\MenuController::class);

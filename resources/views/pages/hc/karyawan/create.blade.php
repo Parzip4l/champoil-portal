@@ -78,6 +78,21 @@
                         </div>
                     </div>
                     <div class="row mb-3">
+                        <div class="col-md-12">
+                            @if($useMultilocation)
+                                <div class="form-group mb-3">
+                                    <label for="work_location_id">Lokasi Kerja</label>
+                                    <select name="work_location_id" class="form-control" required>
+                                        <option value="">-- Pilih Lokasi --</option>
+                                        @foreach($locations as $loc)
+                                            <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col">
                             <label class="form-label">Agama</label>
                             <select class=" form-select" data-width="100%" name="agama">

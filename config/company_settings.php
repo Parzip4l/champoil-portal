@@ -4,6 +4,7 @@ return [
     'keys' => [
         'use_shift',
         'use_schedule',
+        'use_multilocation',
         'late_cut_enabled',
         'late_minutes_threshold',
         'late_cut_amount',
@@ -32,6 +33,8 @@ return [
     'validation_rules' => [
         'use_shift' => ['nullable', 'boolean'],
         'use_schedule' => ['nullable', 'boolean'],
+        'use_multilocation' => ['nullable', 'boolean'],
+
         'late_cut_enabled' => ['nullable', 'boolean'],
         'late_minutes_threshold' => ['nullable', 'numeric', 'min:0'],
         'late_cut_amount' => ['nullable', 'numeric', 'min:0'],

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Payrolinfo\Payrolinfo;
+use App\Company\WorkLocation;
 use App\User;
 
 class Employee extends Model
@@ -18,6 +19,7 @@ class Employee extends Model
         'referal_code',
         'alamat_ktp',
         'alamat',
+        'work_location_id',
         'divisi',
         'pendidikan_trakhir',
         'jurusan',
@@ -57,5 +59,10 @@ class Employee extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'employee_code', 'nik');
+    }
+
+    public function workLocation()
+    {
+        return $this->belongsTo(WorkLocation::class);
     }
 }

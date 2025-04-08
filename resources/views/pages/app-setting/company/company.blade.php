@@ -1,8 +1,11 @@
 @extends('layout.master')
 
 @push('plugin-styles')
-  <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 @endpush
 
 @section('content')
@@ -40,7 +43,7 @@
                 <div class="data-company p-3">
                     <div class="row">
                         <div class="col-lg-12 ps-0">
-                            <form method="POST" action="{{ route('company-settings.update', $company->id) }}">
+                            <form method="POST" action="{{ route('company-settings.update', $company->id) }}" id="form-setting-global">
                                 @csrf
                                 @method('PUT')
 
@@ -48,11 +51,11 @@
                                     <!-- General Section -->
                                     <div class="accordion-item">
                                         <h2 class="accordion-header" id="generalHeading">
-                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#generalSection" aria-expanded="true" aria-controls="generalSection">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#generalSection" aria-expanded="true" aria-controls="generalSection">
                                                 Features
                                             </button>
                                         </h2>
-                                        <div id="generalSection" class="accordion-collapse collapse show" aria-labelledby="generalHeading" data-bs-parent="#settingAccordion">
+                                        <div id="generalSection" class="accordion-collapse collapse" aria-labelledby="generalHeading" data-bs-parent="#settingAccordion">
                                             <div class="accordion-body row g-3">
 
                                                 <div class="col-md-12">
@@ -67,14 +70,14 @@
                                     <!-- Absensi Section -->
                                     <div class="accordion-item">
                                         <h2 class="accordion-header" id="absensiHeading">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#absensiCollapse" aria-expanded="false" aria-controls="absensiCollapse">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#absensiCollapse" aria-expanded="false" aria-controls="absensiCollapse">
                                                 Absensi
                                             </button>
                                         </h2>
-                                        <div id="absensiCollapse" class="accordion-collapse collapse" aria-labelledby="absensiHeading" data-bs-parent="#settingAccordion">
+                                        <div id="absensiCollapse" class="accordion-collapse collapse show" aria-labelledby="absensiHeading" data-bs-parent="#settingAccordion">
                                             <div class="accordion-body row g-3">
                                                 <!-- Fitur -->
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input" id="toggleSchedule" type="checkbox" name="use_schedule" value="1"
                                                             {{ isset($settings['use_schedule']) && $settings['use_schedule'] ? 'checked' : '' }}>
@@ -82,15 +85,25 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" name="use_shift" value="1"
+                                                        <input class="form-check-input" id="toggleShift" type="checkbox" name="use_shift" value="1"
                                                             {{ isset($settings['use_shift']) && $settings['use_shift'] ? 'checked' : '' }}>
-                                                        <label class="form-check-label">Gunakan Shift</label>
+                                                        <label class="form-check-label" for="toggleShift">Gunakan Shift</label>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
+                                                    <div class="form-check form-switch">
+                                                        <input type="hidden" name="use_multilocation" value="0">
+                                                        <input class="form-check-input" type="checkbox" name="use_multilocation" id="toggleMultiLocation" value="1"
+                                                            {{ isset($settings['use_multilocation']) && $settings['use_multilocation'] ? 'checked' : '' }}>
+                                                        <label class="form-check-label">Gunakan Multi Lokasi</label>
+                                                    </div>
+                                                    <small class="text-muted">Aktifkan untuk mengatur lokasi kerja berdasarkan cabang/proyek.</small>
+                                                </div>
+                                                
+                                                <div class="col-md-3">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input" type="checkbox" name="use_radius" value="1"
                                                             {{ isset($settings['use_radius']) && $settings['use_radius'] ? 'checked' : '' }}>
@@ -121,12 +134,11 @@
                                                         <input type="number" name="radius" class="form-control" value="{{ old('radius', $settings['radius_value'] ?? '') }}">
                                                     </div>
 
-                                                    <div class="col-12">
-                                                        <small class="text-muted">
-                                                            ℹ️ Cara mendapatkan koordinat: Buka 
-                                                            <a href="https://www.google.com/maps" target="_blank">Google Maps</a>, klik kanan di lokasi, lalu pilih 
-                                                            <em>“Apa di sini?”</em> → Koordinat akan muncul di bawah.
-                                                        </small>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group mb-3">
+                                                            <label>Preview Lokasi Kerja</label>
+                                                            <div id="map" style="height: 350px;"></div>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -367,9 +379,11 @@
 @endsection
 
 @push('plugin-scripts')
-  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
-  <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
-  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 @endpush
 
 @push('custom-scripts')
@@ -469,7 +483,122 @@
             }
 
             checkbox.addEventListener('change', toggleAmountField);
-            toggleAmountField(); // run once on load
+            toggleAmountField();
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleShift = document.getElementById('toggleShift');
+            const toggleSchedule = document.getElementById('toggleSchedule');
+
+            toggleShift.addEventListener('change', function () {
+                if (this.checked && !toggleSchedule.checked) {
+                    this.checked = false;
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tidak Bisa Aktifkan Shift',
+                        text: 'Aktifkan Schedule terlebih dahulu sebelum mengaktifkan Shift .',
+                        confirmButtonText: 'OK',
+                        timer: 3000
+                    });
+                }
+            });
+
+            toggleSchedule.addEventListener('change', function () {
+                if (!this.checked && toggleShift.checked) {
+                    toggleShift.checked = false;
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Schedule Dinonaktifkan',
+                        text: 'Schedule otomatis dimatikan karena Shift dinonaktifkan.',
+                        confirmButtonText: 'OK',
+                        timer: 3000
+                    });
+                }
+            });
+        });
+    </script>
+<script>
+document.getElementById('toggleMultiLocation').addEventListener('change', function () {
+    if (this.checked) {
+        // Tampilkan konfirmasi SweetAlert
+        Swal.fire({
+            title: 'Multi Lokasi Diaktifkan',
+            text: "Ingin langsung setup lokasi kerja sekarang?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Setup Sekarang',
+            cancelButtonText: 'Nanti Saja'
+        }).then((result) => {
+            // Tambahkan input hidden agar controller tahu user mau redirect atau tidak
+            let form = document.getElementById('form-setting-global');
+            let redirectInput = document.createElement('input');
+            redirectInput.setAttribute('type', 'hidden');
+            redirectInput.setAttribute('name', 'redirect_to_location');
+            redirectInput.setAttribute('value', result.isConfirmed ? '1' : '0');
+            form.appendChild(redirectInput);
+
+            // Submit form
+            form.submit();
+        });
+    }
+});
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const latInput = document.querySelector('input[name="latitude"]');
+        const lngInput = document.querySelector('input[name="longitude"]');
+
+        let lat = parseFloat(latInput.value) || -6.2;
+        let lng = parseFloat(lngInput.value) || 106.8;
+        const radius = parseFloat(document.querySelector('input[name="radius"]').value) || 100;
+
+        const map = L.map('map').setView([lat, lng], 16);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        const marker = L.marker([lat, lng], {
+            draggable: true
+        }).addTo(map);
+
+        const circle = L.circle([lat, lng], {
+            color: 'blue',
+            fillColor: '#3c8dbc',
+            fillOpacity: 0.2,
+            radius: radius
+        }).addTo(map);
+
+        function updateInputs(e) {
+            const newLatLng = e.latlng || marker.getLatLng();
+            latInput.value = newLatLng.lat.toFixed(6);
+            lngInput.value = newLatLng.lng.toFixed(6);
+            marker.setLatLng(newLatLng);
+            circle.setLatLng(newLatLng);
+        }
+
+        // drag marker
+        marker.on('dragend', function (e) {
+            updateInputs(e);
+        });
+
+        // klik di peta
+        map.on('click', function (e) {
+            updateInputs(e);
+        });
+
+        // 🔍 Tambahkan kontrol pencarian alamat
+        L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            const center = e.geocode.center;
+            map.setView(center, 16);
+            updateInputs({ latlng: center });
+        })
+        .addTo(map);
+    });
+</script>
+    
 @endpush

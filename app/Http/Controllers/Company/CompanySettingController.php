@@ -35,6 +35,7 @@ class CompanySettingController extends Controller
             'npwp_required',
             'use_radius',
             'allow_leave_conversion',
+            'use_multilocation',
         ];
         foreach ($checkboxKeys as $key) {
             if (!$request->has($key)) {
@@ -89,6 +90,12 @@ class CompanySettingController extends Controller
                 ->where('key', 'leave_conversion_amount')
                 ->delete();
         }
+
+        if ($request->input('redirect_to_location') === '1') {
+            return redirect()->route('company.work-locations.index', $company_id)
+                ->with('success', 'Pengaturan disimpan. Silakan atur lokasi kerja.');
+        }
+
 
         return redirect()->back()->with('success', 'Company settings updated.');
     }

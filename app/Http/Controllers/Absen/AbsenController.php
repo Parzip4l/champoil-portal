@@ -285,7 +285,7 @@ class AbsenController extends Controller
             $useSchedule = CompanySettingHelper::get($companyId, 'use_schedule');
             $defaultInTime = CompanySettingHelper::get($companyId, 'default_in_time');
             $defaultOutTime = CompanySettingHelper::get($companyId, 'default_out_time');
-            $lateTolerance = CompanySettingHelper::get($companyId, 'late_tolerance', 0);
+            $lateTolerance = CompanySettingHelper::get($companyId, 'grace_period', 0);
             $workdays = CompanySettingHelper::get($companyId, 'workdays', []);
 
             // Validasi hari kerja

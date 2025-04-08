@@ -16,6 +16,7 @@ return [
         'npwp_required',
         'use_radius',
         'radius_value',
+        'grace_period',
         'gps_coordinates',
         'attendance_mode',
         'default_in_time',
@@ -53,6 +54,7 @@ return [
         'default_in_time' => ['nullable', 'date_format:H:i'],
         'default_out_time' => ['nullable', 'date_format:H:i'],
         'late_tolerance' => ['nullable', 'numeric', 'min:0'],
+        'grace_period' => ['nullable', 'numeric', 'min:0'],
 
         'workdays' => ['nullable', 'array'],
         'workdays.*' => ['in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu'],

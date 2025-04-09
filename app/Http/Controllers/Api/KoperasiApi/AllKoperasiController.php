@@ -359,14 +359,15 @@ class AllKoperasiController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'pinjamanAwal' => $pinjamanAwal,
-                    'biayaMembership' => $membership * 100 . '%',
-                    'biayaMerchandise' => $merchendise * 100 . '%',
-                    'totalPinjaman' => $totalPinjaman,
-                    'tenor' => $tenor,
-                    'cicilanPerBulan' => $instalment,
+                    'pinjamanAwal'      => (string) $pinjamanAwal,
+                    'biayaMembership'   => (string) ($membership * 100) . '%',
+                    'biayaMerchandise'  => (string) ($merchendise * 100) . '%',
+                    'totalPinjaman'     => (string) $totalPinjaman,
+                    'tenor'             => (string) $tenor,
+                    'cicilanPerBulan'   => (string) $instalment,
                 ]
             ], 200);
+            
 
         } catch (\Exception $e) {
             // Tangani pengecualian dan kembalikan respons error

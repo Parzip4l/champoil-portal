@@ -181,7 +181,7 @@ class ApiLoginController extends Controller
                     return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
                 }
 
-                if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
+                if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
                     $cek = ProjectShift::where('shift_code', $schedulebackup->shift)
                         ->where('project_id', $schedulebackup->project)
                         ->get();

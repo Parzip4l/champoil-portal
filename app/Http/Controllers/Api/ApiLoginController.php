@@ -223,7 +223,7 @@ class ApiLoginController extends Controller
                         }
                 }
     
-                if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
+                if(strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0 && $shift_fix==0){
                     return response()->json(['message' => $msg]);
                 }
                 

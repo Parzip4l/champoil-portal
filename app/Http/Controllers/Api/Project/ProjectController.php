@@ -40,7 +40,7 @@ class ProjectController extends Controller
     }
 
     public function projectDetailData($id){
-        $records = projectDetail::where('project_code',$id)->get();
+        $records = ProjectDetails::where('project_code',$id)->get();
  
         return response()->json($records);
     }

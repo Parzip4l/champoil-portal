@@ -87,7 +87,14 @@
                         @csrf 
                         <div class="form-group mb-2">
                             <label for="jumlah" class="form-label">Masukan Jumah Pinjaman</label>
-                            <input type="text" id="jumlahPinjaman" class="form-control" placeholder="Masukkan jumlah pinjaman" name="amount" required>
+                            <input 
+                            type="text" 
+                            id="jumlahPinjaman" 
+                            class="form-control" 
+                            placeholder="Masukkan jumlah pinjaman" 
+                            name="amount" 
+                            required 
+                            data-max="{{ $limitpinjaman }}">
                         </div>
                         <div class="form-group mb-2">
                             <label for="jumlah" class="form-label">Pilih Tenor</label>
@@ -260,4 +267,31 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('jumlahPinjaman');
+        const maxLimit = parseInt(input.getAttribute('data-max'));
+
+        input.addEventListener('input', function () {
+            let rawValue = input.value.replace(/\D/g, '');
+            let value = parseInt(rawValue || 0);
+
+            if (value > maxLimit) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Melebihi Batas',
+                    text: `Jumlah pinjaman tidak boleh melebihi Rp ${maxLimit.toLocaleString('id-ID')}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                value = maxLimit;
+            }
+
+            // Format ulang ke format rupiah
+            input.value = value.toLocaleString('id-ID');
+        });
+    });
+</script>
+
 @endpush

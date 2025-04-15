@@ -329,9 +329,29 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         
         Route::delete('{id}', [\App\Http\Controllers\Company\WorkLocationController::class, 'destroy'])->name('company.work-locations.destroy');
     });
-    
-    
 
+    // Shift Setting
+    Route::prefix('company/{company}/shifts')->middleware('auth')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Company\Shift\ShiftnewController::class, 'index'])->name('company.shifts.index');
+        Route::get('create', [\App\Http\Controllers\Company\Shift\ShiftnewController::class, 'create'])->name('company.shifts.create');
+        Route::post('/', [\App\Http\Controllers\Company\Shift\ShiftnewController::class, 'store'])->name('company.shifts.store');
+        Route::delete('/{id}', [\App\Http\Controllers\Company\Shift\ShiftnewController::class, 'destroy'])->name('company.shifts.destroy');
+        Route::get('{shift}/edit', [\App\Http\Controllers\Company\Shift\ShiftnewController::class, 'edit'])->name('company.shifts.edit');
+        Route::put('{shift}', [\App\Http\Controllers\Company\Shift\ShiftnewController::class, 'update'])->name('company.shifts.update');
+    });
+
+    // Schedule Setting
+    Route::prefix('company/{company}/schedules')->middleware('auth')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'index'])->name('company.schedules.index');
+        Route::get('create', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'create'])->name('company.schedules.create');
+        Route::post('/', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'store'])->name('company.schedules.store');
+        Route::get('{id}/edit', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'edit'])->name('company.schedules.edit');
+        Route::put('{id}', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'update'])->name('company.schedules.update');
+        Route::delete('{id}', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'destroy'])->name('company.schedules.destroy');
+
+        Route::post('{scheduleId}/update-shift', [\App\Http\Controllers\Company\Shift\SchedulenewController::class, 'updateShift'])->name('company.schedules.updateShift');
+    });
+    
 
     // Menu Settings
     Route::resource('menu', App\Http\Controllers\MenuController::class);

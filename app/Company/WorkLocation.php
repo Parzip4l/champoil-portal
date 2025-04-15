@@ -21,6 +21,11 @@ class WorkLocation extends Model
 
     public function company()
     {
-        return $this->belongsTo(CompanyModel::class);
+        return $this->belongsTo(\App\Company\CompanyModel::class);
+    }
+
+    public function employees()
+    {
+        return $this->hasMany(\App\Employee::class, 'work_location_id', 'id');
     }
 }

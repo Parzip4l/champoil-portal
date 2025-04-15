@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Payrolinfo\Payrolinfo;
 use App\Company\WorkLocation;
+use App\Company\SceduleModel;
 use App\User;
 
 class Employee extends Model
@@ -64,5 +65,10 @@ class Employee extends Model
     public function workLocation()
     {
         return $this->belongsTo(WorkLocation::class);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(SceduleModel::class);
     }
 }

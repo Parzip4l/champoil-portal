@@ -14,7 +14,7 @@ class ScheduleModel extends Model
     use HasFactory;
     protected $table = 'company_schedule';
 
-    protected $fillable = ['company_id', 'employee_id', 'shift_id', 'work_location_id', 'work_date'];
+    protected $fillable = ['company_id', 'employee_id', 'shift_id', 'work_location_id', 'work_date','periode','bulan', 'tahun','created_by','updated_by'];
 
     public function company() {
         return $this->belongsTo(CompanyModel::class);

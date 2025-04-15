@@ -334,7 +334,41 @@
                             </div>
                         </div>
                     </div>
-                    
+                    @php
+                        $user = Auth::user();
+                        $nik = $user->employee_code;
+
+                        $karyawanLogin = \App\Employee::where('nik', $nik)->select('unit_bisnis','organisasi')->first();
+                        $company = \App\Company\CompanyModel::where('company_name', $karyawanLogin->unit_bisnis)->value('id');
+                    @endphp
+                    <div class="col-md-4">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                            <a href="{{ route('company.shifts.index', ['company' => $company]) }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Shift Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('company.schedules.index', ['company' => $company]) }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Schedule Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

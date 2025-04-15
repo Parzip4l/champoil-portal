@@ -23,6 +23,9 @@
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
 <!-- End -->
 <div class="row desktop">
     <div class="col-md-12 grid-margin stretch-card">
@@ -91,6 +94,7 @@
                                                             {{ isset($settings['use_shift']) && $settings['use_shift'] ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="toggleShift">Gunakan Shift</label>
                                                     </div>
+                                                    <small class="text-muted" id="shiftSetting">Setting Shift <a href="{{ route('company.shifts.index', ['company' => $company->id]) }}">Disini</a>.</small>
                                                 </div>
 
                                                 <div class="col-md-3">
@@ -412,6 +416,27 @@
 
         
     </style>
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
+@if(session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: "{{ session('error') }}",
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
     <script>
         function togglePPH21Options() {
             if ($('#pph21-switch').is(':checked')) {

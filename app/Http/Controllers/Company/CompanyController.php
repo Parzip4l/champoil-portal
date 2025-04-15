@@ -30,16 +30,16 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $company = Auth::user()->unit_bisnis;
+        $company = Auth::user()->company;
         $dataLogin = json_decode(Auth::user()->permission);
-
+        
         if(in_array('superadmin_access', $dataLogin))
         {
             $companyData = CompanyModel::all();
-        } elseif(in_array('admincompany_access', $dataLogin)) {
-            $companyData = CompanyModel::where('company_name', $company);
+        } elseif(in_array('hc_access', $dataLogin)) {
+            $companyData = CompanyModel::where('company_name', $company)->get();
         } else {
-            $companyData = CompanyModel::where('company_name', $company);
+            $companyData = CompanyModel::where('company_name', $company)->get();
         }
 
         return view('pages.company.index',compact('companyData'));

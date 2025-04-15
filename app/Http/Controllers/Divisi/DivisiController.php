@@ -23,8 +23,7 @@ class DivisiController extends Controller
         $company = Employee::where('nik', $code)->first();
 
         $karyawan = Employee::where('unit_bisnis',$company->unit_bisnis)
-                            ->where('resign_status',0)
-                            ->where('organisasi','Management Leaders')->get();
+                            ->where('resign_status',0)->get();
 
         $divisi = Divisi::where('company', $company->unit_bisnis)->get();
         return view('pages.company.divisi.index', compact('divisi','karyawan'));

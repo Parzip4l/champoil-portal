@@ -78,16 +78,23 @@
                             $today = \Carbon\Carbon::now()->format('Y-m-d');
                             $nik = $user->employee_code;
 
-                            $karyawanLogin = \App\Employee::where('nik', $nik)->select('unit_bisnis','organisasi')->first();
+                            $karyawanLogin = \App\Employee::where('nik', $nik)->select('id','unit_bisnis','organisasi')->first();
                             $companyId = \App\Company\CompanyModel::where('company_name', $karyawanLogin->unit_bisnis)->value('id');
 
                             $useSchedule = \App\Helpers\CompanySettingHelper::get($companyId, 'use_schedule', false);
                             $workdays = \App\Helpers\CompanySettingHelper::get($companyId, 'workdays', []);
 
                             $todayName = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
-                            $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $nik)
-                                ->whereDate('tanggal', $today)
-                                ->exists();
+
+                            if (strtoupper($karyawanLogin->unit_bisnis) === 'KAS') {
+                                $hasScheduleForToday = \App\ModelCG\Schedule::where('employee', $nik)
+                                    ->whereDate('tanggal', $today)
+                                    ->exists();
+                            } else {
+                                $hasScheduleForToday = \App\Company\ScheduleModel::where('employee_id', $karyawanLogin->id)
+                                    ->whereDate('work_date', $today)
+                                    ->exists();
+                            }
 
                             $clockin = \App\Absen::where('nik', $nik)
                                 ->whereDate('tanggal', $today)

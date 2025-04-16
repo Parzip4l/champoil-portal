@@ -4,6 +4,16 @@ namespace App\Http\Controllers\Absen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Exports\AttendenceExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Log;
+
+// Model
 use App\Absen;
 use App\Employee;
 use App\ModelCG\Schedule;
@@ -13,16 +23,11 @@ use App\ModelCG\Datamaster\ProjectShift;
 use App\Absen\RequestAbsen;
 use App\Backup\AbsenBackup;
 use App\User;
-use Carbon\Carbon;
-use Carbon\CarbonPeriod;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Exports\AttendenceExport;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Company\CompanyModel;
-use Yajra\DataTables\Facades\DataTables;
 use App\Organisasi\Organisasi;
-use Illuminate\Support\Facades\Log;
+use App\Company\CompanyModel;
+use App\Company\ScheduleModel;
+use App\Company\ShiftModel;
+use App\Company\WorkLocation;
 
 // helper
 use App\Helpers\CompanySettingHelper;
@@ -267,16 +272,20 @@ class AbsenController extends Controller
     // Absen Masuk
 
     public function clockin(Request $request)
-    {   
+    {
         try {
             $user = Auth::user();
-            $nik = Auth::user()->employee_code;
-            $unit_bisnis = Employee::where('nik',$nik)->first();
+            $nik = $user->employee_code;
+            
+            $unit_bisnis = Employee::where('nik', $nik)->first();
+
+            $employeeId = $unit_bisnis->id;
             $companyId = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->value('id');
+
             $today = Carbon::now()->format('Y-m-d');
             $nowTime = now()->format('H:i');
             $todayName = now()->locale('id')->isoFormat('dddd');
-            
+
             // Ambil setting dari company_setting
             $useRadius = CompanySettingHelper::get($companyId, 'use_radius');
             $radiusValue = CompanySettingHelper::get($companyId, 'radius_value', 5);
@@ -287,9 +296,9 @@ class AbsenController extends Controller
             $defaultOutTime = CompanySettingHelper::get($companyId, 'default_out_time');
             $lateTolerance = CompanySettingHelper::get($companyId, 'grace_period', 0);
             $workdays = CompanySettingHelper::get($companyId, 'workdays', []);
+            $useMultiLocation = CompanySettingHelper::get($companyId, 'use_multilocation');
 
             // Validasi hari kerja
-            $todayName = now()->locale('id')->isoFormat('dddd');
             if (!in_array($todayName, $workdays)) {
                 return redirect()->back()->with('error', 'Clockin Rejected, Hari ini bukan hari kerja.');
             }
@@ -299,35 +308,63 @@ class AbsenController extends Controller
                 return back()->with('error', 'Clockin Rejected, Anda sudah absen hari ini.');
             }
 
-            // Ambil data lokasi user
-            $lat  = $request->input('latitude');
+            // Ambil data lokasi user dari request
+            $lat = $request->input('latitude');
             $long = $request->input('longitude');
 
-            // Validasi lokasi
+            // Default lokasi kantor
             $kantorLat = $gpsCoordinates['latitude'];
             $kantorLong = $gpsCoordinates['longitude'];
-
-            // Ambil dari schedule jika aktif
             $projectId = null;
             $shift = null;
-            if ($useSchedule) {
-                $schedule = Schedule::where('employee', $nik)->whereDate('tanggal', $today)->first();
-                if ($schedule) {
-                    $projectId = $schedule->project;
-                    $shift = $schedule->shift;
+            $workLocationId = null;
+            $workLocationLat = null;
+            $workLocationLong = null;
 
-                    if ($projectId) {
-                        $project = Project::find($projectId);
-                        $kantorLat = $project->latitude;
-                        $kantorLong = $project->longtitude;
+            // Kode khusus untuk company "KAS" tetap dipertahankan
+            if (strtoupper($unit_bisnis->unit_bisnis) === 'KAS') {
+                if ($useSchedule) {
+                    $schedule = Schedule::where('employee', $nik)->whereDate('tanggal', $today)->first();
+                    if ($schedule) {
+                        $projectId = $schedule->project;
+                        $shift = $schedule->shift;
+
+                        if ($projectId) {
+                            $project = Project::find($projectId);
+                            $kantorLat = $project->latitude;
+                            $kantorLong = $project->longtitude;
+                        }
                     }
+                }
+            } else {
+                // Untuk company umum: ambil schedule dan lokasi kerja
+                if ($useSchedule) {
+                    $schedule = ScheduleModel::where('employee_id', $employeeId)->whereDate('work_date', $today)->first();
+                    if ($schedule) {
+                        $shift = $schedule->shift_id;
+                        $workLocationId = $schedule->work_location_id;
+
+                        if ($useMultiLocation && $workLocationId) {
+                            $workLocation = WorkLocation::find($workLocationId);
+                            if ($workLocation) {
+                                $workLocationLat = $workLocation->latitude;
+                                $workLocationLong = $workLocation->longitude;
+                            }
+                        }
+                    }
+                }
+
+                // Ganti lokasi jika multi lokasi aktif
+                if ($useMultiLocation && $workLocationLat && $workLocationLong) {
+                    $kantorLat = $workLocationLat;
+                    $kantorLong = $workLocationLong;
                 }
             }
 
-            // Driver bisa absen bebas
+            // Radius khusus untuk DRIVER
             $allowedRadius = strtoupper($unit_bisnis->jabatan) === 'DRIVER' ? 9999999 : $radiusValue;
 
-            // Hitung jarak
+            // Hitung jarak dan validasi radius
             if ($useRadius) {
                 $distance = $this->calculateDistance($kantorLat, $kantorLong, $lat, $long);
                 if ($distance > $allowedRadius) {
@@ -335,7 +372,7 @@ class AbsenController extends Controller
                 }
             }
 
-            // Validasi Jam Masuk (tanpa shift dan schedule)
+            // Validasi jam masuk jika tidak pakai shift/schedule
             if (!$useShift && !$useSchedule && $defaultInTime) {
                 $toleransiMasuk = Carbon::createFromFormat('H:i', $defaultInTime)->addMinutes($lateTolerance)->format('H:i');
                 if ($nowTime > $toleransiMasuk) {
@@ -343,18 +380,32 @@ class AbsenController extends Controller
                 }
             }
 
-            // Validasi khusus company "Kas"
-            if (strtoupper($unit_bisnis->unit_bisnis) === 'KAS') {
-                $shiftData = ProjectShift::where('shift_code', $shift)
-                    ->where('project_id', $projectId)
-                    ->first();
+            // Validasi jam shift jika menggunakan shift atau schedule
+            if (($useShift || $useSchedule) && $shift) {
+                $shiftModel = ShiftModel::where('id', $shift)
+                    ->where('company_id', $companyId)
+                    ->when($useMultiLocation && $workLocationId, function ($q) use ($workLocationId) {
+                        return $q->where('work_location_id', $workLocationId);
+                    })->first();
 
-                if (!$shiftData) {
+                if ($shiftModel) {
+                    $startShift = Carbon::createFromFormat('H:i', $shiftModel->start_time);
+                    $endShift = Carbon::createFromFormat('H:i', $shiftModel->end_time);
+                    $currentTime = Carbon::createFromFormat('H:i', $nowTime);
+
+                    // Tangani shift malam
+                    if ($endShift->lt($startShift)) {
+                        $endShift->addDay();
+                        if ($currentTime->lt($startShift)) {
+                            $currentTime->addDay();
+                        }
+                    }
+
+                    if ($currentTime->lt($startShift)) {
+                        return back()->with('error', 'Clockin Rejected, Shift belum dimulai.');
+                    }
+                } else {
                     return back()->with('error', 'Shift tidak ditemukan.');
-                }
-
-                if (!($nowTime >= $shiftData->jam_masuk && $nowTime <= $shiftData->jam_pulang)) {
-                    return back()->with('error', 'Anda tidak bisa clock in karena schedule ' . $shift . ' (' . $shiftData->jam_masuk . ' - ' . $shiftData->jam_pulang . ')');
                 }
             }
 
@@ -368,6 +419,7 @@ class AbsenController extends Controller
             $absen->longtitude = $long;
             $absen->status = $request->input('status');
             $absen->project = $projectId;
+            $absen->work_location_id = $workLocationId;
 
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');
@@ -381,10 +433,10 @@ class AbsenController extends Controller
 
             return back()->with('success', 'Clockin success, Happy Working Day!');
         } catch (\Exception $e) {
-            // Handle the exception here
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+
 
     // Absen Balik
     public function clockout(Request $request)

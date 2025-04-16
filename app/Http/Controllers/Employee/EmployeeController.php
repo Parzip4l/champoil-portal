@@ -248,7 +248,7 @@ class EmployeeController extends Controller
         $project = Project::all();
 
         $golongan = GolonganModel::where('company', $company->unit_bisnis)->get();
-        $atasan = Employee::where('unit_bisnis',$company->unit_bisnis)->where('resign_status',0)->where('organisasi', 'Management Leaders')->get();
+        $atasan = Employee::where('unit_bisnis',$company->unit_bisnis)->where('resign_status',0)->get();
 
         $companyId = CompanyModel::where('company_name', $company->unit_bisnis)->value('id');
 

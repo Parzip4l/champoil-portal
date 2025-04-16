@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Company\Shift;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\company\CompanySetting;
-use App\company\CompanyModel;
-use App\company\ScheduleModel;
-use App\company\ShiftModel;
+use App\Company\CompanySetting;
+use App\Company\CompanyModel;
+use App\Company\ScheduleModel;
+use App\Company\ShiftModel;
 use App\Employee;
-use App\company\WorkLocation;
+use App\Company\WorkLocation;
 use Illuminate\Support\Facades\Auth;
 
 class SchedulenewController extends Controller

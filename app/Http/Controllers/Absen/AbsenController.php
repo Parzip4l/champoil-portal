@@ -345,11 +345,11 @@ class AbsenController extends Controller
                         $shift = $schedule->shift_id;
                         $projectId = $schedule->work_location_id;
 
-                        if ($useMultiLocation && $workLocationId) {
-                            $workLocation = WorkLocation::find($workLocationId);
-                            if ($workLocation) {
-                                $workLocationLat = $workLocation->latitude;
-                                $workLocationLong = $workLocation->longitude;
+                        if ($useMultiLocation && $projectId) {
+                            $projectId = WorkLocation::find($projectId);
+                            if ($projectId) {
+                                $workLocationLat = $projectId->latitude;
+                                $workLocationLong = $projectId->longitude;
                             }
                         }
                     }
@@ -390,9 +390,9 @@ class AbsenController extends Controller
                     })->first();
 
                 if ($shiftModel) {
-                    $startShift = Carbon::createFromFormat('H:i', $shiftModel->start_time);
-                    $endShift = Carbon::createFromFormat('H:i', $shiftModel->end_time);
-                    $currentTime = Carbon::createFromFormat('H:i', $nowTime);
+                    $startShift = Carbon::parse($shiftModel->start_time);
+                    $endShift = Carbon::parse($shiftModel->end_time);
+                    $currentTime = now();
 
                     // Tangani shift malam
                     if ($endShift->lt($startShift)) {
@@ -420,7 +420,6 @@ class AbsenController extends Controller
             $absen->longtitude = $long;
             $absen->status = $request->input('status');
             $absen->project = $projectId;
-            $absen->work_location_id = $workLocationId;
 
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');

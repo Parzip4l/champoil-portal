@@ -419,7 +419,7 @@ class AbsenController extends Controller
             $absen->latitude = $lat;
             $absen->longtitude = $long;
             $absen->status = $request->input('status');
-            $absen->project = $projectId;
+            $absen->project = $projectId->id;
 
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');

@@ -289,7 +289,8 @@ class AbsenController extends Controller
             // Ambil setting dari company_setting
             $useRadius = CompanySettingHelper::get($companyId, 'use_radius');
             $radiusValue = CompanySettingHelper::get($companyId, 'radius_value', 5);
-            $gpsCoordinates = CompanySettingHelper::get($companyId, 'gps_coordinates', ['latitude' => null, 'longitude' => null]);
+            $gpsCoordinatesRaw = CompanySettingHelper::get($companyId, 'gps_coordinates');
+            $gpsCoordinates = is_string($gpsCoordinatesRaw) ? json_decode($gpsCoordinatesRaw, true) : $gpsCoordinatesRaw;
             $useShift = CompanySettingHelper::get($companyId, 'use_shift');
             $useSchedule = CompanySettingHelper::get($companyId, 'use_schedule');
             $defaultInTime = CompanySettingHelper::get($companyId, 'default_in_time');
@@ -312,9 +313,9 @@ class AbsenController extends Controller
             $lat = $request->input('latitude');
             $long = $request->input('longitude');
 
-            // Default lokasi kantor
-            $kantorLat = $gpsCoordinates['latitude'];
-            $kantorLong = $gpsCoordinates['longitude'];
+            // Default lokasi kantor            
+            $kantorLat = $gpsCoordinates['latitude'] ?? null;
+            $kantorLong = $gpsCoordinates['longitude'] ?? null;
             $projectId = null;
             $shift = null;
             $workLocationId = null;

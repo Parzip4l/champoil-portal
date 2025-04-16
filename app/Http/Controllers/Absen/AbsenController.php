@@ -342,7 +342,7 @@ class AbsenController extends Controller
                     $schedule = ScheduleModel::where('employee_id', $employeeId)->whereDate('work_date', $today)->first();
                     if ($schedule) {
                         $shift = $schedule->shift_id;
-                        $workLocationId = $schedule->work_location_id;
+                        $projectId = $schedule->work_location_id;
 
                         if ($useMultiLocation && $workLocationId) {
                             $workLocation = WorkLocation::find($workLocationId);

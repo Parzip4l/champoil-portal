@@ -4,7 +4,6 @@ namespace App\Exports;
 
 use App\Absen;
 use App\Employee;
-use App\ModelCG\Project;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -16,89 +15,90 @@ class AttendenceExport implements FromCollection, WithHeadings
     protected $loggedInUserNik;
     protected $startDate;
     protected $endDate;
+    protected $dates;
+    protected $organisasi;
 
-    public function __construct($unitBisnis, $loggedInUserNik, $startDate, $endDate)
+    public function __construct($unitBisnis, $loggedInUserNik, $startDate, $endDate, $organisasi = null)
     {
         $this->unitBisnis = $unitBisnis;
         $this->loggedInUserNik = $loggedInUserNik;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
-    }
+        $this->organisasi = $organisasi;
 
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    public function collection()
-    {
-        // Mengambil semua karyawan dalam unit bisnis tertentu
-        $employees = Employee::where('unit_bisnis', $this->unitBisnis)
-        ->where(function ($query) {
-            $query->where('organisasi', 'FRONTLINE OFFICER');
-            $query->where('resign_status', '0');
-        })
-        ->get();
-
-        // Mengatur struktur data untuk menyimpan hasil
-        $result = collect();
-
-        foreach ($employees as $employee) {
-            $absensi = Absen::where('nik', $employee->nik)
-                ->whereBetween('tanggal', [$this->startDate, $this->endDate])
-                ->select('tanggal', 'clock_in', 'clock_out', 'status','project')
-                ->get();
-
-            foreach ($this->getDateRange($this->startDate, $this->endDate) as $date) {
-                $absenHarian = $absensi->where('tanggal', $date->toDateString())->first();
-                
-                
-                $result->push([
-                    'Nama Karyawan' => $employee->nama,
-                    'Tanggal' => $date->toDateString(),
-                    'Clock In' => $absenHarian ? $absenHarian->clock_in : '',
-                    'Clock Out' => $absenHarian ? $absenHarian->clock_out : '',
-                    'Status' => $absenHarian ? $absenHarian->status : '',
-                    'Project' => $absenHarian ? $absenHarian->project : '',
-                    
-                ]);
-            }
+        $this->dates = collect();
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $this->dates->push($current->copy());
+            $current->addDay();
         }
-
-        return $result;
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
-        // Specify the headers for your exported data
-        return [
-            'Nama Karyawan',
-            'Tanggal',
-            'Clock In',
-            'Clock Out',
-            'Status',
-            'Project'
-        ];
+        $headings = ['Nama Karyawan'];
+        foreach ($this->dates as $date) {
+            $headings[] = $date->format('d M');
+        }
+        $headings[] = 'Total Masuk';
+        $headings[] = 'Tidak Masuk';
+        return $headings;
     }
 
-    /**
-     * Get date range between two dates
-     *
-     * @param Carbon $startDate
-     * @param Carbon $endDate
-     * @return array
-     */
-    protected function getDateRange($startDate, $endDate)
+    public function collection()
     {
-        $dates = [];
-        $currentDate = $startDate->copy();
+        $employeesQuery = Employee::where('unit_bisnis', $this->unitBisnis)
+            ->where('resign_status', '0');
 
-        while ($currentDate->lte($endDate)) {
-            $dates[] = $currentDate->copy();
-            $currentDate->addDay();
+        if ($this->organisasi) {
+            $employeesQuery->where('organisasi', $this->organisasi);
         }
 
+        $employees = $employeesQuery->get();
+        logger('Organisasi Filter: ' . $this->organisasi);
+
+        $data = [];
+
+        foreach ($employees as $employee) {
+            $row = [$employee->nama];
+            $absens = Absen::where('nik', $employee->nik)
+                ->whereBetween('tanggal', [$this->startDate->format('Y-m-d'), $this->endDate->format('Y-m-d')])
+                ->get()
+                ->keyBy('tanggal');
+
+            $totalMasuk = 0;
+            $totalTidakMasuk = 0;
+
+            foreach ($this->dates as $date) {
+                $absen = $absens[$date->toDateString()] ?? null;
+
+                if ($absen && $absen->clock_in) {
+                    $row[] = ($absen->clock_in ?? '-') . ' / ' . ($absen->clock_out ?? '-');
+                    $totalMasuk++;
+                } else {
+                    $row[] = '-';
+                    $totalTidakMasuk++;
+                }
+            }
+
+            // Tambahkan kolom total di akhir baris
+            $row[] = $totalMasuk;
+            $row[] = $totalTidakMasuk;
+
+            $data[] = $row;
+        }
+
+        return new Collection($data);
+    }
+
+    protected function generateDateRange(Carbon $start, Carbon $end)
+    {
+        $dates = [];
+        $current = $start->copy();
+        while ($current->lte($end)) {
+            $dates[] = $current->copy();
+            $current->addDay();
+        }
         return $dates;
     }
 }

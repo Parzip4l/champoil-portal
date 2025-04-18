@@ -25,6 +25,7 @@ use App\Backup\AbsenBackup;
 use App\User;
 use App\Organisasi\Organisasi;
 use App\Company\CompanyModel;
+use App\Company\CompanySetting;
 use App\Company\ScheduleModel;
 use App\Company\ShiftModel;
 use App\Company\WorkLocation;
@@ -42,115 +43,123 @@ class AbsenController extends Controller
      */
     public function index(Request $request)
     {
-        $code = Auth::user()->employee_code;
-        $company = Employee::where('nik', $code)->first();
-        $project = Project::all();
-        $client_id = Auth::user()->project_id;
-        $organisasi = Organisasi::where('company', $company->unit_bisnis)->get();
-    
-        $today = now();
-        $periode = $request->input('periode');
-        Log::info('Periode dari request:', ['periode' => $periode]);
-        if ($periode) {
-            // Parsing periode
-            [$startDate, $endDate] = explode(' - ', $periode);
-            Log::info('Data hasil explode:', ['start' => $startDate, 'end' => $endDate]);
+        $user = Auth::user();
+        $nik = $user->employee_code;
+
+        $employee = Employee::where('nik', $nik)->first();
+        $org = $employee->unit_bisnis;
+        $companyId = CompanyModel::where('company_name', $org)->value('id');
+        $settings = CompanySetting::where('company_id', $companyId)->pluck('value', 'key');
+
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+        $workLocationId = $request->input('work_location_id');
+        $selectedOrg = $request->input('org');
+        $organisasiId = $request->input('organisasi_id');
+        $useSchedule = CompanySettingHelper::get($companyId, 'use_schedule', false);
+
+        $startDate = null;
+        $endDate = null;
+
+        // Cek apakah ada pengaturan cutoff_start dan cutoff_end
+        if (isset($settings['cutoff_start']) && isset($settings['cutoff_end'])) {
+            $cutoffStartDay = (int) $settings['cutoff_start'];
+            $cutoffEndDay = (int) $settings['cutoff_end'];
+
+            // Tentukan tanggal cutoff mulai berdasarkan bulan dan tahun yang diberikan
+            $startDate = \Carbon\Carbon::createFromDate($year, $month, $cutoffStartDay)->startOfDay();
+
+            // Tentukan tanggal cutoff akhir berdasarkan bulan berikutnya dan tanggal yang diberikan
+            $endDate = $startDate->copy()->addMonth()->day($cutoffEndDay)->endOfDay();
+
+            // Jika tanggal akhir bulan berikutnya tidak valid (misalnya 31 Februari), sesuaikan
+            if ($endDate->day != $cutoffEndDay) {
+                $endDate->day = $endDate->daysInMonth;
+            }
         } else {
-            // Periode default
-            $startDate = Carbon::create($today->year, $today->month, 21)->format('Y-m-d');
-            $endDate = Carbon::create($today->year, $today->month, 20)->addMonth()->format('Y-m-d');
+            // Jika tidak ada pengaturan cutoff_start dan cutoff_end, fallback ke bulan yang dimaksud
+            $startDate = Carbon::create($year, $month, 1);  // fallback ke tanggal 1 bulan jika cutoff_start tidak ada
+            $endDate = $startDate->copy()->endOfMonth();  // fallback ke akhir bulan jika cutoff_end tidak ada
+        }
+        
+        $dates = [];
+        while ($startDate <= $endDate) {
+            $dates[] = $startDate->format('Y-m-d');
+            $startDate->addDay();
         }
 
-        Log::info('Periode dari default:', ['start' => $startDate]);
-        Log::info('Periode dari default:', ['end' => $endDate]);
-    
-        // Query absensi
-        $query = DB::table('users')
-            ->join('karyawan', 'karyawan.nik', '=', 'users.name')
-            ->leftJoin('absens', function ($join) use ($startDate, $endDate) {
-                $join->on('absens.nik', '=', 'users.name')
-                    ->whereBetween('absens.tanggal', [$startDate, $endDate]);
+        $scheduleEmployeeIds = collect();
+        $scheduleEmployeeNiks = collect();
+        if ($useSchedule) {
+            if (strtoupper($org) === 'KAS') {
+                $scheduleEmployeeNiks = Schedule::query()
+                    ->whereBetween('tanggal', [reset($dates), end($dates)])
+                    ->when($workLocationId, function ($q) use ($workLocationId) {
+                        $q->where('project', $workLocationId);
+                    })
+                    ->pluck('employee')
+                    ->unique();
+            } else {
+                $scheduleEmployeeIds = ScheduleModel::query()
+                    ->whereBetween('work_date', [reset($dates), end($dates)])
+                    ->when($workLocationId, function ($q) use ($workLocationId) {
+                        $q->where('work_location_id', $workLocationId);
+                    })
+                    ->pluck('employee_id')
+                    ->unique();
+            }
+        }
+
+        $employees = Employee::query()
+            ->where('resign_status', 0)
+            ->when($selectedOrg, function ($q) use ($selectedOrg) {
+                $q->where('unit_bisnis', $selectedOrg);
             })
-            ->select(
-                'users.id as user_id',
-                'karyawan.nik',
-                'karyawan.nama',
-                'karyawan.organisasi',
-                'karyawan.unit_bisnis',
-                DB::raw("GROUP_CONCAT(absens.tanggal ORDER BY absens.tanggal) as dates"),
-                DB::raw("GROUP_CONCAT(absens.clock_in ORDER BY absens.tanggal) as clock_ins"),
-                DB::raw("GROUP_CONCAT(absens.clock_out ORDER BY absens.tanggal) as clock_outs")
-            )
-            ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-            ->where('karyawan.resign_status', '0')
-            ->groupBy('users.id', 'karyawan.nik', 'karyawan.nama', 'karyawan.organisasi', 'karyawan.unit_bisnis')
-            ->orderBy('karyawan.nama');
-    
-        if ($request->organisasi && $request->organisasi !== 'ALL') {
-            $query->where('karyawan.organisasi', $request->organisasi);
-        }
-    
-        if ($request->project && $request->project !== 'ALL') {
-            $query->where('absens.project', $request->project);
+            ->when($organisasiId, function ($q) use ($organisasiId) {
+                $q->where('organisasi', $organisasiId);
+            })
+            ->when($workLocationId && $useSchedule && strtoupper($org) !== 'KAS', function ($q) use ($scheduleEmployeeIds) {
+                $q->whereIn('id', $scheduleEmployeeIds);
+            })
+            ->when($workLocationId && $useSchedule && strtoupper($org) === 'KAS', function ($q) use ($scheduleEmployeeNiks) {
+                $q->whereIn('nik', $scheduleEmployeeNiks);
+            })
+            ->where('unit_bisnis', $org)
+            ->get();
+
+        $niks = $employees->pluck('nik');
+
+        $absens = Absen::whereBetween('tanggal', [reset($dates), end($dates)])
+            ->whereIn('nik', $niks)
+            ->get()
+            ->groupBy('nik');
+        
+        if (strtoupper($org) === 'KAS') {
+            $schedules = Schedule::whereBetween('tanggal', [reset($dates), end($dates)])
+                ->whereIn('employee', $employees->pluck('nik'))
+                ->get()
+                ->groupBy(function($s) {
+                    return $s->employee . '-' . $s->tanggal; // Sesuaikan dengan field yang tepat
+                });
+
+                \Log::info('Grouped Schedules:', $schedules->toArray());
+        }else {
+            $schedules = ScheduleModel::whereBetween('work_date', [reset($dates), end($dates)])
+                ->whereIn('employee_id', $employees->pluck('id'))
+                ->get()
+                ->groupBy(fn($s) => $s->employee_id . '-' . $s->work_date);
         }
 
-        if(!empty($client_id)){
-            $query->where('absens.project', $client_id);
+        if (strtoupper($org) === 'KAS') {
+            $shifts = ProjectShift::all();
+        } else {
+            $shifts = ShiftModel::where('company_id', $companyId)->get()->keyBy('id');
         }
-    
-        if ($request->ajax()) {
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->editColumn('nama', function ($row) {
-                    $link = route('absen.details', ['nik' => $row->nik]);
-                    return '<a href="' . $link . '">' . htmlspecialchars($row->nama) . '</a>';
-                })
-                ->addColumn('attendance', function ($row) use ($startDate, $endDate) {
-                    $attendanceData = [];
-                    $dates = explode(',', $row->dates);
-                    $clockIns = explode(',', $row->clock_ins);
-                    $clockOuts = explode(',', $row->clock_outs);
-    
-                    $dateIndexMap = array_flip($dates);
-    
-                    foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
-                        $formattedDate = $date->format('Y-m-d');
-                        if (isset($dateIndexMap[$formattedDate])) {
-                            $index = $dateIndexMap[$formattedDate];
-                            $clockIn = $clockIns[$index] ?? '-';
-                            $clockOut = $clockOuts[$index] ?? '-';
-                        } else {
-                            $clockIn = $clockOut = '-';
-                        }
-                        $attendanceData['absens_' . $date->format('Ymd')] = [
-                            'clock_in' => $clockIn,
-                            'clock_out' => $clockOut,
-                        ];
-                    }
-    
-                    return $attendanceData;
-                })
-                ->filter(function ($query) use ($request) {
-                    if ($request->has('search') && $request->search['value'] !== '') {
-                        $search = strtolower($request->search['value']);
-                        $query->where(DB::raw('LOWER(karyawan.nama)'), 'LIKE', "%{$search}%");
-                    }
-                })
-                ->rawColumns(['nama'])
-                ->toJson();
-        }
-    
-        // Generate daftar bulan untuk dropdown
-        $months = [];
-        for ($i = -1; $i < 13; $i++) {
-            $start = $today->copy()->startOfYear()->addYear($i >= 12 ? 1 : 0)->addMonths($i % 12)->day(21);
-            $end = $start->copy()->addMonth()->day(20);
-            $months[$start->format('Y-m-d') . ' - ' . $end->format('Y-m-d')] = $end->format('M Y');
-        }
-
-    
-        return view('pages.absen.index', compact('endDate', 'startDate', 'months', 'project', 'client_id', 'organisasi'));
+        
+        $useMultilocation = CompanySettingHelper::get($companyId, 'use_multilocation');
+        return view('pages.absen.index', compact('employees', 'dates', 'absens', 'schedules', 'shifts', 'useMultilocation', 'org','companyId'));
     }
+
     
 
     public function indexbackup()
@@ -198,50 +207,64 @@ class AbsenController extends Controller
 
     public function exportAttendence(Request $request)
     {
-        $selectedMonth = $request->input('selected_month');
 
-        // Validasi input bulan
+        $user = Auth::user();
+        $nik = $user->employee_code;
+
+        $employee = Employee::where('nik', $nik)->first();
+        $org = $employee->unit_bisnis;
+        $companyId = CompanyModel::where('company_name', $org)->value('id');
+
         $validatedData = $request->validate([
-            'selected_month' => 'required|string', // Validasi jenis data
+            'selected_month' => 'required|string',
         ]);
 
-        // Tambahkan tahun ke nilai bulan
-        $selectedMonthWithYear = date('Y') . '-' . date('m',strtotime($selectedMonth));
-
-        // Konversi input bulan menjadi objek Carbon
+        // Ambil bulan dan tahun dari input (format: YYYY-MM)
+        $selectedMonthWithYear = date('Y') . '-' . date('m', strtotime($request->selected_month));
         $selectedDate = Carbon::createFromFormat('Y-m', $selectedMonthWithYear);
-
-        // Dapatkan tahun dan bulan dari input
         $year = $selectedDate->year;
-        // $month = $selectedDate->month;
-
-        // Dapatkan tanggal awal dan akhir periode berdasarkan bulan yang dipilih
-        // $startDate = Carbon::create($year, $month, 21)->startOfMonth();
-        // $endDate = $startDate->copy()->addMonth()->subDay();
-        $monthNumber = $selectedMonth;
-        $startDate = Carbon::create($year, $monthNumber, 21);
-        if ($monthNumber == 12) {
-            // Handle December case, where end date should be in the next year
-            $endDate = Carbon::create($year + 1, 1, 20);
-        } else {
-            $endDate = Carbon::create($year, $monthNumber + 1, 20);
-        }
-
+        $month = $selectedDate->month;
+        $organisasi = $request->input('organisasi');
 
         try {
-            // Lakukan proses eksportasi seperti sebelumnya
+            // Ambil NIK user yang login
             $loggedInUserNik = auth()->user()->employee_code;
-            $company = Employee::where('nik', $loggedInUserNik)->first();
-            $unitBisnis = $company->unit_bisnis;
+            $employee = Employee::where('nik', $loggedInUserNik)->first();
+            $unitBisnis = $employee->unit_bisnis;
 
-            $export = new AttendenceExport($unitBisnis, $loggedInUserNik, $startDate, $endDate);
+            // Ambil settingan cutoff dari company_settings
+            $settings = CompanySetting::where('company_id', $companyId)->pluck('value', 'key'); // pastikan ini adalah helper yg ambil settingan sesuai company user
 
-            return Excel::download($export, 'attendence_export_' . strtolower($startDate->format('F')) . '.xlsx');
+            $startDate = null;
+            $endDate = null;
+
+            if (isset($settings['cutoff_start']) && isset($settings['cutoff_end'])) {
+                $cutoffStartDay = (int) $settings['cutoff_start'];
+                $cutoffEndDay = (int) $settings['cutoff_end'];
+
+                // Tentukan tanggal cutoff mulai dari bulan yang dipilih
+                $startDate = Carbon::create($year, $month, $cutoffStartDay)->startOfDay();
+
+                // Tanggal akhir: bulan berikutnya, tanggal cutoff end
+                $endDate = $startDate->copy()->addMonth()->day($cutoffEndDay)->endOfDay();
+
+                // Handle jika tanggal cutoff_end melebihi jumlah hari di bulan
+                if ($endDate->day != $cutoffEndDay) {
+                    $endDate->day = $endDate->daysInMonth;
+                }
+            } else {
+                // Fallback jika tidak ada setting cutoff
+                $startDate = Carbon::create($year, $month, 1)->startOfDay();
+                $endDate = $startDate->copy()->endOfMonth()->endOfDay();
+            }
+
+            // Buat file export Excel
+            $export = new AttendenceExport($unitBisnis, $loggedInUserNik, $startDate, $endDate, $organisasi);
+            return Excel::download($export, 'attendence_export_' . strtolower($startDate->format('F_Y')) . '.xlsx');
+
         } catch (\Exception $e) {
-            // Tampilkan pesan kesalahan kepada pengguna
-            return back()->with('error', 'Terjadi kesalahan saat mengunduh file Excel. Silakan coba lagi.');
+            return back()->with('error', 'Terjadi kesalahan saat mengunduh file Excel: ' . $e->getMessage());
         }
-        
     }
 
     /**

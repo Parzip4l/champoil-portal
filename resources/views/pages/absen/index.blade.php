@@ -6,130 +6,186 @@
 @endpush
 
 @section('content')
-<nav class="page-breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="#">Additional Information</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Absensi</li>
-  </ol>
-</nav>
+    <h4 class="mb-3">Rekap Absensi</h4>
 
-@php 
-    $user = Auth::user(); 
-    $employee = \App\Employee::where('nik', $user->employee_code)->first(); 
-@endphp
-
-@if(session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
-@endif  
-
-@if (session('error'))
-<div class="alert alert-danger">
-    {{ session('error') }}
-</div>
-@endif
-
-<div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h5>Filter</h5>
-            </div>
-            <div class="card-body">
-                <form id="filter-form">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="organisasi" class="form-label">Organisasi</label>
-                            <select name="organisasi" id="organisasi" class="form-control select2">
-                                <option value="ALL">ALL</option>
-                                @foreach($organisasi as $dataorg)
-                                    @if($user->project_id == null || $dataorg->name == "FRONTLINE OFFICER")
-                                        <option value="{{ $dataorg->id }}">{{ $dataorg->name }}</option>
-                                    @endif
-                                @endforeach
+    {{-- Filter --}}
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card custom-card2">
+                <div class="card-body">
+                    <form method="GET" class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label for="month">Bulan</label>
+                            <select class="form-select" name="month" id="month">
+                                @for ($m = 1; $m <= 12; $m++)
+                                    <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::create()->month($m)->locale('id')->isoFormat('MMMM') }}
+                                    </option>
+                                @endfor
                             </select>
                         </div>
-                        @if(optional($employee)->unit_bisnis === 'Kas')
-                        <div class="col-md-4">
-                            <label for="project" class="form-label">Project</label>
-                            <select name="project" id="project" class="form-control select2">
-                                <option value="ALL">ALL</option>
-                                @foreach($project as $dataproject)
-                                    @if($user->project_id == null || $user->project_id == $dataproject->id)
-                                        <option value="{{ $dataproject->id }}">{{ $dataproject->name }}</option>
-                                    @endif
-                                @endforeach
+                        <div class="col-md-2">
+                            <label for="year">Tahun</label>
+                            <select class="form-select" name="year" id="year">
+                                @for ($y = now()->year - 2; $y <= now()->year + 1; $y++)
+                                    <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                        {{ $y }}
+                                    </option>
+                                @endfor
                             </select>
                         </div>
+                        
+                        {{-- Filter Lokasi Kerja --}}
+                        @if($useMultilocation)
+                            <div class="col-md-3">
+                                <label for="work_location_id">Lokasi Kerja</label>
+                                <select class="form-select" name="work_location_id" id="work_location_id">
+                                    <option value="">Semua Lokasi</option>
+                                    @if (strtoupper($org) === 'KAS') 
+                                        @foreach (App\ModelCG\Project::where('company', $org ?? null)->get() as $lokasi)
+                                            <option value="{{ $lokasi->id }}" {{ request('work_location_id') == $lokasi->id ? 'selected' : '' }}>
+                                                {{ $lokasi->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        @foreach (\App\Company\WorkLocation::where('company_id', $companyId ?? null)->get() as $lokasi)
+                                            <option value="{{ $lokasi->id }}" {{ request('work_location_id') == $lokasi->id ? 'selected' : '' }}>
+                                                {{ $lokasi->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
                         @endif
-                        <div class="col-md-4">
-                            <label for="periode" class="form-label">Periode</label>
-                            <select id="periode" class="form-control">
-                                <option value="">Select Periode</option>
-                                @foreach($months as $key => $label)
-                                    <option value="{{ $key }}">{{ $label }}</option>
+                        
+                        {{-- Filter Organisasi --}}
+                        <div class="col-md-3">
+                            <label for="organisasi_id">Organisasi</label>
+                            <select class="form-select" name="organisasi_id" id="organisasi_id">
+                                <option value="">Semua Organisasi</option>
+                                @foreach (\App\Organisasi\Organisasi::where('company', $org)->get() as $organisasi)
+                                    <option value="{{ $organisasi->name }}" {{ request('organisasi_id') == $organisasi->name ? 'selected' : '' }}>
+                                        {{ $organisasi->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <h6 class="">Employees Attendance 
-                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#export-attendance" class="btn btn-success btn-xs" style="float:right">Export</a>
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="dataTableExample1" class="table table-striped table-bordered">
-                        <thead id="table-header">
-                            <tr>
-                                <th>Nama</th>
-                                <th>NIK</th>
-                                <th>PROJECT NAME</th>
-                                <th>Total Schedule</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- DataTable akan secara otomatis mengisi data di sini -->
-                        </tbody>
-                    </table>
+                        
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" type="submit">Filter</button>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#exportModal">
+                                Export to Excel
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="export-attendance" tabindex="-1" aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <form action="" method="GET">
-                    <div class="form-group">
-                        <label for="month" class="form-label">Absen Periode</label>
-                        <select name="month" id="month" class="form-control" required>
-                            @foreach(['nov-2024' => 'November - 2024', 'dec-2024' => 'Desember - 2024', 
-                                      'jan-2025' => 'Januari - 2025', 'feb-2025' => 'Februari - 2025'] as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
+    {{-- Table --}}
+    <div class="card custom-card2">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle text-center" id="attendance-table">
+                    <thead class="table-light sticky-top" style="z-index: 1">
+                        <tr>
+                            <th style="min-width: 150px">Nama</th>
+                            @foreach ($dates as $date)
+                                <th style="min-width: 100px" class="text-center">
+                                    {{ \Carbon\Carbon::parse($date)->format('d M') }}
+                                </th>
                             @endforeach
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success btn-sm" id="exportButton">Export</button>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($employees as $employee)
+                            <tr>
+                                <td class="text-start fixed-column" style="min-width: 150px">{{ $employee->nama }}</td>
+                                @foreach ($dates as $date)
+                                    @php
+                                        $absen = isset($absens[$employee->nik]) ? $absens[$employee->nik]->firstWhere('tanggal', $date) : null;
+                                        if (strtoupper($org) === 'KAS') {
+                                            $scheduleKey = $employee->nik . '-' . $date;
+                                        }else{
+                                            $scheduleKey = $employee->id . '-' . $date;
+                                        }
+                                        
+                                        $scheduleRaw = $schedules[$scheduleKey] ?? null;
+                                        if (!$scheduleRaw) {
+                                            \Log::warning('Schedule Not Found', ['scheduleKey' => $scheduleKey]);
+                                        }
+                                        $schedule = $scheduleRaw instanceof \Illuminate\Support\Collection ? $scheduleRaw->first() : $scheduleRaw;
+
+                                        if (strtoupper($org) === 'KAS') {
+                                            $shift = null;
+                                            if ($schedule && isset($schedule->shift) && isset($schedule->project)) {
+                                                // Cari shift berdasarkan project_id dan shift_code
+                                                $shift = \App\ModelCG\Datamaster\ProjectShift::where('project_id', $schedule->project)
+                                                    ->where('shift_code', $schedule->shift)
+                                                    ->first(); // Ambil yang pertama jika ditemukan
+                                            }
+                                        } else {
+                                            $shift = $schedule && isset($shifts[$schedule->shift_id]) ? $shifts[$schedule->shift_id] : null;
+                                        }
+                                        
+                                    @endphp
+                                    <td class="p-1">
+                                    @if ($schedule || $shift)
+                                        <p class="text-muted">{{ $shift->shift_code ?? $shift->code ?? 'OFF' }} <br>
+                                        (<span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span>)</p>
+                                            
+                                    @else
+                                    <p class="text-muted">
+                                    <span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span></p>
+                                    @endif
+                                </td>
+
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</div>
+
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Pilih Bulan untuk Export</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form untuk memilih bulan -->
+                    <form action="{{ route('export.attendence') }}" method="GET">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="selected_month" class="form-label">Pilih Bulan</label>
+                            <input type="month" name="selected_month" id="selected_month" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="organisasi" class="form-label">Pilih Organisasi</label>
+                            <select class="form-select" name="organisasi" id="organisasi_id">
+                                <option value="">Semua Organisasi</option>
+                                @foreach (\App\Organisasi\Organisasi::where('company', $org)->get() as $organisasi)
+                                    <option value="{{ $organisasi->name }}" {{ request('organisasi_id') == $organisasi->name ? 'selected' : '' }}>
+                                        {{ $organisasi->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Export</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 @endsection
 
 @push('plugin-scripts')
@@ -140,96 +196,22 @@
 
 @push('custom-scripts')
 <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<style>
+    .fixed-column {
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);  /* Shadow pada kolom fixed */
+        background-color: #f8f9fa; /* Beri latar belakang agar lebih terlihat */
+        z-index: 10; /* Pastikan kolom fixed tampil di atas kolom lainnya */
+        border-right: 2px solid #dee2e6; /* Border di sebelah kanan kolom */
+    }
+</style>
 <script>
-$(document).ready(function () {
-    function fetchData() {
-        let organisasi = $('#organisasi').val();
-        let project = $('#project').val();
-        let periode = $('#periode').val();
-
-        // Pastikan periode valid sebelum melakukan request
-        let periodeSplit = periode ? periode.split(' - ') : ['', ''];
-        let start = periodeSplit[0] || '';
-        let end = periodeSplit[1] || '';
-
-        $.ajax({
-            url: '/api/v1/attendance-records',
-            type: 'GET', // Gunakan GET agar bisa digunakan untuk export juga
-            data: {
-                organisasi: organisasi,
-                project_id: project,
-                start: start,
-                end: end
-            },
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'success' && response.data.length > 0) {
-                    updateTable(response.data);
-                } else {
-                    Swal.fire('Info', 'No data available', 'info');
-                }
-            },
-            error: function (xhr) {
-                Swal.fire('Error', xhr.responseJSON?.message || 'Failed to fetch data', 'error');
+    $(document).ready(function() {
+        var table = $('#attendance-table').DataTable({
+            scrollX: true,  // Aktifkan scroll horizontal
+            fixedColumns: {
+                left: 1  // Pinned kolom pertama
             }
         });
-    }
-
-    function updateTable(employees) {
-        let dates = Object.keys(employees[0]?.schedules || {});
-
-        // Generate table headers
-        let headerHTML = `<tr>
-            <th>Employee Name</th>
-            <th>Employee NIK</th>
-            <th>Employee Project</th>
-            <th>Total Schedules</th>
-            ${dates.map(date => `<th>${date}</th>`).join('')}
-        </tr>`;
-        $("#table-header").html(headerHTML);
-
-        // Generate table rows
-        let rowsHTML = employees.map(emp => {
-            return `<tr>
-                <td>${emp.employee_name}</td>
-                <td>${emp.employee}</td>
-                <td>${emp.project_name}</td>
-                <td>${emp.total_schedules}</td>
-                ${dates.map(date => `<td>${emp.schedules[date]?.shift || '-'} ( ${emp.schedules[date]?.clock_in || '-'} : ${emp.schedules[date]?.clock_out || '-'} )</td>`).join('')}
-            </tr>`;
-        }).join('');
-        
-        $("#dataTableExample1 tbody").html(rowsHTML);
-
-        // Inisialisasi ulang DataTable
-        if ($.fn.DataTable.isDataTable("#dataTableExample1")) {
-            $("#dataTableExample1").DataTable().clear().destroy();
-        }
-        $("#dataTableExample1").DataTable();
-    }
-
-    // Panggil fetchData saat halaman dimuat
-    fetchData();
-
-    // Reload data saat filter diubah
-    $('#organisasi, #project, #periode').on('change', function () {
-        fetchData();
     });
-
-    // Tombol export
-    $('#exportButton').on('click', function () {
-        let organisasi = $('#organisasi').val();
-        let project = $('#project').val();
-        let periode = $('#periode').val();
-        let periodeSplit = periode ? periode.split(' - ') : ['', ''];
-        let start = periodeSplit[0] || '';
-        let end = periodeSplit[1] || '';
-
-        let url = `/api/v1/attendance-records/export?organisasi=${organisasi}&project_id=${project}&start=${start}&end=${end}`;
-        window.location.href = url;
-    });
-});
 </script>
-
 @endpush

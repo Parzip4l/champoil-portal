@@ -76,6 +76,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/absensi/clockin', [\App\Http\Controllers\Absen\AbsenController::class, 'clockin'])
     ->middleware('auth')
     ->name('clockin');
+    Route::get('/absensi/datatable', [App\Http\Controllers\Absen\AbsenController::class, 'index2'])->name('absensi.data');
 
     Route::post('/absensi/backup/clockout', [\App\Http\Controllers\Absen\AbsenController::class, 'clockoutbackup'])
     ->middleware('auth')

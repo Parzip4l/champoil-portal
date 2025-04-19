@@ -317,7 +317,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access">
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="hc_access">
                                     <label class="form-check-label">HR</label>
                                 </div>
                             </div>
@@ -341,14 +341,7 @@
                                     <label class="form-check-label">Client</label>
                                 </div>
                             </div>
-                            
                             @endif
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access">
-                                    <label class="form-check-label">Super Admin</label>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="col-md-12 mb-2">

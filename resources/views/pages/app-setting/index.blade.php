@@ -369,6 +369,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('company.work-locations.index', ['company' => $company]) }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="settings"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>Multi Location Settings</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

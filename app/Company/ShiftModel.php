@@ -14,7 +14,7 @@ class ShiftModel extends Model
 {
     use HasFactory;
     protected $table = 'company_shifts';
-    protected $fillable = ['company_id', 'work_location_id', 'name', 'start_time', 'end_time','created_by', 'updated_by','code'];
+    protected $fillable = ['company_id', 'work_location_id', 'name', 'start_time', 'end_time','created_by', 'updated_by','code','is_off'];
 
     public function company() {
         return $this->belongsTo(CompanyModel::class);

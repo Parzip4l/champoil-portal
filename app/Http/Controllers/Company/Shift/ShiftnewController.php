@@ -55,17 +55,20 @@ class ShiftnewController extends Controller
         $code = Auth::user()->employee_code;
         $request->validate([
             'name' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'work_location_id' => 'nullable|exists:work_location_id,id'
+            'code' => 'required',
+            'start_time' => 'nullable|required_unless:is_off,1',
+            'end_time' => 'nullable|required_unless:is_off,1',
+            'location_id' => 'nullable|exists:company_work_location,id',
+            'is_off' => 'nullable|boolean'
         ]);
 
         ShiftModel::create([
             'company_id' => $companyId,
             'name' => $request->name,
             'code' => $request->code,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
+            'start_time' => $request->is_off ? null : $request->start_time,
+            'end_time' => $request->is_off ? null : $request->end_time,
+            'is_off' => $request->is_off ? 1 : 0,
             'work_location_id' => $request->location_id,
             'created_by' => $code,
             'updated_by' => $code,
@@ -104,20 +107,22 @@ class ShiftnewController extends Controller
 
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
-                'start_time' => 'required',
-                'end_time' => 'required',
+                'start_time' => 'nullable',
+                'end_time' => 'nullable',
                 'code' => 'required',
                 'work_location_id' => 'nullable|exists:company_work_location,id',
             ]);
-
             $validated['updated_by'] = $code;
-
             $shift->update($validated);
 
             return redirect()->route('company.shifts.index', $companyId)
                 ->with('success', 'Shift berhasil diperbarui.');
         } catch (\Throwable $e) {
-            \Log::error('Shift update error', ['error' => $e]);
+            \Log::error('Shift update error', [
+                'error' => $e->getMessage(),
+                'stack' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan saat memperbarui shift: ' . $e->getMessage());

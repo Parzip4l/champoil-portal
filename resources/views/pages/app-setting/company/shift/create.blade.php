@@ -6,24 +6,31 @@
     <div class="card-body">
         <form method="POST" action="{{ route('company.shifts.store', $companyId) }}" onsubmit="return validateShiftTime(event)">
             @csrf
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="is_off" id="is_off" value="1"
+                    {{ old('is_off') ? 'checked' : '' }} onchange="toggleTimeFields(this)">
+                <label class="form-check-label" for="is_off">Shift Libur (OFF)</label>
+            </div>
+
             <div class="form-group mb-2">
                 <label>Nama Shift</label>
-                <input type="text" name="name" class="form-control" required>
+                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
             </div>
 
             <div class="form-group mb-2">
                 <label>Kode Shift</label>
-                <input type="text" name="code" class="form-control" placeholder="eg; ML or PG or MDL" required>
+                <input type="text" name="code" class="form-control" value="{{ old('code') }}" placeholder="eg; ML or PG or MDL" required>
             </div>
 
             <div class="form-group mb-2">
                 <label>Jam Masuk</label>
-                <input type="time" name="start_time" id="start_time" class="form-control" required>
+                <input type="time" name="start_time" id="start_time" class="form-control" value="{{ old('start_time') }}" {{ old('is_off') ? 'disabled' : '' }}>
             </div>
 
             <div class="form-group mb-2">
                 <label>Jam Keluar</label>
-                <input type="time" name="end_time" id="end_time" class="form-control" required>
+                <input type="time" name="end_time" id="end_time" class="form-control" value="{{ old('end_time') }}" {{ old('is_off') ? 'disabled' : '' }}>
             </div>
 
             @if($useMultilocation)
@@ -32,7 +39,9 @@
                     <select name="location_id" class="form-control">
                         <option value="">-- Pilih Lokasi --</option>
                         @foreach($locations as $loc)
-                            <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                            <option value="{{ $loc->id }}" {{ old('location_id') == $loc->id ? 'selected' : '' }}>
+                                {{ $loc->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -50,7 +59,16 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    function toggleTimeFields(checkbox) {
+        const disabled = checkbox.checked;
+        document.getElementById('start_time').disabled = disabled;
+        document.getElementById('end_time').disabled = disabled;
+    }
+
     function validateShiftTime(event) {
+        const isOff = document.getElementById('is_off').checked;
+        if (isOff) return true;
+
         const startTime = document.getElementById('start_time').value;
         const endTime = document.getElementById('end_time').value;
 
@@ -58,12 +76,10 @@
 
         const [startHour, startMinute] = startTime.split(':').map(Number);
         const [endHour, endMinute] = endTime.split(':').map(Number);
-
         const start = startHour * 60 + startMinute;
         const end = endHour * 60 + endMinute;
 
-        // Valid: end > start (hari yang sama) atau shift malam (end < start dan end < jam 12 siang)
-        const isValid = (end > start) || (start > end && end < 720);
+        const isValid = (end > start) || (start > end && end < 720); // Shift malam
 
         if (!isValid) {
             event.preventDefault();

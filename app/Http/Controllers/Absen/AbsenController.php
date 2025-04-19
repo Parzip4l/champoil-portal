@@ -413,6 +413,12 @@ class AbsenController extends Controller
                     })->first();
 
                 if ($shiftModel) {
+                    
+                    // Validasi Schedule Off
+                    if ($shiftModel->is_off == 1) {
+                        return back()->with('error', 'Anda tidak bisa absen karena hari ini adalah hari libur.');
+                    }
+
                     $startShift = Carbon::parse($shiftModel->start_time);
                     $endShift = Carbon::parse($shiftModel->end_time);
                     $currentTime = now();

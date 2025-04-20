@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Mail\ForgotPasswordMail;
+use GuzzleHttp\Client;  
 use PDF;
 // Model
 use App\Employee;
@@ -49,6 +50,7 @@ use App\Koperasi\Anggota;
 use App\Koperasi\Loan;
 use App\VoltageData;
 use App\Absen;
+use App\Slack;
 
 class AllDataController extends Controller
 {
@@ -674,13 +676,40 @@ class AllDataController extends Controller
             $endDate = Carbon::create($tahun, $bulan, 20)->addMonth()->format('d-m-Y');
             $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
             $organisasiUser = Employee::where('nik', $employeeCode)->value('organisasi');
+
+            $period = CarbonPeriod::create($startDate, $endDate);
+
+            $tanggalArray = [];
+            foreach ($period as $date) {
+                $tanggalArray[] = $date->format('d-m-Y');
+            }
+
             // Initialize Spreadsheet
+            
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $sheet->setTitle('DATA GAJI');
+
             $spreadsheet->createSheet();
-            $backupSheet = $spreadsheet->setActiveSheetIndex(1);  // Switch to the second sheet
-            $backupSheet->setTitle('BACK UP');
+            $scheSheet = $spreadsheet->setActiveSheetIndex(1);  // Switch to the second sheet
+            $scheSheet->setTitle('SCHEDULE');
+
+            $spreadsheet->createSheet();
+            $attSheet = $spreadsheet->setActiveSheetIndex(2);  // Switch to the second sheet
+            $attSheet->setTitle('ATTENDANCE');
+            
+            $spreadsheet->createSheet();
+            $backupSheet = $spreadsheet->setActiveSheetIndex(3);  // Switch to the second sheet
+            $backupSheet->setTitle('SCHEDULE BACK UP');
+
+            $spreadsheet->createSheet();
+            $attBackupSheet = $spreadsheet->setActiveSheetIndex(4);  // Switch to the second sheet
+            $attBackupSheet->setTitle('ATTENDANCE BACK UP');
+
+    //+------------------------------------------+
+    //                   HEADER                  |
+    //-------------------------------------------+
+
             $headers = [
                 'A6' => 'NO',
                 'B6' => 'NAMA',
@@ -738,6 +767,35 @@ class AllDataController extends Controller
             $sheet->mergeCells('AE6:AE7');
             $sheet->mergeCells('AF6:AF7');
             
+            $headersSch = ['NAMA', 'NIK', 'JABATAN', 'PROJECT','Total Schedule',...$tanggalArray];
+            $headersAtt = ['NAMA', 'NIK', 'JABATAN', 'PROJECT',...$tanggalArray];
+           
+
+            
+
+            $headersBackup = [
+                'A1' => 'NO',
+                'B1' => 'NAMA',
+                'C1' => 'NIK',
+                'D1' => 'JABATAN PENGGANTI',
+                'E1' => 'PROJECT PENGGANTI',
+                'F1' => 'NAMA DIGANTIKAN',
+                'G1' => 'JABATAN DIGANTIKAN',
+                'H1' => 'PROJECT',
+                'I1' => 'TANGGAL',
+                'J1' => 'AMOUNT'
+            ];
+
+            $headersAttBackup = [
+                'A1' => 'NO',
+                'B1' => 'NAMA',
+                'C1' => 'NIK',
+                'D1' => 'PROJECT',
+                'E1' => 'TANGGAL',
+                'F1' => 'ABSEN',
+            ];
+            
+            
         
             $headerStyle = [
                 'font' => [
@@ -760,6 +818,9 @@ class AllDataController extends Controller
                     ],
                 ],
             ];
+    //+------------------------------------------+
+    //               END HEADER                  |
+    //-------------------------------------------+
             
             foreach ($headers as $cell => $label) {
                 // Set header text
@@ -927,18 +988,109 @@ class AllDataController extends Controller
                     $no++;
                 }
             }
-            $headersBackup = [
-                'A1' => 'NO',
-                'B1' => 'NAMA',
-                'C1' => 'NIK',
-                'D1' => 'JABATAN PENGGANTI',
-                'E1' => 'PROJECT PENGGANTI',
-                'F1' => 'NAMA DIGANTIKAN',
-                'G1' => 'JABATAN DIGANTIKAN',
-                'H1' => 'PROJECT',
-                'I1' => 'TANGGAL',
-                'J1' => 'AMOUNT'
-            ];
+
+            // start sheet  schedules
+            $scheSheet->fromArray($headersSch, null, 'A1');
+
+            $projectIDs = Project::where('company', 'Kas')->pluck('id')->toArray();
+
+            $dataSchedule = Schedule::select('employee', 'project', DB::raw('COUNT(*) as total_schedules'))
+                                    ->whereIn('project', $projectIDs)
+                                    ->whereBetween('tanggal', [date('Y-m-d',strtotime($startDate)), date('Y-m-d',strtotime($endDate))]);
+
+            $grouped =  $dataSchedule->groupBy('employee', 'project')->get();
+
+            $tanggalArray = []; // inisialisasi array tanggal
+            $result_schedules = [];
+
+            foreach ($grouped as $row) {
+                $employee = karyawan_bynik($row->employee);
+
+                if (!$employee) {
+                    continue;
+                }
+
+                $employeeData = [
+                    'Employee Name' => $employee->nama,
+                    'Employee NIK' => $row->employee,
+                    'Jabatan' => $employee->jabatan,
+                    'Project Name' => project_byID($row->project)->name ?? '-',
+                    'Total Schedules' => $row->total_schedules
+                ];
+
+                $schedules = Schedule::where('employee', $row->employee)
+                    ->whereBetween('tanggal', [date('Y-m-d',strtotime($startDate)), date('Y-m-d',strtotime($endDate))])
+                    ->get();
+
+                foreach ($schedules as $schedule) {
+                    $absen = Absen::where('nik', $row->employee)
+                        ->where('tanggal', $schedule->tanggal)
+                        ->first();
+
+                    $employeeData[$schedule->tanggal] = [
+                        'Shift' => $schedule->shift,
+                        'Project' => $absen->project->name ?? '-',
+                        'Clock In' => $absen->clock_in ?? '-',
+                        'Clock Out' => $absen->clock_out ?? '-',
+                        'Status' => $absen->status ?? '-'
+                    ];
+
+                    if (!in_array($schedule->tanggal, $tanggalArray)) {
+                        $tanggalArray[] = $schedule->tanggal;
+                    }
+                }
+
+                $result_schedules[] = $employeeData;
+            }
+
+            $rowIndex = 2;
+            foreach ($result_schedules as $row) {
+                $rowData = [
+                    $row['Employee Name'],
+                    "'{$row['Employee NIK']}",
+                    $row['Jabatan'],
+                    $row['Project Name'],
+                    $row['Total Schedules']
+                ];
+
+                foreach ($tanggalArray as $date) {
+                    $schedule = $row[$date] ?? ['Shift' => '-', 'Clock In' => '-', 'Clock Out' => '-', 'Status' => '-'];
+                    $rowData[] = $schedule['Shift'];
+                }
+
+                $scheSheet->fromArray($rowData, null, "A$rowIndex");
+                $rowIndex++;
+            }
+
+
+            // end  sheet schedules
+            
+            
+            
+            $attSheet->fromArray($headersAtt, null, 'A1');
+            $rowIndexAtt=2;
+            foreach ($result_schedules as $row) {
+                $rowData = [
+                    $row['Employee Name'],
+                    "'{$row['Employee NIK']}",
+                    $row['Jabatan'],
+                    $row['Project Name'],
+                    $row['Total Schedules']
+                ];
+
+                foreach ($tanggalArray as $date) {
+                    $schedule = $row[$date] ?? ['Shift' => '-', 'Clock In' => '-', 'Clock Out' => '-', 'Status' => '-'];
+                    $rowData[] = $schedule['Status'];
+                }
+
+                $attSheet->fromArray($rowData, null, "A$rowIndexAtt");
+                $rowIndexAtt++;
+            }
+            
+            
+
+            
+            
             foreach ($headersBackup as $cell => $label) {
                 // Set header text
                 $backupSheet->setCellValue($cell, $label);
@@ -949,6 +1101,19 @@ class AllDataController extends Controller
                 // Set auto size for columns
                 $backupSheet->getColumnDimension($columnLetter)->setAutoSize(true);
             }
+
+            foreach ($headersAttBackup as $cell => $label) {
+                // Set header text
+                $attBackupSheet->setCellValue($cell, $label);
+                
+                // Apply style to header
+                $attBackupSheet->getStyle($cell)->applyFromArray($headerStyle);
+                $columnLetter = preg_replace('/[0-9]/', '', $cell); // Remove digits to get column letter
+                // Set auto size for columns
+                $attBackupSheet->getColumnDimension($columnLetter)->setAutoSize(true);
+            }
+
+
             $backup = ScheduleBackup::where('periode',date('F-Y', strtotime($endDate)))->get();
             if (!empty($backup)) {
                 $indexBackup = 2; // Starting from row 2, since row 1 is for headers
@@ -990,12 +1155,12 @@ class AllDataController extends Controller
             
                     // Set cell values
                     $backupSheet->setCellValue('A' . $indexBackup, $no);
-                    $backupSheet->setCellValue('B' . $indexBackup, strtoupper($manBackup->nama ?? ''));
-                    $backupSheet->setCellValue('C' . $indexBackup, "'" . ($manBackup->ktp ?? ''));
-                    $backupSheet->setCellValue('D' . $indexBackup, strtoupper($manBackup->jabatan ?? ''));
+                    $backupSheet->setCellValue('B' . $indexBackup, strtoupper($employee->nama ?? ''));
+                    $backupSheet->setCellValue('C' . $indexBackup, "'" . ($employee->ktp ?? ''));
+                    $backupSheet->setCellValue('D' . $indexBackup, strtoupper($employee->jabatan ?? ''));
                     $backupSheet->setCellValue('E' . $indexBackup, strtoupper($project));
-                    $backupSheet->setCellValue('F' . $indexBackup, strtoupper($employee->nama ?? ''));
-                    $backupSheet->setCellValue('G' . $indexBackup, $employee->jabatan ?? '');
+                    $backupSheet->setCellValue('F' . $indexBackup, strtoupper($manBackup->nama ?? ''));
+                    $backupSheet->setCellValue('G' . $indexBackup, $manBackup->jabatan ?? '');
                     $backupSheet->setCellValue('H' . $indexBackup, strtoupper($projectDetails->name ?? ''));
                     $backupSheet->setCellValue('I' . $indexBackup, $back->tanggal);
                     $backupSheet->setCellValue('J' . $indexBackup, $sallary);
@@ -1004,6 +1169,67 @@ class AllDataController extends Controller
                     $no++;
                 }
             }
+
+            $backupAbsen = ScheduleBackup::where('periode', date('F-Y', strtotime($endDate)))->get();
+
+            if ($backupAbsen->isNotEmpty()) {
+                $indexBackup = 2; // Mulai dari baris ke-2
+                $no = 1;
+
+                foreach ($backupAbsen as $back) {
+                    $employee = karyawan_bynik($back->employee);
+                    $manBackup = karyawan_bynik($back->man_backup);
+                    $projectDetails = project_byID($back->project);
+
+                    if (!$employee || !$manBackup) {
+                        continue; // Skip jika data karyawan tidak ditemukan
+                    }
+
+                    // Ambil jadwal manager yang backup di tanggal tersebut
+                    $get_schedule = Schedule::where('periode', strtoupper($back->periode))
+                                            ->where('tanggal', $back->tanggal)
+                                            ->where('employee', $back->man_backup)
+                                            ->first();
+
+                    // Hitung jumlah jadwal non-OFF untuk karyawan
+                    $count_schedule = Schedule::where('periode', strtoupper($back->periode))
+                                            ->where('employee', $back->employee)
+                                            ->where('shift', '!=', 'OFF')
+                                            ->count();
+
+                    // Ambil data gaji
+                    $get_salary = ProjectDetails::where('jabatan', $employee->jabatan)
+                                                ->where('project_code', $back->project)
+                                                ->first();
+
+                    $salary = $get_salary
+                        ? $get_salary->tp_bulanan / max($count_schedule, 1)
+                        : 0;
+
+                    $projectName = $get_schedule
+                        ? project_byID($get_schedule->project)?->name ?? 'BKO'
+                        : 'BKO';
+
+                    $absen = Absen::where('nik', $back->employee)
+                        ->where('tanggal', $back->tanggal)
+                        ->where('project', $back->project)
+                        ->first();
+                    $absen = $absen ? $absen->status : 'NOT ATTENDANCE';
+
+                    // Isi data ke sheet
+                    $attBackupSheet->setCellValue("A{$indexBackup}", $no);
+                    $attBackupSheet->setCellValue("B{$indexBackup}", strtoupper($employee->nama ?? ''));
+                    $attBackupSheet->setCellValue("C{$indexBackup}", "'" . ($employee->ktp ?? ''));
+                    $attBackupSheet->setCellValue("D{$indexBackup}", strtoupper($projectName));
+                    $attBackupSheet->setCellValue("E{$indexBackup}", $back->tanggal);
+                    $attBackupSheet->setCellValue("F{$indexBackup}", $absen);
+                    
+
+                    $indexBackup++;
+                    $no++;
+                }
+            }
+
             
             // Define file path
             $fileName = 'payroll.xlsx';
@@ -1015,17 +1241,60 @@ class AllDataController extends Controller
             // Save file
             $writer = new Xlsx($spreadsheet);
             $writer->save($filePath);
+
+            $slackChannel = Slack::where('channel', 'Payroll')->where('company',strtoupper('KAS'))->first();
+            
+            
+            $slackData = json_decode($slackChannel->url); // url berisi JSON
+
+            $channelId = $slackData->channel_id;
+            $slackToken = $slackData->channel_token;
+            $slackUrl = $slackData->channel_url;
+            $filePath = public_path('reports/' . $fileName);
+
+            $client = new Client();
+
+                $response = $client->request('POST', $slackUrl, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $slackToken,
+                    ],
+                    'multipart' => [
+                        [
+                            'name'     => 'channels',
+                            'contents' => $channelId,
+                        ],
+                        [
+                            'name'     => 'initial_comment',
+                            'contents' => 'Hallo @channel Payroll Frontline File',
+                        ],
+                        [
+                            'name'     => 'title',
+                            'contents' => 'File Payroll Frontline',
+                        ],
+                        [
+                            'name'     => 'file',
+                            'contents' => fopen($filePath, 'r'),
+                            'filename' => 'PAYROLL_FRONTLINE.xlsx',
+                        ],
+                    ],
+                ]);
+
+                $body = json_decode($response->getBody(), true);
             return response()->json([
                 'error' => false,
-                'data'=>$result,
+                'data'=>$body,
                 'url' => url('reports/' . $fileName) // URL accessible from the web
             ], 200);
+
+            
         } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
             return response()->json(['error' => 'Failed to process export: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error processing request: ' . $e->getMessage()], 500);
         }
     }
+
+
     public function paklaring($id){
         try {
             

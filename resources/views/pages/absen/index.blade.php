@@ -39,7 +39,7 @@
                         @if($useMultilocation)
                             <div class="col-md-3">
                                 <label for="work_location_id">Lokasi Kerja</label>
-                                <select class="form-select" name="work_location_id" id="work_location_id">
+                                <select class="form-select select2" name="work_location_id" id="work_location_id">
                                     <option value="">Semua Lokasi</option>
                                     @if (strtoupper($org) === 'KAS') 
                                         @foreach (App\ModelCG\Project::where('company', $org ?? null)->get() as $lokasi)
@@ -61,7 +61,7 @@
                         {{-- Filter Organisasi --}}
                         <div class="col-md-3">
                             <label for="organisasi_id">Organisasi</label>
-                            <select class="form-select" name="organisasi_id" id="organisasi_id">
+                            <select class="form-select select2" name="organisasi_id" id="organisasi_id">
                                 <option value="">Semua Organisasi</option>
                                 @foreach (\App\Organisasi\Organisasi::where('company', $org)->get() as $organisasi)
                                     <option value="{{ $organisasi->name }}" {{ request('organisasi_id') == $organisasi->name ? 'selected' : '' }}>

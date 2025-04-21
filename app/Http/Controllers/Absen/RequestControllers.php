@@ -34,7 +34,7 @@ class RequestControllers extends Controller
             $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                         ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                         ->whereDate('requests_attendence.created_at','>','2024-06-20')
-                                        ->where('requests_attendence.aprrove_status','Pending')
+                                        // ->where('requests_attendence.aprrove_status','Pending')
                                         ->select('requests_attendence.*')
                                         ->orderBy('requests_attendence.tanggal', 'desc')
                                         ->limit(500)
@@ -61,7 +61,7 @@ class RequestControllers extends Controller
                                ->get();
         }
         
-
+        
         return view('pages.absen.request.index', compact('dataRequest'));
     }
 

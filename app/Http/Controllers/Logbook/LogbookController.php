@@ -8,6 +8,8 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\ModelCG\Schedule;
+use App\Employee;
 
 class LogbookController extends Controller
 {
@@ -26,10 +28,18 @@ class LogbookController extends Controller
     {
         // Create a new Guzzle client instance
         $client = new Client();
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        $project=Auth::user()->project_id;
+        if ($employee->organisasi == 'FRONTLINE OFFICER') {
+            $get_project = Schedule::where('employee', $code)->first();
+            $project = $get_project->project;
+        }
 
         try {
             // Make a GET request to the API endpoint
-            $response = $client->get('http://data.cityservice.co.id/log/public/api/tamu/'.Auth::user()->project_id);
+            $response = $client->get('http://data.cityservice.co.id/log/public/api/tamu/'.$project);
 
             // Get the JSON response body as a string
             $body = $response->getBody()->getContents();
@@ -52,9 +62,18 @@ class LogbookController extends Controller
         // Create a new Guzzle client instance
         $client = new Client();
 
+        $code = Auth::user()->employee_code;
+        $employee = Employee::where('nik', $code)->first();
+
+        $project=Auth::user()->project_id;
+        if ($employee->organisasi == 'FRONTLINE OFFICER') {
+            $get_project = Schedule::where('employee', $code)->first();
+            $project = $get_project->project;
+        }
+
         try {
             // Make a GET request to the API endpoint
-            $response = $client->get('http://data.cityservice.co.id/log/public/api/barang/'.Auth::user()->project_id);
+            $response = $client->get('http://data.cityservice.co.id/log/public/api/barang/'.$project);
 
             // Get the JSON response body as a string
             $body = $response->getBody()->getContents();

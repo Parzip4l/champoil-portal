@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Project;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ModelCG\Project;
+use App\ModelCG\ProjectDetails;
 use App\ModelCG\Schedule;
 use App\ModelCG\Datamaster\ProjectShift;
 
@@ -34,6 +35,12 @@ class ProjectController extends Controller
 
     public function projectDetail(Request $request){
         $records = Project::where('id',$request->id)->first();
+ 
+        return response()->json($records);
+    }
+
+    public function projectDetailData($id){
+        $records = ProjectDetails::where('project_code',$id)->get();
  
         return response()->json($records);
     }

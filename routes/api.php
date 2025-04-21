@@ -181,6 +181,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/cek_schedule', [ProjectController::class, 'project_schedule']);
     Route::get('/get-project', [ProjectController::class, 'projectList']);
     Route::get('/get-project-detail', [ProjectController::class, 'projectDetail']);
+    Route::get('/get-project-detail-data/{id}', [ProjectController::class, 'projectDetailData']);
     Route::get('/absen_daily', [DailyContrtoller::class, 'daily_absen']);
     Route::get('/project-shift/{id}', [ProjectController::class, 'projectShift']);
     Route::post('/create-project-shift', [ProjectController::class, 'createProjectShift']);

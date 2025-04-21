@@ -84,7 +84,7 @@
                     @if($useMultilocation)
                         <div class="form-group mb-3">
                             <label for="work_location_id">Lokasi Kerja</label>
-                            <select name="work_location_id" class="form-control" required>
+                            <select name="work_location_id" class="form-control">
                                 <option value="">-- Pilih Lokasi --</option>
                                 @foreach($locations as $loc)
                                     <option value="{{ $loc->id }}" {{ $employee->work_location_id == $loc->id ? 'selected' : '' }}>

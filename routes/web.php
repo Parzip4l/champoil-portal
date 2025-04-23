@@ -367,8 +367,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     
     // logbook
     Route::resource('logbook', App\Http\Controllers\Logbook\LogbookController::class);
-    Route::get('logbook-tamu', [App\Http\Controllers\Logbook\LogbookController::class, 'tamu'])->name('logbook-tamu');
-    Route::get('logbook-barang', [App\Http\Controllers\Logbook\LogbookController::class, 'barang'])->name('logbook-barang');
+    Route::view('logbook-tamu', 'pages.logbook.index')->name('logbook-tamu');
+    Route::view('logbook-barang', 'pages.logbook.barang')->name('logbook-barang');
 
     // Request Type
     Route::resource('request-type', App\Http\Controllers\Absen\RequestTypeController::class);

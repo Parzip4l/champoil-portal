@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\VoiceOfController;
 use App\Http\Controllers\Api\Recruitments\TrainingController;
 use App\Http\Controllers\Api\Patroli\PatroliProojectController;
 use App\Http\Controllers\Api\Patroli\LapsitController;
+use App\Http\Controllers\Api\LogbookController;
 
 
 Route::prefix('v1')->group(function () {
@@ -276,6 +277,12 @@ Route::prefix('v1')->group(function () {
     Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
     Route::get('attendance-records', [AttendanceController::class, 'index']);
     Route::get('export-absensi', [AttendanceController::class, 'exportAbsensi']);
+
+    //logbook  
+    Route::get('/tamu', [LogbookController::class, 'index']);
+    Route::get('/tamu/{id}', [LogbookController::class, 'tamuDetail']);
+    Route::get('/barang', [LogbookController::class, 'barang']);
+    Route::get('/barang/{id}', [LogbookController::class, 'barangDetail']);
     
     
 });

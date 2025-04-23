@@ -3,41 +3,64 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
 @endpush
+
+@php 
+    $user = Auth::user();
+    $dataLogin = json_decode($user->permission); 
+    $employee = \App\Employee::where('nik', $user->name)->first(); 
+
+    $project_id = '';
+    if ($employee->jabatan == 'CLIENT') {
+        $project_id = $user->project_id;
+    }
+
+    if ($employee->organisasi == 'FRONTLINE OFFICER') {
+        $get_project = \App\ModelCG\Schedule::where('employee', $user->name)
+            ->where('tanggal', date('Y-m-d'))
+            ->first();
+        $project_id = $get_project->project;
+    }
+@endphp
 
 @section('content')
 <div class="row">
     <div class="col-md-12 stretch-card">
         <div class="card">
-        <!-- <button id="addProjectBtn" class="btn btn-primary mb-3">Add Project</button> -->
-        <div class="card-header">
-            <div class="head-card d-flex justify-content-between">
-                <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-0">Data Patroli Project</h6>
-                    
-                </div>
-                <div class="tombol-pembantu d-flex">
-                    <div class="dropdown">
-                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item d-flex align-items-center me-2" href="#" id="addProjectBtn">
-                                <i data-feather="plus" class="icon-sm me-2"></i> Tambah List
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#download">
-                                <i data-feather="download" class="icon-sm me-2"></i> Download
-                            </a>
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0">Data Patroli Project</h6>
+                    <div class="d-flex align-items-center">
+                        <div class="dropdown me-2">
+                            @if ($employee->organisasi == 'Management Leaders' || $employee->organisasi == 'MANAGEMENT LEADERS')
+                                <select id="filterProject" class="form-select select2" style="width: 250px;">
+                                    <option value="">All Projects</option>
+                                    @foreach(project_data('Kas') as $project)
+                                        <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-icon p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item d-flex align-items-center me-2" href="#" id="addProjectBtn">
+                                    <i data-feather="plus" class="icon-sm me-2"></i> Tambah List
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#download">
+                                    <i data-feather="download" class="icon-sm me-2"></i> Download
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
             <div class="card-body">
-                
-                <table id="dataTable" class="table table-striped table-bordered">
-                    <thead>
+                <table id="dataTable" class="table table-striped table-bordered table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th>#</th>
                             <th>Project ID</th>
@@ -56,90 +79,10 @@
     </div>
 </div>
 
-<!-- Modal for Add/Edit -->
-<div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="projectModalLabel">Add/Edit Project</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="projectForm">
-          <div class="mb-3">
-            <label for="project_id" class="form-label">Project ID</label>
-            <input type="number" class="form-control" id="project_id" name="project_id" value="582307" readonly="readonly" required>
-          </div>
-          <div class="mb-3">
-            <label for="judul" class="form-label">Judul</label>
-            <input type="text" class="form-control" id="judul" name="judul" required>
-          </div>
-          <input type="hidden" id="projectId">
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveProjectBtn">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
+@include('pages.operational.patroli_project.modals.add_edit')
+@include('pages.operational.patroli_project.modals.qr_code')
+@include('pages.operational.patroli_project.modals.download')
 
-<!-- Modal for QR Code -->
-<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="qrModalLabel">QR Code</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <div id="qrContainer"></div>
-        <p id="qrProjectTitle" class="mt-3"></p>
-        <button id="downloadQrBtn" class="btn btn-success mt-3">Download QR Code</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="download" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Filter Download</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="download_file">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Filter Tanggal</label>
-                                <input type="text" class="form-control" name="tanggal" required id="tanggal_report">
-                            
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <label for="" class="form-label">Filter Jam</label>
-                            <input type="time" class="form-control" name="jam" required id="jam">    
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <label for="" class="form-label">&nbsp;</label>
-                            <input type="time" class="form-control" name="jam2" required id="jam2">    
-                        </div>
-
-                        
-                        <div id="project_list"></div>
-                        
-                        
-                        <div class="col-md-12 mt-2">
-                            <button class="btn btn-primary w-100" type="button" id="download_file_patrol">Download</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('plugin-scripts')
@@ -147,16 +90,25 @@
   <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 @endpush
 
 @push('custom-scripts')
-  <script>
+<script>
     $(document).ready(function () {
+        // Initialize Select2
+        $('#filterProject').select2({
+            placeholder: "Select a project",
+            allowClear: true,
+            theme: "bootstrap-5"
+        });
+
         const table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: function (data, callback) {
-                axios.get('/api/v1/patroli-projects-get')
+                const projectId = $('#filterProject').val() || '{{ $project_id }}';
+                axios.get('/api/v1/patroli-projects-get', { params: { project_id: projectId } })
                     .then(response => {
                         const formattedData = response.data.map((item, index) => ({
                             id: index + 1,
@@ -185,6 +137,10 @@
                 { data: 'created_at', title: 'Created At' },
                 { data: 'actions', title: 'Actions', orderable: false, searchable: false }
             ]
+        });
+
+        $('#filterProject').change(function () {
+            table.ajax.reload();
         });
 
         // Add Project
@@ -261,135 +217,27 @@
                 }
             });
         });
-
-        // Show QR Button
-        $('#dataTable').on('click', '.qr-btn', function () {
-        const unixCode = $(this).data('unix');
-        const qrValue = unixCode;
-
-        const qr = new QRious({
-            element: document.getElementById('qrContainer'),
-            value: qrValue,
-            size: 200
-        });
-
-        $('#qrProjectTitle').text(`QR Code for Unix Code: ${unixCode}`);
-        $('#qrModal').modal('show');
-
-        
-    });
     });
 
     function downloadQr(unixCode) {
         axios.get(`/api/v1/patroli-projects/${unixCode}/download`, { responseType: 'blob' })
             .then(response => {
-                // Create a URL for the file
                 const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-
-                // Create an anchor element to download the file
                 const link = document.createElement('a');
                 link.href = fileURL;
-
-                // Get the filename from the response headers (you can customize this if needed)
                 const contentDisposition = response.headers['content-disposition'];
                 const filename = contentDisposition 
                     ? contentDisposition.split('filename=')[1].replace(/"/g, '') 
-                    : `qr_code_${unixCode}.pdf`;  // Default filename
-
-                link.setAttribute('download', filename); // Set the download attribute with the filename
+                    : `qr_code_${unixCode}.pdf`;
+                link.setAttribute('download', filename);
                 document.body.appendChild(link);
-                link.click(); // Trigger the download
-                document.body.removeChild(link); // Clean up
+                link.click();
+                document.body.removeChild(link);
             })
             .catch(error => {
                 console.error('Error downloading the QR code:', error);
                 alert('Failed to download QR code.');
             });
     }
-
-    $(document).ready(function() {
-        $('#loadingBackdrop').hide();
-        $('#download_file_patrol').on('click', function() {
-            // Define any parameters you want to send
-            $('#loadingBackdrop').show();
-            var project = 582307;
-            let project_id='';
-            if(project ===''){
-                project_id  = $("#project_id_filter").val();
-            }else{
-                project_id  = project;
-            }
-
-            var jenis_file = $('input[name="filter_type"]:checked').val() || "pdf";
-            var shift = $('input[name="shift"]:checked').val();
-            
-            const params = {
-                tanggal: $("#tanggal_report").val(), // Example parameter
-                project_id:  project_id, // Another example parameter
-                jenis_file:jenis_file,
-                shift:shift,
-                jam1: $("#jam").val(),
-                jam2: $("#jam2").val()
-            };
-
-            // Send GET request using Axios
-            axios.get('/api/v1/patroli-activity-download', { params })
-                .then(function(response) {
-                    // Handle success response
-                    const paths = response.data.path; // Pastikan backend mengirimkan key `paths` berisi array
-        
-                    // Buat elemen link sementara
-                    const link = document.createElement('a');
-                    link.href = paths; // Set path dari array
-                    link.target = '_blank'; // Buka di tab baru
-                    
-                    // Tambahkan atribut download (opsional untuk mengatur nama file)
-                    link.setAttribute('download', response.data.file_name);
-
-                    // Tambahkan ke body
-                    document.body.appendChild(link);
-                    
-                    // Klik link untuk memulai unduhan
-                    link.click();
-                    
-                    // Hapus link setelah digunakan
-                    document.body.removeChild(link);
-
-                    $('#loadingBackdrop').hide();
-                    alert('File downloaded successfully');
-                    // Optionally, you can handle the response, like redirecting to a download URL
-                    // window.location.href = response.data.downloadUrl; 
-                })
-                .catch(function(error) {
-                    // Handle error response
-                    console.error('Error downloading file', error);
-                    $('#loadingBackdrop').hide();
-                });
-        });
-    });
-
-    flatpickr("#tanggal_report", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        onClose: function(selectedDates, dateStr, instance) {
-            if (selectedDates.length === 2) {
-                const startDate = selectedDates[0];
-                const endDate = selectedDates[1];
-
-                // Calculate the difference in time and then convert to days
-                const timeDiff = endDate - startDate;
-                const dayDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
-
-                // Show alert if the difference is greater than 31 days
-                if (dayDiff > 7) {
-                    alert("MAKSIMAL 7 HARI");
-                    // Optionally clear the selected dates
-                    instance.clear(); // Uncomment if you want to clear the selection
-                    return; // Exit the function if the alert is shown
-                }
-            }
-        }
-    }); 
-
-  </script>
+</script>
 @endpush

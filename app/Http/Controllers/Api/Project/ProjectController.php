@@ -51,6 +51,16 @@ class ProjectController extends Controller
         return response()->json($records);
     }
 
+    public function deleteProjectShift($id){
+        $deletedCount = ProjectShift::where('id', $id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => $deletedCount > 0 ? 'Shifts successfully deleted!' : 'No shifts found to delete.',
+            'deleted_count' => $deletedCount
+        ]);
+    }
+
     public function createProjectShift(Request $request){
         $validated = $request->validate([
             'project_id' => 'required',

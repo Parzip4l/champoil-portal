@@ -192,9 +192,10 @@
         </div>
     </div>
     <div class="col-md-4 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header d-flex justify-content-between">
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
                 <h5 class="mb-0 align-self-center">PROJECT SHIFT</h5>
+                <i class="icon-lg text-white" data-feather="clock"></i>
             </div>
             <div class="card-body">
                 <div class="row mb-6">
@@ -204,7 +205,7 @@
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">SHIFT NAME</label>
-                                    <select name="shift_code" class="form-control">
+                                    <select name="shift_code" class="form-control border-primary">
                                         <option value="">-- PILIH --</option>
                                         @foreach($shift as $row)
                                             <option value="{{$row->code}}">{{$row->code}}</option>
@@ -215,36 +216,35 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">MAKSIMAL JAM MASUK</label>
-                                    <input type="time" name="jam_masuk" class="form-control" placeholder="Jam Masuk" required>
+                                    <input type="time" name="jam_masuk" class="form-control border-primary" placeholder="Jam Masuk" required>
                                     <input type="hidden" name="project_id" value="{{ $project->id }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="" class="form-label">JAM PULANG</label>
-                                    <input type="time" name="jam_pulang" class="form-control" placeholder="Jam Pulang" required>
+                                    <input type="time" name="jam_pulang" class="form-control border-primary" placeholder="Jam Pulang" required>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <a href="javascript:void(0)" class="btn btn-outline-primary mb-3" style="float:right" id="submitBtn">Save</a>
+                            <div class="col-md-12 text-end">
+                                <button type="button" class="btn btn-outline-primary mb-3" id="submitBtn">
+                                    <i class="icon-sm" data-feather="save"></i> Save
+                                </button>
                             </div>
                         </div>
                     </form>
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table_project_shift">
-                            <thead>
+                        <table class="table table-striped table-hover" id="table_project_shift">
+                            <thead class="table-primary">
                                 <tr>
-                                    <td>SHIFT</td>
-                                    <td>JAM MASUK</td>
-                                    <td>MAKSIMAL JAM MASUK</td>
+                                    <th>SHIFT</th>
+                                    <th>JAM MASUK</th>
+                                    <th>MAKSIMAL JAM MASUK</th>
+                                    <th>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+                                
                             </tbody>
                         </table>
                     </div>
@@ -565,22 +565,25 @@
         });
 
         $.ajax({
-            url: '/api/v1/project-shift/'+project_id, // Ganti dengan API kamu
+            url: '/api/v1/project-shift/' + project_id, // Ganti dengan API kamu
             type: 'GET',
             dataType: 'json',
             success: function (response) {
-                
-
                 response.forEach(data => {
-                    $('#table_project_shift tbody').append( // Pastikan selector sesuai
+                    $('#table_project_shift tbody').append(
                         '<tr>'+
                             '<td>'+data.shift_code+'</td>'+
                             '<td>'+data.jam_masuk+'</td>'+
                             '<td>'+data.jam_pulang+'</td>'+
+                            '<td>'+
+                                '<button class="btn btn-outline-danger btn-sm delete-shift d-flex align-items-center" data-id="'+data.id+'">'+
+                                    '<i class="icon-sm me-1" data-feather="trash-2"></i> Delete'+
+                                '</button>'+
+                            '</td>'+
                         '</tr>'
                     );
                 });
-                
+
                 Swal.close();
 
                 Swal.fire({
@@ -599,6 +602,44 @@
                     text: 'Terjadi kesalahan!',
                 });
             }
+        });
+
+        // Handle delete action
+        $(document).on('click', '.delete-shift', function () {
+            const shiftId = $(this).data('id');
+            Swal.fire({
+                title: 'Hapus Shift',
+                text: 'Anda yakin ingin menghapus shift ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/api/v1/delete-project-shift/' + shiftId, // Ganti dengan API delete kamu
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        success: function () {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Shift berhasil dihapus.',
+                            }).then(() => {
+                                window.location.reload(); // Refresh halaman setelah penghapusan
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan saat menghapus shift.',
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 </script>
@@ -622,13 +663,18 @@
         axios.post('/api/v1/create-project-shift', formData)
             .then(response => {
                 console.log('Success:', response.data);
-                $('#table_project_shift tbody').append( // Pastikan selector sesuai
-                        '<tr>'+
-                            '<td>'+response.data.data.shift_code+'</td>'+
-                            '<td>'+response.data.data.jam_masuk+'</td>'+
-                            '<td>'+response.data.data.jam_pulang+'</td>'+
-                        '</tr>'
-                    );
+                $('#table_project_shift tbody').append(
+                    '<tr>'+
+                        '<td>'+response.data.data.shift_code+'</td>'+
+                        '<td>'+response.data.data.jam_masuk+'</td>'+
+                        '<td>'+response.data.data.jam_pulang+'</td>'+
+                        '<td>'+
+                            '<button class="btn btn-outline-danger btn-sm delete-shift d-flex align-items-center" data-id="'+response.data.data.id+'">'+
+                                '<i class="icon-sm me-1" data-feather="trash-2"></i> Delete'+
+                            '</button>'+
+                        '</td>'+
+                    '</tr>'
+                );
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',

@@ -37,19 +37,35 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="radius">Radius (meter)</label>
+                        <label for="radius">Radius (KM)</label>
                         <input type="number" name="radius" class="form-control" value="{{ old('radius', $location->radius ?? '') }}" required>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="monthly_salary">Gaji Bulanan (Opsional)</label>
-                        <input type="number" name="monthly_salary" class="form-control" value="{{ old('monthly_salary', $location->monthly_salary ?? '') }}">
+                        <div id="salary-by-position">
+                            <div class="row mb-2 position-salary-group">
+                                <div class="col-md-6">
+                                    <label for="monthly_salary">Jabatan</label>
+                                    <select name="position_salaries[0][position_id]" class="form-control select2" required>
+                                        <option value="">-- Pilih Jabatan --</option>
+                                        @foreach ($positions as $position)
+                                            <option value="{{ $position->id }}">{{ $position->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control format-rupiah" placeholder="Gaji Bulanan" />
+                                    <input type="hidden" name="position_salaries[0][monthly_salary]" class="rupiah-value" />
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control format-rupiah" placeholder="Rate Harian" />
+                                    <input type="hidden" name="position_salaries[0][daily_rate]" class="rupiah-value" />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addPositionSalary">+ Tambah Jabatan</button>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label for="daily_rate">Rate Harian (Opsional)</label>
-                        <input type="number" name="daily_rate" class="form-control" value="{{ old('daily_rate', $location->daily_rate ?? '') }}">
-                    </div>
 
 
                     <button class="btn btn-success">Simpan Lokasi</button>
@@ -118,6 +134,79 @@
             updateInputs({ latlng: center });
         })
         .addTo(map);
+    });
+</script>
+<script>
+    const positions = @json($positions); // kirim daftar jabatan ke JS
+
+    function generatePositionOptions() {
+        return positions.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    }
+    
+    function formatRupiah(angka) {
+        return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function unformatRupiah(angka) {
+        return angka.replace(/\./g, '');
+    }
+
+    function handleRupiahInput(input) {
+        input.addEventListener('input', function () {
+            const raw = unformatRupiah(input.value);
+            if (!isNaN(raw)) {
+                input.value = formatRupiah(raw);
+                const hiddenInput = input.parentElement.querySelector('.rupiah-value');
+                if (hiddenInput) {
+                    hiddenInput.value = raw;
+                }
+            }
+        });
+    }
+
+    function initRupiahFormatting() {
+        document.querySelectorAll('.format-rupiah').forEach(function (input) {
+            handleRupiahInput(input);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initRupiahFormatting();
+
+        document.getElementById('addPositionSalary').addEventListener('click', function () {
+            const container = document.getElementById('salary-by-position');
+            const count = container.querySelectorAll('.position-salary-group').length;
+
+            const html = `
+                <div class="row mb-2 position-salary-group align-items-end">
+                    <div class="col-md-6">
+                        <select name="position_salaries[${count}][position_id]" class="form-control" required>
+                            <option value="">-- Pilih Jabatan --</option>
+                            ${generatePositionOptions()}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control format-rupiah" placeholder="Gaji Bulanan" />
+                        <input type="hidden" name="position_salaries[${count}][monthly_salary]" class="rupiah-value" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control format-rupiah" placeholder="Rate Harian" />
+                        <input type="hidden" name="position_salaries[${count}][daily_rate]" class="rupiah-value" />
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-position">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            initRupiahFormatting();
+        });
+    });
+
+    $(document).on('click', '.remove-position', function () {
+        $(this).closest('.position-salary-group').remove();
     });
 </script>
 @endpush

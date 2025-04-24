@@ -54,7 +54,7 @@
                         </div>
                         <div class="col">
                             <label class="form-label">Divisi</label>
-                            <select class=" form-select" data-width="100%" name="divisi">
+                            <select class=" form-select select2" data-width="100%" name="divisi">
                                 @foreach($divisi as $divisi)
                                     <option value="{{$divisi->name}}">{{$divisi->name}}</option>
                                 @endforeach
@@ -62,7 +62,7 @@
                         </div>
                         <div class="col">
                             <label class="form-label">Jabatan</label>
-                            <select class="form-select" data-width="100%" name="jabatan">
+                            <select class="form-select select2" data-width="100%" name="jabatan">
                                 @foreach($jabatan as $jabatan)
                                     <option value="{{$jabatan->name}}">{{$jabatan->name}}</option>
                                 @endforeach
@@ -70,7 +70,7 @@
                         </div>
                         <div class="col">
                             <label class="form-label">Atasan</label>
-                            <select class="form-select" data-width="100%" name="manager">
+                            <select class="form-select select2" data-width="100%" name="manager">
                                 @foreach($atasan as $dataAtasan)
                                     <option value="{{$dataAtasan->nama}}">{{$dataAtasan->nama}}</option>
                                 @endforeach
@@ -309,39 +309,14 @@
                     <div class="col-md-12 mb-2">
                         <label class="form-label">Permission</label>
                         <div class="row">
+                            @foreach($roles as $drole)
                             <div class="col-md-4">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access">
-                                    <label class="form-check-label">User</label>
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="{{$drole->name}}">
+                                    <label class="form-check-label">{{$drole->role_name}}</label>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="hc_access">
-                                    <label class="form-check-label">HR</label>
-                                </div>
-                            </div>
-                           
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access">
-                                    <label class="form-check-label">Area Manager</label>
-                                </div>
-                            </div>
-                            @if($employee->unit_bisnis === 'Kas')
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access">
-                                    <label class="form-check-label">Project PIC</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input type="checkbox" id="client" class="form-check-input" name="permissions[]" value="client_access">
-                                    <label class="form-check-label">Client</label>
-                                </div>
-                            </div>
-                            @endif
+                            @endforeach
                         </div>
                     </div>
                     <div class="col-md-12 mb-2">

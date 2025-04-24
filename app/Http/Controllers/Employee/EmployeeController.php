@@ -6,6 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+// Additional
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\EmployeeExport;
+use App\Imports\EmployeeImport;
+use Illuminate\Support\Facades\Mail;
+use Yajra\DataTables\Facades\DataTables;
+
+// Model
 use App\Employee;
 use App\EmployeeResign;
 use App\Absen;
@@ -21,22 +34,14 @@ use App\ModelCG\ScheuleParent;
 use App\ModelCG\ScheduleBackup;
 use App\ModelCG\Project;
 use App\ModelCG\Referal;
-use Carbon\Carbon;
 use App\Absen\RequestAbsen;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Exports\EmployeeExport;
-use App\Imports\EmployeeImport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Setting\Golongan\GolonganModel;
-use Yajra\DataTables\Facades\DataTables;
 use App\Mail\NewEmployee;
-use Illuminate\Support\Facades\Mail;
 use App\Koperasi\Anggota;
 use App\Company\CompanyModel;
 use App\Company\CompanySetting;
 use App\Company\WorkLocation;
+use App\RolesAuthority;
 
 class EmployeeController extends Controller
 {
@@ -252,6 +257,9 @@ class EmployeeController extends Controller
 
         $companyId = CompanyModel::where('company_name', $company->unit_bisnis)->value('id');
 
+        $roles = RolesAuthority::where('company',$company->unit_bisnis)
+        ->whereNot('name','superadmin_access')->get();
+
         $useMultilocation = CompanySetting::where('company_id', $companyId)
             ->where('key', 'use_multilocation')
             ->value('value') == '1';
@@ -262,7 +270,7 @@ class EmployeeController extends Controller
             $locations = WorkLocation::where('company_id', $companyId)->get();
         }
 
-        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project','golongan','atasan','companyId', 'useMultilocation', 'locations'));
+        return view('pages.hc.karyawan.create', compact('jabatan','divisi','organisasi','project','golongan','atasan','companyId', 'useMultilocation', 'locations','roles'));
     }
 
     /**
@@ -560,6 +568,9 @@ Password: ".$request->password;
      */
     public function edit($id)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
         $employee = Employee::where('nik', $id)->with('payrolinfo','user')->first();
         if(!empty($employee->referal_code)){
             $unix = $employee->referal_code;
@@ -586,9 +597,12 @@ Password: ".$request->password;
         if ($useMultilocation) {
             $locations = WorkLocation::where('company_id', $companyId)->get();
         }
+
+        $roles = RolesAuthority::where('company',$company->unit_bisnis)
+        ->whereNot('name','superadmin_access')->get();
         
 
-        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan','user','companyId', 'useMultilocation', 'locations'));
+        return view('pages.hc.karyawan.edit', compact('employee','unix','divisi','jabatan','organisasi','golongan','atasan','user','companyId', 'useMultilocation', 'locations','roles'));
         
     }
 

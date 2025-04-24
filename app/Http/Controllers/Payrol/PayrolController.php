@@ -123,7 +123,7 @@ class PayrolController extends Controller
             $totalLembur = (int) RequestAbsen::where('employee', $nik)
                 ->whereBetween('tanggal', [$start_date, $end_date])
                 ->where('aprrove_status', 'Approved')
-                ->sum('jam_lembur');
+                ->sum('alasan');
 
             // Hitung hari bolos dalam 1 bulan
             $totalBolosBulanan = $totalHariKerjaBulanan - $totalHadirBulanan;

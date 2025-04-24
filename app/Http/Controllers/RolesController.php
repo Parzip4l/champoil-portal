@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+// Model
+use App\Employee;
 use App\RolesAuthority;
 
 class RolesController extends Controller
@@ -14,9 +18,13 @@ class RolesController extends Controller
      */
     public function index(Request $request)
     {
+
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
         $search = $request->get('search'); 
 
-        $role = RolesAuthority::when($search, function ($query, $search) {
+        $role = RolesAuthority::where('company',$company->unit_bisnis)->when($search, function ($query, $search) {
             return $query->where('role_name', 'like', '%' . $search . '%');
         })
         ->paginate(10);
@@ -46,6 +54,9 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
+        $code = Auth::user()->employee_code;
+        $company = Employee::where('nik', $code)->first();
+
         $validated = $request->validate([
             'role_name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
@@ -58,6 +69,7 @@ class RolesController extends Controller
             $role->role_name = $request->role_name;
             $role->description = $request->description;
             $role->name = $request->name;
+            $role->company = $company->unit_bisnis;
             $role->save();
 
             // Redirect dengan pesan sukses

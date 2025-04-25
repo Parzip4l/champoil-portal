@@ -572,7 +572,7 @@ class ApiLoginController extends Controller
                         if(count($payslipsData) > 0) {
                             foreach ($payslipsData as $key => $payslip) {
                                 $payslipsData[$key]['basic_salary'] = (string)$payslip['basic_salary'];
-                                $payslipsData[$key]['net_salary'] = array_key_exists('net_salary', $payslip) ? (string)$payslip['net_salary'] : '0';   ⁠
+                                $payslipsData[$key]['net_salary'] = array_key_exists('net_salary', $payslip) ? (string)$payslip['net_salary'] : '0';
                             }
                         }
 

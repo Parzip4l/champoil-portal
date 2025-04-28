@@ -62,7 +62,7 @@ class SendSlackAttendanceReport extends Command
             $message = "*Semua karyawan hadir hari ini. Tidak ada yang absen.*";
         } else {
             // Membuat pesan daftar karyawan yang tidak hadir
-            $message = "*Berikut adalah daftar karyawan yang tidak melakukan absensi hari ini:*\n";
+            $message = "*Berikut adalah daftar karyawan yang belum melakukan absensi hari ini:*\n";
             foreach ($dailyreportAbsen as $index => $karyawan) {
                 $mention = $karyawan->slack_id ? "<@{$karyawan->slack_id}>" : "(Tidak ada Slack ID)";
                 $message .= ($index + 1) . ". {$karyawan->nama} $mention\n";

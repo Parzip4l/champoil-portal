@@ -41,6 +41,11 @@ class ReportController extends Controller
         $company = Employee::where('nik', $code)->first();
         [$start, $end] = $this->getDateRange($request);
 
+        // Handle daterange filter
+        if ($request->filled('daterange')) {
+            [$start, $end] = explode(' to ', str_replace('+', ' ', $request->input('daterange')));
+        }
+
         $percentages = [
             '50' => 0,
             '50_80' => 0,
@@ -50,6 +55,8 @@ class ReportController extends Controller
 
         $project = Project::whereNull('deleted_at')
                           ->where('company', $company->unit_bisnis)
+                          ->where('name', 'not like', 'uni test') // Exclude projects with name "uni test"
+                          ->whereNotIn('id', [171322, 382812]) // Exclude projects with specific IDs
                           ->orderBy('name', 'asc')
                           ->get();
 

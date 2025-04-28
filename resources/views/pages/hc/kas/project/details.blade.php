@@ -3,6 +3,8 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -121,18 +123,14 @@
 
                                         <div class="form-group mb-2">
                                             <label for="" class="form-label">Leader PIC</label>
-                                            <select name="leader_pic" class="form-control select2" id="" required>
+                                            <select name="leader_pic" class="form-control" id="leader_pic" required>
+                                                <option value="" disabled {{ $project->leader_pic ? '' : 'selected' }}>-- PILIH --</option>
                                                 @foreach($atasan as $dataAtasan)
-                                                    @php 
-                                                        $check_atasan = "";
-                                                        if($dataAtasan->nik==$project->leader_pic){
-                                                            $check_atasan="selected";
-                                                        }
-                                                    @endphp
-                                                    <option value="{{$dataAtasan->nik}}" {{$check_atasan}}>{{$dataAtasan->nama}} ({{$dataAtasan->nik}})</option>
+                                                    <option value="{{$dataAtasan->nik}}" {{ $dataAtasan->nik == $project->leader_pic ? 'selected' : '' }}>
+                                                        {{$dataAtasan->nama}} ({{$dataAtasan->nik}})
+                                                    </option>
                                                 @endforeach
                                             </select>
-                                                
                                         </div>
                                         
                                         <button type="submit" class="btn btn-primary w-100">Update Data Project</button>
@@ -475,16 +473,19 @@
 
 @push('plugin-scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
-  <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
-  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-  
+    <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    
 @endpush
 
 @push('custom-scripts')
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
     <script src="{{ asset('assets/js/project.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     
     
     <script>
@@ -689,6 +690,17 @@
                     text: 'Something went wrong! Please try again.'
                 });
             });
+    });
+
+    $(document).ready(function() {
+        $('#ModalUpdateProject').on('shown.bs.modal', function () {
+            $('#leader_pic').select2({
+                theme: 'bootstrap-5',
+                placeholder: "Select Leader PIC",
+                allowClear: true,
+                dropdownParent: $('#ModalUpdateProject') // Ensure dropdown works inside the modal
+            });
+        });
     });
 
 </script>

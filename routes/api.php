@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\Recruitments\TrainingController;
 use App\Http\Controllers\Api\Patroli\PatroliProojectController;
 use App\Http\Controllers\Api\Patroli\LapsitController;
 use App\Http\Controllers\Api\LogbookController;
+use App\Http\Controllers\Api\AllData\BackupRecordsController;
 
 
 Route::prefix('v1')->group(function () {
@@ -190,6 +191,8 @@ Route::prefix('v1')->group(function () {
     
     Route::get('/schedule-reminder/{key}/{periode}', [DailyContrtoller::class, 'reminder_schedule']);
     Route::get('/report-absens-qc', [DailyContrtoller::class, 'report_absen']);
+    Route::get('/backup-records', [BackupRecordsController::class, 'index']);
+    
     
 
     /**
@@ -284,6 +287,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/tamu/{id}', [LogbookController::class, 'tamuDetail']);
     Route::get('/barang', [LogbookController::class, 'barang']);
     Route::get('/barang/{id}', [LogbookController::class, 'barangDetail']);
+
     
     
 });

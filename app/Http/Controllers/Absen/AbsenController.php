@@ -131,6 +131,7 @@ class AbsenController extends Controller
 
         $absens = Absen::whereBetween('tanggal', [reset($dates), end($dates)])
             ->whereIn('nik', $niks)
+            ->whereNull('project_backup')
             ->get()
             ->groupBy('nik');
         

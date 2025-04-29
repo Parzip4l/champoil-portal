@@ -572,7 +572,7 @@ class ApiLoginController extends Controller
                         if(count($payslipsData) > 0) {
                             foreach ($payslipsData as $key => $payslip) {
                                 $payslipsData[$key]['basic_salary'] = (string)$payslip['basic_salary'];
-                                $payslipsData[$key]['net_salary'] = (string)$payslip['net_salary'];
+                                $payslipsData[$key]['net_salary'] = array_key_exists('net_salary', $payslip) ? (string)$payslip['net_salary'] : '0';
                             }
                         }
 
@@ -897,16 +897,20 @@ class ApiLoginController extends Controller
 
             
             $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
+
             $employee = $request->input('employee');
             $cek_absen = Absen::where('nik', $employee)
                 ->whereDate('tanggal', $tanggal)
                 ->first();
-            if ($cek_absen) {
-                return response()->json([
-                    'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
-                ], 200);
-            }
 
+            if ($organisasi->unit_bisnis === 'Kas') {
+                if ($cek_absen) {
+                    return response()->json([
+                        'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
+                    ], 200);
+                }
+            }
+            
             // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve
             $existingRequest = RequestAbsen::where('employee', $employee)
                 ->where('tanggal', $tanggal)

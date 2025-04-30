@@ -168,7 +168,7 @@
                         <a href="{{ $canApplyForLoan ? url('pengajuan-pinjaman') : '#' }}" class="btn {{ $canApplyForLoan ? 'btn-primary' : 'btn-danger' }} w-100" {{ $canApplyForLoan ? '' : 'disabled' }}>Apply for a Loan</a>
                     </div>
                 </div>
-                @elseif($loan->loan_status == 'waiting')
+                @elseif($datasaya->status == 'waiting')
                 <hr>
                 <div class="wallet-body">
                     <div class="title mb-2">
@@ -180,7 +180,7 @@
                        </div>
                     </div>
                 </div>
-                @elseif($loan->loan_status == 'approve')
+                @elseif($datasaya->status == 'approve')
                 <div class="wallet-body">
                     <div class="title mb-2">
                         <h5>Remaining Debt</h5>
@@ -197,7 +197,7 @@
                        </div>
                     </div>
                 </div>
-                @elseif($loan->loan_status == 'rejected')
+                @elseif($datasaya->status == 'rejected')
                 <div class="persyaratan-pinjaman-wrap mt-4 mb-4">
                     <h5 class="mb-3">Loan Terms :</h5>
                     

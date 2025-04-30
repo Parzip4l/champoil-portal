@@ -26,7 +26,7 @@ class EmployeeController extends Controller
 
                 if($last_schdl){
                     $project = Project::where('id', $last_schdl->project)->first();
-                    $row->project = $project->name;
+                    $row->project = $project->name??"-";
                 }
 
                 // Tanggal awal

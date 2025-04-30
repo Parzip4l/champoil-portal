@@ -231,7 +231,7 @@ TRUEST Team```';
         }
 
 
-        $anggota_update = Anggota::where('employee_code', $code)->update(['loan_status'=>'noloan']);
+        $anggota_update = Anggota::where('employee_code', $employee_code)->update(['loan_status'=>'noloan']);
         
         $records = Employee::where('nik', $employee_code)->get();
         $EmailData = Employee::where('nik', $employee_code)->first();

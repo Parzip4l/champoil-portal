@@ -229,6 +229,9 @@ TRUEST Team```';
         if ($latestLoan) {
             $latestLoan->delete(); // Deletes only the latest record if it exists
         }
+
+
+        $anggota_update = Anggota::where('employee_code', $code)->update(['loan_status'=>'noloan']);
         
         $records = Employee::where('nik', $employee_code)->get();
         $EmailData = Employee::where('nik', $employee_code)->first();

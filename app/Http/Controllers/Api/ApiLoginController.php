@@ -888,6 +888,13 @@ class ApiLoginController extends Controller
     public function submitAbsenceRequest(Request $request)
     {
         try {
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $organisasi = Employee::where('nik',$user->employee_code)
+                        ->select('organisasi','unit_bisnis')
+                        ->first();
+
+                        
             $request->validate([
                 'tanggal' => 'required',
                 'employee' => 'required',
@@ -899,6 +906,7 @@ class ApiLoginController extends Controller
             $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
 
             $employee = $request->input('employee');
+
             $cek_absen = Absen::where('nik', $employee)
                 ->whereDate('tanggal', $tanggal)
                 ->first();
@@ -958,12 +966,6 @@ class ApiLoginController extends Controller
 
             $pengajuan->save();
             $token = $request->bearerToken();
-
-            // Authenticate the user based on the token
-            $user = Auth::guard('api')->user();
-            $organisasi = Employee::where('nik',$user->employee_code)
-                        ->select('organisasi','unit_bisnis')
-                        ->first();
         
             if ($organisasi->unit_bisnis === 'CHAMPOIL' ||  $organisasi->unit_bisnis === 'RUN' || $organisasi->unit_bisnis === 'Run' ||  $organisasi->unit_bisnis === 'KAS' ||  $organisasi->unit_bisnis === 'Kas') {
                 $slackChannel = Slack::where('channel', 'Request')->where('company',strtoupper($organisasi->unit_bisnis))->first();

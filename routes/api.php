@@ -41,6 +41,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/oauth/token', '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken');
 
+    Route::get('/absen-cek/{company}/{shift}', [DailyContrtoller::class, 'absen_cek']);
+
     // Employee
     Route::get('/user', [ApiLoginController::class, 'getUser']);
     Route::get('/employee', [EmployeeController::class, 'ApiEmployee']);

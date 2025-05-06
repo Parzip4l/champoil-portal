@@ -218,17 +218,21 @@ class DailyContrtoller extends Controller
             ->where('karyawan.resign_status',0)
             ->where('shift', $shift)
             ->get();
-
-        $filtered_data = $schedule_data->filter(function ($schedule) {
-            // Check if the employee's attendance does not exist in the absens table
-            return !Absen::where('nik', $schedule->employee)
+        $result = [];
+        foreach ($schedule_data as $schedule) {
+            // Get absence count for each schedule date
+            $absen_count = DB::table('absens')->where('nik', $schedule->employee)
                 ->where('tanggal', Carbon::today()->format('Y-m-d'))
-                ->exists();
-        });
+                ->count();
+            $schedule->absen_count = $absen_count;
+            if($absen_count == 0) {
+                $result[] = $schedule;
+            }
+        }
 
         return response()->json([
             'status' => 'success',
-            'data' => $filtered_data->values()
+            'data' => $result
         ]);
     }
 }

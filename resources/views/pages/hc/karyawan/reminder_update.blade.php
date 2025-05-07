@@ -107,13 +107,13 @@
                             <label for="jumlah_tanggungan">Jumlah Tanggungan</label>
                             <input type="number" class="form-control" id="jumlah_tanggungan" name="jumlah_tanggungan"  required="required">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="bpjs_kesehatan">BPJS Ketenaga Kerjaan</label>
                             <input type="text" class="form-control" id="bpjs_kesehatan" name="bpjs_kesehatan"  required="required">
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <label for="npwp">NPWP</label>
-                            <input type="text" class="form-control" id="npwp" name="npwp"  required="required">
+                            <input type="text" class="form-control" id="npwp" name="npwp">
                         </div>
                         <div class="form-group">
                             <label for="bank_name">Bank Name (BNI)</label>

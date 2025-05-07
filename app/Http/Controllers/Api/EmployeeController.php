@@ -203,7 +203,7 @@ Thank you for your attention and cooperation. If you have any questions or issue
 
             $payroll = DB::table('payrolinfos')->where('employee_code',$records->nik)->first();
             $data_payrol = [
-                'bpjs_tk' => $request->bpjs_kesehatan,
+                // 'bpjs_tk' => $request->bpjs_kesehatan,
                 'npwp' => $request->npwp,
                 'bank_name' => $request->bank_name,
                 'bank_number' => $request->nomor_rekening,

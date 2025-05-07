@@ -168,7 +168,7 @@
                     }
                 });
 
-                axios.post('/api/v1/cek-ocr', ocrFormData, {
+                axios.post('https://data.cityservice.co.id/ocr/public/api/v1/cek-ocr', ocrFormData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }

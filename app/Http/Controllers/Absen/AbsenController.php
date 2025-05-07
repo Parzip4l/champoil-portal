@@ -161,7 +161,7 @@ class AbsenController extends Controller
         return view('pages.absen.index', compact('employees', 'dates', 'absens', 'schedules', 'shifts', 'useMultilocation', 'org','companyId'));
     }
 
-    
+   
 
     public function indexbackup()
     {

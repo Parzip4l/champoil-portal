@@ -3,6 +3,8 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <script src="{{ asset('assets/plugins/flatpickr/flatpickr.min.js') }}"></script>
+  <link href="{{ asset('assets/plugins/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 @endpush
 
 @php 
@@ -24,94 +26,72 @@
         {{ session('error') }}
     </div>
 @endif
+
+<div class="row mb-3">
+    <form method="GET" action="" class="d-flex">
+        <div class="col-md-6">
+            <label for="daterange_picker" class="form-label">Filter by Date Range</label>
+            <input type="text" id="daterange_picker" name="daterange" class="form-control" placeholder="Select date range" value="{{ request('daterange') }}" />
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
 <div class="row">
     <div class="col-md-3 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">Dibawah 50 %</div>
-            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[0] / count($project)) * 100,2) }} %</div>
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-danger text-white">Dibawah 50 %</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[0] / count($project)) * 100, 2) }} %</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">Absensi 50 s/d 80 %</div>
-            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[1] / count($project)) * 100,2) }} %</div>
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-warning text-dark">Absensi 50 s/d 80 %</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[1] / count($project)) * 100, 2) }} %</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">Absensi 80 s/d 99 %</div>
-            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[2] / count($project)) * 100,2) }} %</div>
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-info text-white">Absensi 80 s/d 99 %</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[2] / count($project)) * 100, 2) }} %</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">Absensi 100 %</div>
-            <div class="card-body" style="font-size:50px; text-align:center">{{  round(($percent[3] / count($project)) * 100,2) }} %</div>
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-success text-white">Absensi 100 %</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[3] / count($project)) * 100, 2) }} %</div>
         </div>
     </div>
-    <div class="col-md-12 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header">
-                <div class="head-card justify-content-between">
-                    <div class="header-title align-self-center">
-                        <h6 class="card-title align-self-center mb-2">Report Absensi</h6>
-                        <form>
-                            <div class="row">
-                                @csrf
-                                <div class="col-md-5">
-                                    <select name="periode" class="form-control mb-2 select2" id="periode" required>
-                                        <option value="">Periode</option>
-                                        @if(bulan())
-                                            @foreach(bulan() as $key=>$value)
-                                                @php 
-                                                    $checked="";
-                                                    if(strtoupper($value).'-'.date('Y') == $_GET['periode']){
-                                                        $checked= 'selected';
-                                                    }
-                                                @endphp
-                                                    
-                                                <option value="{{ strtoupper($value).'-'.date('Y') }}" {{$checked}}>{{ $value }}</option>
-                                            @endforeach
-                                            <option value="JANUARY-2025">JANUARY-2025</option>
-                                        @endif
-                                    </select>
-                                    
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="text" class="form-control" name="tanggal" id="daterange_picker">
-                                </div>
-                                <div class="col-md-2">
-                                <button type="button" class="btn btn-primary" id='search'>Filter</button>
-                                </div>
-                                
-                            </div>  
-                        </form>
-                        
-                    </div>
-                    
-                </div>
+</div>
+<div class="col-md-12 grid-margin stretch-card">
+    <div class="card custom-card2 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">Report Absensi</h6>
+                <a href="{{ route('rekap-report') }}" class="btn btn-sm btn-outline-light">Rekap</a>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                <a href="{{ route('rekap-report') }}" class="btn btn-sm btn-outline-warning" style="float:right;">Rekap</a>
-                <!-- <a href="javascript:void(0)" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#exportPayrollModal" style="float:right;margin-right:3px">Export Payroll</a> -->
-                <table id="dataTableExample" class="table">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Project Name</th>
-                        <th>Total Schedule</th>
-                        <th>Total Absensi</th>
-                        <th>Persentase</th>
-                        <th>Tanpa Clockout</th>
-                        <th>Persentase</th>
-                        <th>Total Schedule Backup</th>
-                        <th>Total Absensi</th>
-                        <th>Persentase</th>
-                        <th>Leader PIC</th>
-                        <th>Need Approval</th>
-                        <th>Approved</th>
-                    </tr>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="dataTableExample" class="table table-striped table-hover table-bordered align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Project Name</th>
+                            <th>Total Schedule</th>
+                            <th>Total Absensi</th>
+                            <th>Persentase</th>
+                            <th>Tanpa Clockout</th>
+                            <th>Persentase</th>
+                            <th>Total Schedule Backup</th>
+                            <th>Total Absensi</th>
+                            <th>Persentase</th>
+                            <th>Leader PIC</th>
+                            <th>Need Approval</th>
+                            <th>Approved</th>
+                        </tr>
                     </thead>
                     <tbody>
                         @if($project)
@@ -126,48 +106,38 @@
                                 $total_tidak_clockout= 0;
                                 $persentase_tidak_clockout = 0;
                                 $color="";
-                                $percen_50=0;
-                                $percen_50_80=0;
-                                $percen_80_99=0;
-                                $percen_100=0;
                             @endphp
                             @foreach($project as $row)
                                 @php 
                                     if($row->persentase_absen <= 50 ){
-                                        $color="background-color:#ff6f74";
-                                        $text_color="color:white";
-                                        $text_muted="color:white";
+                                        $color="table-danger";
                                     }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
-                                        $color="background-color:#fff199";
-                                        $text_color="color:black";
-                                        $text_muted="color:#7987a1";
+                                        $color="table-warning";
+                                    }else if($row->persentase_absen >80 && $row->persentase_absen < 100){
+                                        $color="table-info";
                                     }else{
-                                        $color="";
-                                        $text_color="color:black";
-                                        $text_muted="color:#7987a1";
+                                        $color="table-success";
                                     }
                                 @endphp
-                                <tr style="{{ $color }};{{$text_color}}">
+                                <tr class="{{ $color }}">
                                     <td>{{ $no }}</td>
                                     <td>
                                         <a href="{{ route('report-detail', [
                                             'id' => $row->id,
                                             'periode' => isset($_GET['periode']) && strtotime($_GET['periode']) ? date('M Y', strtotime($_GET['periode'])) : date('m-Y')
-                                        ]) }}" style="{{$text_color}}">
+                                        ]) }}" class="text-decoration-none text-dark">
                                             {{ $row->name }} <br/>
-                                            <small class="" style="{{ $text_muted }}">DEPLOYMENT DATE : {{ $row->tanggal_deploy ?? '-' }}</small>
+                                            <small class="text-muted">DEPLOYMENT DATE : {{ $row->tanggal_deploy ?? '-' }}</small>
                                         </a>
                                     </td>
-
-
                                     <td>{{ $row->schedule }}</td>
                                     <td>{{ $row->absen }}</td>
-                                    <td style="text-align:right">{{ $row->persentase_absen }} %</td>
+                                    <td>{{ $row->persentase_absen }} %</td>
                                     <td>{{ $row->tanpa_clockout }}</td>
-                                    <td style="text-align:right">{{ $row->persentase_tanpa_clockout }} %</td>
+                                    <td>{{ $row->persentase_tanpa_clockout }} %</td>
                                     <td>{{ $row->schedule_backup }}</td>
                                     <td>{{ $row->absen_backup }}</td>
-                                    <td style="text-align:right">{{ $row->persentase_backup }} %</td>
+                                    <td>{{ $row->persentase_backup }} %</td>
                                     <td>{{ @karyawan_bynik($row->leader_pic)->nama }}</td>
                                     <td>{{ $row->need_approval }}</td>
                                     <td>{{ $row->approved }}</td>
@@ -178,8 +148,8 @@
                                     $schedule_backup +=$row->schedule_backup;
                                     $absen_backup +=$row->absen_backup;
                                     $total_tidak_clockout +=$row->tanpa_clockout;
-                                $no++;
-                            @endphp
+                                    $no++;
+                                @endphp
                             @endforeach
                             @php 
                                 if($total_absen > 0 && $total_schedule> 0){
@@ -191,47 +161,37 @@
                                 if($absen_backup > 0 && $schedule_backup> 0){
                                     $percent_backup = round(($absen_backup / $schedule_backup) * 100,2);
                                 }
-
-                                if($percent_absen <= 50 ){
-                                    $color="background-color:#ff6f74";
-                                }else if($percent_absen >50 && $percent_absen >80 ){
-                                    $color="background-color:#fff199";
-                                }
                             @endphp
-                            <tr style="{{ $color }}">
-                                <td colspan=2>Total</td>
+                            <tr class="table-secondary">
+                                <td colspan=2><strong>Total</strong></td>
                                 <td>{{ $total_schedule }}</td>
                                 <td>{{ $total_absen }}</td>
-                                <td style="text-align:right">{{ $percent_absen }} %</td>
+                                <td>{{ $percent_absen }} %</td>
                                 <td>{{ $total_tidak_clockout }}</td>
-                                <td style="text-align:right">{{ $persentase_tidak_clockout }} %</td>
+                                <td>{{ $persentase_tidak_clockout }} %</td>
                                 <td>{{ $schedule_backup }}</td>
                                 <td>{{ $absen_backup }}</td>
-                                <td style="text-align:right">{{ $percent_backup }} %</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ $percent_backup }} %</td>
+                                <td colspan=3></td>
                             </tr>
-
                         @endif
-                        
                     </tbody>
                 </table>
-                </div>
             </div>
         </div>
     </div>
 </div>
 <div class="modal fade" id="exportPayrollModal" tabindex="-1" aria-labelledby="exportPayrollModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <!-- <div class="modal-header">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-secondary text-white">
                 <h5 class="modal-title" id="exportPayrollModalLabel">Export Absen</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div> -->
+            </div>
             <div class="modal-body">
                 <form action="" method="GET">
                     <div class="form-group">
-                        <label for="" class="form-label">Absen Periode</label>
+                        <label for="month" class="form-label">Absen Periode</label>
                         <select name="month" id="month" class="form-control" required>
                             <option value="nov-2024">November - 2024</option>
                             <option value="dec-2024">Desember - 2024</option>
@@ -248,13 +208,11 @@
                             <option value="nov-2025">November - 2025</option>
                             <option value="dec-2025">Desember - 2025</option>
                         </select>
-
                     </div>
-                    
                 </form>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-success btn-sm" id="exportButton" style="float:right">Export</button>
+                <button type="button" class="btn btn-success btn-sm" id="exportButton">Export</button>
             </div>
         </div>
     </div>
@@ -292,7 +250,7 @@
         endDate = dateRangeArray[1];
     }
     
-    flatpickr('#date_range', {
+    flatpickr('#daterange_picker', {
         mode: 'range',
         dateFormat: 'Y-m-d',
         defaultDate: [startDate,endDate]
@@ -321,16 +279,21 @@
             text: '{{ session('error') }}',
         });
     @endif
-    flatpickr("#daterange_picker", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            onClose: function(selectedDates, dateStr, instance) {
-                console.log(dateStr); // Date range in 'Y-m-d to Y-m-d' format
-            }
-        });
-</script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateRangePicker = document.getElementById('daterange_picker');
 
-<script>
+        if (dateRangePicker) {
+            flatpickr(dateRangePicker, {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                defaultDate: "{{ request('daterange') }}".split(' to '),
+                onClose: function(selectedDates, dateStr, instance) {
+                    console.log(dateStr); // Date range in 'Y-m-d to Y-m-d' format
+                }
+            });
+        }
+    });
+
     document.getElementById('exportButton').addEventListener('click', function () {
     const month = document.getElementById('month').value;
     const employee = "{{ $employee->ktp }}";

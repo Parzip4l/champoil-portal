@@ -149,6 +149,12 @@ function project_all() {
   return $html;
 }
 
+function project_data($company) {
+  $projects = app('App\ModelCG\Project')->where('company',$company)->get();
+  // Return the HTML
+  return $projects;
+}
+
 
 function project_filter($project_id){
   $project = app('App\ModelCG\Project');

@@ -3,46 +3,68 @@
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/plugins/select2/select2.min.css') }}" rel="stylesheet" />
 @endpush
 @php 
     $user = Auth::user();
-    $dataLogin = json_decode(Auth::user()->permission); 
-    $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
-    
+    $dataLogin = json_decode($user->permission); 
+    $employee = \App\Employee::where('nik', $user->name)->first(); 
+
+    $project_id = '';
+    if ($employee->jabatan == 'CLIENT') {
+        $project_id = $user->project_id;
+    }
+
+    if ($employee->organisasi == 'FRONTLINE OFFICER') {
+        $get_project = \App\ModelCG\Schedule::where('employee', $user->name)
+            ->where('tanggal', date('Y-m-d'))
+            ->first();
+        $project_id = $get_project->project;
+    }
 @endphp
 @section('content')
 <div class="row">
     <div class="col-md-12 stretch-card">
-        <div class="card">
-        <div class="card-header">
-            <div class="head-card d-flex justify-content-between">
-                <div class="header-title align-self-center">
-                    <h6 class="card-title align-self-center mb-0">Lapsit Project</h6>
-                    
-                </div>
-                <div class="tombol-pembantu d-flex">
-                    <div class="dropdown">
-                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="icon-lg text-muted pb-3px align-self-center" data-feather="align-justify"></i>
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item d-flex align-items-center me-2" href="#" id="addProjectBtn">
-                                <i data-feather="plus" class="icon-sm me-2"></i> Tambah List
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center me-2" href="#" data-bs-toggle="modal" data-bs-target="#download">
-                                <i data-feather="download" class="icon-sm me-2"></i> Download
-                            </a>
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <div class="head-card d-flex justify-content-between">
+                    <div class="header-title align-self-center">
+                        <h6 class="card-title align-self-center mb-0">Lapsit Project</h6>
+                    </div>
+                    <div class="tombol-pembantu d-flex">
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Options
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item d-flex align-items-center" href="#" id="addProjectBtn">
+                                    <i data-feather="plus" class="icon-sm me-2"></i> Add List
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#download">
+                                    <i data-feather="download" class="icon-sm me-2"></i> Download
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
             <div class="card-body">
-                
-                <!-- <button id="addProjectBtn" class="btn btn-primary mb-3">Add Pos</button> -->
-                <table id="dataTable" class="table table-striped table-bordered">
-                    <thead>
+                @if (strcasecmp($employee->organisasi, 'MANAGEMENT LEADER') === 0 || strcasecmp($employee->organisasi, 'Management Leaders') === 0)
+                <div class="alert alert-warning" role="alert">
+                    Please filter the project to view the data.
+                </div>
+                <div class="mb-4">
+                    <label for="projectFilter" class="form-label">Filter by Project</label>
+                    <select id="projectFilter" class="form-control select2" onchange="filterProject()">
+                        <option value="">Select a Project</option>
+                        @foreach (project_data('Kas') as $project)
+                            <option value="{{ $project->id }}">{{ $project->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+                <table id="dataTable" class="table table-hover table-bordered">
+                    <thead class="table-light">
                         <tr>
                             <th>#</th>
                             <th>Project ID</th>
@@ -63,79 +85,76 @@
 
 <!-- Modal for Add/Edit -->
 <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="projectModalLabel">Add/Edit POS</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="projectForm">
-          <div class="mb-3">
-            <label for="project_id" class="form-label">Project ID</label>
-            <input type="number" class="form-control" id="project_id" name="project_id" value="582307" readonly="readonly" required>
-          </div>
-          <div class="mb-3">
-            <label for="judul" class="form-label">Judul</label>
-            <input type="text" class="form-control" id="judul" name="judul" required>
-          </div>
-          <input type="hidden" id="projectId">
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveProjectBtn">Save</button>
-      </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="projectModalLabel">Add/Edit POS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <div class="mb-3">
+                        <label for="project_id" class="form-label">Project ID</label>
+                        <input type="number" class="form-control" id="project_id" name="project_id" value='{{$project_id}}' required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="judul" class="form-label">Judul</label>
+                        <input type="text" class="form-control" id="judul" name="judul" required>
+                    </div>
+                    <input type="hidden" id="projectId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveProjectBtn">Save</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Modal for QR Code -->
 <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="qrModalLabel">QR Code</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <div id="qrContainer"></div>
-        <p id="qrProjectTitle" class="mt-3"></p>
-        <button id="downloadQrBtn" class="btn btn-success mt-3">Download QR Code</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade" id="download" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="qrModalLabel">QR Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qrContainer" class="mb-3"></div>
+                <p id="qrProjectTitle" class="mt-3"></p>
+                <button id="downloadQrBtn" class="btn btn-success mt-3">Download QR Code</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Download -->
+<div class="modal fade" id="download" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
                 <h5 class="modal-title" id="exampleModalLabel">Filter Download</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="download_file">
                     @csrf
                     <div class="row">
-                        <div class="col-md-12 mb-2">
-                            <label for="" class="form-label">Filter Tanggal</label>
-                                <input type="text" class="form-control" name="tanggal" required id="tanggal_report">
-                            
+                        <div class="col-md-12 mb-3">
+                            <label for="tanggal_report" class="form-label">Filter Tanggal</label>
+                            <input type="text" class="form-control" name="tanggal" required id="tanggal_report">
                         </div>
-                        <div class="col-md-6 mb-2">
-                            <label for="" class="form-label">Filter Jam</label>
-                            <input type="time" class="form-control" name="jam" required id="jam">    
+                        <div class="col-md-6 mb-3">
+                            <label for="jam" class="form-label">Filter Jam</label>
+                            <input type="time" class="form-control" name="jam" required id="jam">
                         </div>
-                        <div class="col-md-6 mb-2">
-                            <label for="" class="form-label">&nbsp;</label>
-                            <input type="time" class="form-control" name="jam2" required id="jam2">    
+                        <div class="col-md-6 mb-3">
+                            <label for="jam2" class="form-label">Filter Jam Akhir</label>
+                            <input type="time" class="form-control" name="jam2" required id="jam2">
                         </div>
-
-                        
                         <div id="project_list"></div>
-                        
-                        
-                        <div class="col-md-12 mt-2">
+                        <div class="col-md-12 mt-3">
                             <button class="btn btn-primary w-100" type="button" id="download_file_patrol">Download</button>
                         </div>
                     </div>
@@ -151,17 +170,22 @@
   <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
   <script>
     $(document).ready(function () {
-        let project ="<?php echo  $user->project_id ?>";
         const table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: function (data, callback) {
-                axios.get('/api/v1/lapsit-projects-get/'+project)  // Changed to 'lapsit-projects-get'
+                let project = "{{ $project_id }}";
+                @if (strcasecmp($employee->organisasi, 'MANAGEMENT LEADER') === 0 || strcasecmp($employee->organisasi, 'Management Leaders') === 0)
+                project = $('#projectFilter').val() || ''; // Use filter for MANAGEMENT LEADER
+                @endif
+
+                axios.get(`/api/v1/lapsit-projects-get/${project}`)
                     .then(response => {
                         const formattedData = response.data.map((item, index) => ({
                             id: index + 1,
@@ -179,7 +203,7 @@
                     })
                     .catch(error => {
                         console.error(error);
-                        Swal.fire('Error', 'Failed to load data', 'error');
+                        callback({ data: [] }); // Return empty data on error
                     });
             },
             columns: [
@@ -192,11 +216,24 @@
             ]
         });
 
+        window.filterProject = function () {
+            table.ajax.reload(); // Reload table data when filter changes
+        };
+
         // Add Project
         $('#addProjectBtn').click(() => {
             $('#projectForm')[0].reset();
             $('#projectId').val('');
             $('#projectModalLabel').text('Add Lapsit');
+
+            // Set project_id dynamically for MANAGEMENT LEADER
+            @if (strcasecmp($employee->organisasi, 'MANAGEMENT LEADER') === 0 || strcasecmp($employee->organisasi, 'Management Leaders') === 0)
+            const selectedProject = $('#projectFilter').val();
+            if (selectedProject) {
+                $('#project_id').val(selectedProject).prop('readonly', true);
+            }
+            @endif
+
             $('#projectModal').modal('show');
         });
 
@@ -283,6 +320,14 @@
 
         
     });
+
+        @if ($employee->organisasi == 'MANAGEMENT LEADER')
+        $('#projectFilter').on('change', function () {
+            const selectedProject = $(this).val();
+            const table = $('#dataTable').DataTable();
+            table.ajax.url(`/api/v1/lapsit-projects-get/${selectedProject}`).load();
+        });
+        @endif
     });
 
     function downloadQr(unixCode) {

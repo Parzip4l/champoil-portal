@@ -22,6 +22,9 @@ Route::view('voice-frontline-detail/{id}', 'pages.voice.detail')->name('voice-fr
 Route::view('forgot-password','pages.auth.forgot_password')->name('forgot-password');
 Route::view('form-forgot-password/{id}','pages.auth.form_forgot_password')->name('form-forgot-password');
 
+
+Route::view('/reminder-update/{id}', 'pages.hc.karyawan.reminder_update')->name('reminder-update');
+
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
 
@@ -49,7 +52,7 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);
     Route::resource('payslip-ns', App\Http\Controllers\Payrol\PayslipnsController::class);
     Route::resource('absen', App\Http\Controllers\Absen\AbsenController::class);
-
+    Route::view('backup-absen', 'pages.absen.absen_backup')->name('backup-absen');
     // absenduplikat
     Route::get('duplikat-absen', [App\Http\Controllers\Absen\AbsenController::class, 'duplicateAttendance'])->name('absens.index');
     Route::delete('/absens/delete/{nik}/{tanggal}', [App\Http\Controllers\Absen\AbsenController::class, 'deleteDuplicate'])->name('absens.deleteDuplicate');
@@ -367,8 +370,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     
     // logbook
     Route::resource('logbook', App\Http\Controllers\Logbook\LogbookController::class);
-    Route::get('logbook-tamu', [App\Http\Controllers\Logbook\LogbookController::class, 'tamu'])->name('logbook-tamu');
-    Route::get('logbook-barang', [App\Http\Controllers\Logbook\LogbookController::class, 'barang'])->name('logbook-barang');
+    Route::view('logbook-tamu', 'pages.logbook.index')->name('logbook-tamu');
+    Route::view('logbook-barang', 'pages.logbook.barang')->name('logbook-barang');
 
     // Request Type
     Route::resource('request-type', App\Http\Controllers\Absen\RequestTypeController::class);

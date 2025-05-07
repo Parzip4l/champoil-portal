@@ -46,7 +46,7 @@ class DailyContrtoller extends Controller
                 // Initialize counters
                 $absen = 0;
                 $not_absen = 0;
-                $no_absen =[];
+                $no_absen=[];
 
         
                 // Count absentees and presentees based on clock_in field
@@ -210,6 +210,29 @@ class DailyContrtoller extends Controller
             'schedule_onperiode' => $schedule_onperiode
         ]);
     }
-    
-    
+
+    public function absen_cek($company, $shift) {
+        $schedule_data = Schedule::where('tanggal', Carbon::today()->format('Y-m-d'))
+            ->join('karyawan', 'karyawan.nik', '=', 'schedules.employee')
+            ->where('karyawan.unit_bisnis', $company)
+            ->where('karyawan.resign_status',0)
+            ->where('shift', $shift)
+            ->get();
+        $result = [];
+        foreach ($schedule_data as $schedule) {
+            // Get absence count for each schedule date
+            $absen_count = DB::table('absens')->where('nik', $schedule->employee)
+                ->where('tanggal', Carbon::today()->format('Y-m-d'))
+                ->count();
+            $schedule->absen_count = $absen_count;
+            if($absen_count == 0) {
+                $result[] = $schedule;
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $result
+        ]);
+    }
 }

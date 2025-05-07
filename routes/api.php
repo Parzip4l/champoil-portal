@@ -27,17 +27,25 @@ use App\Http\Controllers\Api\VoiceOfController;
 use App\Http\Controllers\Api\Recruitments\TrainingController;
 use App\Http\Controllers\Api\Patroli\PatroliProojectController;
 use App\Http\Controllers\Api\Patroli\LapsitController;
+use App\Http\Controllers\Api\LogbookController;
+use App\Http\Controllers\Api\AllData\BackupRecordsController;
+
+use App\Http\Controllers\Api\OcrController;
 
 
 Route::prefix('v1')->group(function () {
 
     // Authentication
     Route::post('/login', [ApiLoginController::class, 'login']);
+    Route::post('/cek-ocr', [OcrController::class, 'cek_ocr']);
+    Route::post('/submit-employe-update', [ApiEmployee::class, 'EmployeeUpdate']);
     Route::post('/logout', [ApiLoginController::class, 'logout']);
     Route::post('/forgot-password', [AllDataController::class, 'forgotPassword']);
     Route::post('/submit-forgot-password', [AllDataController::class, 'submitforgotPassword']);
 
     Route::post('/oauth/token', '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken');
+
+    Route::get('/absen-cek/{company}/{shift}', [DailyContrtoller::class, 'absen_cek']);
 
     // Employee
     Route::get('/user', [ApiLoginController::class, 'getUser']);
@@ -185,9 +193,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/absen_daily', [DailyContrtoller::class, 'daily_absen']);
     Route::get('/project-shift/{id}', [ProjectController::class, 'projectShift']);
     Route::post('/create-project-shift', [ProjectController::class, 'createProjectShift']);
+    Route::delete('/delete-project-shift/{id}', [ProjectController::class, 'deleteProjectShift']);
     
     Route::get('/schedule-reminder/{key}/{periode}', [DailyContrtoller::class, 'reminder_schedule']);
     Route::get('/report-absens-qc', [DailyContrtoller::class, 'report_absen']);
+    Route::get('/backup-records', [BackupRecordsController::class, 'index']);
+    
     
 
     /**
@@ -276,6 +287,13 @@ Route::prefix('v1')->group(function () {
     Route::get('download-sertifikat/{unit_bisnis}', [AllDataController::class, 'download_sertifikat']);
     Route::get('attendance-records', [AttendanceController::class, 'index']);
     Route::get('export-absensi', [AttendanceController::class, 'exportAbsensi']);
+
+    //logbook  
+    Route::get('/tamu', [LogbookController::class, 'index']);
+    Route::get('/tamu/{id}', [LogbookController::class, 'tamuDetail']);
+    Route::get('/barang', [LogbookController::class, 'barang']);
+    Route::get('/barang/{id}', [LogbookController::class, 'barangDetail']);
+
     
     
 });

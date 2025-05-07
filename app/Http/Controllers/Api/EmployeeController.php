@@ -10,6 +10,7 @@ use App\Koperasi\Anggota;
 use App\Absen;
 use App\ModelCG\Project;
 use App\Employee;
+use Illuminate\Support\Facades\DB;
 
 
 class EmployeeController extends Controller
@@ -26,7 +27,7 @@ class EmployeeController extends Controller
 
                 if($last_schdl){
                     $project = Project::where('id', $last_schdl->project)->first();
-                    $row->project = $project->name;
+                    $row->project = $project->name??"-";
                 }
 
                 // Tanggal awal
@@ -169,6 +170,83 @@ Thank you for your attention and cooperation. If you have any questions or issue
         $records = Employee::where('id',$id)->update(['resign_status'=>0]);
         $result=[
             "records"=>$records,
+            "message"=>"success",
+            "error"=>false
+        ];
+
+        return response()->json($result);
+    }
+
+    public function EmployeeUpdate(Request $request){
+        $records = Employee::where('id',$request->id)->first();
+        if($records){
+            $records->nama = $request->nama;
+            $records->alamat = $request->alamat_domisili;
+            $records->telepon = $request->nomor_telepon_pribadi;
+            $records->status_pernikahan = $request->status_pernikahan;
+            $records->tanggungan = $request->jumlah_tanggungan;
+            $records->sertifikasi = $request->sertifikasi;
+            $records->expired_sertifikasi = $request->sertifikasi_expired_date;
+            $records->pendidikan_trakhir = $request->pendidikan;
+
+            Employee::where('id',$request->id)->update([
+                'nama' => $records->nama,
+                'alamat' => $records->alamat,
+                'telepon' => $records->telepon,
+                'telepon_darurat' => str_replace('-','',$request->nomor_telepon_darurat),
+                'status_pernikahan' => str_replace('-','',$records->status_pernikahan),
+                'tanggungan' => $records->tanggungan,
+                'sertifikasi' => $records->sertifikasi,
+                'expired_sertifikasi' => $records->expired_sertifikasi,
+                'pendidikan_trakhir' => $records->pendidikan_trakhir
+            ]);
+
+            $payroll = DB::table('payrolinfos')->where('employee_code',$records->nik)->first();
+            $data_payrol = [
+                'bpjs_tk' => $request->bpjs_kesehatan,
+                'npwp' => $request->npwp,
+                'bank_name' => $request->bank_name,
+                'bank_number' => $request->nomor_rekening,
+            ];
+            
+            if($payroll){
+                DB::table('payrolinfos')->where('employee_code',$records->nik)->update($data_payrol);
+            }else{
+                $data_payrol['employee_code'] = $records->nik;
+                DB::table('payrolinfos')->insert($data_payrol);
+            }
+
+            if ($request->hasFile('foto_biru')) {
+                $file = $request->file('foto_biru');
+            
+                // Simpan file ke folder public/uploads
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+            
+                // Simpan path ke DB
+                $photoPath = 'uploads/' . $filename;
+            } else {
+                $photoPath = null;
+            }
+            
+            DB::table('karyawan_update_rutin')->insert([
+                "document_type"=>"update",
+                "user_id"=>$request->id,
+                "created_at"=>date('Y-m-d H:i:s'),
+                "bb"=>$request->berat_badan,
+                "tb"=>$request->tinggi_badan,
+                "golongan_darah"=>$request->golongan_darah,
+                "photo_biru"=>$photoPath]);
+
+            if($records){
+                return response()->json([
+                    'error'=>false,
+                    'result'=>$records    
+                ]);
+            }
+        }
+        $result=[
+            "records"=>[],
             "message"=>"success",
             "error"=>false
         ];

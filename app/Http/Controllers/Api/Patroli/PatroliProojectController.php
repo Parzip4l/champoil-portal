@@ -19,15 +19,25 @@ use App\ModelCG\Project;
 
 class PatroliProojectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $records = PatroliProject::all();
-        if($records){
-            foreach($records as $row){
+        $filter = $request->input('project_id') ?? '';
+
+        $query = PatroliProject::query();
+
+        if (!empty($filter)) {
+            $query->where('project_id', $filter);
+        }
+
+        $records = $query->get(); // ambil data-nya di sini
+
+        if ($records->isNotEmpty()) {
+            foreach ($records as $row) {
                 $row->url_file = url('storage/images/' . $row->unix_code . '.png');
-                $row->created_at =date('Y-m-d H:i:s',strtotime($row->created_at));
+                $row->created_at = date('Y-m-d H:i:s', strtotime($row->created_at));
             }
         }
+
         return response()->json($records, 200);
     }
 
@@ -309,7 +319,12 @@ class PatroliProojectController extends Controller
             ini_set('memory_limit', '4096M');
             set_time_limit(0);
             // Generate the PDF
-            $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);
+            if($project_id==582307){
+                $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);
+            }else{
+                $pdf = Pdf::loadView('pages.operational.patroli_project.global', $data);
+            }
+            
             $pdf->setOption('no-outline', true);
             $pdf->setOption('isHtml5ParserEnabled', true);
             $pdf->setOption('isPhpEnabled', true);

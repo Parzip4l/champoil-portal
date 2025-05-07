@@ -27,7 +27,7 @@
                     <div class="col-md-6">
                         <div class="col">
                             <label class="form-label">Sertifikasi</label>
-                            <select class="form-select" data-width="100%" name="sertifikasi" id="sertifikasi" required="">
+                            <select class="form-select" data-width="100%" name="sertifikasi" id="sertifikasi"  required="required">
                                 <option value="TIDAK ADA">TIDAK ADA</option>
                                 <option value="GADA PRATAMA">GADA PRATAMA</option>
                                 <option value="GADA MADYA">GADA MADYA</option>
@@ -45,23 +45,23 @@
                         
                         <div class="form-group">
                             <label for="nama">Nama</label>
-                            <input type="text" class="form-control" id="nama" name="nama" >
+                            <input type="text" class="form-control" id="nama" name="nama"  required="required">
                         </div>
                         <div class="form-group">
                             <label for="nomor_telepon_pribadi">Nomor Telepon Pribadi (terhubung ke WhatsApp)</label>
-                            <input type="text" class="form-control" id="nomor_telepon_pribadi" name="nomor_telepon_pribadi" >
+                            <input type="text" class="form-control" id="nomor_telepon_pribadi" name="nomor_telepon_pribadi"  required="required">
                         </div>
                         <div class="form-group">
                             <label for="nomor_telepon_darurat">Nomor Telepon Darurat (terhubung ke WhatsApp)</label>
-                            <input type="text" class="form-control" id="nomor_telepon_darurat" name="nomor_telepon_darurat" >
+                            <input type="text" class="form-control" id="nomor_telepon_darurat" name="nomor_telepon_darurat"  required="required">
                         </div>
                         <div class="form-group">
                             <label for="alamat_domisili">Alamat Domisili</label>
-                            <textarea class="form-control" id="alamat_domisili" name="alamat_domisili" rows="3" ></textarea>
+                            <textarea class="form-control" id="alamat_domisili" name="alamat_domisili" rows="3"  required="required"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="pendidikan">Pendidikan</label>
-                            <select class=" form-select" data-width="100%" name="pendidikan" required="">
+                            <select class=" form-select" data-width="100%" name="pendidikan" required="required">
                                 <option value="SD">SD</option>
                                 <option value="SMP">SMP</option>
                                 <option value="SMA">SMA</option>
@@ -74,15 +74,15 @@
                         </div>
                         <div class="form-group">
                             <label for="tinggi_badan">Tinggi Badan (cm)</label>
-                            <input type="number" class="form-control" id="tinggi_badan" name="tinggi_badan">
+                            <input type="number" class="form-control" id="tinggi_badan" name="tinggi_badan" required="required">
                         </div>
                         <div class="form-group">
                             <label for="berat_badan">Berat Badan (kg)</label>
-                            <input type="number" class="form-control" id="berat_badan" name="berat_badan">
+                            <input type="number" class="form-control" id="berat_badan" name="berat_badan" required="required">
                         </div>
                         <div class="form-group">
                             <label for="golongan_darah">Golongan Darah</label>
-                            <select class="form-control" id="golongan_darah" name="golongan_darah">
+                            <select class="form-control" id="golongan_darah" name="golongan_darah" required="required">
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                                 <option value="AB">AB</option>
@@ -98,22 +98,22 @@
                         
                         <div class="form-group">
                             <label for="status_pernikahan">Status Pernikahan</label>
-                            <select class="form-control" id="status_pernikahan" name="status_pernikahan" >
+                            <select class="form-control" id="status_pernikahan" name="status_pernikahan" required="required" >
                                 <option value="Single">Single</option>
                                 <option value="Married">Married</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="jumlah_tanggungan">Jumlah Tanggungan</label>
-                            <input type="number" class="form-control" id="jumlah_tanggungan" name="jumlah_tanggungan" >
+                            <input type="number" class="form-control" id="jumlah_tanggungan" name="jumlah_tanggungan"  required="required">
                         </div>
                         <div class="form-group">
                             <label for="bpjs_kesehatan">BPJS Ketenaga Kerjaan</label>
-                            <input type="text" class="form-control" id="bpjs_kesehatan" name="bpjs_kesehatan" >
+                            <input type="text" class="form-control" id="bpjs_kesehatan" name="bpjs_kesehatan"  required="required">
                         </div>
                         <div class="form-group">
                             <label for="npwp">NPWP</label>
-                            <input type="text" class="form-control" id="npwp" name="npwp" >
+                            <input type="text" class="form-control" id="npwp" name="npwp"  required="required">
                         </div>
                         <div class="form-group">
                             <label for="bank_name">Bank Name (BNI)</label>
@@ -121,7 +121,7 @@
                         </div>
                         <div class="form-group">
                             <label for="nomor_rekening">Nomor Rekening (BNI)</label>
-                            <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening" >
+                            <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening"  required="required">
                         </div>
                         
                     </div>

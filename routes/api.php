@@ -30,11 +30,15 @@ use App\Http\Controllers\Api\Patroli\LapsitController;
 use App\Http\Controllers\Api\LogbookController;
 use App\Http\Controllers\Api\AllData\BackupRecordsController;
 
+use App\Http\Controllers\Api\OcrController;
+
 
 Route::prefix('v1')->group(function () {
 
     // Authentication
     Route::post('/login', [ApiLoginController::class, 'login']);
+    Route::post('/cek-ocr', [OcrController::class, 'cek_ocr']);
+    Route::post('/submit-employe-update', [ApiEmployee::class, 'EmployeeUpdate']);
     Route::post('/logout', [ApiLoginController::class, 'logout']);
     Route::post('/forgot-password', [AllDataController::class, 'forgotPassword']);
     Route::post('/submit-forgot-password', [AllDataController::class, 'submitforgotPassword']);

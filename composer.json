@@ -23,6 +23,7 @@
         "maatwebsite/excel": "3.1.45",
         "predis/predis": "^2.2",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "thiagoalessio/tesseract_ocr": "^2.13",
         "yajra/laravel-datatables-oracle": "^10.11"
     },
     "require-dev": {

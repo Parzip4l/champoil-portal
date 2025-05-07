@@ -215,8 +215,28 @@ Thank you for your attention and cooperation. If you have any questions or issue
                 $data_payrol['employee_code'] = $records->nik;
                 DB::table('payrolinfos')->insert($data_payrol);
             }
+
+            if ($request->hasFile('photo_biru')) {
+                $file = $request->file('photo_biru');
             
-            DB::table('karyawan_update_rutin')->insert(["document_type"=>"update","user_id"=>$request->id,"created_at"=>date('Y-m-d H:i:s')]);
+                // Simpan file ke folder public/uploads
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+            
+                // Simpan path ke DB
+                $photoPath = 'uploads/' . $filename;
+            } else {
+                $photoPath = null;
+            }
+            
+            DB::table('karyawan_update_rutin')->insert([
+                "document_type"=>"update",
+                "user_id"=>$request->id,
+                "created_at"=>date('Y-m-d H:i:s'),
+                "bb"=>$request->berat_badan,
+                "tb"=>$request->tinggi_badan,
+                "golongan_darah"=>$request->golongan_darah,
+                "photo_biru"=>$photoPath]);
 
             if($records){
                 return response()->json([

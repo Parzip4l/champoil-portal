@@ -72,6 +72,27 @@
                                 <option value="OTHERS">OTHERS</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="tinggi_badan">Tinggi Badan (cm)</label>
+                            <input type="number" class="form-control" id="tinggi_badan" name="tinggi_badan">
+                        </div>
+                        <div class="form-group">
+                            <label for="berat_badan">Berat Badan (kg)</label>
+                            <input type="number" class="form-control" id="berat_badan" name="berat_badan">
+                        </div>
+                        <div class="form-group">
+                            <label for="golongan_darah">Golongan Darah</label>
+                            <select class="form-control" id="golongan_darah" name="golongan_darah">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="AB">AB</option>
+                                <option value="O">O</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="foto_biru">Foto Background Berlatar Biru</label>
+                            <input type="file" class="form-control" id="foto_biru" name="foto_biru" accept="image/*">
+                        </div>
                     </div>
                     <div class="col-md-6">
                         

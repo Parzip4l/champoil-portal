@@ -216,8 +216,8 @@ Thank you for your attention and cooperation. If you have any questions or issue
                 DB::table('payrolinfos')->insert($data_payrol);
             }
 
-            if ($request->hasFile('photo_biru')) {
-                $file = $request->file('photo_biru');
+            if ($request->hasFile('foto_biru')) {
+                $file = $request->file('foto_biru');
             
                 // Simpan file ke folder public/uploads
                 $filename = time() . '_' . $file->getClientOriginalName();

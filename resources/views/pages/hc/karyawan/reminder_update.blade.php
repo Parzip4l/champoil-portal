@@ -36,7 +36,7 @@
                             </select>
                         </div>
                         <div class="form-group d-none" id="sertifikasiFields">
-                            <label for="sertifikasi_file">Upload Sertifikasi File</label>
+                            <label for="sertifikasi_file">Upload Foto KTA</label>
                             <input type="file" class="form-control" id="sertifikasi_file" name="sertifikasi_file" accept="image/*">
                             <button type="button" class="btn btn-primary d-none" id="submitButton">Check Sertifikasi</button><br/>
                             <label for="sertifikasi_expired_date" class="mt-3">Expired Date Sertifikasi</label>

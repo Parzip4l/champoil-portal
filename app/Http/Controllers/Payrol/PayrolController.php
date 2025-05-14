@@ -431,6 +431,6 @@ class PayrolController extends Controller
 
     public function downloadExcel($periode)
     {
-        return Excel::download(new PayrollAbsensiExport($periode), "Payroll_Absensi_{$periode}.xlsx");
+        return Excel::download(new PayrollAbsensiExport($periode), "Payroll_Frontline_TRUEST_{$periode}.xlsx");
     }
 }

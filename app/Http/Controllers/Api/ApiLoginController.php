@@ -236,7 +236,8 @@ class ApiLoginController extends Controller
                     'latitude' => $lat,
                     'longtitude' => $long,
                     'status' => $status,
-                    'photo' => $filename
+                    'photo' => $filename,
+                    'absen_type' => "apps"
                 ]);
                 DB::commit(); 
                 return response()->json(['message' => 'Absen Masuk Berhasil, Selamat Bekerja!','cek'=>$insert]);
@@ -410,6 +411,7 @@ class ApiLoginController extends Controller
                 }
                 $absensi->photo = $filename;
                 $absensi->project_backup = $project_id;
+                $absensi->absen_type = "apps";
                 $absensi->save();
                 return response()->json(['message' => 'Clockin success, Happy Working Day!']);
             } else {

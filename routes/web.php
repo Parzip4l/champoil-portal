@@ -47,6 +47,8 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::post('/checklist/toggle', [App\Http\Controllers\DashboardController::class, 'toggle'])->name('checklist.toggle');
     Route::resource('/', DashboardController::class);
 
+    Route::view('cek_menu',  'pages.cek_menu')->name('cek_menu');
+
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');
     Route::resource('payslip', App\Http\Controllers\Payrol\PayslipController::class);

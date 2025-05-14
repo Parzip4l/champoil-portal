@@ -23,7 +23,7 @@ Route::view('forgot-password','pages.auth.forgot_password')->name('forgot-passwo
 Route::view('form-forgot-password/{id}','pages.auth.form_forgot_password')->name('form-forgot-password');
 
 
-Route::view('/reminder-update/{id}', 'pages.hc.karyawan.reminder_update')->name('reminder-update');
+// Route::view('/reminder-update/{id}', 'pages.hc.karyawan.reminder_update')->name('reminder-update');
 
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {

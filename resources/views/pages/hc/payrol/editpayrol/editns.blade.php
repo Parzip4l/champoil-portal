@@ -50,7 +50,7 @@
                 <div class="col-md-6">
                     <label for="name" class="form-label">Karyawan</label>
                     <input type="hidden" name="employee_code" value="{{$payrolComponent->employee_code}}">
-                    <input type="text" class="form-control" value="{{$employee->nama}}-{{$payrolComponent['kerajinan']}}" readonly>
+                    <input type="text" class="form-control" value="{{$employee->nama}}" readonly>
                     <input type="hidden" name="periode" value="{{$payrolComponent->periode}}">
                 </div>
                 <div class="col-md-6">

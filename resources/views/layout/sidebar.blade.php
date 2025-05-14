@@ -70,7 +70,7 @@
                             <div class="collapse {{ show_class(['data']) }}" id="subitem{{ $menu->id }}">
                                 <ul class="nav sub-menu">
                                 @foreach($menu->children as $child)
-                                    @if($child->is_active === 1)
+                                    @if($child->is_active == 1)
                                         @php
                                             $childRoleIds = is_string($child->roles) ? json_decode($child->roles, true) : $child->roles;
                                         @endphp

@@ -14,8 +14,19 @@
                 <h5 class="mb-0 align-self-center">Data Pengajuan Attendence</h5>
             </div>
             <div class="card-body">
-                <table id="dataTableExample" class="table table-striped nowrap">
-                    <thead>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <form method="GET" id="filterForm">
+                            <label for="tanggal" class="form-label">Tanggal Range</label>
+                            <input type="text" id="tanggal" name="tanggal" class="form-control flatpickr">
+                        </form>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" form="filterForm" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </div>
+                <table id="dataTableExample" class="table table-striped table-bordered table-hover table-primary nowrap">
+                    <thead class="table-primary">
                         <tr>
                             <th>Employee</th>
                             <th>Tanggal Diajukan</th>
@@ -31,51 +42,47 @@
                             @php 
                                 $employeename = \App\Employee::where('nik', $data->employee)->first();
                             @endphp
-                            <td><a href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}">{{ $employeename->nama }}</a></td>
-                            <td> {{ $data->created_at }} </td>
+                            <td>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}" class="text-primary" data-bs-toggle="tooltip" title="View Details">
+                                    {{ $employeename->nama }}
+                                </a>
+                            </td>
                             <td> {{ $data->tanggal }} </td>
+                            <td> {{ $data->created_at }} </td>
                             <td> {{ $data->status }} </td>
-                            <td>    {{$data->aprrove_status}}</td>
+                            <td>
+                                <span class="badge {{ $data->aprrove_status === 'Approved' ? 'bg-success' : ($data->aprrove_status === 'Reject' ? 'bg-danger' : 'bg-warning') }}">
+                                    {{ $data->aprrove_status }}
+                                </span>
+                            </td>
                             <td>
                                 <div class="dropdown">
-                                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Actions
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        @if ($data->aprrove_status !=="Approved")
-                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('approve.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $data->id }}').submit();">
+                                        @if ($data->aprrove_status !== "Approved")
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('approve.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('setujui-usulan-form-{{ $data->id }}').submit();" data-bs-toggle="tooltip" title="Approve Request">
                                             <i data-feather="check" class="icon-sm me-2"></i>
-                                            <span class="">Approve</span>
+                                            Approve
                                         </a>
                                         @endif
 
-                                        @if ($data->aprrove_status !=="Reject")
-                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('reject.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $data->id }}').submit();">
+                                        @if ($data->aprrove_status !== "Reject")
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ route('reject.request', $data->id)}}" onclick="event.preventDefault(); document.getElementById('reject-usulan-form-{{ $data->id }}').submit();" data-bs-toggle="tooltip" title="Reject Request">
                                             <i data-feather="x" class="icon-sm me-2"></i>
-                                            <span class="">Reject</span>
+                                            Reject
                                         </a>
                                         @endif
 
-                                        <!-- Form Approved -->
-                                        <form id="setujui-usulan-form-{{ $data->id }}" action="{{ route('approve.request', $data->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
-                                        <!-- Form Reject -->
-                                        <form id="reject-usulan-form-{{ $data->id }}" action="{{ route('reject.request', $data->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
-
-                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}">
+                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}" data-bs-toggle="tooltip" title="View Details">
                                             <i data-feather="eye" class="icon-sm me-2"></i>
-                                            <span class="">Details</span>
+                                            Details
                                         </a>
-                                        <form action="#" method="POST" id="delete_contact" class="contactdelete"> 
-                                            @csrf @method('DELETE') 
-                                            <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')">
-                                                <i data-feather="trash" class="icon-sm me-2"></i>
-                                                <span class="">Delete</span>
-                                            </a>
-                                        </form>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" onClick="showDeleteDataDialog('{{ $data->id }}')" data-bs-toggle="tooltip" title="Delete Request">
+                                            <i data-feather="trash" class="icon-sm me-2"></i>
+                                            Delete
+                                        </a>
                                     </div>
                                 </div>
                             </td>
@@ -83,6 +90,68 @@
                         @endforeach
                     </tbody>
                 </table>
+                <style>
+                    #dataTableExample {
+                        font-size: 0.9rem;
+                    }
+                    #dataTableExample thead th {
+                        text-align: center;
+                        background-color: #007bff; /* Primary color */
+                        color: white;
+                    }
+                    #dataTableExample tbody td {
+                        vertical-align: middle;
+                    }
+                    #dataTableExample tbody tr:hover {
+                        background-color: #cce5ff; /* Light primary color for hover */
+                    }
+                    .dropdown-menu a:hover {
+                        background-color: #007bff;
+                        color: white;
+                    }
+                    .btn-outline-primary {
+                        border-color: #007bff;
+                        color: #007bff;
+                    }
+                    .btn-outline-primary:hover {
+                        background-color: #007bff;
+                        color: white;
+                    }
+                </style>
+                <script>
+                    $(document).ready(function() {
+                        // Initialize Flatpickr for date range
+                        $('#tanggal').flatpickr({
+                            mode: 'range',
+                            dateFormat: 'Y-m-d'
+                        });
+
+                        // Auto-fill "tanggal" field if the URL contains a "tanggal" query parameter
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const tanggalParam = urlParams.get('tanggal');
+                        if (tanggalParam) {
+                            $('#tanggal').val(tanggalParam);
+                        }
+
+                        // Initialize DataTables with search functionality
+                        $('#dataTableExample').DataTable({
+                            responsive: true,
+                            language: {
+                                search: "Search:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                                paginate: {
+                                    previous: "Previous",
+                                    next: "Next"
+                                }
+                            },
+                            dom: '<"d-flex justify-content-between"lf>t<"d-flex justify-content-between"ip>'
+                        });
+
+                        // Initialize tooltips
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                    });
+                </script>
             </div>
         </div>
     </div>
@@ -138,17 +207,34 @@
   <script src="{{ asset('assets/js/sweet-alert.js') }}"></script>
   <script>
     $(document).ready(function() {
-    if ($.fn.DataTable.isDataTable('#dataTableExample')) {
-        $('#dataTableExample').DataTable().destroy();
-    }
-    
-    $('#dataTableExample').DataTable({
-        "order": [[0, 'desc']], // Mengurutkan berdasarkan kolom pertama (tanggal) secara menurun
-        "columnDefs": [
-            { "type": "date", "targets": 0 } // Mengatur tipe kolom pertama sebagai tanggal
-        ]
+        // Initialize Flatpickr for date range
+        $('#tanggal').flatpickr({
+            mode: 'range',
+            dateFormat: 'Y-m-d'
+        });
+
+        // Auto-fill "tanggal" field if the URL contains a "tanggal" query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const tanggalParam = urlParams.get('tanggal');
+        if (tanggalParam) {
+            $('#tanggal').val(tanggalParam);
+        }
+
+        // Initialize DataTables with search functionality
+        $('#dataTableExample').DataTable({
+            responsive: true,
+            language: {
+                search: "Search:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                paginate: {
+                    previous: "Previous",
+                    next: "Next"
+                }
+            },
+            dom: '<"d-flex justify-content-between"lf>t<"d-flex justify-content-between"ip>'
+        });
     });
-});
   </script>
   <script>
     function showDeleteDataDialog(id) {

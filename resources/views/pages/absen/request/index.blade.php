@@ -7,18 +7,51 @@
 @endpush
 
 @section('content')
-<div class="row">
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card text-white mb-3 shadow-sm" style="background: linear-gradient(45deg, #28a745, #218838); border-radius: 10px;">
+            <div class="card-header text-center fw-bold">Approved</div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <i class="icon-lg me-3" data-feather="check-circle"></i>
+                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Approved')->count() }}</p>
+            </div>
+            <div class="card-footer text-center">Total Approved Requests</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white mb-3 shadow-sm" style="background: linear-gradient(45deg, #ffc107, #e0a800); border-radius: 10px;">
+            <div class="card-header text-center fw-bold">Pending</div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <i class="icon-lg me-3" data-feather="clock"></i>
+                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Pending')->count() }}</p>
+            </div>
+            <div class="card-footer text-center">Total Pending Requests</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white mb-3 shadow-sm" style="background: linear-gradient(45deg, #dc3545, #c82333); border-radius: 10px;">
+            <div class="card-header text-center fw-bold">Rejected</div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <i class="icon-lg me-3" data-feather="x-circle"></i>
+                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Reject')->count() }}</p>
+            </div>
+            <div class="card-footer text-center">Total Rejected Requests</div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
     <div class="col-md-12 grid-margin stretch-card">
-        <div class="card custom-card2">
-            <div class="card-header d-flex justify-content-between">
-                <h5 class="mb-0 align-self-center">Data Pengajuan Attendence</h5>
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(45deg, #007bff, #0056b3); color: white; border-radius: 10px 10px 0 0;">
+                <h5 class="mb-0">Data Pengajuan Attendance</h5>
+                <i class="icon-lg" data-feather="file-text"></i>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <form method="GET" id="filterForm">
                             <label for="tanggal" class="form-label">Tanggal Range</label>
-                            <input type="text" id="tanggal" name="tanggal" class="form-control flatpickr">
+                            <input type="text" id="tanggal" name="tanggal" class="form-control flatpickr" placeholder="Select date range">
                         </form>
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
@@ -43,7 +76,7 @@
                                 $employeename = \App\Employee::where('nik', $data->employee)->first();
                             @endphp
                             <td>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}" class="text-primary" data-bs-toggle="tooltip" title="View Details">
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}" class="text-primary fw-bold" data-bs-toggle="tooltip" title="View Details">
                                     {{ $employeename->nama }}
                                 </a>
                             </td>
@@ -93,17 +126,18 @@
                 <style>
                     #dataTableExample {
                         font-size: 0.9rem;
+                        border-radius: 10px;
                     }
                     #dataTableExample thead th {
                         text-align: center;
-                        background-color: #007bff; /* Primary color */
+                        background-color: #007bff;
                         color: white;
                     }
                     #dataTableExample tbody td {
                         vertical-align: middle;
                     }
                     #dataTableExample tbody tr:hover {
-                        background-color: #cce5ff; /* Light primary color for hover */
+                        background-color: #cce5ff;
                     }
                     .dropdown-menu a:hover {
                         background-color: #007bff;
@@ -150,6 +184,9 @@
 
                         // Initialize tooltips
                         $('[data-bs-toggle="tooltip"]').tooltip();
+
+                        // Initialize Feather icons
+                        feather.replace();
                     });
                 </script>
             </div>

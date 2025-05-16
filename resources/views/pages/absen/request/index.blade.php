@@ -7,6 +7,7 @@
 @endpush
 
 @section('content')
+@if(request('tanggal'))
 <div class="row g-3">
     <div class="col-md-4">
         <div class="card text-white mb-3 shadow-sm" style="background: linear-gradient(45deg, #28a745, #218838); border-radius: 10px;">
@@ -39,6 +40,7 @@
         </div>
     </div>
 </div>
+@endif
 <div class="row mt-4">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">

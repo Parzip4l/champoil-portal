@@ -23,7 +23,7 @@ Route::view('forgot-password','pages.auth.forgot_password')->name('forgot-passwo
 Route::view('form-forgot-password/{id}','pages.auth.form_forgot_password')->name('form-forgot-password');
 
 
-Route::view('/reminder-update/{id}', 'pages.hc.karyawan.reminder_update')->name('reminder-update');
+// Route::view('/reminder-update/{id}', 'pages.hc.karyawan.reminder_update')->name('reminder-update');
 
 // Dashboard
 Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
@@ -46,6 +46,8 @@ Route::middleware(['auth', 'permission:dashboard_access'])->group(function () {
     Route::resource('dashboard', DashboardController::class);
     Route::post('/checklist/toggle', [App\Http\Controllers\DashboardController::class, 'toggle'])->name('checklist.toggle');
     Route::resource('/', DashboardController::class);
+
+    Route::view('cek_menu',  'pages.cek_menu')->name('cek_menu');
 
     // Payslip
     Route::get('/myslip', [App\Http\Controllers\Payrol\PayslipController::class, 'payslipuser'])->name('mySlip');

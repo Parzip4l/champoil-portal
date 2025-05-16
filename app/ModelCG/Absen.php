@@ -10,7 +10,7 @@ class Absen extends Model
     use HasFactory;
     protected $connection = 'mysql_secondary';
     protected $table = 'absens';
-    protected $fillable = ['nik','tanggal'];
+    protected $fillable = ['nik','tanggal','absen_type'];
 
     public function user()
     {

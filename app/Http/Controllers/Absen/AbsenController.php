@@ -450,6 +450,7 @@ class AbsenController extends Controller
             $absen->longtitude = $long;
             $absen->status = $request->input('status');
             $absen->project = $projectId->id;
+            $absen->absen_type = "web";
 
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');
@@ -569,6 +570,7 @@ class AbsenController extends Controller
             $absensi->longtitude = $long;
             $absensi->status = $status;
             $absensi->project_backup = $project_id;
+            $absen->absen_type = "web";
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
         } else {

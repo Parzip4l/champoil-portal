@@ -23,44 +23,48 @@ class RequestControllers extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
         $company = Employee::where('nik', $EmployeeCode)->first();
-        
-        if($company->organisasi == 'Frontline Officer' || $company->organisasi =='FRONTLINE OFFICER'){
-            $get_project = Schedule::where('employee',$EmployeeCode)->first();
-            $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
-                                        ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-                                        ->whereDate('requests_attendence.created_at','>','2024-06-20')
-                                        // ->where('requests_attendence.aprrove_status','Pending')
-                                        ->select('requests_attendence.*')
-                                        ->orderBy('requests_attendence.tanggal', 'desc')
-                                        ->limit(500)
-                                        ->get();
-            $dataRequest=[];
-            if($request_absen){
-                foreach($request_absen as $row){
-                    $cek = Schedule::whereDate('schedules.tanggal','>','2024-06-20')
-                            ->where('project',$get_project->project)
-                            ->where('employee',$row->employee)
-                            ->count();
-                    if($cek > 0){
-                        $dataRequest[]=$row;
+
+        $dataRequest = [];
+
+        if ($request->input('tanggal') != null) {
+            $tanggalRange = explode(' to ', $request->input('tanggal')); // Example: ?tanggal=2025-04-21+to+2025-05-15
+
+            if ($company->organisasi == 'Frontline Officer' || $company->organisasi == 'FRONTLINE OFFICER') {
+                $get_project = Schedule::where('employee', $EmployeeCode)->first();
+                $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+                                            ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                            ->whereBetween('requests_attendence.tanggal', [$tanggalRange[0], $tanggalRange[1]])
+                                            ->select('requests_attendence.*')
+                                            ->orderBy('requests_attendence.tanggal', 'desc')
+                                            // ->limit(500)
+                                            ->get();
+                $dataRequest = [];
+                if ($request_absen) {
+                    foreach ($request_absen as $row) {
+                        $cek = Schedule::whereBetween('schedules.tanggal', [$tanggalRange[0], $tanggalRange[1]])
+                                ->where('project', $get_project->project)
+                                ->where('employee', $row->employee)
+                                ->count();
+                        if ($cek > 0) {
+                            $dataRequest[] = $row;
+                        }
                     }
                 }
-                
+            } else {
+                $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
+                                ->where('karyawan.unit_bisnis', $company->unit_bisnis)
+                                ->whereBetween('requests_attendence.tanggal', [$tanggalRange[0], $tanggalRange[1]])
+                                ->select('requests_attendence.*')
+                                ->orderBy('requests_attendence.tanggal', 'desc')
+                                // ->limit(50)
+                                ->get();
             }
-        }else{
-            $dataRequest = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
-                               ->where('karyawan.unit_bisnis', $company->unit_bisnis)
-                               ->select('requests_attendence.*')
-                               ->orderBy('requests_attendence.tanggal', 'desc')
-                               ->limit(50)
-                               ->get();
         }
-        
         
         return view('pages.absen.request.index', compact('dataRequest'));
     }
@@ -77,7 +81,7 @@ class RequestControllers extends Controller
             $requestabsen->save();
 
             $dataKaryawanRequest = $requestabsen->employee;
-            $schedule = Schedule::where('employee',$dataKaryawanRequest)->where('tanggal', $requestabsen->tanggal)->first();
+            $schedule = Schedule::where('employee', $dataKaryawanRequest)->where('tanggal', $requestabsen->tanggal)->first();
             
             // Cek status jika lupa absen
             if ($requestabsen->status = 'F') {
@@ -136,10 +140,10 @@ class RequestControllers extends Controller
             return response()->download($file_path);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Handle the case when no data is found
-            return redirect()->back()->with('error','Data not found.');
+            return redirect()->back()->with('error', 'Data not found.');
         } catch (\Exception $e) {
             // Handle other exceptions
-            return redirect()->back()->with('error','Data not found.');
+            return redirect()->back()->with('error', 'Data not found.');
         }
     }
 
@@ -152,12 +156,12 @@ class RequestControllers extends Controller
     {
         $userId = Auth::id();
         $EmployeeCode = Auth::user()->employee_code;
-        $company = Employee::where('nik',$EmployeeCode)->select('unit_bisnis')->first();
+        $company = Employee::where('nik', $EmployeeCode)->select('unit_bisnis')->first();
 
         $historyData = RequestAbsen::where('employee', $EmployeeCode)->get();
         $typeRequest = RequestType::where('company', $company->unit_bisnis)->get();
 
-        return view('pages.absen.request.create', compact('EmployeeCode','historyData','typeRequest'));
+        return view('pages.absen.request.create', compact('EmployeeCode', 'historyData', 'typeRequest'));
     }
 
     /**

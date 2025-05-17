@@ -43,7 +43,8 @@ class ApiLoginController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
+            'uuid' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -64,8 +65,21 @@ class ApiLoginController extends Controller
                 'message' => 'Login Failed!',
             ]);
         }
-        
 
+        // Cek dan simpan UUID
+        if (empty($user->uuid)) {
+            $user->uuid = $request->uuid;
+            $user->save();
+        } else {
+            // UUID sudah tersimpan, cek apakah cocok
+            if ($user->uuid !== $request->uuid) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Login ditolak. Akun ini sudah digunakan di perangkat lain.',
+                ], 403);
+            }
+        }
+        
         return response()->json([
             'success' => true,
             'message' => 'Login Success!',
@@ -97,6 +111,21 @@ class ApiLoginController extends Controller
             $today = now()->toDateString();
 
             DB::beginTransaction();
+
+            $incomingUUID = $request->input('uuid'); 
+
+            // Ambil UUID yang tersimpan di database
+            if ($user->uuid === null) {
+                // Jika UUID kosong di DB, simpan UUID dari device pertama kali
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                // Jika UUID tidak cocok, tolak akses
+                return response()->json([
+                    'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
+                    'success' => false
+                ], 403);
+            }
 
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -276,6 +305,21 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
+            
+            $incomingUUID = $request->input('uuid'); 
+
+            // Ambil UUID dari database user
+            if ($user->uuid === null) {
+                // Jika belum ada UUID, simpan dari request pertama kali
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                // Jika UUID beda, tolak akses
+                return response()->json([
+                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+                    'success' => false
+                ], 403);
+            }
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');

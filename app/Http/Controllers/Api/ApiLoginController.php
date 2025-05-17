@@ -43,8 +43,7 @@ class ApiLoginController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required',
-            'uuid' => 'required|string'
+            'password' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -112,20 +111,16 @@ class ApiLoginController extends Controller
 
             DB::beginTransaction();
 
-            $incomingUUID = $request->input('uuid'); 
-
-            // Ambil UUID yang tersimpan di database
-            if ($user->uuid === null) {
-                // Jika UUID kosong di DB, simpan UUID dari device pertama kali
-                $user->uuid = $incomingUUID;
-                $user->save();
-            } elseif ($user->uuid !== $incomingUUID) {
-                // Jika UUID tidak cocok, tolak akses
-                return response()->json([
-                    'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
-                    'success' => false
-                ], 403);
-            }
+            // $incomingUUID = $request->input('uuid'); 
+            // if ($user->uuid === null) {
+            //     $user->uuid = $incomingUUID;
+            //     $user->save();
+            // } elseif ($user->uuid !== $incomingUUID) {
+            //     return response()->json([
+            //         'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
+            //         'success' => false
+            //     ], 403);
+            // }
 
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -306,20 +301,20 @@ class ApiLoginController extends Controller
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
             
-            $incomingUUID = $request->input('uuid'); 
+            // $incomingUUID = $request->input('uuid'); 
 
-            // Ambil UUID dari database user
-            if ($user->uuid === null) {
-                // Jika belum ada UUID, simpan dari request pertama kali
-                $user->uuid = $incomingUUID;
-                $user->save();
-            } elseif ($user->uuid !== $incomingUUID) {
-                // Jika UUID beda, tolak akses
-                return response()->json([
-                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
-                    'success' => false
-                ], 403);
-            }
+           
+            // if ($user->uuid === null) {
+                
+            //     $user->uuid = $incomingUUID;
+            //     $user->save();
+            // } elseif ($user->uuid !== $incomingUUID) {
+                
+            //     return response()->json([
+            //         'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+            //         'success' => false
+            //     ], 403);
+            // }
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');

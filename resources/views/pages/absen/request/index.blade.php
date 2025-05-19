@@ -14,7 +14,7 @@
             <div class="card-header text-center fw-bold">Approved</div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <i class="icon-lg me-3" data-feather="check-circle"></i>
-                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Approved')->count() }}</p>
+                <p class="card-text fs-4 fw-bold mb-0">{{ collect($dataRequest)->where('aprrove_status', 'Approved')->count() }}</p>
             </div>
             <div class="card-footer text-center">Total Approved Requests</div>
         </div>
@@ -24,7 +24,7 @@
             <div class="card-header text-center fw-bold">Pending</div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <i class="icon-lg me-3" data-feather="clock"></i>
-                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Pending')->count() }}</p>
+                <p class="card-text fs-4 fw-bold mb-0">{{ collect($dataRequest)->where('aprrove_status', 'Pending')->count() }}</p>
             </div>
             <div class="card-footer text-center">Total Pending Requests</div>
         </div>
@@ -34,7 +34,7 @@
             <div class="card-header text-center fw-bold">Rejected</div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <i class="icon-lg me-3" data-feather="x-circle"></i>
-                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Reject')->count() }}</p>
+                <p class="card-text fs-4 fw-bold mb-0">{{ collect($dataRequest)->where('aprrove_status', 'Reject')->count() }}</p>
             </div>
             <div class="card-footer text-center">Total Rejected Requests</div>
         </div>

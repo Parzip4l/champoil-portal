@@ -107,6 +107,7 @@
                                 @foreach ($dates as $date)
                                     @php
                                         $absen = isset($absens[$employee->nik]) ? $absens[$employee->nik]->firstWhere('tanggal', $date) : null;
+                                        
                                         if (strtoupper($org) === 'KAS') {
                                             $scheduleKey = $employee->nik . '-' . $date;
                                         }else{
@@ -135,12 +136,13 @@
                                     <td class="p-1">
                                     @if ($schedule || $shift)
                                         <p class="text-muted">{{ $shift->shift_code ?? $shift->code ?? 'OFF' }} <br>
-                                        (<span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span>)</p>
+                                        (<span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span>)</p>
                                             
                                     @else
                                     <p class="text-muted">
-                                    <span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span></p>
+                                    <span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span></p>
                                     @endif
+
                                 </td>
 
                                 @endforeach

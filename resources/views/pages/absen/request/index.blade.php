@@ -101,6 +101,10 @@
                                             <i data-feather="check" class="icon-sm me-2"></i>
                                             Approve
                                         </a>
+                                        <form id="setujui-usulan-form-{{ $data->id }}" action="{{ route('approve.request', $data->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('POST')
+                                        </form>
                                         @endif
 
                                         @if ($data->aprrove_status !== "Reject")
@@ -108,6 +112,10 @@
                                             <i data-feather="x" class="icon-sm me-2"></i>
                                             Reject
                                         </a>
+                                        <form id="reject-usulan-form-{{ $data->id }}" action="{{ route('reject.request', $data->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('POST')
+                                        </form>
                                         @endif
 
                                         <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}" data-bs-toggle="tooltip" title="View Details">

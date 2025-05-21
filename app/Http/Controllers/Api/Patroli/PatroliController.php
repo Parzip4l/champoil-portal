@@ -766,7 +766,7 @@ class PatroliController extends Controller
                 // Return semua path file dalam JSON response
                 return response()->json([
                     'message' => 'PDF files saved successfully',
-                    'paths' => $files, // Semua file PDF yang dihasilkan
+                    'path' => $files, // Semua file PDF yang dihasilkan
                     'tasks' => $data['tasks'] // Data asli untuk referensi
                 ]);
             }else{

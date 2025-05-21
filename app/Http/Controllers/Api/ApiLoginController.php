@@ -80,7 +80,6 @@ class ApiLoginController extends Controller
             }
         }
         
-        
         return response()->json([
             'success' => true,
             'message' => 'Login Success!',
@@ -112,17 +111,6 @@ class ApiLoginController extends Controller
             $today = now()->toDateString();
 
             DB::beginTransaction();
-
-            $incomingUUID = $request->input('uuid'); 
-            if ($user->uuid === null) {
-                $user->uuid = $incomingUUID;
-                $user->save();
-            } elseif ($user->uuid !== $incomingUUID) {
-                return response()->json([
-                    'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
-                    'success' => false
-                ], 403);
-            }
 
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -184,30 +172,30 @@ class ApiLoginController extends Controller
             if ($distance <= $allowedRadius) {
                 $filename = null;
 
-                if ($request->hasFile('photo')) {
-                    $image = $request->file('photo');
-                    $filename = time() . '.' . $image->getClientOriginalExtension();
+                // if ($request->hasFile('photo')) {
+                //     $image = $request->file('photo');
+                //     $filename = time() . '.' . $image->getClientOriginalExtension();
 
-                    // Use Laravel's store method to handle file uploads
-                    $path = $image->storeAs('images/absen', $filename, 'public');
+                //     // Use Laravel's store method to handle file uploads
+                //     $path = $image->storeAs('images/absen', $filename, 'public');
                     
-                }
-
-                // $base64String = $request->photo;
-
-                // if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
-                //     $base64String = substr($base64String, strpos($base64String, ',') + 1);
                 // }
+
+                $base64String = $request->photo;
+
+                if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
+                    $base64String = substr($base64String, strpos($base64String, ',') + 1);
+                }
             
-                // // Decode the base64 string
-                // $fileData = base64_decode($base64String);
+                // Decode the base64 string
+                $fileData = base64_decode($base64String);
 
                 if(empty($projectData)){
                     DB::rollBack();
                     return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
                 }
 
-                if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
+                if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
                     $cek = ProjectShift::where('shift_code', $schedulebackup->shift)
                         ->where('project_id', $schedulebackup->project)
                         ->get();
@@ -249,7 +237,7 @@ class ApiLoginController extends Controller
                         }
                 }
     
-                if(strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0 && $shift_fix==0){
+                if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
                     return response()->json(['message' => $msg]);
                 }
                 
@@ -262,8 +250,7 @@ class ApiLoginController extends Controller
                     'latitude' => $lat,
                     'longtitude' => $long,
                     'status' => $status,
-                    'photo' => $filename,
-                    'absen_type' => "apps"
+                    'photo' => $filename
                 ]);
                 DB::commit(); 
                 return response()->json(['message' => 'Absen Masuk Berhasil, Selamat Bekerja!','cek'=>$insert]);
@@ -302,21 +289,6 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
-            
-            $incomingUUID = $request->input('uuid'); 
-
-           
-            if ($user->uuid === null) {
-                
-                $user->uuid = $incomingUUID;
-                $user->save();
-            } elseif ($user->uuid !== $incomingUUID) {
-                
-                return response()->json([
-                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
-                    'success' => false
-                ], 403);
-            }
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
@@ -452,7 +424,6 @@ class ApiLoginController extends Controller
                 }
                 $absensi->photo = $filename;
                 $absensi->project_backup = $project_id;
-                $absensi->absen_type = "apps";
                 $absensi->save();
                 return response()->json(['message' => 'Clockin success, Happy Working Day!']);
             } else {
@@ -572,7 +543,7 @@ class ApiLoginController extends Controller
 
     public function payslipuser(Request $request)
     {
-        // try {
+        try {
             // Retrieve the token from the request
             $token = $request->bearerToken();
 
@@ -612,17 +583,13 @@ class ApiLoginController extends Controller
 
                         // Modify the response to return JSON data
                         $payslipsData = $payslips->toArray();
-                        if(count($payslipsData) > 0) {
-                            foreach ($payslipsData as $key => $payslip) {
-                                $payslipsData[$key]['basic_salary'] = (string)$payslip['basic_salary'];
-                                $payslipsData[$key]['net_salary'] = array_key_exists('net_salary', $payslip) ? (string)$payslip['net_salary'] : '0';
-                            }
-                        }
 
 
                         return response()->json([
-                            'payslips' => $payslipsData,
-                            'total' => count($payslips),
+                            'payslips' => $payslips->items(),
+                            'current_page' => $payslips->currentPage(),
+                            'per_page' => $payslips->perPage(),
+                            'total' => $payslips->total(),
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);
@@ -633,10 +600,10 @@ class ApiLoginController extends Controller
             } else {
                 return response()->json(['error' => 'Pengguna tidak terotentikasi.'], 401);
             }
-        // } catch (\Exception $e) {
-        //     // Handle general errors
-        //     return response()->json(['error' => 'Terjadi kesalahan.'], 500);
-        // }
+        } catch (\Exception $e) {
+            // Handle general errors
+            return response()->json(['error' => 'Terjadi kesalahan.'], 500);
+        }
     }
 
     // Details Payslip
@@ -702,12 +669,6 @@ class ApiLoginController extends Controller
                 // Update the payslip object
                 $payslip->allowances = json_encode($allowances);
                 $payslip->deductions = json_encode($deductions);
-            }
-
-            if (!empty($payslip)) {
-                // Ensure 'basic_salary' and 'net_salary' exist before converting
-                $payslip['basic_salary'] = isset($payslip['basic_salary']) ? (string) $payslip['basic_salary'] : '0';
-                $payslip['net_salary'] = isset($payslip['net_salary']) ? (string) $payslip['net_salary'] : '0';
             }
 
             // Return the payslip data as JSON
@@ -931,13 +892,6 @@ class ApiLoginController extends Controller
     public function submitAbsenceRequest(Request $request)
     {
         try {
-            // Authenticate the user based on the token
-            $user = Auth::guard('api')->user();
-            $organisasi = Employee::where('nik',$user->employee_code)
-                        ->select('organisasi','unit_bisnis')
-                        ->first();
-
-                        
             $request->validate([
                 'tanggal' => 'required',
                 'employee' => 'required',
@@ -947,21 +901,16 @@ class ApiLoginController extends Controller
 
             
             $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
-
             $employee = $request->input('employee');
-
             $cek_absen = Absen::where('nik', $employee)
                 ->whereDate('tanggal', $tanggal)
                 ->first();
-
-            if ($organisasi->unit_bisnis === 'Kas') {
-                if ($cek_absen) {
-                    return response()->json([
-                        'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
-                    ], 200);
-                }
+            if ($cek_absen) {
+                return response()->json([
+                    'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
+                ], 200);
             }
-            
+
             // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve
             $existingRequest = RequestAbsen::where('employee', $employee)
                 ->where('tanggal', $tanggal)
@@ -1009,6 +958,12 @@ class ApiLoginController extends Controller
 
             $pengajuan->save();
             $token = $request->bearerToken();
+
+            // Authenticate the user based on the token
+            $user = Auth::guard('api')->user();
+            $organisasi = Employee::where('nik',$user->employee_code)
+                        ->select('organisasi','unit_bisnis')
+                        ->first();
         
             if ($organisasi->unit_bisnis === 'CHAMPOIL' ||  $organisasi->unit_bisnis === 'RUN' || $organisasi->unit_bisnis === 'Run' ||  $organisasi->unit_bisnis === 'KAS' ||  $organisasi->unit_bisnis === 'Kas') {
                 $slackChannel = Slack::where('channel', 'Request')->where('company',strtoupper($organisasi->unit_bisnis))->first();
@@ -1093,27 +1048,14 @@ class ApiLoginController extends Controller
             
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
-
-                // Absen biasa
                 $lastAbsensi = Absen::where('tanggal',$hariini)
                 ->where('nik', $user->employee_code)
                 ->first();
-
-                // Backup
-                $lastAbsensiBackup = AbsenBackup::where('tanggal', $hariini)
-                ->where('nik', $user->employee_code)
-                ->first();
-
                 // Get Data Karyawan
                 $userId = $user->id;
 
                 // Get Log Absensi
                 $logs = Absen::where('user_id', $user->employee_code)
-                    ->whereDate('tanggal', $hariini)
-                    ->get();
-
-                // Logs Backup
-                $logsBackup = AbsenBackup::where('user_id', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
                     ->get();
                     
@@ -1141,10 +1083,6 @@ class ApiLoginController extends Controller
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
-                $isBackup = false;
-                $alreadyClockInBackup = false;
-                $alreadyClockOutBackup = false;
-                $isSameDayBackup = false;
 
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
@@ -1154,17 +1092,6 @@ class ApiLoginController extends Controller
                         $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
-                    }
-                }
-
-                if($lastAbsensiBackup){
-                    if ($lastAbsensiBackup->clock_in && !$lastAbsensiBackup->clock_out) {
-                        $alreadyClockInBackup = true;
-                    } elseif ($lastAbsensiBackup->clock_in && $lastAbsensiBackup->clock_out) {
-                        $alreadyClockOutBackup = true;
-                        $lastClockOutBackup = Carbon::parse($lastAbsensiBackup->clock_out);
-                        $today = Carbon::today();
-                        $isSameDayBackup = $lastClockOutBackup->isSameDay($today);
                     }
                 }
 
@@ -1263,11 +1190,7 @@ class ApiLoginController extends Controller
                     'alreadyClockIn' => $alreadyClockIn,
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
-                    'alreadyClockInBackup' => $alreadyClockInBackup,
-                    'alreadyClockOutBackup' => $alreadyClockOutBackup,
-                    'isSameDayBackup' => $isSameDayBackup,
                     'logs' => $logs,
-                    'logsBackup' => $logsBackup,
                     'logsmonths' => $logsmonths,
                     'daysWithNoLogs' => $daysWithNoLogs,
                     'bulanSelected' => $bulanSelected,

@@ -143,7 +143,10 @@ class ApiLoginController extends Controller
 
         if ($existingAbsen || $existingAbsenBackup) {
             DB::rollBack();
-            return response()->json(['message' => 'Absen Ditolak, sudah ada absensi hari ini!']);
+            return response()->json([
+                'message' => 'Absen Ditolak, sudah ada absensi hari ini!',
+                'success' => false,
+            ], 200);
         }
 
         // Ambil data lokasi & radius berdasarkan schedule
@@ -161,7 +164,10 @@ class ApiLoginController extends Controller
             $allowedRadius = $dataCompany->radius;
         } else {
             DB::rollBack();
-            return response()->json(['message' => 'Tidak ada schedule dan tidak ada backup schedule!']);
+            return response()->json([
+                'message' => 'Tidak ada schedule dan tidak ada backup schedule!',
+                'success' => false,
+            ], 200);
         }
 
         // Tambahan khusus DRIVER
@@ -176,10 +182,16 @@ class ApiLoginController extends Controller
         ) {
             if (!$Schedule) {
                 DB::rollBack();
-                return response()->json(['message' => 'Absen Masuk Ditolak, Tidak ada schedule! Hubungi team leader.']);
+                return response()->json([
+                    'message' => 'Absen Masuk Ditolak, Tidak ada schedule! Hubungi team leader.',
+                    'success' => false,
+                ], 200);
             } elseif ($Schedule->shift === 'OFF') {
                 DB::rollBack();
-                return response()->json(['message' => 'Absen Masuk Ditolak, Schedule OFF. Hubungi team leader.']);
+                return response()->json([
+                    'message' => 'Absen Masuk Ditolak, Schedule OFF. Hubungi team leader.',
+                    'success' => false,
+                ], 200);
             }
         }
 
@@ -236,7 +248,8 @@ class ApiLoginController extends Controller
                 if ($shift_fix == 0) {
                     DB::rollBack();
                     return response()->json([
-                        'message' => "Anda tidak bisa clock in karena schedule {$Schedule->shift} ($jam_masuk - $jam_pulang)"
+                        'message' => "Anda tidak bisa clock in karena schedule {$Schedule->shift} ($jam_masuk - $jam_pulang)",
+                        'success' => false,
                     ]);
                 }
             }
@@ -272,11 +285,15 @@ class ApiLoginController extends Controller
             DB::commit();
             return response()->json([
                 'message' => 'Absen Masuk Berhasil, Selamat Bekerja!',
+                'success' => true,
                 'data' => $insert
             ]);
         } else {
             DB::rollBack();
-            return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
+            return response()->json([
+                'message' => 'Absen Masuk Gagal, Diluar Radius!',
+                'success' => false,
+            ]);
         }
     }
 
@@ -341,7 +358,7 @@ class ApiLoginController extends Controller
                     $absenYesterday->save();
 
                     return response()->json([
-                        'status' => 'success',
+                        'success' => true,
                         'message' => 'Clockout success untuk shift ML! Selamat Beristirahat!',
                     ], 200);
                 }
@@ -358,13 +375,13 @@ class ApiLoginController extends Controller
                     $absenYesterdayBackup->save();
 
                     return response()->json([
-                        'status' => 'success',
+                        'success' => true,
                         'message' => 'Clockout shift ML berhasil (backup)!',
                     ], 200);
                 }
 
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => 'Tidak ditemukan absen clock-in kemarin (shift ML)',
                 ], 404);
             }
@@ -381,7 +398,7 @@ class ApiLoginController extends Controller
                 $absenToday->save();
 
                 return response()->json([
-                    'status' => 'success',
+                    'success' => true,
                     'message' => 'Clockout hari ini berhasil! Selamat Beristirahat!',
                 ], 200);
             }
@@ -398,25 +415,23 @@ class ApiLoginController extends Controller
                 $absenTodayBackup->save();
 
                 return response()->json([
-                    'status' => 'success',
+                    'success' => true,
                     'message' => 'Clockout (backup) hari ini berhasil! Selamat Beristirahat!',
                 ], 200);
             }
 
             return response()->json([
-                'status' => 'error',
+                'success' => false,
                 'message' => 'Clock-in belum dilakukan, tidak bisa clock-out.',
             ], 404);
 
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
-
-
 
     // Backup Absen
     public function clockinbackup(Request $request)

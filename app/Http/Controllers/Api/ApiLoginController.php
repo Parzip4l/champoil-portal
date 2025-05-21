@@ -111,16 +111,16 @@ class ApiLoginController extends Controller
 
             DB::beginTransaction();
 
-            // $incomingUUID = $request->input('uuid'); 
-            // if ($user->uuid === null) {
-            //     $user->uuid = $incomingUUID;
-            //     $user->save();
-            // } elseif ($user->uuid !== $incomingUUID) {
-            //     return response()->json([
-            //         'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
-            //         'success' => false
-            //     ], 403);
-            // }
+            $incomingUUID = $request->input('uuid'); 
+            if ($user->uuid === null) {
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                return response()->json([
+                    'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
+                    'success' => false
+                ], 403);
+            }
 
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -182,23 +182,23 @@ class ApiLoginController extends Controller
             if ($distance <= $allowedRadius) {
                 $filename = null;
 
-                // if ($request->hasFile('photo')) {
-                //     $image = $request->file('photo');
-                //     $filename = time() . '.' . $image->getClientOriginalExtension();
+                if ($request->hasFile('photo')) {
+                    $image = $request->file('photo');
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
 
-                //     // Use Laravel's store method to handle file uploads
-                //     $path = $image->storeAs('images/absen', $filename, 'public');
+                    // Use Laravel's store method to handle file uploads
+                    $path = $image->storeAs('images/absen', $filename, 'public');
                     
-                // }
-
-                $base64String = $request->photo;
-
-                if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
-                    $base64String = substr($base64String, strpos($base64String, ',') + 1);
                 }
+
+                // $base64String = $request->photo;
+
+                // if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
+                //     $base64String = substr($base64String, strpos($base64String, ',') + 1);
+                // }
             
-                // Decode the base64 string
-                $fileData = base64_decode($base64String);
+                // // Decode the base64 string
+                // $fileData = base64_decode($base64String);
 
                 if(empty($projectData)){
                     DB::rollBack();
@@ -301,20 +301,20 @@ class ApiLoginController extends Controller
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
             
-            // $incomingUUID = $request->input('uuid'); 
+            $incomingUUID = $request->input('uuid'); 
 
            
-            // if ($user->uuid === null) {
+            if ($user->uuid === null) {
                 
-            //     $user->uuid = $incomingUUID;
-            //     $user->save();
-            // } elseif ($user->uuid !== $incomingUUID) {
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
                 
-            //     return response()->json([
-            //         'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
-            //         'success' => false
-            //     ], 403);
-            // }
+                return response()->json([
+                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+                    'success' => false
+                ], 403);
+            }
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');

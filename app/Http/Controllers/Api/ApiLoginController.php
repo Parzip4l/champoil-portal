@@ -111,6 +111,21 @@ class ApiLoginController extends Controller
             $today = now()->toDateString();
 
             DB::beginTransaction();
+            // Ambil UUID dari frontend
+            $incomingUUID = $request->input('uuid'); 
+
+            // Ambil UUID dari database user
+            if ($user->uuid === null) {
+                // Jika belum ada UUID, simpan dari request pertama kali
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                // Jika UUID beda, tolak akses
+                return response()->json([
+                    'message' => 'Clock In ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+                    'success' => false
+                ], 403);
+            }
 
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -172,23 +187,23 @@ class ApiLoginController extends Controller
             if ($distance <= $allowedRadius) {
                 $filename = null;
 
-                // if ($request->hasFile('photo')) {
-                //     $image = $request->file('photo');
-                //     $filename = time() . '.' . $image->getClientOriginalExtension();
+                if ($request->hasFile('photo')) {
+                    $image = $request->file('photo');
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
 
-                //     // Use Laravel's store method to handle file uploads
-                //     $path = $image->storeAs('images/absen', $filename, 'public');
+                    // Use Laravel's store method to handle file uploads
+                    $path = $image->storeAs('images/absen', $filename, 'public');
                     
-                // }
-
-                $base64String = $request->photo;
-
-                if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
-                    $base64String = substr($base64String, strpos($base64String, ',') + 1);
                 }
+
+                // $base64String = $request->photo;
+
+                // if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
+                //     $base64String = substr($base64String, strpos($base64String, ',') + 1);
+                // }
             
-                // Decode the base64 string
-                $fileData = base64_decode($base64String);
+                // // Decode the base64 string
+                // $fileData = base64_decode($base64String);
 
                 if(empty($projectData)){
                     DB::rollBack();
@@ -289,6 +304,22 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
+
+            // Ambil UUID dari frontend
+            $incomingUUID = $request->input('uuid'); 
+
+            // Ambil UUID dari database user
+            if ($user->uuid === null) {
+                // Jika belum ada UUID, simpan dari request pertama kali
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                // Jika UUID beda, tolak akses
+                return response()->json([
+                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+                    'success' => false
+                ], 403);
+            }
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');

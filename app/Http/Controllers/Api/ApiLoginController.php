@@ -103,181 +103,181 @@ class ApiLoginController extends Controller
     // Absen Masuk
     public function clockin(Request $request)
     {
-        // try {
-            $token = $request->bearerToken();
-            $user = Auth::guard('api')->user();
-            $nik = $user->employee_code;
-            $unit_bisnis = Employee::where('nik',$nik)->first();
-            $today = now()->toDateString();
+        $token = $request->bearerToken();
+        $user = Auth::guard('api')->user();
+        $nik = $user->employee_code;
+        $unit_bisnis = Employee::where('nik', $nik)->first();
+        $today = now()->toDateString();
 
-            DB::beginTransaction();
-            // Ambil UUID dari frontend
-            $incomingUUID = $request->input('uuid'); 
+        DB::beginTransaction();
 
-            // Ambil UUID dari database user
-            if ($user->uuid === null) {
-                // Jika belum ada UUID, simpan dari request pertama kali
-                $user->uuid = $incomingUUID;
-                $user->save();
-            } elseif ($user->uuid !== $incomingUUID) {
-                // Jika UUID beda, tolak akses
-                return response()->json([
-                    'message' => 'Clock In ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
-                    'success' => false
-                ], 403);
-            }
+        // Validasi UUID perangkat
+        $incomingUUID = $request->input('uuid'); 
+        if ($user->uuid === null) {
+            $user->uuid = $incomingUUID;
+            $user->save();
+        } elseif ($user->uuid !== $incomingUUID) {
+            return response()->json([
+                'message' => 'Clock In ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+                'success' => false
+            ], 403);
+        }
 
-            $schedulebackup = Schedule::where('employee', $nik)
-                ->whereDate('tanggal', $today)
-                ->first();
+        // Ambil schedule & backup
+        $Schedule = Schedule::where('employee', $nik)
+            ->whereDate('tanggal', $today)
+            ->first();
 
-            if ($schedulebackup) {
-                $dataProject = Project::find($schedulebackup->project);
-                $projectData = $dataProject->id;
-                $kantorLatitude = $dataProject->latitude;
-                $kantorLongitude = $dataProject->longtitude;
-                $allowedRadius = 5;
-            } else {
-                $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-                $projectData = 123;
-                $kantorLatitude = $dataCompany->latitude;
-                $kantorLongitude = $dataCompany->longitude;
-                $allowedRadius = $dataCompany->radius;
-            }
+        $schedulebackup = ScheduleBackup::where('employee', $nik)
+            ->whereDate('tanggal', $today)
+            ->first();
 
+        // Cek apakah sudah absen
+        $existingAbsen = Absen::where('nik', $nik)
+            ->whereDate('tanggal', $today)
+            ->first();
 
-            if($unit_bisnis->jabatan =='DRIVER'){
-                $allowedRadius=9999999;
-            }
+        $existingAbsenBackup = AbsenBackup::where('nik', $nik)
+            ->whereDate('tanggal', $today)
+            ->first();
 
-            $shift_fix=0;
-            $msg = "";
-            
+        if ($existingAbsen || $existingAbsenBackup) {
+            DB::rollBack();
+            return response()->json(['message' => 'Absen Ditolak, sudah ada absensi hari ini!']);
+        }
 
-            $existingAbsen = Absen::where('nik', $nik)
-                ->whereDate('tanggal', $today)
-                ->first();
+        // Ambil data lokasi & radius berdasarkan schedule
+        if ($Schedule) {
+            $dataProject = Project::find($Schedule->project);
+            $projectData = $dataProject->id ?? 123;
+            $kantorLatitude = $dataProject->latitude;
+            $kantorLongitude = $dataProject->longtitude;
+            $allowedRadius = 5;
+        } elseif ($schedulebackup) {
+            $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+            $projectData = 123;
+            $kantorLatitude = $dataCompany->latitude;
+            $kantorLongitude = $dataCompany->longitude;
+            $allowedRadius = $dataCompany->radius;
+        } else {
+            DB::rollBack();
+            return response()->json(['message' => 'Tidak ada schedule dan tidak ada backup schedule!']);
+        }
 
-            if ($existingAbsen) {
+        // Tambahan khusus DRIVER
+        if ($unit_bisnis->jabatan == 'DRIVER') {
+            $allowedRadius = 9999999;
+        }
+
+        // Validasi khusus untuk unit "Kas" dan organisasi "Frontline Officer"
+        if (
+            strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 &&
+            strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0
+        ) {
+            if (!$Schedule) {
                 DB::rollBack();
-                return response()->json(['message' => 'Absen Ditolak, sudah ada absensi hari ini!']);
+                return response()->json(['message' => 'Absen Masuk Ditolak, Tidak ada schedule! Hubungi team leader.']);
+            } elseif ($Schedule->shift === 'OFF') {
+                DB::rollBack();
+                return response()->json(['message' => 'Absen Masuk Ditolak, Schedule OFF. Hubungi team leader.']);
+            }
+        }
+
+        // Ambil koordinat user
+        $lat = $request->input('latitude');
+        $long = $request->input('longitude');
+        $status = $request->input('status');
+
+        // Cek jarak GPS
+        $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
+
+        if ($distance <= $allowedRadius) {
+            // Proses upload foto
+            $filename = null;
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('images/absen', $filename, 'public');
             }
 
-            if (strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 && strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0) {
-                $scheduleKas = Schedule::where('employee', $nik)
-                    ->whereDate('tanggal', $today)
-                    ->first();
+            // Validasi shift untuk KAS
+            $shift_fix = 1; // default lolos shift
 
-                    if (!$scheduleKas) {
-                        DB::rollBack();
-                        return response()->json(['message' => 'Absen Masuk Ditolak, Tidak ada schedule! silahkan hubungi team leader untuk schedule!.']);
-                    }elseif ($scheduleKas->shift === 'OFF'){
-                        DB::rollBack();
-                        return response()->json(['message' => 'Absen Masuk Ditolak, Schedule OFF. silahkan hubungi team leader untuk mengubah schedule!']);
+            if (
+                ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") &&
+                $Schedule
+            ) {
+                $cek = ProjectShift::where('shift_code', $Schedule->shift)
+                    ->where('project_id', $Schedule->project)
+                    ->get();
+
+                $nowTime = now()->format('H:i');
+                $shift_fix = 0;
+                $jam_masuk = '';
+                $jam_pulang = '';
+
+                foreach ($cek as $row) {
+                    $jam_masuk = $row->jam_masuk;
+                    $jam_pulang = $row->jam_pulang;
+
+                    if ($jam_pulang < $jam_masuk) {
+                        if ($nowTime >= $jam_masuk || $nowTime <= $jam_pulang) {
+                            $shift_fix = 1;
+                            break;
+                        }
+                    } else {
+                        if ($nowTime >= $jam_masuk && $nowTime <= $jam_pulang) {
+                            $shift_fix = 1;
+                            break;
+                        }
                     }
+                }
 
+                if ($shift_fix == 0) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => "Anda tidak bisa clock in karena schedule {$Schedule->shift} ($jam_masuk - $jam_pulang)"
+                    ]);
+                }
             }
 
-            $lat = $request->input('latitude');
-            $long = $request->input('longitude');
-            $status = $request->input('status');
-
-            $distance = $this->calculateDistance($kantorLatitude, $kantorLongitude, $lat, $long);
-
-            if ($distance <= $allowedRadius) {
-                $filename = null;
-
-                if ($request->hasFile('photo')) {
-                    $image = $request->file('photo');
-                    $filename = time() . '.' . $image->getClientOriginalExtension();
-
-                    // Use Laravel's store method to handle file uploads
-                    $path = $image->storeAs('images/absen', $filename, 'public');
-                    
-                }
-
-                // $base64String = $request->photo;
-
-                // if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
-                //     $base64String = substr($base64String, strpos($base64String, ',') + 1);
-                // }
-            
-                // // Decode the base64 string
-                // $fileData = base64_decode($base64String);
-
-                if(empty($projectData)){
-                    DB::rollBack();
-                    return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
-                }
-
-                if ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") {
-                    $cek = ProjectShift::where('shift_code', $schedulebackup->shift)
-                        ->where('project_id', $schedulebackup->project)
-                        ->get();
-                
-                        if ($cek->isEmpty()) {
-                            $shift_fix=0;
-                            $msg="Shift tidak ditemukan";
-                        }
-                    
-                        $nowTime = now()->format('H:i');
-                        $jam_masuk = "";
-                        $jam_pulang = "";
-                        $shift_fix = 0;  // Jangan reset setelah looping
-                        
-                        foreach ($cek as $row) {
-                            $jam_masuk = $row->jam_masuk;
-                            $jam_pulang = $row->jam_pulang;
-                        
-                            // Jika jam pulang lebih kecil dari jam masuk, berarti shift melewati tengah malam
-                            if ($jam_pulang < $jam_masuk) {
-                                // Cek apakah jam ayeuna berada dalam rentang shift yang melewati tengah malam
-                                if ($nowTime >= $jam_masuk || $nowTime <= $jam_pulang) {
-                                    $shift_fix = 1;
-                                    break;
-                                }
-                            } else {
-                                // Shift normal dalam satu hari
-                                if ($nowTime >= $jam_masuk && $nowTime <= $jam_pulang) {
-                                    $shift_fix = 1;
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        // Jika shift tidak ditemukan, kembalikan pesan error
-                        if ($shift_fix == 0) {
-                            $msg = "Anda tidak bisa clock in karena schedule " . $schedulebackup->shift . " (" . $jam_masuk . " sampai " . $jam_pulang . ")";
-                            return response()->json(['message' => $msg]);
-                        }
-                }
-    
-                if($unit_bisnis->unit_bisnis == "KAS" || $unit_bisnis->unit_bisnis == "Kas" && $shift_fix==0){
-                    return response()->json(['message' => $msg]);
-                }
-                
+            // Simpan ke tabel yang sesuai
+            if ($Schedule) {
                 $insert = Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
                     'project' => $projectData,
-                    'tanggal' => date('Y-m-d'),
+                    'tanggal' => $today,
                     'clock_in' => now()->format('H:i'),
                     'latitude' => $lat,
                     'longtitude' => $long,
                     'status' => $status,
                     'photo' => $filename
                 ]);
-                DB::commit(); 
-                return response()->json(['message' => 'Absen Masuk Berhasil, Selamat Bekerja!','cek'=>$insert]);
             } else {
-                DB::rollBack();
-                return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
+                $insert = AbsenBackup::create([
+                    'user_id' => $nik,
+                    'nik' => $nik,
+                    'project' => $projectData,
+                    'tanggal' => $today,
+                    'clock_in' => now()->format('H:i'),
+                    'latitude' => $lat,
+                    'longtitude' => $long,
+                    'status' => $status,
+                    'photo' => $filename,
+                    'notes' => 'Clock-in via backup schedule'
+                ]);
             }
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     // Log the error or handle it appropriately
-        //     return response()->json(['message' => 'An error occurred while processing the request.']);
-        // }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Absen Masuk Berhasil, Selamat Bekerja!',
+                'data' => $insert
+            ]);
+        } else {
+            DB::rollBack();
+            return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
+        }
     }
 
 
@@ -305,16 +305,13 @@ class ApiLoginController extends Controller
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
 
-            // Ambil UUID dari frontend
-            $incomingUUID = $request->input('uuid'); 
+            $incomingUUID = $request->input('uuid');
 
-            // Ambil UUID dari database user
+            // Validasi UUID perangkat
             if ($user->uuid === null) {
-                // Jika belum ada UUID, simpan dari request pertama kali
                 $user->uuid = $incomingUUID;
                 $user->save();
             } elseif ($user->uuid !== $incomingUUID) {
-                // Jika UUID beda, tolak akses
                 return response()->json([
                     'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
                     'success' => false
@@ -323,70 +320,102 @@ class ApiLoginController extends Controller
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
-            
-            $currentDate = now()->format('Y-m-d');
-            $yesterday = Carbon::yesterday();
-            $today = now()->toDateString();
 
-            // Ambil jadwal kemarin
-            $scheduleKasYesterday = Schedule::where('employee', $nik)
+            $today = now()->toDateString();
+            $yesterday = now()->subDay()->toDateString();
+
+            // Cek shift kemarin (khusus ML)
+            $scheduleYesterday = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $yesterday)
                 ->first();
 
-            // Jika shift kemarin ML, proses clock-out untuk kemarin
-            if ($scheduleKasYesterday && strcasecmp($scheduleKasYesterday->shift, 'ML') == 0) {
-                $absensiml = Absen::where('nik', $nik)
-                            ->whereDate('tanggal', $yesterday)
-                            ->orderBy('clock_in', 'desc')
-                            ->first();
+            if ($scheduleYesterday && strcasecmp($scheduleYesterday->shift, 'ML') == 0) {
+                $absenYesterday = Absen::where('nik', $nik)
+                    ->whereDate('tanggal', $yesterday)
+                    ->first();
 
-                if ($absensiml) {
-                    $absensiml->clock_out = now()->format('H:i');
-                    $absensiml->latitude_out = $lat2;
-                    $absensiml->longtitude_out = $long2;
-                    $absensiml->save();
+                if ($absenYesterday) {
+                    $absenYesterday->clock_out = now()->format('H:i');
+                    $absenYesterday->latitude_out = $lat2;
+                    $absenYesterday->longtitude_out = $long2;
+                    $absenYesterday->save();
 
                     return response()->json([
                         'status' => 'success',
-                        'message' => 'Clockout success! Selamat Beristirahat!',
+                        'message' => 'Clockout success untuk shift ML! Selamat Beristirahat!',
                     ], 200);
-                } else {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'No clock-in record found for yesterday.',
-                    ], 404);
                 }
+
+                // Cek di backup jika absen utama tidak ada
+                $absenYesterdayBackup = AbsenBackup::where('nik', $nik)
+                    ->whereDate('tanggal', $yesterday)
+                    ->first();
+
+                if ($absenYesterdayBackup) {
+                    $absenYesterdayBackup->clock_out = now()->format('H:i');
+                    $absenYesterdayBackup->latitude_out = $lat2;
+                    $absenYesterdayBackup->longtitude_out = $long2;
+                    $absenYesterdayBackup->save();
+
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Clockout shift ML berhasil (backup)!',
+                    ], 200);
+                }
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tidak ditemukan absen clock-in kemarin (shift ML)',
+                ], 404);
             }
 
-            // Jika bukan shift ML atau tidak ada jadwal kemarin, proses clock-out hari ini
-            $absensi = Absen::where('nik', $nik)
-                ->whereDate('tanggal', $currentDate)
-                ->orderBy('clock_in', 'desc')
+            // Proses clock-out untuk hari ini
+            $absenToday = Absen::where('nik', $nik)
+                ->whereDate('tanggal', $today)
                 ->first();
 
-            if ($absensi) {
-                $absensi->clock_out = now()->format('H:i');
-                $absensi->latitude_out = $lat2;
-                $absensi->longtitude_out = $long2;
-                $absensi->save();
+            if ($absenToday) {
+                $absenToday->clock_out = now()->format('H:i');
+                $absenToday->latitude_out = $lat2;
+                $absenToday->longtitude_out = $long2;
+                $absenToday->save();
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Clockout success! Selamat Beristirahat!',
+                    'message' => 'Clockout hari ini berhasil! Selamat Beristirahat!',
                 ], 200);
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'No clock-in record found for today.',
-                ], 404);
             }
+
+            // Cek jika masuk via AbsenBackup
+            $absenTodayBackup = AbsenBackup::where('nik', $nik)
+                ->whereDate('tanggal', $today)
+                ->first();
+
+            if ($absenTodayBackup) {
+                $absenTodayBackup->clock_out = now()->format('H:i');
+                $absenTodayBackup->latitude_out = $lat2;
+                $absenTodayBackup->longtitude_out = $long2;
+                $absenTodayBackup->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Clockout (backup) hari ini berhasil! Selamat Beristirahat!',
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Clock-in belum dilakukan, tidak bisa clock-out.',
+            ], 404);
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
+
 
 
     // Backup Absen
@@ -1076,9 +1105,19 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik',$nik)->first();
-            
+            $lastUpdateProfile = $unit_bisnis->updated_at;
+
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
+
+                // Update Profile
+                $lastUpdateProfile = $unit_bisnis->updated_at;
+                $needsUpdate = false;
+
+                if ($lastUpdateProfile && Carbon::parse($lastUpdateProfile)->lt(Carbon::now()->subMonths(3))) {
+                    $needsUpdate = true;
+                }
+
                 $lastAbsensi = Absen::where('tanggal',$hariini)
                 ->where('nik', $user->employee_code)
                 ->first();
@@ -1086,6 +1125,26 @@ class ApiLoginController extends Controller
                 $lastAbsensiBackup = AbsenBackup::where('tanggal', $hariini)
                 ->where('nik', $user->employee_code)
                 ->first();
+
+                $activeSchedule = false;
+
+                // Cek jadwal utama hari ini
+                $schedule = Schedule::where('employee', $user->employee_code)
+                    ->whereDate('tanggal', $hariini)
+                    ->first();
+
+                // Cek apakah ada jadwal backup untuk hari ini
+                $scheduleBackup = ScheduleBackup::where('employee', $user->employee_code)
+                    ->whereDate('tanggal', $hariini)
+                    ->first();
+
+                // Jika ada schedule backup, kita anggap override > aktifkan yang backup
+                if ($scheduleBackup) {
+                    $activeSchedule = true;
+                    $schedule = $scheduleBackup; 
+                }
+
+
                 // Get Data Karyawan
                 $userId = $user->id;
 
@@ -1242,6 +1301,8 @@ class ApiLoginController extends Controller
 
                 $bulanSelected = $bulan ? date('F', strtotime($bulan)) : date('F');
                 return response()->json([
+                    'isUpdatedata' => $needsUpdate,
+                    'isBackupSchedule' => $activeSchedule,
                     'alreadyClockIn' => $alreadyClockIn,
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
@@ -1253,6 +1314,7 @@ class ApiLoginController extends Controller
                     'logsmonths' => $logsmonths,
                     'daysWithNoLogs' => $daysWithNoLogs,
                     'bulanSelected' => $bulanSelected,
+                    
                 ], 200);
             } else {
                 return response()->json(['error' => 'Unauthorized'], 401);

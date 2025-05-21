@@ -14,7 +14,7 @@
             <div class="card-header text-center fw-bold">Approved</div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <i class="icon-lg me-3" data-feather="check-circle"></i>
-                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Approved')->count() }}</p>
+                <p class="card-text fs-4 fw-bold mb-0">{{ collect($dataRequest)->where('aprrove_status', 'Approved')->count() }}</p>
             </div>
             <div class="card-footer text-center">Total Approved Requests</div>
         </div>
@@ -24,7 +24,7 @@
             <div class="card-header text-center fw-bold">Pending</div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <i class="icon-lg me-3" data-feather="clock"></i>
-                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Pending')->count() }}</p>
+                <p class="card-text fs-4 fw-bold mb-0">{{ collect($dataRequest)->where('aprrove_status', 'Pending')->count() }}</p>
             </div>
             <div class="card-footer text-center">Total Pending Requests</div>
         </div>
@@ -34,7 +34,7 @@
             <div class="card-header text-center fw-bold">Rejected</div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <i class="icon-lg me-3" data-feather="x-circle"></i>
-                <p class="card-text fs-4 fw-bold mb-0">{{ $dataRequest->where('aprrove_status', 'Reject')->count() }}</p>
+                <p class="card-text fs-4 fw-bold mb-0">{{ collect($dataRequest)->where('aprrove_status', 'Reject')->count() }}</p>
             </div>
             <div class="card-footer text-center">Total Rejected Requests</div>
         </div>
@@ -101,6 +101,10 @@
                                             <i data-feather="check" class="icon-sm me-2"></i>
                                             Approve
                                         </a>
+                                        <form id="setujui-usulan-form-{{ $data->id }}" action="{{ route('approve.request', $data->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('POST')
+                                        </form>
                                         @endif
 
                                         @if ($data->aprrove_status !== "Reject")
@@ -108,6 +112,10 @@
                                             <i data-feather="x" class="icon-sm me-2"></i>
                                             Reject
                                         </a>
+                                        <form id="reject-usulan-form-{{ $data->id }}" action="{{ route('reject.request', $data->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('POST')
+                                        </form>
                                         @endif
 
                                         <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#DetailPengajuan{{ $data->id}}" data-bs-toggle="tooltip" title="View Details">

@@ -62,7 +62,11 @@ class ReportController extends Controller
 
         if ($project) {
             foreach ($project as $row) {
-                $this->calculateProjectMetrics($row, $start, $end, $percentages);
+                $effectiveStart = $start;
+                if (!empty($row->tanggal_deploy) && $row->tanggal_deploy > $start) {
+                    $effectiveStart = $row->tanggal_deploy; // Use a temporary variable to avoid overwriting $start
+                }
+                $this->calculateProjectMetrics($row, $effectiveStart, $end, $percentages);
             }
         }
 

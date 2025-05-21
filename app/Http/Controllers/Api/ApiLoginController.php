@@ -66,7 +66,7 @@ class ApiLoginController extends Controller
         }
 
 
-        // Cek dan simpan UUID
+        // Cek dan simpan UUID tes
         if (empty($user->uuid)) {
             $user->uuid = $request->uuid;
             $user->save();

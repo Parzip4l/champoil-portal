@@ -65,6 +65,7 @@ class ApiLoginController extends Controller
             ]);
         }
 
+
         // Cek dan simpan UUID
         if (empty($user->uuid)) {
             $user->uuid = $request->uuid;
@@ -78,6 +79,7 @@ class ApiLoginController extends Controller
                 ], 403);
             }
         }
+        
         
         return response()->json([
             'success' => true,

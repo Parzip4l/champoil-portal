@@ -9,7 +9,7 @@ class AbsenBackup extends Model
 {
     use HasFactory;
     protected $table = 'absen_backup';
-    protected $fillable = ['user_id', 'nik', 'tanggal', 'clock_in', 'latitude', 'longtitude', 'status'];
+    protected $fillable = ['user_id', 'nik', 'tanggal', 'clock_in', 'latitude', 'longtitude', 'status','project'];
 
     public function user()
     {

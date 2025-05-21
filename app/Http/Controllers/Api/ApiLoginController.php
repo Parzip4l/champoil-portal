@@ -158,7 +158,7 @@ class ApiLoginController extends Controller
             $allowedRadius = 5;
         } elseif ($schedulebackup) {
             $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-            $projectData = 123;
+            $projectData = $schedulebackup->project;
             $kantorLatitude = $dataCompany->latitude;
             $kantorLongitude = $dataCompany->longitude;
             $allowedRadius = $dataCompany->radius;

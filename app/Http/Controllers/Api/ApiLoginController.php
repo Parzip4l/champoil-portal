@@ -1038,21 +1038,11 @@ class ApiLoginController extends Controller
                 ->where('nik', $user->employee_code)
                 ->first();
 
-                // Backup
-                $lastAbsensiBackup = AbsenBackup::where('tanggal', $hariini)
-                ->where('nik', $user->employee_code)
-                ->first();
-
                 // Get Data Karyawan
                 $userId = $user->id;
 
                 // Get Log Absensi
                 $logs = Absen::where('user_id', $user->employee_code)
-                    ->whereDate('tanggal', $hariini)
-                    ->get();
-
-                // Logs Backup
-                $logsBackup = AbsenBackup::where('user_id', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
                     ->get();
                     
@@ -1080,11 +1070,6 @@ class ApiLoginController extends Controller
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
-                $isBackup = false;
-                $alreadyClockInBackup = false;
-                $alreadyClockOutBackup = false;
-                $isSameDayBackup = false;
-
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
                         $alreadyClockIn = true;
@@ -1093,17 +1078,6 @@ class ApiLoginController extends Controller
                         $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
-                    }
-                }
-
-                if($lastAbsensiBackup){
-                    if ($lastAbsensiBackup->clock_in && !$lastAbsensiBackup->clock_out) {
-                        $alreadyClockInBackup = true;
-                    } elseif ($lastAbsensiBackup->clock_in && $lastAbsensiBackup->clock_out) {
-                        $alreadyClockOutBackup = true;
-                        $lastClockOutBackup = Carbon::parse($lastAbsensiBackup->clock_out);
-                        $today = Carbon::today();
-                        $isSameDayBackup = $lastClockOutBackup->isSameDay($today);
                     }
                 }
 
@@ -1202,11 +1176,7 @@ class ApiLoginController extends Controller
                     'alreadyClockIn' => $alreadyClockIn,
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
-                    'alreadyClockInBackup' => $alreadyClockInBackup,
-                    'alreadyClockOutBackup' => $alreadyClockOutBackup,
-                    'isSameDayBackup' => $isSameDayBackup,
                     'logs' => $logs,
-                    'logsBackup' => $logsBackup,
                     'logsmonths' => $logsmonths,
                     'daysWithNoLogs' => $daysWithNoLogs,
                     'bulanSelected' => $bulanSelected,

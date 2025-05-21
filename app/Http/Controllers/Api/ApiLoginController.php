@@ -64,8 +64,21 @@ class ApiLoginController extends Controller
                 'message' => 'Login Failed!',
             ]);
         }
-        
 
+        // Cek dan simpan UUID
+        if (empty($user->uuid)) {
+            $user->uuid = $request->uuid;
+            $user->save();
+        } else {
+            // UUID sudah tersimpan, cek apakah cocok
+            if ($user->uuid !== $request->uuid) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Login ditolak. Akun ini sudah digunakan di perangkat lain.',
+                ], 403);
+            }
+        }
+        
         return response()->json([
             'success' => true,
             'message' => 'Login Success!',
@@ -95,8 +108,24 @@ class ApiLoginController extends Controller
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik',$nik)->first();
             $today = now()->toDateString();
-
+            
             DB::beginTransaction();
+
+            // Ambil UUID dari frontend
+            $incomingUUID = $request->input('uuid'); 
+
+            // Ambil UUID yang tersimpan di database
+            if ($user->uuid === null) {
+                // Jika UUID kosong di DB, simpan UUID dari device pertama kali
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                // Jika UUID tidak cocok, tolak akses
+                return response()->json([
+                    'message' => 'Akun ini hanya bisa digunakan di 1 perangkat!',
+                    'success' => false
+                ], 403);
+            }
 
             $schedulebackup = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -158,23 +187,14 @@ class ApiLoginController extends Controller
             if ($distance <= $allowedRadius) {
                 $filename = null;
 
-                // if ($request->hasFile('photo')) {
-                //     $image = $request->file('photo');
-                //     $filename = time() . '.' . $image->getClientOriginalExtension();
+                if ($request->hasFile('photo')) {
+                    $image = $request->file('photo');
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
 
-                //     // Use Laravel's store method to handle file uploads
-                //     $path = $image->storeAs('images/absen', $filename, 'public');
+                    // Use Laravel's store method to handle file uploads
+                    $path = $image->storeAs('images/absen', $filename, 'public');
                     
-                // }
-
-                $base64String = $request->photo;
-
-                if (preg_match('/^data:(.*?);base64,/', $base64String, $matches)) {
-                    $base64String = substr($base64String, strpos($base64String, ',') + 1);
                 }
-            
-                // Decode the base64 string
-                $fileData = base64_decode($base64String);
 
                 if(empty($projectData)){
                     DB::rollBack();
@@ -245,11 +265,6 @@ class ApiLoginController extends Controller
                 DB::rollBack();
                 return response()->json(['message' => 'Absen Masuk Gagal, Diluar Radius!']);
             }
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     // Log the error or handle it appropriately
-        //     return response()->json(['message' => 'An error occurred while processing the request.']);
-        // }
     }
 
 
@@ -279,6 +294,22 @@ class ApiLoginController extends Controller
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
+
+            // Ambil UUID dari frontend
+            $incomingUUID = $request->input('uuid'); 
+
+            // Ambil UUID dari database user
+            if ($user->uuid === null) {
+                // Jika belum ada UUID, simpan dari request pertama kali
+                $user->uuid = $incomingUUID;
+                $user->save();
+            } elseif ($user->uuid !== $incomingUUID) {
+                // Jika UUID beda, tolak akses
+                return response()->json([
+                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+                    'success' => false
+                ], 403);
+            }
             
             $currentDate = now()->format('Y-m-d');
             $yesterday = Carbon::yesterday();
@@ -1043,17 +1074,30 @@ class ApiLoginController extends Controller
             $user = Auth::guard('api')->user();
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik',$nik)->first();
-            
+
             if ($user->id) {
                 $hariini = now()->format('Y-m-d');
+
+                // Absen biasa
                 $lastAbsensi = Absen::where('tanggal',$hariini)
                 ->where('nik', $user->employee_code)
                 ->first();
+
+                // Backup
+                $lastAbsensiBackup = AbsenBackup::where('tanggal', $hariini)
+                ->where('nik', $user->employee_code)
+                ->first();
+
                 // Get Data Karyawan
                 $userId = $user->id;
 
                 // Get Log Absensi
                 $logs = Absen::where('user_id', $user->employee_code)
+                    ->whereDate('tanggal', $hariini)
+                    ->get();
+
+                // Logs Backup
+                $logsBackup = AbsenBackup::where('user_id', $user->employee_code)
                     ->whereDate('tanggal', $hariini)
                     ->get();
                     
@@ -1081,6 +1125,10 @@ class ApiLoginController extends Controller
                 $alreadyClockIn = false;
                 $alreadyClockOut = false;
                 $isSameDay = false;
+                $isBackup = false;
+                $alreadyClockInBackup = false;
+                $alreadyClockOutBackup = false;
+                $isSameDayBackup = false;
 
                 if ($lastAbsensi) {
                     if ($lastAbsensi->clock_in && !$lastAbsensi->clock_out) {
@@ -1090,6 +1138,17 @@ class ApiLoginController extends Controller
                         $lastClockOut = Carbon::parse($lastAbsensi->clock_out);
                         $today = Carbon::today();
                         $isSameDay = $lastClockOut->isSameDay($today);
+                    }
+                }
+
+                if($lastAbsensiBackup){
+                    if ($lastAbsensiBackup->clock_in && !$lastAbsensiBackup->clock_out) {
+                        $alreadyClockInBackup = true;
+                    } elseif ($lastAbsensiBackup->clock_in && $lastAbsensiBackup->clock_out) {
+                        $alreadyClockOutBackup = true;
+                        $lastClockOutBackup = Carbon::parse($lastAbsensiBackup->clock_out);
+                        $today = Carbon::today();
+                        $isSameDayBackup = $lastClockOutBackup->isSameDay($today);
                     }
                 }
 
@@ -1188,7 +1247,11 @@ class ApiLoginController extends Controller
                     'alreadyClockIn' => $alreadyClockIn,
                     'alreadyClockOut' => $alreadyClockOut,
                     'isSameDay' => $isSameDay,
+                    'alreadyClockInBackup' => $alreadyClockInBackup,
+                    'alreadyClockOutBackup' => $alreadyClockOutBackup,
+                    'isSameDayBackup' => $isSameDayBackup,
                     'logs' => $logs,
+                    'logsBackup' => $logsBackup,
                     'logsmonths' => $logsmonths,
                     'daysWithNoLogs' => $daysWithNoLogs,
                     'bulanSelected' => $bulanSelected,

@@ -111,7 +111,7 @@ class ApiLoginController extends Controller
 
         DB::beginTransaction();
 
-        // Validasi UUID perangkat
+        // Validasi UUID perangkats
         $incomingUUID = $request->input('uuid'); 
         if ($user->uuid === null) {
             $user->uuid = $incomingUUID;

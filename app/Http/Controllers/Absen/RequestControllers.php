@@ -35,7 +35,7 @@ class RequestControllers extends Controller
             $tanggalRange = explode(' to ', $request->input('tanggal')); // Example: ?tanggal=2025-04-21+to+2025-05-15
 
             if ($company->organisasi == 'Frontline Officer' || $company->organisasi == 'FRONTLINE OFFICER') {
-                $get_project = Schedule::where('employee', $EmployeeCode)->first();
+                $get_project = Schedule::where('employee', $EmployeeCode)->where('tanggal',date('Y-m-d'))->first();
                 $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                             ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                             ->whereBetween('requests_attendence.tanggal', [$tanggalRange[0], $tanggalRange[1]])

@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Loan;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 use App\Loan\LoanModel;
 use App\Employee;
+use App\User;
 
 class LoanController extends Controller
 {
@@ -16,8 +19,18 @@ class LoanController extends Controller
      */
     public function index()
     {
-        $Loandata = LoanModel::all();
-        $karyawan = Employee::where('unit_bisnis','KAS')->get();
+
+        $userId = Auth::id();
+        $EmployeeCode = Auth::user()->employee_code;
+        $company = Employee::where('nik', $EmployeeCode)->first();
+
+        if (!$company) {
+            return redirect()->route('employee-loan.index')->with('error', 'Company data not found.');
+        }
+
+        $Loandata = LoanModel::join('karyawan','karyawan.nik','=','loans.employee_id')->where('unit_bisnis',$company->unit_bisnis)->get();
+
+        $karyawan = Employee::where('unit_bisnis', $company->unit_bisnis)->get();
         
         return view('pages.hc.loan.index', compact('Loandata','karyawan'));
     }

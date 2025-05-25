@@ -503,6 +503,9 @@ Password: ".$request->password;
 
                 // Pecah periode menjadi bulan dan tahun
                 list($bulan_text, $tahun) = explode('-', $periode);
+
+                // Trim the month text to remove any extra spaces
+                $bulan_text = trim($bulan_text);
                 
                 // Konversi nama bulan ke format angka
                 $bulan_map = [

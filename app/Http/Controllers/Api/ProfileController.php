@@ -217,12 +217,12 @@ class ProfileController extends Controller
             //     $msg='Gagal menyimpan data karyawan.';
             //     $error=true;
             // }
-
-            if (!$payrollInfo->save()) {
-                return redirect()->back()->with('error', '' . $errorMessage);
-                $msg='Gagal menyimpan data Payroll Info.';
-                $error=true;
-            }
+            $error=true;
+            // if (!$payrollInfo->save()) {
+            //     return redirect()->back()->with('error', '' . $errorMessage);
+            //     $msg='Gagal menyimpan data Payroll Info.';
+            //     $error=true;
+            // }
         }
 
         $result=[

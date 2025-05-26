@@ -184,7 +184,7 @@ Thank you for your attention and cooperation. If you have any questions or issue
             $records->alamat = $request->alamat;
             $records->telepon = $request->telepon;
             $records->status_pernikahan = $request->status_pernikahan;
-            $records->tanggungan = $request->jumlah_tanggungan;
+            $records->tanggungan = $request->tanggungan;
             $records->sertifikasi = $request->sertifikasi;
             $records->expired_sertifikasi = $request->sertifikasi_expired_date;
             $records->pendidikan_trakhir = $request->pendidikan;

@@ -213,10 +213,10 @@ class ProfileController extends Controller
         }catch (ValidationException $exception) {
             DB::rollBack();
             $errorMessage = $exception->validator->errors()->first(); // ambil pesan error pertama dari validator
-            if (!$employee->save()) {
-                $msg='Gagal menyimpan data karyawan.';
-                $error=true;
-            }
+            // if (!$employee->save()) {
+            //     $msg='Gagal menyimpan data karyawan.';
+            //     $error=true;
+            // }
 
             if (!$payrollInfo->save()) {
                 return redirect()->back()->with('error', '' . $errorMessage);

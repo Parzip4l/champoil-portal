@@ -803,6 +803,7 @@ class ApiLoginController extends Controller
 
             if ($employee) {
                 // Return employee data in JSON format
+                $employee->agama = ucfirst(strtolower($employee->agama));
                 return response()->json(['data' => $employee], 200);
             } else {
                 // Handle the case when the employee is not found

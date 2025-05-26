@@ -181,7 +181,7 @@ Thank you for your attention and cooperation. If you have any questions or issue
         $records = Employee::where('id',$request->id)->first();
         if($records){
             $records->nama = $request->nama;
-            $records->alamat = $request->alamat_domisili;
+            $records->alamat = $request->alamat;
             $records->telepon = $request->nomor_telepon_pribadi;
             $records->status_pernikahan = $request->status_pernikahan;
             $records->tanggungan = $request->jumlah_tanggungan;

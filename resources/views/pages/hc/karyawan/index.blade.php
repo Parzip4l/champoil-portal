@@ -24,6 +24,50 @@
     $dataLogin = json_decode(Auth::user()->permission); 
     $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
 @endphp
+@if($employee && ($employee->unit_bisnis == 'Kas' || $employee->unit_bisnis == 'KAS'))
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">GADA PRATAMA</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text display-4 fw-bold text-success">{{ $gp }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">NON GADA PRATAMA</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text display-4 fw-bold text-secondary">{{ $non_gp }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">Nearly Expired GADA PRATAMA ( < 60 Days )</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text display-4 fw-bold text-warning">{{ $nearly_expired }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Expired GADA PRATAMA</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text display-4 fw-bold text-danger">{{ $expired }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 <div class="row">
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card custom-card2">

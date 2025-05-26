@@ -181,6 +181,35 @@ class EmployeeController extends Controller
 
         }
 
+        if ($company->unit_bisnis == "Kas" || $company->unit_bisnis == "KAS") {
+            $data_gp = Employee::where('unit_bisnis', $company->unit_bisnis)
+                ->where('resign_status', 0)
+                ->whereNot('jabatan', 'CLIENT')
+                ->get();
+
+            $gp = 0;
+            $non_gp = 0;
+            $nearly_expired = 0;
+            $expired = 0;
+
+            foreach ($data_gp as $row) {
+                if (empty($row->sertifikasi) || $row->sertifikasi == 'TIDAK ADA') {
+                    $non_gp += 1;
+                } elseif (!empty($row->sertifikasi) && strtotime($row->expired_sertifikasi) < strtotime(date('Y-m-d'))) {
+                    $expired += 1;
+                } elseif (!empty($row->sertifikasi) && strtotime($row->expired_sertifikasi) <= strtotime(date('Y-m-d', strtotime('+60 days')))) {
+                    $nearly_expired += 1;
+                } elseif (!empty($row->sertifikasi) && strtotime($row->expired_sertifikasi) > strtotime(date('Y-m-d', strtotime('+60 days')))){
+                    $gp += 1;
+                }
+            }
+
+            $data['gp'] = $gp;
+            $data['non_gp'] = $non_gp;
+            $data['nearly_expired'] = $nearly_expired;
+            $data['expired'] = $expired;
+        }
+
         return view('pages.hc.karyawan.index',$data);
     }
 

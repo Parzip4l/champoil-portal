@@ -182,7 +182,7 @@ Thank you for your attention and cooperation. If you have any questions or issue
         if($records){
             $records->nama = $request->nama;
             $records->alamat = $request->alamat;
-            $records->telepon = $request->nomor_telepon_pribadi;
+            $records->telepon = $request->telepon;
             $records->status_pernikahan = $request->status_pernikahan;
             $records->tanggungan = $request->jumlah_tanggungan;
             $records->sertifikasi = $request->sertifikasi;

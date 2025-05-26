@@ -826,6 +826,7 @@ class ApiLoginController extends Controller
             }
 
             $employee->id = (string) $employee->id;
+            $employee->agama = ucfirst(strtolower($employee->agama));
 
             $nikdata = $employee->nik;
 

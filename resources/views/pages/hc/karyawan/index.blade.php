@@ -65,7 +65,7 @@
                 <p class="card-text display-4 fw-bold text-danger">{{ $expired }}</p>
             </div>
         </div>
-    </div>
+    </div> 
 </div>
 @endif
 <div class="row">

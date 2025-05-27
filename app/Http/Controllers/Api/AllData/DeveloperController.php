@@ -39,52 +39,53 @@ class DeveloperController extends Controller
 
                 foreach ($lines as $line) {
                     if (preg_match('/\[(\d{4}-\d{2}-\d{2}) [^\]]+\] (\w+)\.(\w+): (.*)/', $line, $matches)) {
-                        // Baris utama log
+                        // Main log line
                         $logDate = $matches[1];
                         $level = strtoupper($matches[3]);
                         $message = $matches[4];
 
                         $logCountsByDate[$logDate] = ($logCountsByDate[$logDate] ?? 0) + 1;
-                        $logLevelCounts[$level] = ($logLevelCounts[$level] ?? 0) + 1;
 
-                        // Simpan pesan dan reset trace
-                        $currentMessage = $message;
-                        $currentTrace = '';
-                    } elseif ($currentMessage) {
-                        // Tambahkan baris trace
-                        $currentTrace .= $line . "\n";
+                        // Ensure unique error messages per date
+                        if (!isset($logLevelCounts[$level][$logDate])) {
+                            $logLevelCounts[$level][$logDate] = [];
+                        }
+                        if (!in_array($message, $logLevelCounts[$level][$logDate])) {
+                            $logLevelCounts[$level][$logDate][] = $message;
+                        }
 
-                        // Jika mengandung Controller.php: atau .php: maka simpan ke detail
-                        if (preg_match('/(app\/Http\/Controllers\/[^\s]+\.php:\d+)/', $line, $locMatch)) {
+                        // Check if the same error message already exists for the same date
+                        $existingIndex = array_search($message, array_column($logDetails, 'message'));
+                        if ($existingIndex !== false && $logDetails[$existingIndex]['date'] === $logDate) {
+                            // Increment the count for the existing error
+                            $logDetails[$existingIndex]['count']++;
+                        } else {
+                            // Add new error entry with count = 1
                             $logDetails[] = [
                                 'date' => $logDate,
                                 'level' => $level,
-                                'message' => $currentMessage,
-                                'location' => $locMatch[1],
+                                'message' => $message,
+                                'location' => 'N/A', // Default location if no trace is found
+                                'count' => 1, // Initialize count
                             ];
+                        }
+
+                        // Reset trace
+                        $currentMessage = $message;
+                        $currentTrace = '';
+                    } elseif ($currentMessage) {
+                        // Append trace lines
+                        $currentTrace .= $line . "\n";
+
+                        // If trace contains Controller.php: or .php:, update the last logDetails entry
+                        if (preg_match('/(app\/Http\/Controllers\/[^\s]+\.php:\d+)/', $line, $locMatch)) {
+                            $logDetails[count($logDetails) - 1]['location'] = $locMatch[1];
                         }
                     }
 
-                    // Pastikan error tanpa trace juga disimpan
+                    // Ensure errors without trace are saved
                     if ($currentMessage && trim($line) === '') {
-                        $logDetails[] = [
-                            'date' => $logDate,
-                            'level' => $level,
-                            'message' => $currentMessage,
-                            'location' => $currentTrace ? $currentTrace : 'N/A',
-                        ];
-                        $currentMessage = null; // Reset supaya tidak duplikat
-                    }
-
-                    // Ensure this condition is met even if there are extra spaces or characters
-                    if ($currentMessage && empty(trim($line))) {
-                        $logDetails[] = [
-                            'date' => $logDate,
-                            'level' => $level,
-                            'message' => $currentMessage,
-                            'location' => $currentTrace ? $currentTrace : 'N/A',
-                        ];
-                        $currentMessage = null; // Reset supaya tidak duplikat
+                        $currentMessage = null; // Reset to avoid duplicates
                     }
                 }
             }
@@ -97,18 +98,26 @@ class DeveloperController extends Controller
                 'logDates' => array_keys($logCountsByDate),
                 'logCounts' => array_values($logCountsByDate),
                 'logLevels' => array_keys($logLevelCounts),
-                'levelCounts' => array_values($logLevelCounts),
+                'levelCounts' => array_map(function ($levelErrors) {
+                    return array_reduce($levelErrors, function ($carry, $errors) {
+                        return $carry + count($errors); // Count unique errors per date
+                    }, 0);
+                }, $logLevelCounts),
             ],
             'list' => array_map(function ($error) {
                 return [
+                    'date' => $error['date'], // Include the log date
                     'message' => strtok($error['message'], '{'), // Truncate message at the first '{'
                     'controller' => preg_match('/(app\/Http\/Controllers\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] :
                                     (preg_match('/(app\/Models\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] :
                                     (preg_match('/(resources\/views\/[^\s]+\.blade\.php:\d+)/', $error['location'], $match) ? $match[1] :
                                     (preg_match('/(routes\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] :
                                     (preg_match('/(app\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] : 'Location not found')))), // Check for route files and other app files
+                    'count' => $error['count'], // Include the count of occurrences
                 ];
-            }, $logDetails),
+            }, array_filter($logDetails, function ($error) {
+                return $error['level'] === 'ERROR'; // Include all logs with level ERROR
+            })),
         ]);
     }
 }

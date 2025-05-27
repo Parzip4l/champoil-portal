@@ -112,8 +112,10 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Date</th>
                             <th>Message</th>
                             <th>File Locations</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,14 +174,14 @@
                 .then(data => {
                     Swal.close(); // Close the loading indicator
 
-                    const levels = data.count.logLevels;
+                    const levels = Object.keys(data.count.levelCounts);
                     const counts = data.count.levelCounts;
 
                     let totalLogs = 0;
                     let errorCount = 0;
 
-                    levels.forEach((level, index) => {
-                        const count = counts[index] || 0;
+                    levels.forEach(level => {
+                        const count = counts[level] || 0;
                         totalLogs += count;
 
                         if (level === 'ERROR') {
@@ -195,11 +197,13 @@
                     $('.card.border-warning .card-text').text(`${warningRatio}%`);
 
                     errorMessagesTable.clear(); // Clear existing rows
-                    data.list.forEach((item, index) => {
+                    Object.values(data.list).forEach((item, index) => {
                         errorMessagesTable.row.add([
                             (index + 1).toLocaleString(),
+                            item.date,
                             item.message,
-                            item.controller
+                            item.controller,
+                            item.count.toLocaleString()
                         ]);
                     });
                     errorMessagesTable.draw(); // Redraw the table

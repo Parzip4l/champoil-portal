@@ -622,6 +622,10 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::put('/payroll-cutoff-settings', [App\Http\Controllers\Setting\Cutoff\PayrollCutoffController::class, 'update'])->name('payroll.cutoff.update');
     });
 
+    Route::group(['prefix' => 'developer'], function(){
+        Route::view('/error-logs','pages.dev.error_logs')->name('error-logs');
+    });
+
     
     Route::view('/sample','pages.report.patrol_pdf')->name('sample');
     

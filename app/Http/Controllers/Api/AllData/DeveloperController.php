@@ -75,6 +75,17 @@ class DeveloperController extends Controller
                         ];
                         $currentMessage = null; // Reset supaya tidak duplikat
                     }
+
+                    // Ensure this condition is met even if there are extra spaces or characters
+                    if ($currentMessage && empty(trim($line))) {
+                        $logDetails[] = [
+                            'date' => $logDate,
+                            'level' => $level,
+                            'message' => $currentMessage,
+                            'location' => $currentTrace ? $currentTrace : 'N/A',
+                        ];
+                        $currentMessage = null; // Reset supaya tidak duplikat
+                    }
                 }
             }
         }
@@ -82,16 +93,20 @@ class DeveloperController extends Controller
         ksort($logCountsByDate);
 
         return response()->json([
-            'logDates' => array_keys($logCountsByDate),
-            'logCounts' => array_values($logCountsByDate),
-            'logLevels' => array_keys($logLevelCounts),
-            'levelCounts' => array_values($logLevelCounts),
-            'errors' => array_map(function ($error) {
+            'count' => [
+                'logDates' => array_keys($logCountsByDate),
+                'logCounts' => array_values($logCountsByDate),
+                'logLevels' => array_keys($logLevelCounts),
+                'levelCounts' => array_values($logLevelCounts),
+            ],
+            'list' => array_map(function ($error) {
                 return [
-                    'date' => $error['date'],
-                    'level' => $error['level'],
-                    'message' => $error['message'],
-                    'controller' => $error['location'],
+                    'message' => strtok($error['message'], '{'), // Truncate message at the first '{'
+                    'controller' => preg_match('/(app\/Http\/Controllers\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] :
+                                    (preg_match('/(app\/Models\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] :
+                                    (preg_match('/(resources\/views\/[^\s]+\.blade\.php:\d+)/', $error['location'], $match) ? $match[1] :
+                                    (preg_match('/(routes\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] :
+                                    (preg_match('/(app\/[^\s]+\.php:\d+)/', $error['location'], $match) ? $match[1] : 'Location not found')))), // Check for route files and other app files
                 ];
             }, $logDetails),
         ]);

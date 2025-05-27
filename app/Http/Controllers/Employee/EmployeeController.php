@@ -185,6 +185,7 @@ class EmployeeController extends Controller
             $data_gp = Employee::where('unit_bisnis', $company->unit_bisnis)
                 ->where('resign_status', 0)
                 ->whereNot('jabatan', 'CLIENT')
+                ->whereIN('organisasi',['Frontline Officer','FRONTLINE OFFICER'])
                 ->get();
 
             $gp = 0;

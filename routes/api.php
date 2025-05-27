@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\LogbookController;
 use App\Http\Controllers\Api\AllData\BackupRecordsController;
 
 use App\Http\Controllers\Api\OcrController;
+use App\Http\Controllers\Api\AllData\DeveloperController;
 
 
 Route::prefix('v1')->group(function () {
@@ -294,6 +295,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/barang', [LogbookController::class, 'barang']);
     Route::get('/barang/{id}', [LogbookController::class, 'barangDetail']);
 
+    Route::get('/dev-stats', [DeveloperController::class, 'index']);
     
     
 });

@@ -570,7 +570,7 @@ class AbsenController extends Controller
             $absensi->longtitude = $long;
             $absensi->status = $status;
             $absensi->project_backup = $project_id;
-            $absen->absen_type = "web";
+            $absensi->absen_type = "web";
             $absensi->save();
             return redirect()->back()->with('success', 'Clockin success, Happy Working Day!');
         } else {

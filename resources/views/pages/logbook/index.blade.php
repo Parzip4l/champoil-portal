@@ -152,7 +152,7 @@
         $('#dataTableExample').on('click', '.view-details', function() {
             const id = $(this).data('id');
             $.ajax({
-                url: `/api/v1/tamu/${id}?project_id=${$('#projectFilter').val() || '{{$project_id}}'}`,
+                url: `/api/v1/tamu/${id}`,
                 method: 'GET',
                 success: function(response) {
                     $('#modalContent').html(`

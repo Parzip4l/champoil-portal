@@ -173,6 +173,9 @@
                                                             <i data-feather="send" class="icon-sm me-2"></i> <span class="">Publish Payslip</span>
                                                         </a>
                                                     @endif
+                                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('payroll.ns.download', ['periode' => $data->periode]) }}">
+                                                        <i data-feather="download" class="icon-sm me-2"></i> <span class="">Download CSV</span>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </td>

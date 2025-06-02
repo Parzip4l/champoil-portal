@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use PDF;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 
 // Model
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\DB;
 Use App\Activities\Log;
 use App\Mail\PayslipEmail;
 use App\Absen\RequestAbsen;
+use App\Exports\PayrollAbsensiExport;
 
 use App\Imports\PayrollImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -99,6 +101,7 @@ class PayrolController extends Controller
                 ->where('karyawan.unit_bisnis', 'CHAMPOIL')
                 ->where('karyawan.nik', $nik) 
                 ->whereBetween('absens.tanggal', [$start_date, $end_date])
+                ->where('status', 'H')
                 ->count();
 
             // Total hari kerja dalam satu bulan penuh
@@ -123,7 +126,7 @@ class PayrolController extends Controller
             $totalLembur = (int) RequestAbsen::where('employee', $nik)
                 ->whereBetween('tanggal', [$start_date, $end_date])
                 ->where('aprrove_status', 'Approved')
-                ->sum('jam_lembur');
+                ->sum('alasan');
 
             // Hitung hari bolos dalam 1 bulan
             $totalBolosBulanan = $totalHariKerjaBulanan - $totalHadirBulanan;
@@ -339,7 +342,6 @@ class PayrolController extends Controller
     
         // Extract Week
         list($startDate, $endDate) = explode(' - ', $week);
-    
         // Inisialisasi array untuk menyimpan detail payroll
         $payrolldetails = [];
     
@@ -367,17 +369,18 @@ class PayrolController extends Controller
                 $totalAbsen = Absen::where('nik', $employeeCode)
                     ->whereBetween('tanggal', [$startDate, $endDate])
                     ->count();
-    
+                if($totalAbsen > 5) {
+                    $totalAbsen = 5;
+                }
                 // Hitung total daily salary
                 $daily_salary = $payrollComponents->daily_salary;
-                $totaldaily = $totalAbsen - 2 * $daily_salary;
-    
+                $totaldaily = $daily_salary * ($totalAbsen);
                 // Hitung total potongan
                 $dataDeductions = json_decode($payrollComponents->deductions, true);
                 $totalPotongan = $dataDeductions['hutang'][0] + $dataDeductions['mess'][0] + $dataDeductions['lain_lain'][0];
     
                 // Hitung THP (Take Home Pay)
-                $thpdetails = $totaldaily + $jamLemburdata + $uang_makan[$index] + $uang_kerajinan[$index] - $totalPotongan;
+                $thpdetails = ($totaldaily + $jamLemburdata + $uang_makan[$index] + $uang_kerajinan[$index]) - $totalPotongan;
     
                 // Simpan data payroll
                 $payroll = new Payrollns();
@@ -424,50 +427,10 @@ class PayrolController extends Controller
         return redirect()->back()->with('success', 'Payroll data imported successfully.');
     }
 
+    // CSV
 
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function downloadExcel($periode)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return Excel::download(new PayrollAbsensiExport($periode), "Payroll_Frontline_TRUEST_{$periode}.xlsx");
     }
 }

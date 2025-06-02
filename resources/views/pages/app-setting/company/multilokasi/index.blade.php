@@ -27,11 +27,9 @@
                         <thead>
                             <tr>
                                 <th>Nama</th>
-                                <th>Alamat</th>
+                                <!-- <th>Alamat</th> -->
                                 <th>Koordinat</th>
                                 <th>Radius</th>
-                                <th>Gaji Bulanan</th>
-                                <th>Rate Harian</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -39,12 +37,11 @@
                             @foreach($locations as $loc)
                                 <tr>
                                     <td>{{ $loc->name }}</td>
-                                    <td>{{ $loc->resolved_address ?? '-' }}</td>
+                                    <!-- <td>{{ $loc->resolved_address ?? '-' }}</td> -->
                                     <td>{{ $loc->latitude }}, {{ $loc->longitude }}</td>
                                     <td>{{ $loc->radius }} KM</td>
-                                    <td>Rp{{ number_format($loc->monthly_salary ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp{{ number_format($loc->daily_rate ?? 0, 0, ',', '.') }}</td>
                                     <td>
+                                        <a href="{{ route('company.work-locations.show', [$companyId, $loc->id]) }}" class="btn btn-sm btn-primary">View</a>
                                         <a href="{{ route('company.work-locations.edit', [$companyId, $loc->id]) }}" class="btn btn-sm btn-warning">Edit</a>
                                         <button class="btn btn-sm btn-danger" onclick="showDeleteDataDialog({{ $loc->id }})">Hapus</button>
                                     </td>

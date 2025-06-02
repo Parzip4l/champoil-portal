@@ -4,6 +4,7 @@ namespace App\Company;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Company\LocationPositionSalary;
 
 class WorkLocation extends Model
 {
@@ -27,5 +28,10 @@ class WorkLocation extends Model
     public function employees()
     {
         return $this->hasMany(\App\Employee::class, 'work_location_id', 'id');
+    }
+
+    public function positionSalaries()
+    {
+        return $this->hasMany(LocationPositionSalary::class, 'work_location_id');
     }
 }

@@ -293,6 +293,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::get('/publish-payslipns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'publishPayslipNS'])->name('PublishPayslipDataNS');
     Route::get('/unlock-payrollns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'unlockPayrollns'])->name('unlockPayrollns');
     Route::get('/unpublish-payslipns/{periode}', [App\Http\Controllers\Payrol\PayslipController::class, 'unpublishPayslipns'])->name('UnpublishPayslipns');
+    
 
     // Edit Payroll NS
     Route::get('/edit-payrollns/{id}', [App\Http\Controllers\Payrol\PayslipController::class, 'editNS'])->name('editns.payroldata');
@@ -304,6 +305,8 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::get('/payrol-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'indexns'])->name('payroll.ns');
     Route::get('/get-weeks', [App\Http\Controllers\Payrol\PayrolController::class, 'getWeeks'])->name('getWeek');
     Route::post('/payroll-ns', [App\Http\Controllers\Payrol\PayrolController::class, 'storens'])->name('payrollns.store');
+    Route::get('/payroll/ns/download/{periode}', [App\Http\Controllers\Payrol\PayrolController::class, 'downloadExcel'])->name('payroll.ns.download');
+
 
     // Update Absen
     Route::post('/action/edit/{date}/{nik}', [App\Http\Controllers\Employee\EmployeeController::class, 'UpdateAbsen'])->name('attendance.editData');

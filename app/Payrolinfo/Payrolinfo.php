@@ -4,6 +4,7 @@ namespace App\Payrolinfo;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Payrollns;
 
 class Payrolinfo extends Model
 {
@@ -15,5 +16,9 @@ class Payrolinfo extends Model
     {
         return $this->hasMany(Employee::class);
     }
-    
+
+    public function payroll()
+    {
+        return $this->belongsTo(Payrollns::class, 'employee_code', 'employee_code');
+    }
 }

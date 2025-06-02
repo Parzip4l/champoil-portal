@@ -181,10 +181,10 @@ Thank you for your attention and cooperation. If you have any questions or issue
         $records = Employee::where('id',$request->id)->first();
         if($records){
             $records->nama = $request->nama;
-            $records->alamat = $request->alamat_domisili;
-            $records->telepon = $request->nomor_telepon_pribadi;
+            $records->alamat = $request->alamat;
+            $records->telepon = $request->telepon;
             $records->status_pernikahan = $request->status_pernikahan;
-            $records->tanggungan = $request->jumlah_tanggungan;
+            $records->tanggungan = $request->tanggungan;
             $records->sertifikasi = $request->sertifikasi;
             $records->expired_sertifikasi = $request->sertifikasi_expired_date;
             $records->pendidikan_trakhir = $request->pendidikan;
@@ -206,7 +206,7 @@ Thank you for your attention and cooperation. If you have any questions or issue
                 // 'bpjs_tk' => $request->bpjs_kesehatan,
                 'npwp' => $request->npwp,
                 'bank_name' => $request->bank_name,
-                'bank_number' => $request->nomor_rekening,
+                'bank_number' => $request->bank_number,
             ];
             
             if($payroll){

@@ -56,7 +56,7 @@
                 </div>
                 <div class="col mb-3">
                     <label class="form-label">Divisi</label>
-                    <select name="divisi" class="form-control" id="" required>
+                    <select name="divisi" class="form-control select2" id="" required>
                         @foreach($divisi as $dataDivisi)
                             <option value="{{$dataDivisi->name}}" @if($dataDivisi->name == $employee->divisi) selected @endif>{{$dataDivisi->name}}</option>
                         @endforeach
@@ -64,7 +64,7 @@
                 </div>
                 <div class="col mb-3">
                     <label class="form-label">Jabatan</label>
-                    <select name="jabatan" class="form-control" id="" required>
+                    <select name="jabatan" class="form-control select2" id="" required>
                         @foreach($jabatan as $dataJabatan)
                             <option value="{{$dataJabatan->name}}" @if($dataJabatan->name == $employee->jabatan) selected @endif>{{$dataJabatan->name}}</option>
                         @endforeach
@@ -72,7 +72,7 @@
                 </div>
                 <div class="col mb-3">
                     <label class="form-label">Atasan</label>
-                    <select name="atasan_langsung" class="form-control" id="" required>
+                    <select name="atasan_langsung" class="form-control select2" id="" required>
                         @foreach($atasan as $dataAtasan)
                             <option value="{{$dataAtasan->nama}}" @if($dataAtasan->nama == $employee->manager) selected @endif>{{$dataAtasan->nama}}</option>
                         @endforeach
@@ -296,51 +296,20 @@
                         $permission = json_decode($user->permission);
                     @endphp
                     <div class="row mb-3">
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="permissions[]" value="dashboard_access" 
-                                    {{ in_array('dashboard_access', $permission) ? 'checked' : '' }}>
-                                <label class="form-check-label">User</label>
+                        @foreach($roles as $datarole)
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input 
+                                        type="checkbox" 
+                                        class="form-check-input" 
+                                        name="permissions[]" 
+                                        value="{{ $datarole->name }}" 
+                                        {{ in_array($datarole->name, $permission) ? 'checked' : '' }}
+                                    >
+                                    <label class="form-check-label">{{ $datarole->role_name }}</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="permissions[]" value="hr_access"
-                                    {{ in_array('hr_access', $permission) ? 'checked' : '' }}>
-                                <label class="form-check-label">HR</label>
-                            </div>
-                        </div>
-                        <!-- <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="permissions[]" value="superadmin_access"
-                                    {{ in_array('superadmin_access', $permission) ? 'checked' : '' }}>
-                                <label class="form-check-label">Superadmin</label>
-                            </div>
-                        </div> -->
-                        
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="permissions[]" value="am_access"
-                                    {{ in_array('am_access', $permission) ? 'checked' : '' }}>
-                                <label class="form-check-label">Area Manager</label>
-                            </div>
-                        </div>
-                        @if($employee->unit_bisnis === 'Kas')
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="permissions[]" value="pic_access"
-                                    {{ in_array('pic_access', $permission) ? 'checked' : '' }}>
-                                <label class="form-check-label">Project PIC</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input type="checkbox" id="client" class="form-check-input" name="permissions[]" value="client_access"
-                                    {{ in_array('client_access', $permission) ? 'checked' : '' }}>
-                                <label class="form-check-label">Client</label>
-                            </div>
-                        </div>
-                        @endif
+                        @endforeach
                     </div>
                 @endif
             @if (!$employee->user)

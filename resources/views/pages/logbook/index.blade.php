@@ -159,6 +159,7 @@
                         <p><strong>Nama Lengkap:</strong> ${response.nama_tamu}</p>
                         <p><strong>Tujuan:</strong> ${response.tujuan}</p>
                         <p><strong>Tanggal:</strong> ${response.tanggal}</p>
+                        <p><strong>Keperluan:</strong> ${response.keperluan}</p>
                         <p><strong>Foto Identitas:</strong></p>
                         <img src="https://data.cityservice.co.id/log/public/storage/${response.foto_ktp}" alt="Foto" class="img-thumbnail" style="width: 150px; height: 150px;">
                     `);

@@ -163,6 +163,7 @@
                         <p><strong>Nama Barang:</strong> ${response.nama_barang}</p>
                         <p><strong>Tanggal:</strong> ${response.tanggal}</p>
                         <p><strong>Tujuan:</strong> ${response.tujuan}</p>
+                        <p><strong>Keterangan:</strong> ${response.keterangan}</p>
                         <p><strong>Tipe:</strong> ${response.tipe}</p>
                         <p><strong>Pengiriman:</strong> ${response.pengiriman}</p>
                         <p><strong>Status:</strong> ${response.status}</p>

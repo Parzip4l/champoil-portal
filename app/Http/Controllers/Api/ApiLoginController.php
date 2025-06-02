@@ -976,16 +976,23 @@ class ApiLoginController extends Controller
                 'alasan' => 'required',
             ]);
 
-            
+            $user = Auth::guard('api')->user();
+            $organisasi = Employee::where('nik',$user->employee_code)
+                        ->select('organisasi','unit_bisnis')
+                        ->first();
+
             $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
             $employee = $request->input('employee');
             $cek_absen = Absen::where('nik', $employee)
                 ->whereDate('tanggal', $tanggal)
                 ->first();
-            if ($cek_absen) {
-                return response()->json([
-                    'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
-                ], 200);
+                
+            if ($organisasi->unit_bisnis === 'Kas') {
+                if ($cek_absen) {
+                    return response()->json([
+                        'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
+                    ], 200);
+                }
             }
 
             // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve
@@ -1037,10 +1044,7 @@ class ApiLoginController extends Controller
             $token = $request->bearerToken();
 
             // Authenticate the user based on the token
-            $user = Auth::guard('api')->user();
-            $organisasi = Employee::where('nik',$user->employee_code)
-                        ->select('organisasi','unit_bisnis')
-                        ->first();
+            
         
             if ($organisasi->unit_bisnis === 'CHAMPOIL' ||  $organisasi->unit_bisnis === 'RUN' || $organisasi->unit_bisnis === 'Run' ||  $organisasi->unit_bisnis === 'KAS' ||  $organisasi->unit_bisnis === 'Kas') {
                 $slackChannel = Slack::where('channel', 'Request')->where('company',strtoupper($organisasi->unit_bisnis))->first();

@@ -52,6 +52,7 @@
                                 <th>Nama Lengkap</th>
                                 <th>Tujuan</th>
                                 <th>Tanggal</th>
+                                <th>Keperluan</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -125,6 +126,7 @@
                 { data: 'nama_tamu' },
                 { data: 'tujuan' },
                 { data: 'tanggal' },
+                { data: 'keperluan' },
                 { 
                     data: null,
                     render: function(data) {

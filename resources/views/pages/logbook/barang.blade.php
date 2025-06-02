@@ -48,6 +48,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Foto Barang</th>
+                                <th>Keterangan</th>
                                 <th>Tanggal</th>
                                 <th>Tujuan</th>
                                 <th>Tipe</th>
@@ -121,6 +122,7 @@
                         return 'N/A';
                     }
                 },
+                { data: 'keterangan' },
                 { data: 'tanggal' },
                 { data: 'tujuan' },
                 { data: 'tipe' },

@@ -1322,7 +1322,8 @@ class ApiLoginController extends Controller
 
                 $bulanSelected = $bulan ? date('F', strtotime($bulan)) : date('F');
                 return response()->json([
-                    'isUpdatedata' => $needsUpdate,
+                    // 'isUpdatedata' => $needsUpdate,
+                    'isUpdatedata' => false,
                     'isBackupSchedule' => $activeSchedule,
                     'alreadyClockIn' => $alreadyClockIn,
                     'alreadyClockOut' => $alreadyClockOut,

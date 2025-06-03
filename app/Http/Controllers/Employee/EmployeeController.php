@@ -179,6 +179,18 @@ class EmployeeController extends Controller
                     $badgeClass = $data->status_kontrak == 'Permanent' ? 'bg-primary' : 'bg-success';
                     return '<span class="badge rounded-pill ' . $badgeClass . '">' . $data->status_kontrak . '</span>';
                 })
+                ->addColumn('bmi', function ($data) {
+                    $last_update = DB::table('karyawan_update_rutin')
+                        ->where('user_id', $data->id)
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    if (!empty($last_update->tb) && !empty($last_update->bb)) {
+                        $heightInMeters = $last_update->tb / 100;
+                        $bmi = $last_update->bb / ($heightInMeters * $heightInMeters);
+                        return round($bmi, 1); // Return BMI rounded to 2 decimal places
+                    }
+                    return 'N/A'; // Return 'N/A' if height or weight is missing
+                })
                 ->rawColumns(['action', 'status_kontrak'])
                 ->make(true);
 

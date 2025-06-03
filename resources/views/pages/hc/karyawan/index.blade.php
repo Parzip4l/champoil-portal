@@ -160,6 +160,7 @@
                             <th>Jenis Kelamin</th>
                             <th>Organisasi</th>
                             <th>Jabatan</th>
+                            <th>BMI</th>
                             <th>Status Karyawan</th>
                             <th>Aksi</th>
                         </tr>
@@ -327,6 +328,24 @@
                 { data: 'jenis_kelamin', name: 'jenis_kelamin' },
                 { data: 'organisasi', name: 'organisasi' },
                 { data: 'jabatan', name: 'jabatan' },
+                { data: 'bmi', name: 'bmi', render: function (data, type, row) {
+                    let badge = '';
+                    if (data == 'N/A'){
+                        badge = '<span class="badge rounded-pill bg-seconddary">Belum Melakukan Update</span>';
+                    }else{
+                        if (data < 18.5) {
+                            badge = '<span class="badge rounded-pill bg-warning">Underweight</span>';
+                        } else if (data >= 18.5 && data < 24.9) {
+                            badge = '<span class="badge rounded-pill bg-success">Normal</span>';
+                        } else if (data >= 25 && data < 29.9) {
+                            badge = '<span class="badge rounded-pill bg-danger">Overweight</span>';
+                        } else {
+                            badge = '<span class="badge rounded-pill bg-dark">Obese</span>';
+                        }
+                    }
+                    
+                    return `${data} ${badge}`;
+                } },
                 { data: 'status_kontrak', name: 'status_kontrak' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
             ],

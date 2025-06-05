@@ -24,7 +24,7 @@
     $dataLogin = json_decode(Auth::user()->permission); 
     $employee = \App\Employee::where('nik', Auth::user()->name)->first(); 
 @endphp
-@if($employee && ($employee->unit_bisnis == 'Kas' || $employee->unit_bisnis == 'KAS'))
+@if($employee && ($employee->unit_bisnis == 'Kas' || $employee->unit_bisnis == 'KAS') && $employee->jabatan != 'CLIENT')
 <div class="row mb-3">
     <div class="col-md-3">
         <div class="card border-success">

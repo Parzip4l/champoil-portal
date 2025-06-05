@@ -180,13 +180,14 @@ class ApiLoginController extends Controller
             strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 &&
             strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0
         ) {
-            if (!$Schedule) {
+            if (!$Schedule && !$schedulebackup) {
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Absen Masuk Ditolak, Tidak ada schedule! Hubungi team leader.',
                     'success' => false,
                 ], 200);
-            } elseif ($Schedule->shift === 'OFF') {
+            }
+            if (!empty($Schedule) && $Schedule->shift === 'OFF') {
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Absen Masuk Ditolak, Schedule OFF. Hubungi team leader.',
@@ -197,7 +198,7 @@ class ApiLoginController extends Controller
 
         // Ambil koordinat user
         $lat = $request->input('latitude');
-        $long = $request->input('longitude');
+        $long = $request->input('longitude') ?? $request->input('longtitude');
         $status = $request->input('status');
 
         // Cek jarak GPS

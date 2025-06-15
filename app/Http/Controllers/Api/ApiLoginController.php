@@ -145,7 +145,7 @@ class ApiLoginController extends Controller
             if ($existingAbsenBackup) {
                 DB::rollBack();
                 return response()->json([
-                    'message' => 'Absen Ditolak, sudah ada absensi hari ini!',
+                    'message' => 'Absen Ditolak, sudah ada absensi hari ini! ddd',
                     'success' => false,
                 ], 200);
             }
@@ -172,10 +172,10 @@ class ApiLoginController extends Controller
             }
         }
 
-        if ($existingAbsen) {
+        if ($existingAbsen && empty($schedulebackup)) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Absen Ditolak, sudah ada absensi hari ini!',
+                'message' => 'Absen Ditolak, sudah ada absensi hari ini! ssss',
                 'success' => false,
             ], 200);
         }
@@ -288,7 +288,7 @@ class ApiLoginController extends Controller
                 ]);
             }
             // Simpan ke tabel yang sesuai
-            if ($Schedule) {
+            if ($Schedule && empty($existingAbsen)) {
                 $insert = Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,

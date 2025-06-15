@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\RepeatTasks::class,
+        \App\Console\Commands\PushFcmNotification::class,
     ];
 
     /**

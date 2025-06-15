@@ -108,7 +108,7 @@ class ApiLoginController extends Controller
         $nik = $user->employee_code;
         $unit_bisnis = Employee::where('nik', $nik)->first();
         $today = now()->toDateString();
-
+        $Schedule = null;
         DB::beginTransaction();
 
         // Validasi UUID perangkats
@@ -122,53 +122,72 @@ class ApiLoginController extends Controller
                 'success' => false
             ], 403);
         }
-
-        // Ambil schedule & backup
-        $Schedule = Schedule::where('employee', $nik)
-            ->whereDate('tanggal', $today)
-            ->first();
-
-        $schedulebackup = ScheduleBackup::where('employee', $nik)
-            ->whereDate('tanggal', $today)
-            ->first();
-
-        // Cek apakah sudah absen
+        
         $existingAbsen = Absen::where('nik', $nik)
             ->whereDate('tanggal', $today)
             ->first();
+            
+        if ($unit_bisnis->unit_bisnis === 'Kas') {
+            // Ambil schedule & backup
+            $Schedule = Schedule::where('employee', $nik)
+                ->whereDate('tanggal', $today)
+                ->first();
+    
+            $schedulebackup = ScheduleBackup::where('employee', $nik)
+                ->whereDate('tanggal', $today)
+                ->first();
+    
+    
+            $existingAbsenBackup = AbsenBackup::where('nik', $nik)
+                ->whereDate('tanggal', $today)
+                ->first();
+                
+            if ($existingAbsenBackup) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Absen Ditolak, sudah ada absensi hari ini!',
+                    'success' => false,
+                ], 200);
+            }
+            
+            // Ambil data lokasi & radius berdasarkan schedule
+            if ($Schedule) {
+                $dataProject = Project::find($Schedule->project);
+                $projectData = $dataProject->id ?? 123;
+                $kantorLatitude = $dataProject->latitude;
+                $kantorLongitude = $dataProject->longtitude;
+                $allowedRadius = 5;
+            } elseif ($schedulebackup) {
+                $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+                $projectData = $schedulebackup->project;
+                $kantorLatitude = $dataCompany->latitude;
+                $kantorLongitude = $dataCompany->longitude;
+                $allowedRadius = $dataCompany->radius;
+            } else {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Tidak ada schedule dan tidak ada backup schedule!',
+                    'success' => false,
+                ], 200);
+            }
+        }
 
-        $existingAbsenBackup = AbsenBackup::where('nik', $nik)
-            ->whereDate('tanggal', $today)
-            ->first();
-
-        if ($existingAbsen || $existingAbsenBackup) {
+        if ($existingAbsen) {
             DB::rollBack();
             return response()->json([
                 'message' => 'Absen Ditolak, sudah ada absensi hari ini!',
                 'success' => false,
             ], 200);
         }
-
-        // Ambil data lokasi & radius berdasarkan schedule
-        if ($Schedule) {
-            $dataProject = Project::find($Schedule->project);
+        
+        if ($unit_bisnis->unit_bisnis != 'Kas') {
+            $dataProject = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
             $projectData = $dataProject->id ?? 123;
             $kantorLatitude = $dataProject->latitude;
-            $kantorLongitude = $dataProject->longtitude;
+            $kantorLongitude = $dataProject->longitude;
             $allowedRadius = 5;
-        } elseif ($schedulebackup) {
-            $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-            $projectData = $schedulebackup->project;
-            $kantorLatitude = $dataCompany->latitude;
-            $kantorLongitude = $dataCompany->longitude;
-            $allowedRadius = $dataCompany->radius;
-        } else {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Tidak ada schedule dan tidak ada backup schedule!',
-                'success' => false,
-            ], 200);
         }
+        
 
         // Tambahan khusus DRIVER
         if ($unit_bisnis->jabatan == 'DRIVER') {
@@ -218,7 +237,7 @@ class ApiLoginController extends Controller
 
             if (
                 ($unit_bisnis->unit_bisnis == "Kas" || $unit_bisnis->unit_bisnis == "KAS") &&
-                $Schedule
+                $Schedule && !$schedulebackup
             ) {
                 $cek = ProjectShift::where('shift_code', $Schedule->shift)
                     ->where('project_id', $Schedule->project)
@@ -254,7 +273,20 @@ class ApiLoginController extends Controller
                     ]);
                 }
             }
-
+            
+            if ($unit_bisnis->unit_bisnis != 'Kas') {
+                $insert = Absen::create([
+                    'user_id' => $nik,
+                    'nik' => $nik,
+                    'project' => '-',
+                    'tanggal' => $today,
+                    'clock_in' => now()->format('H:i'),
+                    'latitude' => $lat,
+                    'longtitude' => $long,
+                    'status' => $status,
+                    'photo' => $filename
+                ]);
+            }
             // Simpan ke tabel yang sesuai
             if ($Schedule) {
                 $insert = Absen::create([
@@ -978,15 +1010,23 @@ class ApiLoginController extends Controller
             ]);
 
             
+            $user = Auth::guard('api')->user();
+            $organisasi = Employee::where('nik',$user->employee_code)
+                        ->select('organisasi','unit_bisnis')
+                        ->first();
+
             $tanggal = date('Y-m-d', strtotime($request->input('tanggal')));
             $employee = $request->input('employee');
             $cek_absen = Absen::where('nik', $employee)
                 ->whereDate('tanggal', $tanggal)
                 ->first();
-            if ($cek_absen) {
-                return response()->json([
-                    'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
-                ], 200);
+                
+            if ($organisasi->unit_bisnis === 'Kas') {
+                if ($cek_absen) {
+                    return response()->json([
+                        'message' => 'Anda sudah melakukan absen pada tanggal ' . date('d F Y', strtotime($tanggal)) . '. Anda tidak bisa mengajukan request absen pada tanggal tersebut.'
+                    ], 200);
+                }
             }
 
             // Cek apakah ada request absen yang sudah ada dengan status Pending atau Approve

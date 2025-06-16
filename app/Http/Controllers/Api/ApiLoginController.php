@@ -1504,7 +1504,7 @@ class ApiLoginController extends Controller
             $unitBisnis = Employee::where('nik', $employeeCode)->value('unit_bisnis');
             $company = Employee::where('nik', $employeeCode)->first();
 
-            if($company->organisasi == 'Frontline Officer' || $company->organisasi =='FRONTLINE OFFICER'){
+            if($company->organisasi == 'Frontline Officer' || $company->organisasi =='FRONTLINE OFFICER' || $company->jabatan == 'CLIENT' ){
                 $get_project = Schedule::where('employee',$employeeCode)->first();
                 $request_absen = RequestAbsen::join('karyawan', 'karyawan.nik', '=', 'requests_attendence.employee')
                                             ->where('karyawan.unit_bisnis', $company->unit_bisnis)

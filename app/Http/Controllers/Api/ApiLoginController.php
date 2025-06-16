@@ -1558,6 +1558,7 @@ class ApiLoginController extends Controller
                     $requestAbsen = $requestAbsenQuery
                         ->select('requests_attendence.*', 'karyawan.nama', 'karyawan.unit_bisnis')
                         ->orderBy('requests_attendence.tanggal', 'desc')
+                        ->limit(50)
                         ->get();
                 }
             } else {

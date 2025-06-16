@@ -109,10 +109,12 @@ class ApiLoginController extends Controller
         $unit_bisnis = Employee::where('nik', $nik)->first();
         $today = now()->toDateString();
         $Schedule = null;
+        $cek = null;
         DB::beginTransaction();
 
         // Validasi UUID perangkats
         $incomingUUID = $request->input('uuid'); 
+
         if ($user->uuid === null) {
             $user->uuid = $incomingUUID;
             $user->save();
@@ -127,7 +129,7 @@ class ApiLoginController extends Controller
             ->whereDate('tanggal', $today)
             ->first();
             
-        if ($unit_bisnis->unit_bisnis === 'Kas') {
+        if ($unit_bisnis->unit_bisnis === 'Kas' || $unit_bisnis->unit_bisnis === 'Run') {
             // Ambil schedule & backup
             $Schedule = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -172,6 +174,7 @@ class ApiLoginController extends Controller
             }
         }
 
+      
         if ($existingAbsen && empty($schedulebackup)) {
             DB::rollBack();
             return response()->json([
@@ -179,15 +182,18 @@ class ApiLoginController extends Controller
                 'success' => false,
             ], 200);
         }
+
         
-        if ($unit_bisnis->unit_bisnis != 'Kas') {
+        
+        if ($unit_bisnis->unit_bisnis != 'Kas' || $unit_bisnis->unit_bisnis != 'Run') {
             $dataProject = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
             $projectData = $dataProject->id ?? 123;
             $kantorLatitude = $dataProject->latitude;
             $kantorLongitude = $dataProject->longitude;
-            $allowedRadius = 5;
+            $allowedRadius = 7;
         }
-        
+
+       
 
         // Tambahan khusus DRIVER
         if ($unit_bisnis->jabatan == 'DRIVER') {
@@ -215,6 +221,7 @@ class ApiLoginController extends Controller
             }
         }
 
+        
         // Ambil koordinat user
         $lat = $request->input('latitude');
         $long = $request->input('longitude') ?? $request->input('longtitude');
@@ -274,7 +281,7 @@ class ApiLoginController extends Controller
                 }
             }
             
-            if ($unit_bisnis->unit_bisnis != 'Kas') {
+            if ($unit_bisnis->unit_bisnis != 'Kas' && $unit_bisnis->unit_bisnis != 'Run') {
                 $insert = Absen::create([
                     'user_id' => $nik,
                     'nik' => $nik,
@@ -287,6 +294,8 @@ class ApiLoginController extends Controller
                     'photo' => $filename
                 ]);
             }
+
+            
             // Simpan ke tabel yang sesuai
             if ($Schedule && empty($existingAbsen)) {
                 $insert = Absen::create([
@@ -326,6 +335,9 @@ class ApiLoginController extends Controller
             return response()->json([
                 'message' => 'Absen Masuk Gagal, Diluar Radius!',
                 'success' => false,
+                'cek'=>$cek,
+                'distance' => $allowedRadius,
+                'long'=>$Schedule
             ]);
         }
     }
@@ -1538,7 +1550,7 @@ class ApiLoginController extends Controller
                                 })
                                 ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                 ->whereDate('requests_attendence.created_at','>','2024-06-20')
-                                ->where('requests_attendence.aprrove_status','Pending')
+                                // ->where('requests_attendence.aprrove_status','Pending')
                                 // ->whereIn('schedules.project', $project_id) // GANTI sesuai kebutuhan
                                 ->select('requests_attendence.*','karyawan.nama','karyawan.unit_bisnis')
                                 ->orderBy('requests_attendence.tanggal', 'desc')

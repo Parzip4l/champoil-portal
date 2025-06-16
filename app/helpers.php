@@ -187,6 +187,8 @@ function project_filter($project_id){
 }
 
 
+
+
 function project_byID($id){
   $project = app('App\ModelCG\Project');
   return $project->where('id',$id)->first();
@@ -244,6 +246,31 @@ function push_notif_wa($data,$token,$instance,$nomor,$url){
       echo "cURL Error #:" . $err;
     } else {
       echo $response;
+    }
+}
+
+function whatsapp_message($data, $nomor) {
+    $client = new \GuzzleHttp\Client();
+
+    // Construct the payload dynamically
+    $payload = [
+        'chatId' => $nomor . '@c.us',
+        'message' => $data,
+    ];
+
+    try {
+        $response = $client->request('POST', 'https://waapi.app/api/v1/instances/17816/client/action/send-message', [
+            'body' => json_encode($payload),
+            'headers' => [
+                'accept' => 'application/json',
+                'authorization' => 'Bearer QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08',
+                'content-type' => 'application/json',
+            ],
+        ]);
+
+        return $response->getBody()->getContents();
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
     }
 }
 

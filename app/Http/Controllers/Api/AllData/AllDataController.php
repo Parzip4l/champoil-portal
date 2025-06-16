@@ -1495,7 +1495,7 @@ class AllDataController extends Controller
         $check = User::where('email', strtolower($request->email))->first();
 
         if (!empty($check)) {
-            $random_token = Str::random(60); // Generate token acak
+            $random_token = mt_rand(1000, 9999); // Generate a 4-digit numeric token
 
             $create = [
                 'token_reset' => $random_token,
@@ -1507,12 +1507,20 @@ class AllDataController extends Controller
             $resetLink = url('/form-forgot-password/' . $random_token);
 
             // Kirim email
-            Mail::to($check->email)->send(new ForgotPasswordMail($resetLink));
+            // Mail::to($check->email)->send(new ForgotPasswordMail($resetLink));
 
+            $phone = Employee::where('email', $request->email)->first(); // Ganti dengan nomor telepon yang sesuai
+            $push_wa =  "";
 
+            if ($phone) {
+                $formattedPhone = preg_replace('/^08/', '628', $phone->telepon); // Replace 08 with 62
+                $formattedPhone = preg_replace('/^\+628/', '628', $formattedPhone); // Replace +628 with 628
+
+              $push_wa =  whatsapp_message("OTP : ".$random_token, $formattedPhone);
+            }
 
             $error =false;
-            $message ="OTP Berhasil Dikirim Ke Email Anda, Silahkan Cek Email Anda Untuk Melanjutkan Proses Reset Password";
+            $message ="OTP Berhasil Dikirim Ke Whatsapp Anda, Silahkan Cek Whatsapp Anda Untuk Melanjutkan Proses Reset Password";
             $success = true;
         } else {
             $error =true;
@@ -1532,7 +1540,7 @@ class AllDataController extends Controller
         // Validasi input
         $validator = Validator::make($request->all(), [
             'token' => 'required|string',
-            'password' => 'required|string|min:8|confirmed', // password harus dikonfirmasi
+            'password' => 'required|string|min:8', // password harus dikonfirmasi
         ]);
 
         if ($validator->fails()) {

@@ -72,8 +72,7 @@ class EmployeeController extends Controller
         if ($request->ajax()) {
             if (Auth::user()->project_id == NULL) {
                 $query = Employee::where('unit_bisnis', $company->unit_bisnis)
-                                ->where('resign_status', 0)
-                                ->whereNot('jabatan','CLIENT');
+                                ->where('resign_status', 0);
             } else {
                 $query = Employee::select('karyawan.*')
                                 ->where('unit_bisnis', $company->unit_bisnis)

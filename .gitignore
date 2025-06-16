@@ -3,6 +3,7 @@
 /public/ScheduleImport
 /public/storage
 /storage/*.key
+/storage/*.json
 /vendor
 .env
 .env.backup

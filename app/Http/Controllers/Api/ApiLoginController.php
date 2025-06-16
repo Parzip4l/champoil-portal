@@ -1539,7 +1539,7 @@ class ApiLoginController extends Controller
                                 ->where('karyawan.unit_bisnis', $company->unit_bisnis)
                                 ->whereDate('requests_attendence.created_at','>','2024-06-20')
                                 ->where('requests_attendence.aprrove_status','Pending')
-                                ->whereIn('schedules.project', $project_id) // GANTI sesuai kebutuhan
+                                // ->whereIn('schedules.project', $project_id) // GANTI sesuai kebutuhan
                                 ->select('requests_attendence.*','karyawan.nama','karyawan.unit_bisnis')
                                 ->orderBy('requests_attendence.tanggal', 'desc')
                                 ->get();

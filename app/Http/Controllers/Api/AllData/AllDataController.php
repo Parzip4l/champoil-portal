@@ -1513,14 +1513,18 @@ class AllDataController extends Controller
 
             $error =false;
             $message =$check;
+            $success = true;
         } else {
             $error =true;
             $message ="Email Tidak Terdaftar";
+            $success = false;
         }
 
         return response()->json([
             'error' => $error,
+            'success' => $success,
             'message' => $message
+            
         ], 200);
     }
 

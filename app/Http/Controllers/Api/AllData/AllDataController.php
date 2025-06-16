@@ -1512,7 +1512,7 @@ class AllDataController extends Controller
 
 
             $error =false;
-            $message =$check;
+            $message ="OTP Berhasil Dikirim Ke Email Anda, Silahkan Cek Email Anda Untuk Melanjutkan Proses Reset Password";
             $success = true;
         } else {
             $error =true;
@@ -1522,7 +1522,7 @@ class AllDataController extends Controller
 
         return response()->json([
             'error' => $error,
-            'success' => $success,
+            // 'success' => $success,
             'message' => $message
             
         ], 200);

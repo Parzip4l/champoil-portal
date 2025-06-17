@@ -185,7 +185,7 @@ class ApiLoginController extends Controller
 
         
         
-        if ($unit_bisnis->unit_bisnis != 'Kas' || $unit_bisnis->unit_bisnis != 'Run') {
+        if ($unit_bisnis->unit_bisnis != 'Kas' && $unit_bisnis->unit_bisnis != 'Run') {
             $dataProject = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
             $projectData = $dataProject->id ?? 123;
             $kantorLatitude = $dataProject->latitude;
@@ -335,7 +335,7 @@ class ApiLoginController extends Controller
             return response()->json([
                 'message' => 'Absen Masuk Gagal, Diluar Radius!',
                 'success' => false,
-                'cek'=>$cek,
+                'unit_bisnis'=>$unit_bisnis->unit_bisnis,
                 'distance' => $allowedRadius,
                 'long'=>$Schedule
             ]);

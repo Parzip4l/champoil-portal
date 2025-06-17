@@ -42,7 +42,7 @@
                                 <select class="form-select select2" name="work_location_id" id="work_location_id">
                                     <option value="">Semua Lokasi</option>
                                     @if (strtoupper($org) === 'KAS') 
-                                        @foreach (App\ModelCG\Project::where('company', $org ?? null)->get() as $lokasi)
+                                        @foreach ($project_list as $lokasi)
                                             <option value="{{ $lokasi->id }}" {{ request('work_location_id') == $lokasi->id ? 'selected' : '' }}>
                                                 {{ $lokasi->name }}
                                             </option>

@@ -772,6 +772,8 @@ Password: ".$request->password;
             $employee->manager = $request->input('atasan_langsung');
             $employee->slack_id = $request->input('slack_id');
             $employee->work_location_id = $request->input('work_location_id');
+
+            // dd($request->uuid);
             
 
             // Update the employee's photo if a new one is provided
@@ -830,6 +832,7 @@ Password: ".$request->password;
                 $userInfo->permission = json_encode($request->permissions);
                 $userInfo->employee_code = $request->nik;
                 $userInfo->company = $company->unit_bisnis;
+                $userInfo->uuid = null;
                 $userInfo->save();
             } else {
                 // Update the existing user
@@ -841,6 +844,7 @@ Password: ".$request->password;
                 $userInfo->permission = json_encode($request->permissions);
                 $userInfo->employee_code = $request->nik;
                 $userInfo->company = $company->unit_bisnis;
+                $userInfo->uuid = null;
                 $userInfo->update();
             }
 

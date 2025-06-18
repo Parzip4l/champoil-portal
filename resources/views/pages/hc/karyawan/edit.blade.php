@@ -44,6 +44,10 @@
                     <label for="name" class="form-label">Nama lengkap</label>
                     <input id="name" class="form-control" name="nama" type="text" placeholder="John Doe" value="{{$employee->nama}}">
                 </div>
+                <div class="col mb-3">
+                    <label for="uuid" class="form-label">ID Device</label>
+                    <input id="uuid" class="form-control" name="uuid" type="text" placeholder="" value="{{ $user->uuid}}">
+                </div>
                 <div class="col-md-6 mb-3">
                     <label for="Ktp" class="form-label">KTP</label>
                     <input id="ktp" class="form-control" name="ktp" type="number" placeholder="3xxxxxx" value="{{$employee->ktp}}">

@@ -157,10 +157,14 @@ class AbsenController extends Controller
             $shifts = ShiftModel::where('company_id', $companyId)->get()->keyBy('id');
         }
         $projectIds = json_decode($user->project_id, true); // ubah string JSON jadi array
-
-        $project_list = Project::whereIn('id', $projectIds)->get();
+        if (!$projectIds || !is_array($projectIds)) {
+            $project_list = Project::where('company', 'KAS')->get();
+        }else{
+            $project_list = Project::whereIn('id', $projectIds)->get();
+        }
         
-            $useMultilocation = CompanySettingHelper::get($companyId, 'use_multilocation');
+        
+        $useMultilocation = CompanySettingHelper::get($companyId, 'use_multilocation');
         
         
         return view('pages.absen.index', compact('employees', 'dates', 'absens', 'schedules', 'shifts', 'useMultilocation', 'org','companyId','project_list'));

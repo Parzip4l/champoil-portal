@@ -129,7 +129,7 @@ class ApiLoginController extends Controller
             ->whereDate('tanggal', $today)
             ->first();
             
-        if ($unit_bisnis->unit_bisnis === 'Kas' || $unit_bisnis->unit_bisnis === 'Run') {
+        if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->unit_bisnis == 'Run') {
             // Ambil schedule & backup
             $Schedule = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)

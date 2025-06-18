@@ -66,19 +66,19 @@ class ApiLoginController extends Controller
         }
 
 
-        // Cek dan simpan UUID tes
-        if (empty($user->uuid)) {
-            $user->uuid = $request->uuid;
-            $user->save();
-        } else {
-            // UUID sudah tersimpan, cek apakah cocok
-            if ($user->uuid !== $request->uuid) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Login ditolak. Akun ini sudah digunakan di perangkat lain.',
-                ], 403);
-            }
-        }
+        // // Cek dan simpan UUID tes
+        // if (empty($user->uuid)) {
+        //     $user->uuid = $request->uuid;
+        //     $user->save();
+        // } else {
+        //     // UUID sudah tersimpan, cek apakah cocok
+        //     if ($user->uuid !== $request->uuid) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => 'Login ditolak. Akun ini sudah digunakan di perangkat lain.',
+        //         ], 403);
+        //     }
+        // }
         
         return response()->json([
             'success' => true,
@@ -113,23 +113,23 @@ class ApiLoginController extends Controller
         DB::beginTransaction();
 
         // Validasi UUID perangkats
-        $incomingUUID = $request->input('uuid'); 
+        // $incomingUUID = $request->input('uuid'); 
 
-        if ($user->uuid === null) {
-            $user->uuid = $incomingUUID;
-            $user->save();
-        } elseif ($user->uuid !== $incomingUUID) {
-            return response()->json([
-                'message' => 'Clock In ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
-                'success' => false
-            ], 403);
-        }
+        // if ($user->uuid === null) {
+        //     $user->uuid = $incomingUUID;
+        //     $user->save();
+        // } elseif ($user->uuid !== $incomingUUID) {
+        //     return response()->json([
+        //         'message' => 'Clock In ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+        //         'success' => false
+        //     ], 403);
+        // }
         
         $existingAbsen = Absen::where('nik', $nik)
             ->whereDate('tanggal', $today)
             ->first();
             
-        if ($unit_bisnis->unit_bisnis == 'Kas' && $unit_bisnis->unit_bisnis == 'Run') {
+        // if ($unit_bisnis->unit_bisnis === 'Kas' || $unit_bisnis->unit_bisnis === 'Run') {
             // Ambil schedule & backup
             $Schedule = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
@@ -172,7 +172,7 @@ class ApiLoginController extends Controller
                     'success' => false,
                 ], 200);
             }
-        }
+        // }
 
       
         if ($existingAbsen && empty($schedulebackup)) {
@@ -185,13 +185,13 @@ class ApiLoginController extends Controller
 
         
         
-        if ($unit_bisnis->unit_bisnis != 'Kas' && $unit_bisnis->unit_bisnis != 'Run') {
-            $dataProject = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
-            $projectData = $dataProject->id ?? 123;
-            $kantorLatitude = $dataProject->latitude;
-            $kantorLongitude = $dataProject->longitude;
-            $allowedRadius = 7;
-        }
+        // if ($unit_bisnis->unit_bisnis != 'Kas' || $unit_bisnis->unit_bisnis != 'Run') {
+        //     $dataProject = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+        //     $projectData = $dataProject->id ?? 123;
+        //     $kantorLatitude = $dataProject->latitude;
+        //     $kantorLongitude = $dataProject->longitude;
+        //     $allowedRadius = 7;
+        // }
 
        
 
@@ -281,19 +281,19 @@ class ApiLoginController extends Controller
                 }
             }
             
-            if ($unit_bisnis->unit_bisnis != 'Kas' && $unit_bisnis->unit_bisnis != 'Run') {
-                $insert = Absen::create([
-                    'user_id' => $nik,
-                    'nik' => $nik,
-                    'project' => '-',
-                    'tanggal' => $today,
-                    'clock_in' => now()->format('H:i'),
-                    'latitude' => $lat,
-                    'longtitude' => $long,
-                    'status' => $status,
-                    'photo' => $filename
-                ]);
-            }
+            // if ($unit_bisnis->unit_bisnis != 'Kas' && $unit_bisnis->unit_bisnis != 'Run') {
+            //     $insert = Absen::create([
+            //         'user_id' => $nik,
+            //         'nik' => $nik,
+            //         'project' => '-',
+            //         'tanggal' => $today,
+            //         'clock_in' => now()->format('H:i'),
+            //         'latitude' => $lat,
+            //         'longtitude' => $long,
+            //         'status' => $status,
+            //         'photo' => $filename
+            //     ]);
+            // }
 
             
             // Simpan ke tabel yang sesuai
@@ -335,7 +335,7 @@ class ApiLoginController extends Controller
             return response()->json([
                 'message' => 'Absen Masuk Gagal, Diluar Radius!',
                 'success' => false,
-                'unit_bisnis'=>$unit_bisnis->unit_bisnis,
+                'cek'=>$cek,
                 'distance' => $allowedRadius,
                 'long'=>$Schedule
             ]);

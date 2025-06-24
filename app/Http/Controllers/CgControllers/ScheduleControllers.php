@@ -53,7 +53,7 @@ class ScheduleControllers extends Controller
             }
             $schedulesByProject = $get_data->get();
         }
-
+        $jumlahHari=0;
         if ($selectedPeriod) {
             // Pisahkan BULAN dan TAHUN
             [$monthName, $year] = explode('-', strtoupper($selectedPeriod));

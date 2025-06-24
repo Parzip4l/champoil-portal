@@ -68,7 +68,7 @@
                                 <td>{{ $scheduleByProject->totalSeharusnya }}</td>
                                 <td>
                                     @if ($scheduleByProject->schedule_count == $scheduleByProject->totalSeharusnya)
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">Complete</span>
                                     @else
                                         <span class="badge bg-warning">In Progress</span>
                                     @endif

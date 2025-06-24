@@ -73,7 +73,7 @@ class ScheduleControllers extends Controller
 
         if($schedulesByProject){
             foreach($schedulesByProject as $row){
-                $row->schedule_count = number_format($row->schedule_count, 0, ',', '.');
+                $row->schedule_count = $row->schedule_count;
                 $get_mp = ProjectDetails::where('project_code',$row->project)->get();
                 $row->total_mp = 0;
                 if($get_mp){

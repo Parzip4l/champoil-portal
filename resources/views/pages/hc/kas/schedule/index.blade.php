@@ -45,6 +45,11 @@
                             <tr>
                                 <th>Project</th>
                                 <th>Periode</th>
+                                <th>Jumlah MP</th>
+                                <th>Total Schedule</th>
+                                <th>Jumlah Hari</th>
+                                <th>Total Seharusnya</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -57,6 +62,18 @@
                                 @endphp
                                 <td>{{ $projectname }}</td>
                                 <td>{{ $scheduleByProject->periode }}</td>
+                                <td>{{ $scheduleByProject->total_mp }}</td>
+                                <td>{{ $scheduleByProject->schedule_count }}</td>
+                                <td>{{ $scheduleByProject->jumlahHari }}</td>
+                                <td>{{ $scheduleByProject->totalSeharusnya }}</td>
+                                <td>
+                                    @if ($scheduleByProject->schedule_count == $scheduleByProject->totalSeharusnya)
+                                        <span class="badge bg-success">Active</span>
+                                    @else
+                                        <span class="badge bg-warning">In Progress</span>
+                                    @endif
+                                </td>
+
                                 <td>
                                     <a href="{{ route('schedule.details', ['project' => $scheduleByProject->project, 'periode' => $scheduleByProject->periode]) }}" class="btn btn-primary btn-sm">Details</a>
                                 </td>

@@ -10,6 +10,7 @@ use App\ModelCG\Shift;
 use App\Employee;
 use App\ModelCG\Project;
 use App\ModelCG\ProjectRelations;
+use App\ModelCG\ProjectDetails;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +52,38 @@ class ScheduleControllers extends Controller
                 $get_data->where('periode', $selectedPeriod);
             }
             $schedulesByProject = $get_data->get();
+        }
+
+        if ($selectedPeriod) {
+            // Pisahkan BULAN dan TAHUN
+            [$monthName, $year] = explode('-', strtoupper($selectedPeriod));
+        
+            // Ubah nama bulan ke angka (contoh: JULY -> 7)
+            $monthNumber = date('n', strtotime($monthName));
+        
+            // Hitung tanggal mulai: 21 bulan sebelumnya
+            $start = Carbon::createFromDate($year, $monthNumber, 1)->subMonth()->day(21);
+        
+            // Hitung tanggal akhir: 20 bulan sekarang
+            $end = Carbon::createFromDate($year, $monthNumber, 20);
+        
+            $jumlahHari = $start->diffInDays($end) + 1; // +1 agar inklusif
+    
+        }
+
+        if($schedulesByProject){
+            foreach($schedulesByProject as $row){
+                $row->schedule_count = number_format($row->schedule_count, 0, ',', '.');
+                $get_mp = ProjectDetails::where('project_code',$row->project)->get();
+                $row->total_mp = 0;
+                if($get_mp){
+                    foreach($get_mp as $mp){
+                        $row->total_mp += $mp->kebutuhan;
+                    }
+                }
+                $row->jumlahHari = $jumlahHari;
+                $row->totalSeharusnya = $row->total_mp * $jumlahHari;
+            }
         }
 
         return view('pages.hc.kas.schedule.index', compact('schedulesByProject', 'currentYear', 'selectedPeriod'));

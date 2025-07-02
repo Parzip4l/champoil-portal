@@ -130,20 +130,26 @@ class ApiLoginController extends Controller
             ->first();
             
         // if ($unit_bisnis->unit_bisnis === 'Kas' || $unit_bisnis->unit_bisnis === 'Run') {
-            // Ambil schedule & backup
+        if ($unit_bisnis->unit_bisnis === 'CHAMPOIL') {
+            $dataCompany = CompanyModel::where('company_name', $unit_bisnis->unit_bisnis)->first();
+            $projectData = $dataCompany->id ?? 123;
+            $kantorLatitude = $dataCompany->latitude;
+            $kantorLongitude = $dataCompany->longitude;
+            $allowedRadius = $dataCompany->radius ?? 7;
+        } else {
+            // lanjutkan ambil schedule seperti biasa
             $Schedule = Schedule::where('employee', $nik)
                 ->whereDate('tanggal', $today)
                 ->first();
-    
+        
             $schedulebackup = ScheduleBackup::where('employee', $nik)
                 ->whereDate('tanggal', $today)
                 ->first();
-    
-    
+        
             $existingAbsenBackup = AbsenBackup::where('nik', $nik)
                 ->whereDate('tanggal', $today)
                 ->first();
-                
+        
             if ($existingAbsenBackup) {
                 DB::rollBack();
                 return response()->json([
@@ -151,8 +157,7 @@ class ApiLoginController extends Controller
                     'success' => false,
                 ], 200);
             }
-            
-            // Ambil data lokasi & radius berdasarkan schedule
+        
             if ($Schedule) {
                 $dataProject = Project::find($Schedule->project);
                 $projectData = $dataProject->id ?? 123;
@@ -172,6 +177,7 @@ class ApiLoginController extends Controller
                     'success' => false,
                 ], 200);
             }
+        }
         // }
 
       
@@ -205,14 +211,14 @@ class ApiLoginController extends Controller
             strcasecmp($unit_bisnis->unit_bisnis, 'Kas') == 0 &&
             strcasecmp($unit_bisnis->organisasi, 'FRONTLINE OFFICER') == 0
         ) {
-            if (!$Schedule && !$schedulebackup) {
+            if (!$Schedule && !$schedulebackup && $unit_bisnis->unit_bisnis !== 'CHAMPOIL') {
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Absen Masuk Ditolak, Tidak ada schedule! Hubungi team leader.',
                     'success' => false,
                 ], 200);
             }
-            if (!empty($Schedule) && $Schedule->shift === 'OFF') {
+            if (!empty($Schedule) && $Schedule->shift === 'OFF' && $unit_bisnis->unit_bisnis !== 'CHAMPOIL') {
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Absen Masuk Ditolak, Schedule OFF. Hubungi team leader.',
@@ -339,8 +345,8 @@ class ApiLoginController extends Controller
                 'distance' => $allowedRadius,
                 'long'=>$Schedule
             ]);
-        }
-    }
+  }
+}
 
 
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
@@ -367,18 +373,18 @@ class ApiLoginController extends Controller
             $nik = $user->employee_code;
             $unit_bisnis = Employee::where('nik', $nik)->first();
 
-            $incomingUUID = $request->input('uuid');
+            // $incomingUUID = $request->input('uuid');
 
-            // Validasi UUID perangkat
-            if ($user->uuid === null) {
-                $user->uuid = $incomingUUID;
-                $user->save();
-            } elseif ($user->uuid !== $incomingUUID) {
-                return response()->json([
-                    'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
-                    'success' => false
-                ], 403);
-            }
+            // // Validasi UUID perangkat
+            // if ($user->uuid === null) {
+            //     $user->uuid = $incomingUUID;
+            //     $user->save();
+            // } elseif ($user->uuid !== $incomingUUID) {
+            //     return response()->json([
+            //         'message' => 'Clock Out ditolak! Akun ini hanya bisa digunakan di 1 perangkat.',
+            //         'success' => false
+            //     ], 403);
+            // }
 
             $lat2 = $request->input('latitude_out');
             $long2 = $request->input('longitude_out');
@@ -706,10 +712,10 @@ class ApiLoginController extends Controller
 
 
                         return response()->json([
-                            'payslips' => $payslips->items(),
-                            'current_page' => $payslips->currentPage(),
-                            'per_page' => $payslips->perPage(),
-                            'total' => $payslips->total(),
+                            'payslips' => $payslipsData
+                            // 'current_page' => $payslips->currentPage(),
+                            // 'per_page' => $payslips->perPage(),
+                            // 'total' => $payslips->total(),
                         ]);
                     } else {
                         return response()->json(['error' => 'Data karyawan tidak ditemukan.'], 404);

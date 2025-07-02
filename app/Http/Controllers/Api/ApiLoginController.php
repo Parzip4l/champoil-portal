@@ -956,6 +956,18 @@ class ApiLoginController extends Controller
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->count();
 
+                $get_last = DB::table('karyawan_update_rutin')
+                ->where('user_id', $employee->id)
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($get_last) {
+                $employee->bb = $get_last->bb ?? null;
+                $employee->tb = $get_last->tb ?? null;
+                $employee->golongan_darah = $get_last->golongan_darah ?? null;
+                $employee->photo_biru = $get_last->photo_biru ?? null;
+            }
+
             $leaveTotal = $sakit + $izin;
 
             $profileData = [

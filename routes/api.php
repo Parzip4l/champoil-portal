@@ -296,6 +296,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/barang/{id}', [LogbookController::class, 'barangDetail']);
 
     Route::get('/dev-stats', [DeveloperController::class, 'index']);
+
+    Route::post('/ocr', [OcrController::class, 'parseImage']);
     
     
 });

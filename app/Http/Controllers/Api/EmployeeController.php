@@ -228,6 +228,32 @@ Thank you for your attention and cooperation. If you have any questions or issue
             } else {
                 $photoPath = null;
             }
+
+            if ($request->hasFile('sertifikasi_file')) {
+                $file = $request->file('sertifikasi_file');
+            
+                // Simpan file ke folder public/uploads
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+            
+                // Simpan path ke DB
+                $sertifikasi_file = 'uploads/' . $filename;
+            } else {
+                $sertifikasi_file = null;
+            }
+            
+            if ($request->hasFile('foto_ktp')) {
+                $file = $request->file('foto_ktp');
+            
+                // Simpan file ke folder public/uploads
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+            
+                // Simpan path ke DB
+                $foto_ktp = 'uploads/' . $filename;
+            } else {
+                $foto_ktp = null;
+            }
             
             DB::table('karyawan_update_rutin')->insert([
                 "document_type"=>"update",
@@ -236,7 +262,9 @@ Thank you for your attention and cooperation. If you have any questions or issue
                 "bb"=>$request->berat_badan,
                 "tb"=>$request->tinggi_badan,
                 "golongan_darah"=>$request->golongan_darah,
-                "photo_biru"=>$photoPath]);
+                "photo_biru"=>$photoPath,
+                "foto_ktp"=>$foto_ktp,
+                "sertifikasi_file"=>$sertifikasi_file]);
 
             if($records){
                 return response()->json([

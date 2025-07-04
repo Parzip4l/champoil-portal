@@ -12,6 +12,11 @@ use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Illuminate\Support\Facades\Http;
 use DateTime;
 
+
+use App\User;
+use App\Employee;
+
+
 class OcrController extends Controller
 {
     public function parseImage(Request $request)
@@ -72,8 +77,90 @@ class OcrController extends Controller
         if($request->type_ocr == 'kta'){
             // $parsedData = $text;
             $parsedData = $this->parseRawKtaText($text);
+            if(!$parsedData['nama']) {
+                $get_user = User::find($request->user_id);
+                $employee = null;
+                if($get_user){
+                    $employee = Employee::where('nik', $get_user->name)->first();
+                    
+                }              
+                $data = [
+                    'text' => "Hallo @channel, Terdapat update KTA, dan belum ada Nomor yang dikenali",
+                    'attachments' => [
+                        [
+                            'fields' => [
+                                [
+                                    'title' => 'Nama',
+                                    'value' => $employee->nama??'-',
+                                    'short' => true,
+                                ],
+                                [
+                                    'title' => 'Attachment',
+                                    'value' => url("storage/{$imagePath}"),
+                                    'short' => true,
+                                ]
+                            ],
+                        ],
+                    ],
+                    
+                ];
+
+                $data_string = json_encode($data);
+
+                $ch = curl_init('https://hooks.slack.com/services/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');
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($data_string),
+                ]);
+
+                $result = curl_exec($ch);
+            }
         }else{
             $parsedData = $this->parseRawKtpText($text);
+            if(!$parsedData['nik']) {
+                $get_user = User::find($request->user_id);
+                $employee = null;
+                if($get_user){
+                    $employee = Employee::where('nik', $get_user->name)->first();
+                    
+                }              
+                $data = [
+                    'text' => "Hallo @channel, Terdapat update KTP, dan belum ada NIK yang dikenali",
+                    'attachments' => [
+                        [
+                            'fields' => [
+                                [
+                                    'title' => 'Nama',
+                                    'value' => $employee->nama??'-',
+                                    'short' => true,
+                                ],
+                                [
+                                    'title' => 'Attachment',
+                                    'value' => url("storage/{$imagePath}"),
+                                    'short' => true,
+                                ]
+                            ],
+                        ],
+                    ],
+                    
+                ];
+
+                $data_string = json_encode($data);
+
+                $ch = curl_init('https://hooks.slack.com/services/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');
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($data_string),
+                ]);
+
+                $result = curl_exec($ch);
+            }
             // $parsedData = $text;
         }
         

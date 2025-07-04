@@ -966,6 +966,8 @@ class ApiLoginController extends Controller
                 $employee->tb = $get_last->tb ?? null;
                 $employee->golongan_darah = $get_last->golongan_darah ?? null;
                 $employee->photo_biru = $get_last->photo_biru ?? null;
+                $employee->foto_ktp = $get_last->foto_ktp ?? null;
+                $employee->sertifikasi_file = $get_last->sertifikasi_file ?? null;
             }
 
             $leaveTotal = $sakit + $izin;

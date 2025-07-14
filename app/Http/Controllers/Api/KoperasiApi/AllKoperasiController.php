@@ -346,7 +346,7 @@ class AllKoperasiController extends Controller
             $employeeData = Employee::where('nik', $employeeCode)->first();
             $koperasi = Koperasi::where('company', $employeeData->unit_bisnis)->first();
             $pinjamanAwal = $request->amount; // Jumlah pinjaman yang dimasukkan user
-            $tenor = $koperasi->tenor;
+            $tenor = $request->tenor;
             $membership = $koperasi->membership / 100; // bership
             $merchendise = $koperasi->merchendise / 100; // Biaya merchaBiaya memndise
             $persentase = $membership + $merchendise; // Total biaya tambahan

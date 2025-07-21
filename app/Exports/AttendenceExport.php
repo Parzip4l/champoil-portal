@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Absen;
+use App\ModelCG\Schedule;
 use App\Employee;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -66,17 +67,23 @@ class AttendenceExport implements FromCollection, WithHeadings
                 ->get()
                 ->keyBy('tanggal');
 
+            $schedules = Schedule::where('employee', $employee->nik)
+                    ->whereBetween('tanggal', [$this->startDate->format('Y-m-d'), $this->endDate->format('Y-m-d')])
+                    ->get()
+                    ->keyBy('tanggal');
+
             $totalMasuk = 0;
             $totalTidakMasuk = 0;
 
             foreach ($this->dates as $date) {
                 $absen = $absens[$date->toDateString()] ?? null;
+                $schedule = $schedules[$date->toDateString()] ?? null;
 
                 if ($absen && $absen->clock_in) {
-                    $row[] = ($absen->clock_in ?? '-') . ' / ' . ($absen->clock_out ?? '-');
+                    $row[] = ($absen->clock_in ?? '-') . ' / ' . ($absen->clock_out ?? '-') . '( '.($schedule->shift ?? '-').' )';
                     $totalMasuk++;
                 } else {
-                    $row[] = '-';
+                    $row[] = '-'.' / '.'- ( '.($schedule->shift ?? '-').' )';
                     $totalTidakMasuk++;
                 }
             }

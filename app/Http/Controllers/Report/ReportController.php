@@ -43,7 +43,12 @@ class ReportController extends Controller
 
         // Handle daterange filter
         if ($request->filled('daterange')) {
-            [$start, $end] = explode(' to ', str_replace('+', ' ', $request->input('daterange')));
+            $daterange = str_replace('+', ' ', $request->input('daterange'));
+            if (strpos($daterange, ' to ') !== false) {
+                [$start, $end] = explode(' to ', $daterange);
+            } else {
+                $start = $end = $daterange; // Use the single date for both start and end
+            }
         }
 
         $percentages = [

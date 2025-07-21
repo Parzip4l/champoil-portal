@@ -559,7 +559,7 @@ class PatroliController extends Controller
         // Create the date period with daily intervals
         $dates = CarbonPeriod::create($start, '1 day', $end);
 
-        if($project==582307){
+        if($project==582307 || $project==455823){
            
             $data_patrol = Task::select(
                 'master_tasks.id', 

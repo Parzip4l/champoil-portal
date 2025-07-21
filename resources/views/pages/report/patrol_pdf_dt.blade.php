@@ -14,7 +14,7 @@
             
         </div>
     </div>
-    @if($project_id == 582307 || $project_id == 455823)
+    @if($project_id == 582307)
     <table>
         <tr>
             <td>

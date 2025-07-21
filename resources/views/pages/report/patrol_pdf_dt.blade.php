@@ -14,6 +14,7 @@
             
         </div>
     </div>
+    @if($project_id == 582307 || $project_id == 455823)
     <table>
         <tr>
             <td>
@@ -26,6 +27,7 @@
             </td>
         </tr>
     </table>
+    @endif
     
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; font-size: 9px !important;">
         <thead>

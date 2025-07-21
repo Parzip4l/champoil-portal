@@ -575,7 +575,7 @@ class PatroliController extends Controller
                 $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
                      ->whereBetween('patrolis.created_at', ["$date1 $jam1:00", "$date2 $jam2:00"]);
             })
-            ->where('master_tasks.project_id', 582307)
+            ->where('master_tasks.project_id', $project)
             ->groupBy(
                 'master_tasks.id',
                 'master_tasks.judul',
@@ -613,13 +613,14 @@ class PatroliController extends Controller
             usort($final_list, function ($a, $b) {
                 return strtotime($a->jam_patrol) <=> strtotime($b->jam_patrol);
             });
-            $project  = Project::where('id',582307)->first();
+            $project  = Project::where('id',$project)->first();
             
             // Prepare final data
             $data = [
                 'patroli' => $final_list,
                 'jam' => "$jam1-$jam2",
                 'filter' => "$date1 $jam1 - $date2 $jam2",
+                'project_id' => $project->id ?? 0,
                 'project' => $project->name ?? 'Unknown Project',
                 'tanggal' => $tanggal ?? '',
             ];

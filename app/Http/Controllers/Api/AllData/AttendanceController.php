@@ -402,6 +402,7 @@ class AttendanceController extends Controller
         }
         return response()->json([
             'status' => 'success',
+            'message' => 'Employees retrieved successfully',
             'data' => $data
         ]);
     }
@@ -416,6 +417,18 @@ class AttendanceController extends Controller
             'periode' => 'required',
             'man_backup' => 'nullable'
         ]);
+
+        
+        // $schedule = Schedule::where('employee', $validated['employee'])
+        //     ->where('tanggal', $validated['tanggal'])
+        //     ->first();
+
+        // if($schedule->shift == $validated['shift']){
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Karena shift utama sama dengan shift backup, tidak bisa melakukan backup.'
+        //     ], 400);
+        // }
 
         // // Insert the backup data into the database
         // DB::table('schedule_backups')->insert([

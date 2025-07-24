@@ -40,7 +40,7 @@ class ProjectController extends Controller
             'message' => 'Projects retrieved successfully'
         ];
  
-        return response()->json($records);
+        return response()->json($result, 200);
     }
 
     public function projectDetail(Request $request){

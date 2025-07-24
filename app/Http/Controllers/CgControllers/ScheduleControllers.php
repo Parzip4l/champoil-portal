@@ -40,7 +40,13 @@ class ScheduleControllers extends Controller
             ->groupBy('project', 'periode')
             ->orderBy(DB::raw("DATE_FORMAT(STR_TO_DATE(periode, '%Y-%m'), '%M-%Y')"), 'ASC'); // Ordering by month in the format MMM-YYYY
 
+        $getProject = Project::where('company', Auth::user()->company)
+            ->whereNull('deleted_at')
+            ->pluck('id')->toArray(); // Retrieve multiple IDs as an array
+
+
         if (Auth::user()->project_id == NULL) {
+            $get_data->whereIn('project', $getProject);
             if ($selectedPeriod) {
                 $get_data->where('periode', $selectedPeriod);
                 

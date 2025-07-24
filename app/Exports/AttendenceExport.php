@@ -37,7 +37,7 @@ class AttendenceExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        $headings = ['Nama Karyawan'];
+        $headings = ['Nama Karyawan',"NIK"];
         foreach ($this->dates as $date) {
             $headings[] = $date->format('d M');
         }
@@ -61,7 +61,7 @@ class AttendenceExport implements FromCollection, WithHeadings
         $data = [];
 
         foreach ($employees as $employee) {
-            $row = [$employee->nama];
+            $row = [$employee->nama, $employee->nik];
             $absens = Absen::where('nik', $employee->nik)
                 ->whereBetween('tanggal', [$this->startDate->format('Y-m-d'), $this->endDate->format('Y-m-d')])
                 ->get()

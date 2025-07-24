@@ -265,6 +265,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
     Route::resource('employee', App\Http\Controllers\Employee\EmployeeController::class);
     Route::resource('employee-resign', App\Http\Controllers\Employee\ResignController::class);
     Route::post('/employee.resign', [App\Http\Controllers\Employee\EmployeeController::class, 'resign'])->name('employee.resign');
+    Route::post('/employee.suratTugas', [App\Http\Controllers\Employee\EmployeeController::class, 'saveSuratTugas'])->name('employee.suratTugas');
     Route::get('/users/autocomplete', 'UserController@autocomplete')->name('users.autocomplete');
 
     Route::get('export-employee', [App\Http\Controllers\Employee\EmployeeController::class, 'exportEmployee'])->name('export.employee');

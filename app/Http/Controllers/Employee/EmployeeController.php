@@ -17,6 +17,7 @@ use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\Facades\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf; // Add this at the top if not already imported
 
 // Model
 use App\Employee;
@@ -42,6 +43,7 @@ use App\Company\CompanyModel;
 use App\Company\CompanySetting;
 use App\Company\WorkLocation;
 use App\RolesAuthority;
+use App\Models\Document\SuratTugas;
 
 class EmployeeController extends Controller
 {
@@ -67,6 +69,7 @@ class EmployeeController extends Controller
                                 ->where('jabatan','!=','')
                                 ->groupBy('jabatan')
                                 ->get();
+
         
         // dd($request->input('jenis_kelamin'));
         if ($request->ajax()) {
@@ -119,6 +122,14 @@ class EmployeeController extends Controller
                     // Menghasilkan tombol aksi dan modal untuk setiap karyawan
                     $editUrl = route('employee.edit', ['employee' => $data->nik]);
                     $viewUrl = route('employee.show', $data->id);
+                    $code = Auth::user()->employee_code;
+                    $company = Employee::where('nik', $code)->first();
+                    $projects = Project::where('company', $company->unit_bisnis)->whereNull('deleted_at')->get();       
+                    $project_list ="";
+                    foreach ($projects as $project) {
+                        $selected = $data->project_id == $project->id ? 'selected' : '';
+                        $project_list .= '<option value="' . $project->id . '" ' . $selected . '>' . htmlspecialchars($project->name) . '</option>';
+                    }
 
                     return '
                     <div class="dropdown">
@@ -134,6 +145,9 @@ class EmployeeController extends Controller
                             </a>
                             <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#resignModal-' . $data->id . '">
                                 <i data-feather="user-x" class="icon-sm me-2"></i> <span>Resign</span>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#suratTugas-' . $data->id . '">
+                                <i data-feather="user-x" class="icon-sm me-2"></i> <span>Surat Tugas</span>
                             </a>
                         </div>
                     </div>
@@ -167,6 +181,43 @@ class EmployeeController extends Controller
                                     </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-danger">Konfirmasi Pengunduran Diri</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="suratTugas-' . $data->id . '" tabindex="-1" aria-labelledby="resignModalLabel-' . $data->id . '" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="resignModalLabel-' . $data->id . '">Surat Tugas : ' . $data->nama . '</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="' . route('employee.suratTugas') . '" method="POST">
+                                    ' . csrf_field() . '
+                                    <input type="hidden" name="id" value="' . $data->id . '">
+                                    <input type="hidden" name="nik" value="' . $data->ktp . '">
+                                    <input type="hidden" name="created_by" value="' . @$code . '">
+                                    <div class="modal-body">
+                                        <div class="form-group mb-3">
+                                            <label for="tmt-' . $data->id . '" class="mb-2">TMT</label>
+                                            <input type="date" name="tmt" class="form-control" id="tmt-' . $data->id . '" required>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="project-' . $data->id . '" class="mb-2">Project</label>
+                                            <select name="project" class="form-control select2" id="project-' . $data->id . '" required>
+                                                <option value="">Pilih Project</option>
+                                                ' . $project_list . '
+                                            </select>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="keterangan-' . $data->id . '" class="mb-2">Keterangan</label>
+                                            <textarea name="keterangan" class="form-control" id="keterangan-' . $data->id . '" rows="3" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Simpan Surat Tugas</button>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                     </div>
                                 </form>
@@ -1176,5 +1227,83 @@ Password: ".$request->password;
         $unixTimestampString = date('ymdHis', $unixTimestampNumber);
 
         return "CITY".$unixTimestampString;
+    }
+
+    public function saveSuratTugas(Request $request)
+    {
+        try {
+            $request->validate([
+                'nik' => 'required',
+                'tmt' => 'required|date',
+                'project' => 'required',
+                'keterangan' => 'required',
+                'created_by' => 'required',
+            ]);
+
+            DB::beginTransaction();
+
+            // Get the current year
+            $currentYear = date('Y');
+
+            // Find the highest existing nomor for the current year
+            $lastNomor = SuratTugas::where('tahun', $currentYear)
+                ->selectRaw('CAST(nomor AS UNSIGNED) as nomor')
+                ->orderBy('nomor', 'desc')
+                ->value('nomor');
+
+            // Increment the nomor or start from 1 if none exists
+            $newNomor = $lastNomor ? $lastNomor + 1 : 1;
+
+            // Format nomor as 3-digit
+            $formattedNomor = str_pad($newNomor, 3, '0', STR_PAD_LEFT);
+
+            $data = new SuratTugas;
+            $data->nomor = $formattedNomor;
+            $data->nik = $request->nik;
+            $data->tmt = $request->tmt;
+            $data->kode = "ST-CITY"; // Set this if needed
+            $data->divisi = "OPS";
+            $data->bulan = date('m');
+            $data->tahun = $currentYear;
+            $data->project = $request->project;
+            $data->keterangan = $request->keterangan;
+            $data->created_by = $request->created_by;
+            $data->save();
+
+            // Generate PDF
+            $pdfData = [
+                'nomor' => $formattedNomor,
+                'nik' => $request->nik,
+                'tmt' => $request->tmt,
+                'nama' => strtoupper(Employee::where('nik', $request->nik)->value('nama')),
+                'pembuat' => strtoupper(Employee::where('nik', $request->created_by)->value('nama')),
+                'project' => Project::where('id',$request->project)->value('name'),
+                'keterangan' => $request->keterangan,
+                'created_by' => $request->created_by,
+                'bulan' => $this->convertToRoman($data->bulan),
+                'tahun' => $data->tahun,
+                'divisi' => "OPS",
+                'kode' => "ST-CITY",
+            ];
+
+            $pdf = Pdf::loadView('pdf.surat_tugas', $pdfData);
+            $pdfPath = public_path('surat_tugas/surat_tugas_' . $formattedNomor . '.pdf');
+            $pdf->save($pdfPath);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Surat Tugas Berhasil Dibuat');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal membuat Surat Tugas: ' . $e->getMessage());
+        }
+    }
+    private function convertToRoman($month)
+    {
+        $map = [
+            "01" => 'I', "02" => 'II', "03" => 'III', "04" => 'IV', "05" => 'V', 
+            "06" => 'VI', "07" => 'VII', "08" => 'VIII', "09" => 'IX', "10" => 'X', 
+            "11" => 'XI', "12" => 'XII'
+        ];
+        return $map[$month] ?? $month;
     }
 }

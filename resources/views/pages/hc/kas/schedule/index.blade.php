@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
+                    <table id="" class="table">
                         <thead>
                             <tr>
                                 <th>Project</th>
@@ -54,11 +54,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php  
+                                $totalMp = 0;
+                            @endphp
                             @foreach ($schedulesByProject as $scheduleByProject)
                             <tr>
                                 @php
                                     $project = \App\ModelCG\Project::find($scheduleByProject->project);
                                     $projectname = isset($project->name) ? $project->name : 'Project not found';
+                                    $totalMp += $scheduleByProject->total_mp;
                                 @endphp
                                 <td>{{ $projectname }}</td>
                                 <td>{{ $scheduleByProject->periode }}</td>
@@ -79,6 +83,10 @@
                                 </td>
                             </tr>
                             @endforeach
+                            <tr>
+                                <td colspan="2">Total MP</td>
+                                <td colspan="7">{{ $totalMp }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

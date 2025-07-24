@@ -300,7 +300,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/ocr', [OcrController::class, 'parseImage']);
 
     Route::prefix('pengajuan')->group(function () {
-        Route::get('/backupShiftList', [AllDataController::class, 'getShift']);
+        Route::get('/backupShiftList', [AttendanceController::class, 'getShift']);
     });
     
     

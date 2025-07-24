@@ -30,7 +30,7 @@ class ProjectController extends Controller
                             ->whereNull('deleted_at') // Ensures only non-deleted records are retrieved
                             ->get();
 
-        if($record->isEmpty()){
+        if($records->isEmpty()){
             return response()->json(['status' => 'success','message' => 'No projects found'], 404);
         }
 

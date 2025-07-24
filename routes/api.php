@@ -298,6 +298,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/dev-stats', [DeveloperController::class, 'index']);
 
     Route::post('/ocr', [OcrController::class, 'parseImage']);
+
+    Route::prefix('pengajuan')->group(function () {
+        Route::get('/backupShiftList', [AllDataController::class, 'getShift']);
+    });
     
     
 });

@@ -356,4 +356,19 @@ class AttendanceController extends Controller
             'download_url' => Storage::url($filePath)
         ]);
     }
+
+    public function getShift(Request $request)
+    {
+        $data = [
+            ['value' => 'PG', 'label' => 'Backup Pagi'],
+            ['value' => 'MD', 'label' => 'Backup Middle'],
+            ['value' => 'ML', 'label' => 'Backup Malam'],
+            ['value' => 'NS', 'label' => 'Backup Non Shift']
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
 }

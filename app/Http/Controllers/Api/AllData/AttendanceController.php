@@ -405,4 +405,14 @@ class AttendanceController extends Controller
             'data' => $data
         ]);
     }
+
+    public function storeBackup(Request $request)
+    {
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Backup request submitted successfully',
+            'data' => []
+        ]);
+    }
 }

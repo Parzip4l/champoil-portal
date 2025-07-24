@@ -301,6 +301,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('pengajuan')->group(function () {
         Route::get('/backupShiftList', [AttendanceController::class, 'getShift']);
+        Route::post('/replaceMan', [AttendanceController::class, 'replaceBackup']);
     });
     
     

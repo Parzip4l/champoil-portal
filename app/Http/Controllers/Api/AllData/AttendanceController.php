@@ -371,4 +371,38 @@ class AttendanceController extends Controller
             'data' => $data
         ]);
     }
+
+    public function replaceBackup(Request $request)
+    {
+        $project = $request->project_id;
+        $shift = $request->shift;
+        $tanggal = $request->tanggal;
+        
+
+        $employee = Employee::join('schedules', 'karyawan.nik', '=', 'schedules.employee')
+            ->where('schedules.project', $project)
+            ->where('schedules.shift', $shift)
+            ->where('schedules.tanggal', $tanggal)
+            ->select('karyawan.nik', 'karyawan.nama')
+            ->get();
+
+
+        if ($employee->isEmpty()) { 
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No employees found for the given project, shift, and date.'
+            ], 404);
+        }
+        $data = [];
+        foreach ($employee as $emp) {
+            $data[] = [
+                'value' => $emp->nik,
+                'label' => $emp->nama
+            ];  
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
 }

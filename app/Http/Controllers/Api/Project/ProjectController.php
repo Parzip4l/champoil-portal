@@ -29,6 +29,16 @@ class ProjectController extends Controller
         $records = Project::where('company', 'like', '%' . $request->company . '%')
                             ->whereNull('deleted_at') // Ensures only non-deleted records are retrieved
                             ->get();
+
+        if($record->isEmpty()){
+            return response()->json(['status' => 'success','message' => 'No projects found'], 404);
+        }
+
+        $result=[
+            'status' => 'success',
+            'data' => $records,
+            'message' => 'Projects retrieved successfully'
+        ];
  
         return response()->json($records);
     }

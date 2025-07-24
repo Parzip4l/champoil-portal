@@ -408,7 +408,27 @@ class AttendanceController extends Controller
 
     public function storeBackup(Request $request)
     {
-        
+        $validated = $request->validate([
+            'employee' => 'required',
+            'project' => 'required',
+            'tanggal' => 'required|date',
+            'shift' => 'required',
+            'periode' => 'required',
+            'man_backup' => 'nullable'
+        ]);
+
+        // // Insert the backup data into the database
+        // DB::table('schedule_backups')->insert([
+        //     'employee' => $validated['employee'],
+        //     'project' => $validated['project'],
+        //     'tanggal' => $validated['tanggal'],
+        //     'shift' => $validated['shift'],
+        //     'periode' => $validated['periode'],
+        //     'man_backup' => $validated['man_backup'] ?? null,
+        //     'created_at' => now(),
+        //     'updated_at' => now()
+        // ]);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Backup request submitted successfully',

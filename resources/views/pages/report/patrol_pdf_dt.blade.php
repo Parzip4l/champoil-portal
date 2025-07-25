@@ -1,34 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Patroli</title>
+    <title>Patrol Report</title>
+    <style>
+        /* ...existing styles... */
+        @page {
+            margin: 0px;
+        }
+        body {
+            margin: 160px 20px 180px 20px; /* Add margins to avoid overlap with header and footer */
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 150px; /* Define height for the header */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-image: url('{{ public_path('images/header.png') }}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: top center;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 130px; /* Define height for the footer */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-image: url('{{ public_path('images/footer.png') }}');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
 </head>
 <body>
-    
-    <!-- Header with logo and title in one row using inline CSS -->
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        
-        <div style="text-align: center;">
-            
-        </div>
-    </div>
-    @if($project_id == 582307)
-    <table>
-        <tr>
-            <td>
-                <img src="https://hris.truest.co.id/images/company_logo/hilt2.png" style="width: 200px;" alt="Company Logo">
-            </td>
-            <td style="text-align:center">
-                <h2 style="margin: 0;">DOUBLETREE By HILTON <br/>JAKARTA
-                KEMAYORAN</h2>
-                <h4 style="margin: 0;">{{ $filter }}</h4>
-            </td>
-        </tr>
+    <header>
+    <table style="padding-bottom:40px;width:75%">
+        @if($project_id == 582307)
+            <tr>
+                <td>
+                    <img src="https://hris.truest.co.id/images/company_logo/hilt2.png" style="width:120px;" alt="Company Logo">
+                </td>
+                <td style="text-align:center">
+                    <h2 style="margin: 0;">DOUBLETREE By HILTON <br/>JAKARTA
+                    KEMAYORAN</h2>
+                    <h4 style="margin: 0;">{{ $filter }}</h4>
+                </td>
+            </tr>
+        @else
+            <tr>
+                <td>
+                    <img src="https://hris.truest.co.id/images/company_logo/hilt2.png" style="width:120px;" alt="Company Logo">
+                </td>
+                <td style="text-align:center">
+                    <h2 style="margin: 0;">{{ $project }}</h2>
+                    <h4 style="margin: 0;">{{ $filter }}</h4>
+                </td>
+            </tr>
+        @endif
     </table>
-    @endif
-    
+    </header>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; border: 1px solid #ddd; font-size: 9px !important;">
         <thead>
             <tr style="background-color: #f2f2f2; text-align: left;">
@@ -85,5 +123,16 @@
             @endforeach
         </tbody>
     </table>
+    <footer>
+        <!-- <p>Page <span class="page-number"></span></p> -->
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const pageNumbers = document.querySelectorAll('.page-number');
+            pageNumbers.forEach((el, index) => {
+                el.textContent = index + 1;
+            });
+        });
+    </script>
 </body>
 </html>

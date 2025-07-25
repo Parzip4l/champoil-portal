@@ -33,7 +33,7 @@
                 <td><strong>CERTIFICATE OF EMPLOYMENT</strong></td>
             </tr>
             <tr>
-                <td><em>{{$nomor}}/HC/SKK-KAS/{{convertToRoman(date('m',strtotime($resign->created_at))) }}/{{ date('Y',strtotime($resign->created_at)) }}</em></td>
+                <td><em>{{$nomor}}/HC/SKK-KAS/{{$bulan}}/{{ $tahun }}</em></td>
             </tr>
         </thead>
     </table>
@@ -89,10 +89,10 @@
                 Jakarta, {{ date('d F Y',strtotime($resign->created_at)) }}<br/>
                 Hormat Saya<br/>
                 <br/>
-                <img src="https://hris.truest.co.id/images/company_logo/Bima.png" style="width: 90px; text-align: left;" alt="Company Logo">
+                <img src="{{ public_path('images/ttd_rizka.png') }}" style="width: 90px; text-align: left;" alt="ttd">
                 <img src="https://hris.truest.co.id/images/company_logo/stampel.png" style="width: 110px;margin-top:20px;margin-left:-60px;" alt="Company Logo"><br/>
-                <u><strong>Bima Dwi Yoga Octosella</strong></u><br/>
-                <p>Human Culture Manager </p>
+                <u><strong>Rizka Mega Anggraeni</strong></u><br/>
+                <p>Human Culture </p>
 
             </td>
         </tr>

@@ -1286,9 +1286,12 @@ Password: ".$request->password;
                 'kode' => "ST-CITY",
             ];
 
-            $pdf = Pdf::loadView('pdf.surat_tugas', $pdfData);
+            $pdf = Pdf::loadView('pdf.surat_tugas', $pdfData)->setPaper('a4');
             $pdfPath = public_path('surat_tugas/surat_tugas_' . $formattedNomor . '.pdf');
             $pdf->save($pdfPath);
+
+            // Return the file as a download response
+            return response()->download($pdfPath)->deleteFileAfterSend(true);
 
             DB::commit();
             return redirect()->back()->with('success', 'Surat Tugas Berhasil Dibuat');

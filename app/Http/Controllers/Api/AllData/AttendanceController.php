@@ -360,10 +360,10 @@ class AttendanceController extends Controller
     public function getShift(Request $request)
     {
         $data = [
-            ['value' => 'PG', 'label' => 'Backup Pagi'],
-            ['value' => 'MD', 'label' => 'Backup Middle'],
-            ['value' => 'ML', 'label' => 'Backup Malam'],
-            ['value' => 'NS', 'label' => 'Backup Non Shift']
+            ['value' => 'PG', 'label' => 'BACKUP PAGI'],
+            ['value' => 'MD', 'label' => 'BACKUP MIDDLE'],
+            ['value' => 'ML', 'label' => 'BACKUP MALAM'],
+            ['value' => 'NS', 'label' => 'BACKUP NON SHIFT']
         ];
 
         return response()->json([
@@ -397,7 +397,7 @@ class AttendanceController extends Controller
         foreach ($employee as $emp) {
             $data[] = [
                 'value' => $emp->nik,
-                'label' => $emp->nama
+                'label' => strtoupper($emp->nama)
             ];  
         }
         return response()->json([
@@ -409,43 +409,63 @@ class AttendanceController extends Controller
 
     public function storeBackup(Request $request)
     {
-        $validated = $request->validate([
-            'employee' => 'required',
-            'project' => 'required',
-            'tanggal' => 'required|date',
-            'shift' => 'required',
-            'periode' => 'required',
-            'man_backup' => 'nullable'
-        ]);
+        try {
+            $validated = $request->validate([
+                'employee' => 'required',
+                'project' => 'required',
+                'tanggal' => 'required|date',
+                'shift' => 'required',
+                'periode' => 'required',
+                'man_backup' => 'required'
+            ]);
 
-        
-        // $schedule = Schedule::where('employee', $validated['employee'])
-        //     ->where('tanggal', $validated['tanggal'])
-        //     ->first();
+            $schedule = Schedule::where('employee', $validated['employee'])
+                ->where('tanggal', $validated['tanggal'])
+                ->first();
 
-        // if($schedule->shift == $validated['shift']){
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'Karena shift utama sama dengan shift backup, tidak bisa melakukan backup.'
-        //     ], 400);
-        // }
+            if ($schedule->shift == $validated['shift']) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Karena shift utama sama dengan shift backup, tidak bisa melakukan backup.'
+                ], 400);
+            }
 
-        // // Insert the backup data into the database
-        // DB::table('schedule_backups')->insert([
-        //     'employee' => $validated['employee'],
-        //     'project' => $validated['project'],
-        //     'tanggal' => $validated['tanggal'],
-        //     'shift' => $validated['shift'],
-        //     'periode' => $validated['periode'],
-        //     'man_backup' => $validated['man_backup'] ?? null,
-        //     'created_at' => now(),
-        //     'updated_at' => now()
-        // ]);
+            // Additional validation for PG shift
+            if ($validated['shift'] == 'PG') {
+                $previousDaySchedule = Schedule::where('employee', $validated['employee'])
+                    ->where('tanggal', Carbon::parse($validated['tanggal'])->subDay())
+                    ->first();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Backup request submitted successfully',
-            'data' => []
-        ]);
+                if ($previousDaySchedule && $previousDaySchedule->shift == 'ML') {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Anda Tidak Bisa Mengganti Shift Pagi, Karena Anda Kemarin Masuk Malam.'
+                    ], 400);
+                }
+            }
+
+            ScheduleBackup::create([
+                'employee' => $validated['employee'],
+                'project' => $validated['project'],
+                'tanggal' => $validated['tanggal'],
+                'shift' => $validated['shift'],
+                'periode' => $validated['periode'],
+                'man_backup' => $validated['man_backup'],
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Backup request submitted successfully',
+                'data' => []
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while processing the backup request.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

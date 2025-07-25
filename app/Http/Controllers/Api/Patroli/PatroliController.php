@@ -644,6 +644,16 @@ class PatroliController extends Controller
                 $pdf->setOption('isHtml5ParserEnabled', true);
                 $pdf->setOption('isPhpEnabled', true);
                 $pdf->setPaper('legal', 'portrait');
+
+                // Add background image
+                if ($project->id == 455823){
+                    $pdf->setOption('background', public_path('images/background.png'));
+                }
+
+                // Add header and footer images
+                $pdf->setOption('header-html', public_path('images/header.html'));
+                $pdf->setOption('footer-html', public_path('images/footer.html'));
+                
             
                 // Nama file unik untuk setiap PDF
                 $fileName = 'report_' . date('Ymd') . "_part_{$index}.pdf";
@@ -669,6 +679,7 @@ class PatroliController extends Controller
                 'message' => 'PDF files saved successfully',
                 'path' => $files,
                 'file_name'=>$fileName,
+                'project_detail'=>$project,
                 'project'=>$project->name,
                 'jml'=>count($final_list)
             ]);

@@ -1308,6 +1308,7 @@ class AllDataController extends Controller
             $resign = EmployeeResign::where('employee_code',$employee->nik)->first();
 
             $currentYear = date('Y');
+            $bulan = date('m');
 
             // Fetch the last `nomor` for the current year
             $lastPaklaring = Paklaring::where('tahun', $currentYear)->orderBy('nomor', 'desc')->first();
@@ -1323,7 +1324,8 @@ class AllDataController extends Controller
             // Insert the new paklaring record
             $insert = Paklaring::insert([
                 "nomor" => $newNomor,
-                "tahun" => $currentYear
+                "tahun" => $currentYear,
+                "bulan" => $bulan,
             ]);
 
            
@@ -1331,7 +1333,8 @@ class AllDataController extends Controller
                 'employee' => $employee,
                 'resign' => $resign,
                 "nomor" => $newNomor,
-                "tahun" => $currentYear
+                "tahun" => $currentYear,
+                "bulan" => $this->convertToRoman($bulan),
             ];
             
 
@@ -1361,6 +1364,7 @@ class AllDataController extends Controller
             // Return JSON response with file details
             return response()->json([
                 'message' => 'PDF file generated successfully',
+                'data'=>$data,
                 'path' => $fileUrl,
                 'file_name' => $fileName
             ]);
@@ -1372,6 +1376,18 @@ class AllDataController extends Controller
             ], 500);
         }
     }
+
+    private function convertToRoman($month)
+    {
+        $map = [
+            "01" => 'I', "02" => 'II', "03" => 'III', "04" => 'IV', "05" => 'V', 
+            "06" => 'VI', "07" => 'VII', "08" => 'VIII', "09" => 'IX', "10" => 'X', 
+            "11" => 'XI', "12" => 'XII'
+        ];
+        return $map[$month] ?? $month;
+    }
+
+
     public function  download_sertifikat($unitBisnis){
         $records = Employee::where('unit_bisnis', $unitBisnis)
                             ->where('resign_status', 0)

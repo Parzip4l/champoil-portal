@@ -54,6 +54,11 @@ class FirebaseService
     public function sendNotification($token, $title, $body, $data = [])
     {
         try {
+            // Validate that $data is an associative array (map)
+            if (!is_array($data) || array_keys($data) === range(0, count($data) - 1)) {
+                throw new \Exception('The "data" parameter must be an associative array.');
+            }
+
             $accessToken = $this->getAccessToken();
             $fcmUrl = "https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send";
 
@@ -75,21 +80,74 @@ class FirebaseService
                 ]
             ]);
 
+            $responseBody = json_decode($response->getBody(), true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Failed to decode JSON response: ' . json_last_error_msg());
+            }
+
             return [
                 'status' => 'success',
                 'message' => 'Notification sent successfully',
-                'response' => json_decode($response->getBody(), true)
+                'response' => $responseBody
             ];
 
         } catch (ConnectException $e) {
+            \Log::error('Connection error while sending notification', [
+                'token' => $token,
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'error' => $e->getMessage()
+            ]);
             return [
                 'status' => 'error',
                 'message' => 'Connection error: ' . $e->getMessage()
             ];
         } catch (MessagingException $e) {
+            \Log::error('FCM error while sending notification', [
+                'token' => $token,
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'error' => $e->getMessage()
+            ]);
             return [
                 'status' => 'error',
                 'message' => 'FCM error: ' . $e->getMessage()
+            ];
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $responseBody = $e->getResponse()->getBody()->getContents();
+            $decodedResponse = json_decode($responseBody, true);
+
+            // Log detailed error response
+            \Log::error('Client error while sending notification', [
+                'token' => $token,
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'error' => $e->getMessage(),
+                'response' => $decodedResponse
+            ]);
+
+            // Extract meaningful error message if available
+            $errorMessage = $decodedResponse['error']['message'] ?? 'Unknown error';
+            return [
+                'status' => 'error',
+                'message' => 'Client error: ' . $errorMessage,
+                'response' => $decodedResponse
+            ];
+        } catch (\Exception $e) {
+            \Log::error('General error while sending notification', [
+                'token' => $token,
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'error' => $e->getMessage()
+            ]);
+            return [
+                'status' => 'error',
+                'message' => 'General error: ' . $e->getMessage()
             ];
         }
     }

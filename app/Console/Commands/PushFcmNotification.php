@@ -49,23 +49,14 @@ class PushFcmNotification extends Command
         $title = $this->argument('title') ?? 'Default Title'; // Provide a default title
         $body = $this->argument('body') ?? 'Default Body'; // Provide a default body
 
-        // Determine the shift based on the current time
-        $currentHour = (int) date('H'); // Get the current hour in 24-hour format
-        if ($currentHour >= 8 && $currentHour < 10) {
-            $shift = "PG";
-        } elseif ($currentHour >= 14 && $currentHour < 16) {
-            $shift = "MD";
-        } elseif ($currentHour >= 18 && $currentHour <= 23) {
-            $shift = "ML";
-        } else {
-            $shift = "OFF"; // Default to "OFF" if no shift matches
-        }
+        
 
         // Fetch schedule and join with users and Firebase tokens
         $schedule = Schedule::join('users', 'schedules.employee', '=', 'users.name')
             ->join('firebase_tokens', 'users.id', '=', 'firebase_tokens.user_id')
             ->join('karyawan', 'schedules.employee', '=', 'karyawan.nik') // Ensure this join is correct
-            ->where('schedules.shift',$shift) // Example condition, adjust as needed
+            ->where('schedules.shift',"PG") // Example condition, adjust as needed
+            ->where('schedules.project',"382812") // Exclude OFF shifts
             ->where('schedules.tanggal',date('Y-m-d')) // Exclude OFF shifts
             ->get();
 
@@ -74,7 +65,7 @@ class PushFcmNotification extends Command
         // Alternatively, you can use:
         // print_r($schedule->toArray()); // Convert to array and print
 
-        if (!$schedule) {
+        if ($schedule->isEmpty()) { // Use isEmpty() to check if the collection is empty
             $this->error('No pending schedules found.');
             return Command::FAILURE;
         }

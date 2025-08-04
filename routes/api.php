@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\AllData\BackupRecordsController;
 
 use App\Http\Controllers\Api\OcrController;
 use App\Http\Controllers\Api\AllData\DeveloperController;
+use App\Http\Controllers\Api\CoverMe\CovermeController;
 
 
 Route::prefix('v1')->group(function () {
@@ -303,6 +304,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/backupShiftList', [AttendanceController::class, 'getShift']);
         Route::post('/replaceMan', [AttendanceController::class, 'replaceBackup']);
         Route::post('/replaceManStore', [AttendanceController::class, 'storeBackup']);
+    });
+
+    Route::prefix('cover-me')->group(function () {
+        Route::get('/list', [CovermeController::class, 'index']);
+        Route::get('/detail/{id}', [CovermeController::class, 'details']);
+        Route::post('/apply', [CovermeController::class, 'apply']);
+        Route::post('/post-comment', [CovermeController::class, 'postComment']);
     });
     
     

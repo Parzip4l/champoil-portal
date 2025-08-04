@@ -23,6 +23,11 @@ class CovermeController extends Controller
                 "profile_url" => "https://example.com/profiles/PR001",
                 "status" => "Aktif",
                 "sallary" => "Rp 5.000.000 - Rp 7.000.000",
+                "requirements" => [
+                    "Minimal pendidikan D3",
+                    "Pengalaman kerja minimal 2 tahun",
+                    "Mampu bekerja dalam tim"
+                ],
                 "maps" => "-6.200000,106.816666",
                 "comment" => [
                     [
@@ -50,6 +55,11 @@ class CovermeController extends Controller
                 "profile_url" => "https://example.com/profiles/PR002",
                 "status" => "Nonaktif",
                 "sallary" => "Rp 4.000.000 - Rp 6.000.000",
+                "requirements" => [
+                    "Minimal pendidikan SMA/SMK",
+                    "Memiliki SIM A atau C",
+                    "Bersedia bekerja shift malam"
+                ],
                 "maps" => "-6.914744,107.609810",
                 "comment" => [
                     [
@@ -77,6 +87,11 @@ class CovermeController extends Controller
                 "profile_url" => "https://example.com/profiles/PR003",
                 "status" => "Aktif",
                 "sallary" => "Rp 6.000.000 - Rp 8.000.000",
+                "requirements" => [
+                    "Minimal pendidikan S1 Teknik Sipil",
+                    "Pengalaman di bidang konstruksi minimal 3 tahun",
+                    "Mampu membaca gambar teknik"
+                ],
                 "maps" => "-7.250445,112.768845",
                 "comment" => [
                     [
@@ -118,6 +133,11 @@ class CovermeController extends Controller
                 "profile_url" => "https://example.com/profiles/PR001",
                 "status" => "Aktif",
                 "sallary" => "Rp 5.000.000 - Rp 7.000.000",
+                "requirements" => [
+                    "Minimal pendidikan D3",
+                    "Pengalaman kerja minimal 2 tahun",
+                    "Mampu bekerja dalam tim"
+                ],
                 "maps" => "-6.200000,106.816666",
                 "comment" => [
                     [
@@ -145,6 +165,11 @@ class CovermeController extends Controller
                 "profile_url" => "https://example.com/profiles/PR002",
                 "status" => "Nonaktif",
                 "sallary" => "Rp 4.000.000 - Rp 6.000.000",
+                "requirements" => [
+                    "Minimal pendidikan SMA/SMK",
+                    "Memiliki SIM A atau C",
+                    "Bersedia bekerja shift malam"
+                ],
                 "maps" => "-6.914744,107.609810",
                 "comment" => [
                     [
@@ -172,6 +197,11 @@ class CovermeController extends Controller
                 "profile_url" => "https://example.com/profiles/PR003",
                 "status" => "Aktif",
                 "sallary" => "Rp 6.000.000 - Rp 8.000.000",
+                "requirements" => [
+                    "Minimal pendidikan S1 Teknik Sipil",
+                    "Pengalaman di bidang konstruksi minimal 3 tahun",
+                    "Mampu membaca gambar teknik"
+                ],
                 "maps" => "-7.250445,112.768845",
                 "comment" => [
                     [

@@ -13,7 +13,7 @@ class CovermeController extends Controller
     {
         $data = [
             [
-                "nama_perusahaan" => "PT Maju Jaya Abadi",
+                "nama_perusahaan" => "IPEKA PLUIT",
                 "id_perusahaan" => "PR001",
                 "alamat_perusahaan" => "Jl. Merdeka No. 12, Jakarta Pusat",
                 "description" => "Perusahaan manufaktur komponen otomotif.",
@@ -22,11 +22,11 @@ class CovermeController extends Controller
                 "man_nik" => "320101198805010001",
                 "profile_url" => "https://example.com/profiles/PR001",
                 "status" => "Aktif",
-                "sallary" => "Rp 5.000.000 - Rp 7.000.000",
+                "sallary" => null,
                 "requirements" => [
-                    "Minimal pendidikan D3",
-                    "Pengalaman kerja minimal 2 tahun",
-                    "Mampu bekerja dalam tim"
+                    "Pengalaman",
+                    "GP",
+                    "LAKI - LAKI"
                 ],
                 "maps" => "-6.200000,106.816666",
                 "comment" => [
@@ -45,7 +45,7 @@ class CovermeController extends Controller
                 ]
             ],
             [
-                "nama_perusahaan" => "CV Sukses Selalu",
+                "nama_perusahaan" => "CHAMPOIL",
                 "id_perusahaan" => "PR002",
                 "alamat_perusahaan" => "Jl. Sudirman No. 45, Bandung",
                 "description" => "Perusahaan distribusi produk makanan dan minuman.",
@@ -54,11 +54,11 @@ class CovermeController extends Controller
                 "man_nik" => "320101197912120004",
                 "profile_url" => "https://example.com/profiles/PR002",
                 "status" => "Nonaktif",
-                "sallary" => "Rp 4.000.000 - Rp 6.000.000",
+                "sallary" => null,
                 "requirements" => [
-                    "Minimal pendidikan SMA/SMK",
-                    "Memiliki SIM A atau C",
-                    "Bersedia bekerja shift malam"
+                    "Pengalaman",
+                    "GP",
+                    "LAKI - LAKI"
                 ],
                 "maps" => "-6.914744,107.609810",
                 "comment" => [
@@ -77,7 +77,7 @@ class CovermeController extends Controller
                 ]
             ],
             [
-                "nama_perusahaan" => "PT Sejahtera Bersama",
+                "nama_perusahaan" => "MANDARIN ORIENTAL",
                 "id_perusahaan" => "PR003",
                 "alamat_perusahaan" => "Jl. Gatot Subroto No. 99, Surabaya",
                 "description" => "Perusahaan jasa konstruksi bangunan.",
@@ -86,11 +86,11 @@ class CovermeController extends Controller
                 "man_nik" => "320101198712070007",
                 "profile_url" => "https://example.com/profiles/PR003",
                 "status" => "Aktif",
-                "sallary" => "Rp 6.000.000 - Rp 8.000.000",
+                "sallary" => null,
                 "requirements" => [
-                    "Minimal pendidikan S1 Teknik Sipil",
-                    "Pengalaman di bidang konstruksi minimal 3 tahun",
-                    "Mampu membaca gambar teknik"
+                    "Pengalaman",
+                    "GP",
+                    "LAKI - LAKI"
                 ],
                 "maps" => "-7.250445,112.768845",
                 "comment" => [
@@ -123,7 +123,7 @@ class CovermeController extends Controller
     {
         $data = [
             "PR001" => [
-                "nama_perusahaan" => "PT Maju Jaya Abadi",
+                "nama_perusahaan" => "IPEKA PLUIT",
                 "id_perusahaan" => "PR001",
                 "alamat_perusahaan" => "Jl. Merdeka No. 12, Jakarta Pusat",
                 "description" => "Perusahaan manufaktur komponen otomotif.",
@@ -132,11 +132,11 @@ class CovermeController extends Controller
                 "man_nik" => "320101198805010001",
                 "profile_url" => "https://example.com/profiles/PR001",
                 "status" => "Aktif",
-                "sallary" => "Rp 5.000.000 - Rp 7.000.000",
+                "sallary" => null,
                 "requirements" => [
-                    "Minimal pendidikan D3",
-                    "Pengalaman kerja minimal 2 tahun",
-                    "Mampu bekerja dalam tim"
+                    "Pengalaman",
+                    "GP",
+                    "LAKI - LAKI"
                 ],
                 "maps" => "-6.200000,106.816666",
                 "comment" => [
@@ -155,7 +155,7 @@ class CovermeController extends Controller
                 ]
             ],
             "PR002" => [
-                "nama_perusahaan" => "CV Sukses Selalu",
+                "nama_perusahaan" => "CHAMPOIL",
                 "id_perusahaan" => "PR002",
                 "alamat_perusahaan" => "Jl. Sudirman No. 45, Bandung",
                 "description" => "Perusahaan distribusi produk makanan dan minuman.",
@@ -164,11 +164,11 @@ class CovermeController extends Controller
                 "man_nik" => "320101197912120004",
                 "profile_url" => "https://example.com/profiles/PR002",
                 "status" => "Nonaktif",
-                "sallary" => "Rp 4.000.000 - Rp 6.000.000",
+                "sallary" => null,
                 "requirements" => [
-                    "Minimal pendidikan SMA/SMK",
-                    "Memiliki SIM A atau C",
-                    "Bersedia bekerja shift malam"
+                    "Pengalaman",
+                    "GP",
+                    "LAKI - LAKI"
                 ],
                 "maps" => "-6.914744,107.609810",
                 "comment" => [
@@ -187,7 +187,7 @@ class CovermeController extends Controller
                 ]
             ],
             "PR003" => [
-                "nama_perusahaan" => "PT Sejahtera Bersama",
+                "nama_perusahaan" => "MANDARIN ORIENTAL",
                 "id_perusahaan" => "PR003",
                 "alamat_perusahaan" => "Jl. Gatot Subroto No. 99, Surabaya",
                 "description" => "Perusahaan jasa konstruksi bangunan.",
@@ -196,11 +196,11 @@ class CovermeController extends Controller
                 "man_nik" => "320101198712070007",
                 "profile_url" => "https://example.com/profiles/PR003",
                 "status" => "Aktif",
-                "sallary" => "Rp 6.000.000 - Rp 8.000.000",
+                "sallary" => null,
                 "requirements" => [
-                    "Minimal pendidikan S1 Teknik Sipil",
-                    "Pengalaman di bidang konstruksi minimal 3 tahun",
-                    "Mampu membaca gambar teknik"
+                    "Pengalaman",
+                    "GP",
+                    "LAKI - LAKI"
                 ],
                 "maps" => "-7.250445,112.768845",
                 "comment" => [

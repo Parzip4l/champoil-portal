@@ -80,8 +80,8 @@ class PushFcmNotification extends Command
             }
 
             $token = $user_data->token;
-            $title = 'Reminder Absen'; // Set title to "Reminder Absen"
-            $body = "Halo {$user_data->nama}, Anda belum melakukan absen untuk {$user_data->shift}. Silahkan absen."; // Set body with user name
+            $title = 'REMINDER ABSEN'; // Set title to "Reminder Absen"
+            $body = "Hallo {$user_data->nama}, Anda belum melakukan absen untuk Shift {$user_data->shift}. Silahkan absen segera."; // Set body with user name
             $data = $this->option('data');
 
             // Debug $data using dd

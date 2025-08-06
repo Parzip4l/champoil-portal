@@ -26,13 +26,11 @@ class FirebaseTokenController extends Controller
         if ($cek) {
             FirebaseToken::where('user_id', $user->id)->delete(); // Hapus token lama jika ada
         }
-       
 
-       
-        FirebaseToken::create(
-            ['user_id' => $user->id], 
-            ['token' => $request->token] 
-        );
+        FirebaseToken::create([
+            'user_id' => $user->id,
+            'token' => $request->token
+        ]);
 
         return response()->json(['message' => 'Token berhasil disimpan'], 200);
     }

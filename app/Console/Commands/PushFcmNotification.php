@@ -16,7 +16,7 @@ class PushFcmNotification extends Command
      *
      * @var string
      */
-    protected $signature = 'fcm:push {token?} {title?} {body?} {--data=*}';
+    protected $signature = 'fcm:push {token?} {title?} {body?} {--data=*} {--shift=}';
 
     /**
      * The console command description.
@@ -49,15 +49,14 @@ class PushFcmNotification extends Command
         $title = $this->argument('title') ?? 'Default Title'; // Provide a default title
         $body = $this->argument('body') ?? 'Default Body'; // Provide a default body
 
-        
-
         // Fetch schedule and join with users and Firebase tokens
+        $shift = $this->option('shift') ?? 'PG'; // Default to "PG" if no shift is provided
         $schedule = Schedule::join('users', 'schedules.employee', '=', 'users.name')
             ->join('firebase_tokens', 'users.id', '=', 'firebase_tokens.user_id')
             ->join('karyawan', 'schedules.employee', '=', 'karyawan.nik') // Ensure this join is correct
-            ->where('schedules.shift',"PG") // Example condition, adjust as needed
-            ->where('schedules.project',"382812") // Exclude OFF shifts
-            ->where('schedules.tanggal',date('Y-m-d')) // Exclude OFF shifts
+            ->where('schedules.shift', $shift) // Use the shift from the --shift option
+            ->where('schedules.project', "382812") // Example condition, adjust as needed
+            ->where('schedules.tanggal', date('Y-m-d')) // Exclude OFF shifts
             ->get();
 
         // Print the result of the query

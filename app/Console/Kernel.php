@@ -28,6 +28,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('kirim:artikel')->dailyAt('08:30');
         $schedule->command('tasks:repeat')->daily();
         $schedule->command('slack:attendance-report')->dailyAt('16:00');
+        $schedule->command('fcm:push --data=screen=absen --shift=PG')->dailyAt('09:00');
+        $schedule->command('fcm:push --data=screen=absen --shift=MD')->dailyAt('15:00');
+        $schedule->command('fcm:push --data=screen=absen --shift=ML')->dailyAt('20:00');
     }
 
     /**

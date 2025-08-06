@@ -22,11 +22,14 @@ class FirebaseTokenController extends Controller
 
         $user = Auth::user(); // Mendapatkan pengguna yang terautentikasi
 
-
-        FirebaseToken::where('user_id', $user->id)->delete(); // Hapus token lama jika ada
+        $cek = FirebaseToken::where('user_id', $user->id)->first();
+        if ($cek) {
+            FirebaseToken::where('user_id', $user->id)->delete(); // Hapus token lama jika ada
+        }
+       
 
        
-        FirebaseToken::updateOrCreate(
+        FirebaseToken::create(
             ['user_id' => $user->id], 
             ['token' => $request->token] 
         );

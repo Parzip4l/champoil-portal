@@ -55,7 +55,6 @@ class PushFcmNotification extends Command
             ->join('firebase_tokens', 'users.id', '=', 'firebase_tokens.user_id')
             ->join('karyawan', 'schedules.employee', '=', 'karyawan.nik') // Ensure this join is correct
             ->where('schedules.shift', $shift) // Use the shift from the --shift option
-            ->where('schedules.project', "382812") // Example condition, adjust as needed
             ->where('schedules.tanggal', date('Y-m-d')) // Exclude OFF shifts
             ->get();
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\CoverMe; // Assuming you have a CoverMe model
 use App\Models\CoverComment; // Assuming you have a CoverMeComment model
 use App\Models\CoverClaim; // Assuming you have a CoverMeApply model
+use App\Models\CategoryRequirements; // Assuming you have a CoverMeResource for API responses
 
 class CovermeController extends Controller
 {
@@ -368,6 +369,24 @@ class CovermeController extends Controller
                 "status" => "success",
                 "message" => "Data klaim berhasil diambil.",
                 "data" => $claims
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getRequirements()
+    {
+        try {
+            $requirements = CategoryRequirements::all();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Data persyaratan berhasil diambil.",
+                "data" => $requirements
             ]);
         } catch (\Exception $e) {
             return response()->json([

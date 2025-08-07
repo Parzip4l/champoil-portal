@@ -315,6 +315,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/claim-cover', [CovermeController::class, 'claim']);
         Route::post('/action-cover', [CovermeController::class, 'actionClaim']);
         Route::get('/list-claim', [CovermeController::class, 'getClaim']);
+        Route::get('/claim-detail/{id}', [CovermeController::class, 'claimDetail']);
+        Route::get('/category-requirements', [CovermeController::class, 'getRequirements']);
     });
     
     

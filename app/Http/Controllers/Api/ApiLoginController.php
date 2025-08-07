@@ -218,7 +218,7 @@ class ApiLoginController extends Controller
                     'success' => false,
                 ], 200);
             }
-            if (!empty($Schedule) && $Schedule->shift === 'OFF' && $unit_bisnis->unit_bisnis !== 'CHAMPOIL') {
+            if (!empty($Schedule) && $Schedule->shift === 'OFF' && $unit_bisnis->unit_bisnis !== 'CHAMPOIL' && !$schedulebackup) {
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Absen Masuk Ditolak, Schedule OFF. Hubungi team leader.',

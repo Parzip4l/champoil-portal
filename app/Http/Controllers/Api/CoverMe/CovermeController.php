@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Api\CoverMe;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Models\CoverMe; // Assuming you have a CoverMe model
+use App\Models\CoverComment; // Assuming you have a CoverMeComment model
+use App\Models\CoverClaim; // Assuming you have a CoverMeApply model
+
 class CovermeController extends Controller
 {
     //
@@ -236,32 +240,140 @@ class CovermeController extends Controller
 
     public function apply(Request $request)
     {
-        $validated = $request->validate([
-            'id_perusahaan' => 'required|string',
-            'nik' => 'required|string',
-            'name' => 'required|string'
-        ]);
+        try {
+            $validated = $request->validate([
+                'id_perusahaan' => 'required|string',
+                'nik' => 'required|string',
+                'name' => 'required|string'
+            ]);
 
-        return response()->json([
-            "status" => "success",
-            "message" => "Lamaran berhasil diajukan.",
-            "data" => $validated
-        ]);
+            return response()->json([
+                "status" => "success",
+                "message" => "Lamaran berhasil diajukan.",
+                "data" => $validated
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function postComment(Request $request)
     {
-        $validated = $request->validate([
-            'id_cover_me' => 'required|integer',
-            'nik' => 'required|string',
-            'name' => 'required|string',
-            'comment' => 'required|string'
-        ]);
+        try {
+            $validated = $request->validate([
+                'id_cover_me' => 'required|integer',
+                'nik' => 'required|string',
+                'name' => 'required|string',
+                'comment' => 'required|string'
+            ]);
 
-        return response()->json([
-            "status" => "success",
-            "message" => "Komentar berhasil ditambahkan.",
-            "data" => $validated
-        ]);
+            return response()->json([
+                "status" => "success",
+                "message" => "Komentar berhasil ditambahkan.",
+                "data" => $validated
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'id_perusahaan' => 'required|integer',
+                'nik_cover' => 'required|integer',
+                'tanggal' => 'required|date',
+                'shift' => 'required|string',
+                'requirements' => 'required|array',
+            ]);
+
+            // Encode requirements as JSON
+            $validated['requirements'] = json_encode($validated['requirements']);
+
+            // Assuming you have a CoverMe model to handle the data
+            $coverMe = CoverMe::create($validated);
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Data berhasil disimpan.",
+                "data" => $coverMe
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function claim(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'cover_id' => 'required|integer',
+                'nik' => 'required|string'
+            ]);
+            $validated['status'] = 0; // Default status for new claims
+            // Assuming you have a CoverClaim model to handle the data
+            $coverClaim = CoverClaim::create($validated);
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Klaim berhasil diajukan.",
+                "data" => $coverClaim
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function actionClaim(Request $request)
+    {
+        try {
+            $claim_id = $request->input('claim_id');
+            $claim = CoverClaim::findOrFail($claim_id);
+            $claim->status = $request->input('status', $claim->status);
+            $claim->action_by = $request->input('action_by', 00000); // Default to 00000 if not provided
+            $claim->save();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Status klaim berhasil diperbarui.",
+                "data" => $claim
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getClaim(Request $request)
+    {
+        try {
+            $claims = CoverClaim::all();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Data klaim berhasil diambil.",
+                "data" => $claims
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ], 500);
+        }
     }
 }

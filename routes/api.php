@@ -311,6 +311,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/detail/{id}', [CovermeController::class, 'details']);
         Route::post('/apply', [CovermeController::class, 'apply']);
         Route::post('/post-comment', [CovermeController::class, 'postComment']);
+        Route::post('/create-cover', [CovermeController::class, 'store']);
+        Route::post('/claim-cover', [CovermeController::class, 'claim']);
+        Route::post('/action-cover', [CovermeController::class, 'actionClaim']);
+        Route::get('/list-claim', [CovermeController::class, 'getClaim']);
     });
     
     

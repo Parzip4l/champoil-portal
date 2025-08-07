@@ -72,54 +72,54 @@ class CovermeController extends Controller
     }
 
     public function details($id){
-    $record = CoverMe::find($id);
+        $record = CoverMe::find($id);
 
-    if (!$record) {
-        return response()->json([
-            "status" => "error",
-            "message" => "Perusahaan tidak ditemukan."
-        ], 404);
-    }
+        if (!$record) {
+            return response()->json([
+                "status" => "error",
+                "message" => "Perusahaan tidak ditemukan."
+            ], 404);
+        }
 
-    $nama_perusahaan = project_byID($record->id_perusahaan);
-    $karyawan = karyawan_bynik($record->nik_cover);
+        $nama_perusahaan = project_byID($record->id_perusahaan);
+        $karyawan = karyawan_bynik($record->nik_cover);
 
-    $detail = [
-        "id" => $record->id,
-        "nama_perusahaan" => $nama_perusahaan->name,
-        "id_perusahaan" => $record->id_perusahaan,
-        "alamat_perusahaan" => $nama_perusahaan->badan,
-        "description" => $record->description ?? '', // Jika field ada
-        "shift" => $record->shift,
-        "man_replace" => $karyawan->nama ?? null,
-        "man_nik" => $karyawan->nik ?? null,
-        "profile_url" => "https://example.com/profiles/" . $record->id_perusahaan,
-        "status" => "Aktif", // Atau ambil dari field jika tersedia
-        "sallary" => $record->sallary ?? null, // Jika field ada
-        "requirements" => json_decode($record->requirements, true),
-        "maps" => $nama_perusahaan->latitude . ',' . $nama_perusahaan->longtitude,
-        "comment" => [
-            [
-                "nik" => "320101199001010002",
-                "name" => "Andi Wijaya",
-                "profile_url" => "https://example.com/profiles/320101199001010002",
-                "comment" => "Pelayanan cepat dan ramah."
-            ],
-            [
-                "nik" => "320101199202020003",
-                "name" => "Rina Putri",
-                "profile_url" => "https://example.com/profiles/320101199202020003",
-                "comment" => "Tempat kerja nyaman."
+        $detail = [
+            "id" => $record->id,
+            "nama_perusahaan" => $nama_perusahaan->name,
+            "id_perusahaan" => $record->id_perusahaan,
+            "alamat_perusahaan" => $nama_perusahaan->badan,
+            "description" => $record->description ?? '', // Jika field ada
+            "shift" => $record->shift,
+            "man_replace" => $karyawan->nama ?? null,
+            "man_nik" => $karyawan->nik ?? null,
+            "profile_url" => "https://example.com/profiles/" . $record->id_perusahaan,
+            "status" => "Aktif", // Atau ambil dari field jika tersedia
+            "sallary" => $record->sallary ?? null, // Jika field ada
+            "requirements" => json_decode($record->requirements, true),
+            "maps" => $nama_perusahaan->latitude . ',' . $nama_perusahaan->longtitude,
+            "comment" => [
+                [
+                    "nik" => "320101199001010002",
+                    "name" => "Andi Wijaya",
+                    "profile_url" => "https://example.com/profiles/320101199001010002",
+                    "comment" => "Pelayanan cepat dan ramah."
+                ],
+                [
+                    "nik" => "320101199202020003",
+                    "name" => "Rina Putri",
+                    "profile_url" => "https://example.com/profiles/320101199202020003",
+                    "comment" => "Tempat kerja nyaman."
+                ]
             ]
-        ]
-    ];
+        ];
 
-    return response()->json([
-        "status" => "success",
-        "message" => "Detail perusahaan berhasil diambil.",
-        "data" => $detail
-    ]);
-}
+        return response()->json([
+            "status" => "success",
+            "message" => "Detail perusahaan berhasil diambil.",
+            "data" => $detail
+        ]);
+    }
 
 
     public function apply(Request $request)
@@ -246,12 +246,47 @@ class CovermeController extends Controller
     public function getClaim(Request $request)
     {
         try {
-            $claims = CoverClaim::all();
+            $claims = CoverClaim::join('cover_mes', 'cover_claims.cover_id', '=', 'cover_mes.id')
+                ->select('cover_claims.*', 'cover_mes.id_perusahaan', 'cover_mes.nik_cover', 'cover_mes.shift')
+                ->get();
+
+            if ($claims->isEmpty()) {
+                return response()->json([
+                    "status" => "error",
+                    "message" => "Tidak ada data klaim."
+                ], 404);
+            }
+
+            $fixed_result = [];
+
+            foreach ($claims as $claim) {
+                $nama_perusahaan = project_byID($claim->id_perusahaan);
+                $karyawan = karyawan_bynik($claim->nik_cover);
+                $man_backup = karyawan_bynik($claim->nik);
+                $requirements = ["GP", "BISA MENGEMUDI"]; // Bisa dibuat dinamis kalau ada field-nya
+
+                if($claim->status == 0) {
+                    $claim->status = "Menunggu Konfirmasi";
+                }else if($claim->status == 1) {
+                    $claim->status = "Diterima";
+                } else if($claim->status == 2) {
+                    $claim->status = "Ditolak";
+                }
+                $fixed_result[] = [
+                    "id" => $claim->id,
+                    "nama_perusahaan" => $nama_perusahaan->name ?? '-',
+                    "shift" => $claim->shift,
+                    "man_replace" => $karyawan->nama ?? '-',
+                    "man_backup" => $man_backup->nama ?? '-',
+                    "status" => $claim->status,
+                    
+                ];
+            }
 
             return response()->json([
                 "status" => "success",
-                "message" => "Data klaim berhasil diambil.",
-                "data" => $claims
+                "message" => "Data klaim berhasil diformat.",
+                "data" => $fixed_result
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -260,6 +295,7 @@ class CovermeController extends Controller
             ], 500);
         }
     }
+
 
     public function getRequirements()
     {

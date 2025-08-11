@@ -171,7 +171,6 @@ class CovermeController extends Controller
     {
         try {
             $validated = $request->validate([
-                'id_perusahaan' => 'required|integer',
                 'nik_cover' => 'required|integer',
                 'tanggal' => 'required|date',
                 'shift' => 'required|string',
@@ -179,6 +178,7 @@ class CovermeController extends Controller
                 'requirements' => 'required|array',
             ]);
 
+            $validated['id_perusahaan'] = $request->input('project', 0); // Default to 0 if not provided
             // Encode requirements as JSON
             $validated['requirements'] = json_encode($validated['requirements']);
 

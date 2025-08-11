@@ -171,7 +171,7 @@ class CovermeController extends Controller
     {
         try {
             $validated = $request->validate([
-                'nik_cover' => 'required|integer',
+                'nik_cover' => 'required',
                 'tanggal' => 'required|date',
                 'shift' => 'required|string',
                 'alasan' => 'required',

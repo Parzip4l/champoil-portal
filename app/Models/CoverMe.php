@@ -14,6 +14,7 @@ class CoverMe extends Model
         'nik_cover',
         'tanggal',
         'shift',
+        'alasan',
         'requirements',
     ];
 }

@@ -175,6 +175,7 @@ class CovermeController extends Controller
                 'nik_cover' => 'required|integer',
                 'tanggal' => 'required|date',
                 'shift' => 'required|string',
+                'alasan' => 'required',
                 'requirements' => 'required|array',
             ]);
 

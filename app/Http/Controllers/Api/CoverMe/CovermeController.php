@@ -306,7 +306,7 @@ class CovermeController extends Controller
             return response()->json([
                 "status" => "success",
                 "message" => "Data persyaratan berhasil diambil.",
-                "data" => ["GP","BISA MENGEMUDI"] // Contoh data, bisa diubah sesuai kebutuhan
+                "requirements" => ["GP","BISA MENGEMUDI"] // Contoh data, bisa diubah sesuai kebutuhan
             ]);
         } catch (\Exception $e) {
             return response()->json([

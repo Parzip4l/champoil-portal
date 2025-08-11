@@ -180,7 +180,7 @@ class CovermeController extends Controller
 
             $validated['id_perusahaan'] = $request->input('project', 0); // Default to 0 if not provided
             // Encode requirements as JSON
-            $validated['requirements'] = json_encode($validated['requirements']);
+            $validated['requirements'] = json_encode($validated['requirement']);
 
             // Assuming you have a CoverMe model to handle the data
             $coverMe = CoverMe::create($validated);

@@ -175,7 +175,7 @@ class CovermeController extends Controller
                 'tanggal' => 'required|date',
                 'shift' => 'required|string',
                 'alasan' => 'required',
-                'requirements' => 'required|array',
+                // 'requirements' => 'required|array',
             ]);
 
             $validated['id_perusahaan'] = $request->input('project', 0); // Default to 0 if not provided
@@ -306,7 +306,7 @@ class CovermeController extends Controller
             return response()->json([
                 "status" => "success",
                 "message" => "Data persyaratan berhasil diambil.",
-                "requirements" => ["GP","BISA MENGEMUDI"] // Contoh data, bisa diubah sesuai kebutuhan
+                "data" => $requirements
             ]);
         } catch (\Exception $e) {
             return response()->json([

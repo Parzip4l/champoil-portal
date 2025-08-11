@@ -148,12 +148,13 @@ class CovermeController extends Controller
     {
         try {
             $validated = $request->validate([
-                'id_cover_me' => 'required|integer',
                 'nik' => 'required|string',
-                'name' => 'required|string',
                 'comment' => 'required|string'
             ]);
+            $validated['cover_id'] = $request->input('id_cover_me', 0); // Default to 0 if not provided
 
+            
+            CoverComment::create($validated);
             return response()->json([
                 "status" => "success",
                 "message" => "Komentar berhasil ditambahkan.",

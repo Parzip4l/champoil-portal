@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class CoverComment extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'cover_id',
+        'nik',
+        'comment',
+    ];
 }

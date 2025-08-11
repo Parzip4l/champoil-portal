@@ -360,10 +360,9 @@ class AttendanceController extends Controller
     public function getShift(Request $request)
     {
         $data = [
-            ['value' => 'BCK-PG', 'label' => 'BACKUP PAGI'],
-            ['value' => 'BCK-MD', 'label' => 'BACKUP MIDDLE'],
-            ['value' => 'BCK-ML', 'label' => 'BACKUP MALAM'],
-            ['value' => 'BCK-NS', 'label' => 'BACKUP NON SHIFT']
+            ['value' => 'PG', 'label' => 'BACKUP PAGI'],
+            ['value' => 'MD', 'label' => 'BACKUP MIDDLE'],
+            ['value' => 'ML', 'label' => 'BACKUP MALAM']
         ];
 
         return response()->json([

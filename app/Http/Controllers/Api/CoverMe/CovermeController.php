@@ -175,7 +175,7 @@ class CovermeController extends Controller
                 'tanggal' => 'required|date',
                 'shift' => 'required|string',
                 'alasan' => 'required',
-                // 'requirements' => 'required|array',
+                'requirement' => 'required|array',
             ]);
 
             $validated['id_perusahaan'] = $request->input('project', 0); // Default to 0 if not provided

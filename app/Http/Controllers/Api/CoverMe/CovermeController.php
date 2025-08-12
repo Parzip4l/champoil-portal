@@ -241,12 +241,13 @@ class CovermeController extends Controller
             }
 
 
-            if ($coverDetail->created_by === $user->id) {
+            if ($coverDetail->created_by == $user->id) {
                 return response()->json([
                     "status" => "error",
                     "message" => "Anda tidak dapat mengklaim cover Anda sendiri."
                 ], 400);
             }
+            
             $validated = $request->validate([
                 'cover_id' => 'required|integer',
                 'nik' => 'required|string'

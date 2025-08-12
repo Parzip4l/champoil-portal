@@ -227,6 +227,26 @@ class CovermeController extends Controller
     public function claim(Request $request)
     {
         try {
+            $user = Auth::guard('api')->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            
+            $coverDetail = CoverMe::find($request->input('cover_id'));
+            if (!$coverDetail) {
+                return response()->json([
+                    "status" => "error",
+                    "message" => "Cover tidak ditemukan."
+                ], 404);
+            }
+
+
+            if ($coverDetail->created_by === $user->id) {
+                return response()->json([
+                    "status" => "error",
+                    "message" => "Anda tidak dapat mengklaim cover Anda sendiri."
+                ], 400);
+            }
             $validated = $request->validate([
                 'cover_id' => 'required|integer',
                 'nik' => 'required|string'

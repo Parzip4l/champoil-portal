@@ -31,6 +31,21 @@ class CovermeController extends Controller
             $nama_perusahaan = project_byID($record->id_perusahaan);
             $karyawan = karyawan_bynik($record->nik_cover);
             $requirements = ["GP","BISA MENGEMUDI"];
+            $comments=[];
+            $cover_comments = CoverComment::where('cover_id', $record->id)->get();
+            if($cover_comments->isEmpty()) {
+                $comments=[];
+            }
+
+            foreach ($cover_comments as $comment) {
+                $karyawan_comment = karyawan_bynik($comment->nik);
+                $comments[] = [
+                    "nik" => $comment->nik,
+                    "name" => $karyawan_comment->nama ?? 'Unknown',
+                    "profile_url" => "https://example.com/profiles/" . $comment->nik,
+                    "comment" => $comment->comment
+                ];
+            }
             $fixed_result[] = [
                         "id" => $record->id,
                         "nama_perusahaan" => $nama_perusahaan->name,
@@ -45,21 +60,8 @@ class CovermeController extends Controller
                         "sallary" => null,
                         "requirements" => $requirements,
                         "maps" => $nama_perusahaan->latitude.','.$nama_perusahaan->longtitude,
-                        "comment" => [
-                            [
-                                "nik" => "320101199001010002",
-                                "name" => "Andi Wijaya",
-                                "profile_url" => "https://example.com/profiles/320101199001010002",
-                                "comment" => "Pelayanan cepat dan ramah."
-                            ],
-                            [
-                                "nik" => "320101199202020003",
-                                "name" => "Rina Putri",
-                                "profile_url" => "https://example.com/profiles/320101199202020003",
-                                "comment" => "Tempat kerja nyaman."
-                            ]
-                        ]
-                            ];
+                        "comment" => $comments
+            ];
         }
 
         $result = [

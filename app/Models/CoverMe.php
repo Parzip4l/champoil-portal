@@ -16,5 +16,6 @@ class CoverMe extends Model
         'shift',
         'alasan',
         'requirements',
+        'created_by', // Assuming you want to track who created the cover
     ];
 }

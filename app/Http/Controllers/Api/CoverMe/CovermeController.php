@@ -5,6 +5,14 @@ namespace App\Http\Controllers\Api\CoverMe;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+
 use App\Models\CoverMe; // Assuming you have a CoverMe model
 use App\Models\CoverComment; // Assuming you have a CoverMeComment model
 use App\Models\CoverClaim; // Assuming you have a CoverMeApply model
@@ -16,6 +24,12 @@ class CovermeController extends Controller
 
     public function index()
     {
+
+        $user = Auth::guard('api')->user();
+            
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
         $records = CoverMe::all();
         $fixed_result=[];
@@ -67,6 +81,7 @@ class CovermeController extends Controller
         $result = [
             "status" => "success",
             "message" => "Data perusahaan berhasil diambil.",
+            "user" => $user,
             "data" => $fixed_result
         ];
 
@@ -173,6 +188,13 @@ class CovermeController extends Controller
     public function store(Request $request)
     {
         try {
+
+            $user = Auth::guard('api')->user();
+            
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            
             $validated = $request->validate([
                 'nik_cover' => 'required',
                 'tanggal' => 'required|date',
@@ -184,13 +206,14 @@ class CovermeController extends Controller
             $validated['id_perusahaan'] = $request->input('project', 0); // Default to 0 if not provided
             // Encode requirements as JSON
             $validated['requirements'] = json_encode($validated['requirement']);
-
+            $validated['created_by'] = $user->id; // Assuming you want to store the user who created this
             // Assuming you have a CoverMe model to handle the data
             $coverMe = CoverMe::create($validated);
 
             return response()->json([
                 "status" => "success",
                 "message" => "Data berhasil disimpan.",
+                "user" => $user,
                 "data" => $coverMe
             ]);
         } catch (\Exception $e) {

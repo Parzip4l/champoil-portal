@@ -41,7 +41,7 @@ class VersionController extends Controller
                                       ->where('release_type', 'stable')
                                       ->orderBy('id', 'desc')
                                       ->value('version_name'),
-            "android_build" => VersionDetail::where('platform_id', AppsVersion::where('name', 'android')->first()->id ?? null)
+            "android_build" => (int) VersionDetail::where('platform_id', AppsVersion::where('name', 'android')->first()->id ?? null)
                                             ->where('release_type', 'stable')
                                             ->orderBy('id', 'desc')
                                             ->value('version_code'),
@@ -49,7 +49,7 @@ class VersionController extends Controller
                                   ->where('release_type', 'stable')
                                   ->orderBy('id', 'desc')
                                   ->value('version_name'),
-            "ios_build" => VersionDetail::where('platform_id', AppsVersion::where('name', 'ios')->first()->id ?? null)
+            "ios_build" => (int) VersionDetail::where('platform_id', AppsVersion::where('name', 'ios')->first()->id ?? null)
                                         ->where('release_type', 'stable')
                                         ->orderBy('id', 'desc')
                                         ->value('version_code'),

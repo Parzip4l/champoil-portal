@@ -207,6 +207,8 @@ Route::prefix('v1')->group(function () {
      * version 
      */
     Route::get('/version', [VersionController::class, 'version']);
+    Route::get('/version/list', [VersionController::class, 'index']);
+    Route::post('/version/store', [VersionController::class, 'store']);
 
     // Analytics
     Route::get('unique-visitors', [AnalyticsController::class, 'getUniqueVisitorsCount']);

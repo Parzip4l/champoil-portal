@@ -323,6 +323,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('mobile-menu')->group(function () {
+        Route::get('/list', [MobileController::class, 'listMobile']);
         Route::get('/{company}', [MobileController::class, 'index']);
         Route::post('/', [MobileController::class, 'store']);
         Route::post('/change-status', [MobileController::class, 'changeStatus']);

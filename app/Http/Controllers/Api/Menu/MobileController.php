@@ -166,4 +166,26 @@ class MobileController extends Controller
             'message' => 'MobileMenu status updated successfully',
         ], 200);
     }
+
+    // Retrieve a filtered list of MobileMenu items
+    public function listMobile()
+    {
+        $user = Auth::guard('api')->user();
+            
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $records = MobileMenuRelatioans::join('mobile_menus', 'mobile_menu_relatioans.mobile_menu_id', '=', 'mobile_menus.id')
+            ->where('mobile_menu_relatioans.company_name', $user->company)
+            ->select('mobile_menus.*')
+            ->orderBy('mobile_menus.urutan', 'asc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Filtered MobileMenu items retrieved successfully',
+            'data' => $records
+        ], 200);
+    }
 }

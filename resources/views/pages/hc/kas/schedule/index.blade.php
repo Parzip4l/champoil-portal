@@ -1,4 +1,25 @@
 @extends('layout.master')
+@php 
+    $schComplete =  0;
+    $schIncomplete =  0;
+    $schLebih = 0;
+    @endphp
+    @foreach ($schedulesByProject as $a)
+        @php
+            $project = \App\ModelCG\Project::find($a->project);
+            $projectname = $project->name ?? 'Project not found';
+
+            // Update schedule completion counters
+            if ($a->schedule_count == $a->totalSeharusnya) {
+                $schComplete++;
+            } else if ($a->schedule_count < $a->totalSeharusnya) {
+                $schIncomplete++;
+            }else{
+                $schLebih++;
+            }
+        @endphp
+    @endforeach
+
 
 @push('plugin-styles')
   <link href="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.css') }}" rel="stylesheet" />
@@ -6,6 +27,38 @@
 @endpush
 
 @section('content')
+<div class="row mb-4">
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-success text-white" style="font-size:20px;font-weight: bold;text-align:center">Complete Schedule</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ $schComplete }}</div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-warning text-white" style="font-size:20px;font-weight: bold;text-align:center">Incomplete Schedule</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ $schIncomplete }}</div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-danger text-white" style="font-size:20px;font-weight: bold;text-align:center">Incomplete Schedule</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ $schLebih }}</div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header bg-info text-white" style="font-size:20px;font-weight: bold;text-align:center">Average Rate</div>
+            <div class="card-body text-center" style="font-size:50px;">
+                @php
+                    $totalSchedules = $schComplete + $schIncomplete + $schLebih;
+                    $averageRate = $totalSchedules > 0 ? round(($schComplete / $totalSchedules) * 100, 2) : 0;
+                @endphp
+                {{ $averageRate }}%
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card custom-card2">
@@ -30,8 +83,11 @@
                             <select name="periode" class="form-control mb-2" id="periodeSelect" onchange="document.getElementById('filterForm').submit();">
                                 <option value="">Semua Periode</option>
                                 @foreach (range(1, 12) as $month)
-                                    <option value="{{ strtoupper(date('F', mktime(0, 0, 0, $month, 10))) }}-{{ $currentYear }}" {{ request('periode') == strtoupper(date('F', mktime(0, 0, 0, $month, 10))) . '-' . $currentYear ? 'selected' : '' }}>
-                                        {{ strtoupper(date('F', mktime(0, 0, 0, $month, 10))) }}-{{ $currentYear }}
+                                    @php
+                                        $monthName = strtoupper(date('F', mktime(0, 0, 0, $month, 10)));
+                                    @endphp
+                                    <option value="{{ $monthName }}-{{ $currentYear }}" {{ request('periode') == $monthName . '-' . $currentYear ? 'selected' : '' }}>
+                                        {{ $monthName }}-{{ $currentYear }}
                                     </option>
                                 @endforeach
                                 <option value="JANUARY-2025">JANUARY 2025</option>
@@ -40,7 +96,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table id="" class="table">
+                    <table id="scheduleTable" class="table">
                         <thead>
                             <tr>
                                 <th>Project</th>
@@ -61,8 +117,10 @@
                             <tr>
                                 @php
                                     $project = \App\ModelCG\Project::find($scheduleByProject->project);
-                                    $projectname = isset($project->name) ? $project->name : 'Project not found';
+                                    $projectname = $project->name ?? 'Project not found';
                                     $totalMp += $scheduleByProject->total_mp;
+
+                                   
                                 @endphp
                                 <td>{{ $projectname }}</td>
                                 <td>{{ $scheduleByProject->periode }}</td>
@@ -73,8 +131,10 @@
                                 <td>
                                     @if ($scheduleByProject->schedule_count == $scheduleByProject->totalSeharusnya)
                                         <span class="badge bg-success">Complete</span>
+                                    @elseif ($scheduleByProject->schedule_count < $scheduleByProject->totalSeharusnya)
+                                        <span class="badge bg-warning">Incomplete</span>
                                     @else
-                                        <span class="badge bg-warning">In Progress</span>
+                                        <span class="badge bg-danger">Exceed</span>
                                     @endif
                                 </td>
 
@@ -83,10 +143,6 @@
                                 </td>
                             </tr>
                             @endforeach
-                            <tr>
-                                <td colspan="2">Total MP</td>
-                                <td colspan="7">{{ $totalMp }}</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -94,7 +150,7 @@
         </div>
     </div>
 </div>
-<!-- Modal IMport -->
+<!-- Modal Import -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -133,8 +189,6 @@
             confirmButtonText: 'Delete',
         }).then((result) => {
             if (result.isConfirmed) {
-                // Perform the delete action here (e.g., send a request to delete the data)
-                // Menggunakan ID yang diteruskan sebagai parameter ke dalam URL delete route
                 const deleteUrl = "{{ route('shift.destroy', ':id') }}".replace(':id', id);
                 fetch(deleteUrl, {
                     method: 'DELETE',
@@ -142,24 +196,21 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     },
                 }).then((response) => {
-                    // Handle the response as needed (e.g., show alert if data is deleted successfully)
                     if (response.ok) {
                         Swal.fire({
                             title: 'Shift Successfully Deleted',
                             icon: 'success',
                         }).then(() => {
-                            window.location.reload(); // Refresh halaman setelah menutup alert
+                            window.location.reload();
                         });
                     } else {
-                        // Handle error response if needed
                         Swal.fire({
                             title: 'Shift Failed to Delete',
                             text: 'An error occurred while deleting data.',
                             icon: 'error',
                         });
                     }
-                }).catch((error) => {
-                    // Handle fetch error if needed
+                }).catch(() => {
                     Swal.fire({
                         title: 'Shift Failed to Delete',
                         text: 'An error occurred while deleting data.',
@@ -189,9 +240,14 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Menangkap perubahan pada elemen select
-        document.getElementById('organizationSelect').addEventListener('change', function () {
-            // Mengirim formulir saat terjadi perubahan
+        $('#scheduleTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true
+        });
+
+        document.getElementById('organizationSelect')?.addEventListener('change', function () {
             document.getElementById('filterForm').submit();
         });
     });

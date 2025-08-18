@@ -360,6 +360,10 @@ class ScheduleControllers extends Controller
                                         ->where('project_id', $project)
                                         ->where('periode', $periode)
                                         ->count();
+            $row->jumlah_schedule = Schedule::where('employee', $row->employee)
+                                        ->where('project', $project)
+                                        ->where('periode', $periode)
+                                        ->count();
             if($status  == 0){
                 $row->status ='<span class="badge rounded-pill bg-success">Active</span>';
             }else{

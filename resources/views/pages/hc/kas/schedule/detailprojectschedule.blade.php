@@ -21,6 +21,7 @@
                                 <th>Project</th>
                                 <th>Status</th>
                                 <th>Periode</th>
+                                <th>Jumlah Schedule</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -42,6 +43,7 @@
                                 <td> {{ $projectname }} </td>
                                 <td>{!! $schedule->status !!}</td>
                                 <td> {{ $schedule->periode }} </td>
+                                <td> {{ $schedule->jumlah_schedule }} </td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\AllData\BackupRecordsController;
 use App\Http\Controllers\Api\OcrController;
 use App\Http\Controllers\Api\AllData\DeveloperController;
 use App\Http\Controllers\Api\CoverMe\CovermeController;
+use App\Http\Controllers\Api\Menu\MobileController;
 
 
 Route::prefix('v1')->group(function () {
@@ -319,6 +320,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/list-claim', [CovermeController::class, 'getClaim']);
         Route::get('/claim-detail/{id}', [CovermeController::class, 'claimDetail']);
         Route::get('/category-requirements', [CovermeController::class, 'getRequirements']);
+    });
+
+    Route::prefix('mobile-menu')->group(function () {
+        Route::get('/{company}', [MobileController::class, 'index']);
+        Route::post('/', [MobileController::class, 'store']);
+        Route::post('/change-status', [MobileController::class, 'changeStatus']);
+        Route::get('/{id}', [MobileController::class, 'show']);
+        Route::put('/{id}', [MobileController::class, 'update']);
+        Route::delete('/{id}', [MobileController::class, 'destroy']);
     });
     
     

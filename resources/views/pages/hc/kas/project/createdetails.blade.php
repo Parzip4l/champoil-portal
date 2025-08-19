@@ -5,6 +5,12 @@
   <link href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
 @endpush
 
+@php
+$id = (int) trim(request()->segment(count(request()->segments())));
+$project = \App\ModelCG\Project::find($id);
+            
+@endphp
+
 @section('content')
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">

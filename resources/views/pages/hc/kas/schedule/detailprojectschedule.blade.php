@@ -21,6 +21,10 @@
                                 <th>Project</th>
                                 <th>Status</th>
                                 <th>Periode</th>
+                                <th>PG</th>
+                                <th>MD</th>
+                                <th>ML</th>
+                                <th>OFF</th>
                                 <th>Jumlah Schedule</th>
                                 <th>Action</th>
                             </tr>
@@ -31,6 +35,25 @@
                                 @php 
                                     $projectname = \App\ModelCG\Project::find($schedule->project)->name;
                                     $employee = \App\Employee::where('nik', $schedule->employee)->first();
+                                    $PG=0;
+                                    $MD=0;
+                                    $ML=0;
+                                    $OFF=0;
+                                    $schedules_row = \App\ModelCG\Schedule::where('employee', $schedule->employee)
+                                        ->where('periode', $schedule->periode)
+                                        ->where('project', $schedule->project)
+                                        ->get();
+                                    foreach ($schedules_row as $sch) {
+                                        if ($sch->shift == 'PG') {
+                                            $PG++;
+                                        } elseif ($sch->shift == 'MD') {
+                                            $MD++;
+                                        } elseif ($sch->shift == 'ML') {
+                                            $ML++;
+                                        } elseif ($sch->shift == 'OFF') {
+                                            $OFF++;
+                                        }
+                                    }
                                 @endphp
                                 <td> <a href="{{route('schedule.employee', ['project' => $schedule->project, 'periode' => $schedule->periode, 'employee' => $schedule->employee])}}">
                                     @if($employee && $employee->nama)
@@ -43,6 +66,10 @@
                                 <td> {{ $projectname }} </td>
                                 <td>{!! $schedule->status !!}</td>
                                 <td> {{ $schedule->periode }} </td>
+                                <td> {{ $PG }} </td>
+                                <td> {{ $MD }} </td>
+                                <td> {{ $ML }} </td>
+                                <td> {{ $OFF }} </td>
                                 <td> {{ $schedule->jumlah_schedule }} </td>
                                 <td>
                                     <div class="dropdown">

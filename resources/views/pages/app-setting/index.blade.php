@@ -243,6 +243,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3 mt-2">
+                        <div class="card custom-card2">
+                            <div class="card-body">
+                                <a href="{{ route('user-guide') }}" class="text-center link-settings">
+                                    <div class="icon-menu-settings mb-2">
+                                        <i data-feather="book-open"></i> 
+                                    </div>
+                                    <div class="title-menu">
+                                        <h6>How To Use</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     
                 </div>
             </div>
@@ -409,6 +423,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>

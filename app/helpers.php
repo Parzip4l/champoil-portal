@@ -253,17 +253,15 @@ function whatsapp_message($data, $nomor) {
     $client = new \GuzzleHttp\Client();
 
     // Construct the payload dynamically
-    $payload = [
-        'chatId' => $nomor . '@c.us',
-        'message' => $data,
-    ];
-
     try {
-        $response = $client->request('POST', 'https://waapi.app/api/v1/instances/80621/client/action/send-message', [
-            'body' => json_encode($payload),
+        $response = $client->request('POST', 'https://gate.whapi.cloud/messages/text', [
+            'body' => json_encode([
+                'to' => $nomor,
+                'body' => $data,
+            ]),
             'headers' => [
                 'accept' => 'application/json',
-                'authorization' => 'Bearer QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08',
+                'authorization' => 'Bearer S02iEU5vqCA0QdttXov3Pdxmh3BKiOsU',
                 'content-type' => 'application/json',
             ],
         ]);

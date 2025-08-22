@@ -98,16 +98,34 @@
                                     {{ \Carbon\Carbon::parse($date)->format('d M') }}
                                 </th>
                             @endforeach
+                            <th>PG</th>
+                            <th>MD</th>
+                            <th>ML</th>
+                            <th>OFF</th>
+                            <th>Total Masuk</th>
+                            <th>Total Tidak Masuk</th>
+                            <th>Total Shift</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $total_pg = 0;
+                            $total_md = 0;
+                            $total_ml = 0;
+                            $total_off = 0;
+                            $total_masuk = 0;
+                            $total_tidak_masuk = 0;
+                        @endphp
                         @foreach ($employees as $employee)
                             <tr>
                                 <td class="text-start fixed-column" style="min-width: 150px">{{ $employee->nama }}</td>
                                 @foreach ($dates as $date)
                                     @php
                                         $absen = isset($absens[$employee->nik]) ? $absens[$employee->nik]->firstWhere('tanggal', $date) : null;
+                                        $status = $absen->status ?? null;
+
                                         
+
                                         if (strtoupper($org) === 'KAS') {
                                             $scheduleKey = $employee->nik . '-' . $date;
                                         }else{
@@ -131,10 +149,31 @@
                                         } else {
                                             $shift = $schedule && isset($shifts[$schedule->shift_id]) ? $shifts[$schedule->shift_id] : null;
                                         }
+
+                                        
                                         
                                     @endphp
+
+                                    @if(!empty($shift))
+                                        @php
+                                            if ($shift->shift_code == 'PG') {
+                                                $total_pg++;
+                                            } elseif ($shift->shift_code == 'MD') {
+                                                $total_md++;
+                                            } elseif ($shift->shift_code == 'ML') {
+                                                $total_ml++;
+                                            } elseif ($shift->shift_code == 'OFF') {
+                                                $total_off++;
+                                            } elseif ($shift->shift_code == 'Masuk') {
+                                                $total_masuk++;
+                                            } elseif ($shift->shift_code == 'Tidak Masuk') {
+                                                $total_tidak_masuk++;
+                                            }
+                                        @endphp
+                                    @endif
                                     <td class="p-1">
                                     @if ($schedule || $shift)
+                                        
                                         <p class="text-muted">{{ $shift->shift_code ?? $shift->code ?? 'OFF' }} <br>
                                         (<span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span>)</p>
                                             
@@ -146,6 +185,18 @@
                                 </td>
 
                                 @endforeach
+                                <td>{{ $total_pg }}</td>
+                                <td>{{ $total_md }}</td>
+                                <td>{{ $total_ml }}</td>
+                                <td>{{ $total_off }}</td>
+                                <td>{{ $total_masuk }}</td>
+                                <td>{{ $total_tidak_masuk }}</td>
+                                <td>
+                                    @php
+                                        $scheduleCount = isset($schedule) && $schedule ? (is_countable($schedule) ? count($schedule) : 1) : 0;
+                                    @endphp
+                                    {{ $scheduleCount > 0 ? $scheduleCount : '-' }}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

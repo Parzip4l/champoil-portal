@@ -104,7 +104,7 @@
                                         @endphp
                                         @if($absenExists)
                                             <td style="background-color: #d4edda; text-align: center; vertical-align: middle;">
-                                                {{ $shift === '-' ? 'Pending' : $shift }}
+                                                {{ $shift }}
                                                 <i data-feather="check" class="text-success"></i> <!-- Feather checkmark icon -->
                                             </td>
                                         @elseif($backupCount > 0)

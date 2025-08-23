@@ -29,13 +29,13 @@ class ReviewController extends Controller
 
                 $startDate = Carbon::createFromDate($year, $month, 21)->subMonth()->startOfDay();
                 $endDate = Carbon::createFromDate($year, $month, 20)->endOfDay();
-                $schedulesQuery->whereBetween('tanggal', [$startDate, $endDate]);
+                $schedulesQuery->whereBetween('tanggal', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
 
                 // Generate complete range of dates
                 $dates = [];
-                $currentDate = $startDate->copy();
+                $currentDate = $startDate->copy(); // Ensure $startDate is a Carbon instance
                 while ($currentDate->lte($endDate)) {
-                    $dates[] = $currentDate->toDateString();
+                    $dates[] = $currentDate->toDateString(); // Normalize dates to string format
                     $currentDate->addDay();
                 }
             } else {
@@ -55,8 +55,21 @@ class ReviewController extends Controller
                 $data[$employeeName]['nama'] = $employeeName;
                 $data[$employeeName]['nik'] = $schedule->employee_name;
                 $data[$employeeName]['project'] = $schedule->project_name;
-                $data[$employeeName]['schedule'][$schedule->tanggal] = $schedule->shift; // Directly store shift with date as key
+
+                // Initialize schedule array for the employee if not already done
+                if (!isset($data[$employeeName]['schedule'])) {
+                    $data[$employeeName]['schedule'] = array_fill_keys($dates, null); // Fill all dates with null initially
+                }
+                
+                // Normalize the tanggal field to a date string
+                $normalizedDate = Carbon::parse($schedule->tanggal)->toDateString();
+
+                // Assign the shift to the specific date
+                if (in_array($normalizedDate, $dates)) { // Ensure the date exists in the range
+                    $data[$employeeName]['schedule'][$normalizedDate] = $schedule->shift;
+                }
             }
+
 
             // Ensure all dates are included in the result
             foreach ($data as &$employeeData) {
@@ -75,7 +88,7 @@ class ReviewController extends Controller
                 'data' => $data,
             ];
         }
-
+        // dd($result);
         $html['result'] = $result;
         return view('review', $html);
     }

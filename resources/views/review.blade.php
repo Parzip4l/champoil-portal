@@ -94,7 +94,7 @@
                                     <td>{{ $row['project'] }}</td>
                                     @foreach($result['dates'] as $date)
                                         @php
-                                            $shift = $row['schedule'][$date] ?? '-';
+                                            $shift = $row['schedule'][$date];
                                             $absenExists = \DB::table('absens')->where('tanggal', $date)->where('nik', $row['nik'])->exists();
                                             $backupCount = \DB::table('schedule_backups')
                                                 ->where('man_backup', $row['nik'])
@@ -103,9 +103,19 @@
                                                 ->count();
                                         @endphp
                                         @if($absenExists)
+                                            @php
+                                                $attendanceDetails = \DB::table('absens')
+                                                    ->where('tanggal', $date)
+                                                    ->where('nik', $row['nik'])
+                                                    ->select('clock_in', 'clock_out', 'photo')
+                                                    ->first();
+                                            @endphp
                                             <td style="background-color: #d4edda; text-align: center; vertical-align: middle;">
-                                                {{ $shift }}
-                                                <i data-feather="check" class="text-success"></i> <!-- Feather checkmark icon -->
+                                                <p><small>Shift:</small> {{ $shift }}</p>
+                                                <p><small>Clock In:</small> {{ $attendanceDetails->clock_in }}</p>
+                                                <p><small>Clock Out:</small> {{ $attendanceDetails->clock_out }}</p>
+                                                <p><small>Photo:</small></p>
+                                                <img src="https://hris.truest.co.id/storage/app/public/images/absen/{{ $attendanceDetails->photo }}" alt="Photo" style="max-width: 100%; height: auto;">
                                             </td>
                                         @elseif($backupCount > 0)
                                             @php
@@ -124,7 +134,7 @@
                                                     <p><small>Clock In:</small> {{ $backupDetails->clock_in }}</p>
                                                     <p><small>Clock Out:</small> {{ $backupDetails->clock_out }}</p>
                                                     <p><small>Photo:</small></p>
-                                                    <img src="{{ asset('storage/app/public/images/absen/' . $backupDetails->photo) }}" alt="Photo" style="max-width: 100%; height: auto;">
+                                                    <img src="https://hris.truest.co.id/storage/app/public/images/absen/{{ $backupDetails->photo }}" alt="Photo" style="max-width: 100%; height: auto;">
                                                 </td>
                                             @else
                                                 <td style="background-color: yellow; text-align: center; cursor: pointer;" title="Butuh Perbaikan Absen" onclick="alert('Butuh Perbaikan Absen')">

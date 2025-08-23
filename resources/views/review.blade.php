@@ -107,7 +107,7 @@
                                                 $attendanceDetails = \DB::table('absens')
                                                     ->where('tanggal', $date)
                                                     ->where('nik', $row['nik'])
-                                                    ->select('clock_in', 'clock_out', 'photo')
+                                                    ->select('clock_in', 'clock_out', 'photo','status')
                                                     ->first();
                                             @endphp
                                             <td style="background-color: #d4edda; text-align: center; vertical-align: middle;">
@@ -116,6 +116,7 @@
                                                 <p><small>Clock Out:</small> {{ $attendanceDetails->clock_out }}</p>
                                                 <p><small>Photo:</small></p>
                                                 <img src="https://hris.truest.co.id/storage/app/public/images/absen/{{ $attendanceDetails->photo }}" alt="Photo" style="max-width: 100%; height: auto;">
+                                                <p><small>Status:</small> {{ $attendanceDetails->status }}</p>
                                             </td>
                                         @elseif($backupCount > 0)
                                             @php
@@ -135,6 +136,7 @@
                                                     <p><small>Clock Out:</small> {{ $backupDetails->clock_out }}</p>
                                                     <p><small>Photo:</small></p>
                                                     <img src="https://hris.truest.co.id/storage/app/public/images/absen/{{ $backupDetails->photo }}" alt="Photo" style="max-width: 100%; height: auto;">
+                                                    
                                                 </td>
                                             @else
                                                 <td style="background-color: yellow; text-align: center; cursor: pointer;" title="Butuh Perbaikan Absen" onclick="alert('Butuh Perbaikan Absen')">

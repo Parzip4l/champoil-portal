@@ -632,6 +632,9 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         Route::view('/error-logs','pages.dev.error_logs')->name('error-logs');
     });
 
+    Route::group(['prefix' => 'simulasi-payrol'], function(){
+        Route::get('/', [App\Http\Controllers\CgControllers\ReviewController::class, 'index'])->name('simulasi-payrol.index');
+    });
     
     Route::view('/sample','pages.report.patrol_pdf')->name('sample');
     Route::view('/user-guide','pages.user-guide.index')->name('user-guide');

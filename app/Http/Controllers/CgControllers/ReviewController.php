@@ -55,6 +55,7 @@ class ReviewController extends Controller
                 $data[$employeeName]['nama'] = $employeeName;
                 $data[$employeeName]['nik'] = $schedule->employee_name;
                 $data[$employeeName]['project'] = $schedule->project_name;
+                $data[$employeeName]['project_id'] = $project->id;
 
                 // Initialize schedule array for the employee if not already done
                 if (!isset($data[$employeeName]['schedule'])) {

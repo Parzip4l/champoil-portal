@@ -27,6 +27,117 @@
             width: 150px; /* Explicit width for proper alignment */
         }
     </style>
+    <style>
+    .timeline {
+        position: relative;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    .timeline::after {
+        content: '';
+        position: absolute;
+        width: 4px;
+        background-color: #FF9F55;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        margin-left: -2px;
+    }
+    .container {
+        padding: 15px 40px;
+        position: relative;
+        background-color: inherit;
+        width: 50%;
+    }
+    .container::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        right: -10px;
+        background-color: #FF9F55;
+        border: 3px solid white;
+        top: 20px;
+        border-radius: 50%;
+        z-index: 1;
+    }
+    .left {
+        left: 0;
+    }
+    .right {
+        left: 50%;
+    }
+    .left::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 25px;
+        width: 0;
+        z-index: 1;
+        right: 30px;
+        border: medium solid #FF9F55;
+        border-width: 10px 0 10px 10px;
+        border-color: transparent transparent transparent #FF9F55;
+    }
+    .right::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 25px;
+        width: 0;
+        z-index: 1;
+        left: 30px;
+        border: medium solid #FF9F55;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent #FF9F55 transparent transparent;
+    }
+    .right::after {
+        left: -10px;
+    }
+    .content {
+        padding: 20px;
+        background-color: #474e5d;
+        color: white;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        text-align: left;
+    }
+    .content h5 {
+        margin: 0 0 10px;
+        color: #FF9F55;
+        font-size: 1.2rem;
+    }
+    .content img {
+        margin-top: 10px;
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        border-radius: 8px;
+    }
+    @media screen and (max-width: 600px) {
+        .timeline::after {
+            left: 31px;
+        }
+        .container {
+            width: 100%;
+            padding-left: 70px;
+            padding-right: 25px;
+        }
+        .container::before {
+            left: 60px;
+            border: medium solid #FF9F55;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent #FF9F55 transparent transparent;
+        }
+        .left::after, .right::after {
+            left: 15px;
+        }
+        .right {
+            left: 0%;
+        }
+    }
+</style>
 @endpush
 
 @section('content')
@@ -80,14 +191,20 @@
                         </thead>
                         <tbody>
                             @foreach($result['data'] as $index => $row)
+                                @php 
+                                    $jumlahBackup = \DB::table('schedule_backups')
+                                                    ->whereIn('tanggal', $result['dates'])
+                                                    ->where('employee', $row['nik'])
+                                                    ->count();
+                                @endphp
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>
                                         {{ $row['nama'] }}<br>
-                                        <button class="btn btn-sm btn-outline-secondary mt-1" >
-                                            Check Backup
+                                        <button class="btn btn-sm btn-outline-secondary mt-1" data-bs-toggle="modal" data-bs-target="#backupModal-{{ $index }}">
+                                            Check Backup ({{$jumlahBackup}})
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary mt-1" >
+                                        <button class="btn btn-sm btn-outline-secondary mt-1">
                                             Check Pengajuan
                                         </button>
                                     </td>
@@ -164,6 +281,59 @@
     @else
         <p>No data available for the selected filters.</p>
     @endif
+
+    @foreach($result['data'] as $index => $row)
+        @php
+            $backupDetails = \DB::table('schedule_backups')
+                ->join('absen_backup', 'absen_backup.nik', '=', 'schedule_backups.employee')
+                ->where('absen_backup.nik', $row['nik'])
+                ->whereIn('schedule_backups.tanggal', $result['dates'])
+                ->select('absen_backup.nik as employee',
+                         'absen_backup.clock_in', 
+                         'absen_backup.clock_out', 
+                         'absen_backup.photo',
+                         'schedule_backups.tanggal',
+                         'schedule_backups.man_backup',
+                         'schedule_backups.project'
+                         )
+                ->get();
+        @endphp
+        <!-- Modal for Check Backup -->
+        <div class="modal fade bd-example-modal-xl" id="backupModal-{{ $index }}" tabindex="-1" aria-labelledby="backupModalLabel-{{ $index }}" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="backupModalLabel-{{ $index }}">Backup Details for {{ $row['nama'] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if($backupDetails->isEmpty())
+                            <p>No backup details available.</p>
+                        @else
+                            <div class="timeline">
+                                @foreach($backupDetails as $index => $detail)
+                                    <div class="container {{ $index % 2 == 0 ? 'left' : 'right' }}">
+                                        <div class="content">
+                                            <h5>{{ karyawan_bynik($detail->employee)->nama }}</h5>
+                                            <p><strong>Clock In:</strong> {{ $detail->clock_in }}</p>
+                                            <p><strong>Clock Out:</strong> {{ $detail->clock_out }}</p>
+                                            <p><strong>Tanggal Backup:</strong> {{ $detail->tanggal }}</p>
+                                            <p><strong>Project Backup:</strong> {{ project_byID($detail->project)->name }}</p>
+                                            <p><strong>Backup Menggantikan:</strong> {{ karyawan_bynik($detail->man_backup)->nama }}</p>
+                                            <img src="https://hris.truest.co.id/storage/app/public/images/absen/{{ $detail->photo }}" alt="Photo" style="width: 100%; max-width: 200px; height: auto; margin-top: 10px;">
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 @endsection
 
 @push('plugin-scripts')
@@ -177,6 +347,7 @@
 <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/chartjs/chart.umd.js') }}"></script>
 <script src="{{ asset('assets/plugins/datatables-fixedcolumns/js/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
@@ -199,7 +370,7 @@
         var table = $('.table').DataTable({
             scrollX: true,  // Aktifkan scroll horizontal
             fixedColumns: {
-                left: 1  // Pinned kolom pertama
+                left: 2  // Pinned kolom pertama
             }
         });
     });

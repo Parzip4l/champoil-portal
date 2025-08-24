@@ -89,7 +89,7 @@
     <div class="card custom-card2">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-sm align-middle text-center" id="attendance-table">
+                <table class="table table-sm align-middle text-center table-bordered" id="attendance-table">
                     <thead class="table-light sticky-top" style="z-index: 1">
                         <tr>
                             <th style="min-width: 150px">Nama</th>
@@ -98,27 +98,28 @@
                                     {{ \Carbon\Carbon::parse($date)->format('d M') }}
                                 </th>
                             @endforeach
-                            <th>PG</th>
-                            <th>MD</th>
-                            <th>ML</th>
-                            <th>OFF</th>
-                            <th>Total Masuk</th>
-                            <th>Total Tidak Masuk</th>
-                            <th>Total Shift</th>
+                            <th>Details</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $total_pg = 0;
-                            $total_md = 0;
-                            $total_ml = 0;
-                            $total_off = 0;
-                            $total_masuk = 0;
-                            $total_tidak_masuk = 0;
-                        @endphp
+                        
                         @foreach ($employees as $employee)
+
+                            @php
+                                $total_pg = 0;
+                                $total_md = 0;
+                                $total_ml = 0;
+                                $total_off = 0;
+                                $total_masuk = 0;
+                                $total_tidak_masuk = 0;
+                            @endphp
                             <tr>
-                                <td class="text-start fixed-column" style="min-width: 150px">{{ $employee->nama }}</td>
+                                <td class="text-start fixed-column" style="min-width: 150px">
+                                    {{ $employee->nik }} <br/> {{ $employee->nama }}<br/>
+                                    <!-- <button type="button" class="btn btn-outline-primary btn-sm">Replacements</button>
+                                    <button type="button" class="btn btn-outline-warning btn-sm">Remind Attendance Fix</button> -->
+                                </td>
                                 @foreach ($dates as $date)
                                     @php
                                         $absen = isset($absens[$employee->nik]) ? $absens[$employee->nik]->firstWhere('tanggal', $date) : null;
@@ -156,48 +157,111 @@
 
                                     @if(!empty($shift))
                                         @php
-                                            if ($shift->shift_code == 'PG') {
-                                                $total_pg++;
-                                            } elseif ($shift->shift_code == 'MD') {
-                                                $total_md++;
-                                            } elseif ($shift->shift_code == 'ML') {
-                                                $total_ml++;
-                                            } elseif ($shift->shift_code == 'OFF') {
-                                                $total_off++;
-                                            } elseif ($shift->shift_code == 'Masuk') {
-                                                $total_masuk++;
-                                            } elseif ($shift->shift_code == 'Tidak Masuk') {
-                                                $total_tidak_masuk++;
-                                            }
+                                            
                                         @endphp
                                     @endif
-                                    <td class="p-1">
+                                
                                     @if ($schedule || $shift)
-                                        
+                                        @php
+                                            $jadwal = $shift->shift_code ?? $shift->code ?? 'OFF';
+                                            $status = $absen->status ?? 0;
+                                            if ($jadwal == 'PG') {
+                                                $total_pg +=1;
+                                            } elseif ($jadwal == 'MD') {
+                                                $total_md+=1;
+                                            } elseif ($jadwal == 'ML') {
+                                                $total_ml+=1;
+                                            } elseif ($jadwal == 'OFF') {
+                                                $total_off+=1;
+                                            }
+                                            $btn="";
+                                            if($jadwal == 'OFF'){
+                                                $bgColor = '#f8d7da'; // Green pastel
+                                            }else{
+                                                
+                                                if($status == 0){
+                                                    $total_tidak_masuk+=1;
+                                                    $bgColor = '#FFFACD'; // Red pastel if not attended
+                                                    $cekScheduleBackup = \App\ModelCG\ScheduleBackup::where('man_backup', $employee->nik)
+                                                        ->join('absen_backup', 'schedule_backups.employee', '=', 'absen_backup.nik') 
+                                                        ->where('schedule_backups.project', $schedule->project ?? null)
+                                                        ->where('schedule_backups.tanggal', $date)
+                                                        ->limit(1)
+                                                        ->get();
+                                                        if ($cekScheduleBackup->count() > 0) {
+                                                        $btn = "<button type='button' class='btn btn-sm btn-outline-primary mt-3' data-bs-toggle='modal' data-bs-target='#exampleModal-{$date}-{$employee->nik}'>
+                                                                    Check Backup
+                                                                </button>
+                                                                <!-- Modal -->
+                                                                <div class='modal fade' id='exampleModal-{$date}-{$employee->nik}' tabindex='-1' aria-labelledby='exampleModalLabel-{$date}-{$employee->nik}' aria-hidden='true'>
+                                                                    <div class='modal-dialog'>
+                                                                        <div class='modal-content'>
+                                                                            <div class='modal-header'>
+                                                                                <h5 class='modal-title' id='exampleModalLabel-{$date}-{$employee->nik}'>Employe Backup</h5>
+                                                                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                                                            </div>
+                                                                            <div class='modal-body' style='text-align: left;'>";
+                                                                                foreach ($cekScheduleBackup as $backup) {
+                                                                                    $btn .= "<div class='row'>
+                                                                                        <div class='col-md-4'>
+                                                                                            <img src='https://hris.truest.co.id/storage/app/public/images/absen/{$backup->photo}' alt='Photo' class='img-fluid' style='width: 100%; height: auto;border-radius:0px' >
+                                                                                        </div>
+                                                                                        <div class='col-md-8'>
+                                                                                            <h5>" . karyawan_bynik($backup->nik)->nama . "</h5>
+                                                                                            <p><strong>Clock In:</strong> {$backup->clock_in}</p>
+                                                                                            <p><strong>Clock Out:</strong> {$backup->clock_out}</p>
+                                                                                            <p><strong>Tanggal Backup:</strong> {$backup->tanggal}</p>
+                                                                                        </div>
+                                                                                    </div>";
+                                                                                }
+
+                                                        $btn .= "</div></div>
+                                                                <div class='modal-footer'>
+                                                                    <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+                                                                    <button type='button' class='btn btn-primary'>Save changes</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>";
+                                                    }else{
+                                                        $btn = "<button class='btn btn-sm btn-outline-danger mt-3' disabled>Butuh Perbaikan</button>";
+                                                    }
+                                                }else{
+                                                    $bgColor = '#d1e7dd'; // Green pastel if attended
+                                                    $total_masuk+=1;
+                                                }
+                                                
+                                            } 
+                                        @endphp
+
+                                    <td class="p-1" style="background-color: {{ $bgColor ?? '' }};">
                                         <p class="text-muted">{{ $shift->shift_code ?? $shift->code ?? 'OFF' }} <br>
                                         (<span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span>)</p>
-                                            
+                                        {!! $btn !!}
+                                    </td>
                                     @else
-                                    <p class="text-muted">
-                                    <span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span></p>
+                                    <td class="p-1">
+                                        <p class="text-muted">
+                                        <span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span></p>
+                                    </td>
                                     @endif
 
-                                </td>
+                                
 
                                 @endforeach
-                                <td>{{ $total_pg }}</td>
-                                <td>{{ $total_md }}</td>
-                                <td>{{ $total_ml }}</td>
-                                <td>{{ $total_off }}</td>
-                                <td>{{ $total_masuk }}</td>
-                                <td>{{ $total_tidak_masuk }}</td>
                                 <td>
-                                    @php
-                                        $scheduleCount = isset($schedule) && $schedule ? (is_countable($schedule) ? count($schedule) : 1) : 0;
-                                    @endphp
-                                    {{ $scheduleCount > 0 ? $scheduleCount : '-' }}
+                                    <ul class="list-unstyled text-start m-0">
+                                        <li><strong>PG:</strong> {{ $total_pg }}</li>
+                                        <li><strong>MD:</strong> {{ $total_md }}</li>
+                                        <li><strong>ML:</strong> {{ $total_ml }}</li>
+                                        <li><strong>Off:</strong> {{ $total_off }}</li>
+                                        <li><strong>Masuk:</strong> {{ $total_masuk }}</li>
+                                        <li><strong>Tidak Masuk:</strong> {{ $total_tidak_masuk }}</li>
+                                        <li><strong>Total Schedule:</strong> {{ $total_pg + $total_md + $total_ml + $total_off }}</li>
+                                    </ul>
                                 </td>
                             </tr>
+                            
                         @endforeach
                     </tbody>
                 </table>

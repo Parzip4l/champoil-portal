@@ -103,8 +103,8 @@
                             <th>ML</th>
                             <th>OFF</th>
                             <th>Masuk</th>
-                            <th>Tidak Masuk</th>
-                            <th>Total Schedule</th>
+                            <th>BUTUH PERBAIKAN</th>
+                            <th>TOTAL SCHEDULE</th>
                             
                         </tr>
                     </thead>
@@ -195,9 +195,9 @@
                                                         ->limit(1)
                                                         ->get();
                                                         if ($cekScheduleBackup->count() > 0) {
-                                                        $btn = "<a href='#exampleModal-{$date}-{$employee->nik}' class=' mt-3' data-bs-toggle='modal'>
-                                                                    Backup
-                                                                </a>
+                                                        $btn = "(<a href='#exampleModal-{$date}-{$employee->nik}' class=' mt-3' data-bs-toggle='modal'>
+                                                                    BACKUP
+                                                                </a>)
                                                                 <!-- Modal -->
                                                                 <div class='modal fade' id='exampleModal-{$date}-{$employee->nik}' tabindex='-1' aria-labelledby='exampleModalLabel-{$date}-{$employee->nik}' aria-hidden='true'>
                                                                     <div class='modal-dialog'>
@@ -230,7 +230,7 @@
                                                         </div>
                                                     </div>";
                                                     }else{
-                                                        $btn = "<a href='#' class='text-danger mt-3 disabled'>Butuh Perbaikan</a>";
+                                                        $btn = "(<a href='#' class='text-danger mt-3 disabled'>BUTUH PERBAIKAN</a>)";
                                                     }
                                                 }else{
                                                     $bgColor = '#d1e7dd'; // Green pastel if attended

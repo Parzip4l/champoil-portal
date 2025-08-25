@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-8 grid-margin stretch-card">
+    <div class="col-md-5 grid-margin stretch-card">
         <div class="card custom-card2">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="mb-0 align-self-center">PROJECT DETAILS</h5>
@@ -213,14 +213,14 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="" class="form-label">MAKSIMAL JAM MASUK</label>
+                                    <label for="" class="form-label">BATAS MINIMAL CLOCK IN</label>
                                     <input type="time" name="jam_masuk" class="form-control border-primary" placeholder="Jam Masuk" required>
                                     <input type="hidden" name="project_id" value="{{ $project->id }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="" class="form-label">JAM PULANG</label>
+                                    <label for="" class="form-label">BATAS MAKSIMAL CLOCK IN</label>
                                     <input type="time" name="jam_pulang" class="form-control border-primary" placeholder="Jam Pulang" required>
                                 </div>
                             </div>
@@ -236,8 +236,60 @@
                             <thead class="table-primary">
                                 <tr>
                                     <th>SHIFT</th>
-                                    <th>JAM MASUK</th>
-                                    <th>MAKSIMAL JAM MASUK</th>
+                                    <th>BATAS MINIMAL CLOCK IN</th>
+                                    <th>BATAS MAKSIMAL CLOCK IN</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+           
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card custom-card2 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                <h5 class="mb-0 align-self-center">PROJECT Schema</h5>
+                <i class="icon-lg text-white" data-feather="git-branch"></i>
+            </div>
+            <div class="card-body">
+                <div class="row mb-6">
+                    <form id="shiftForm">
+                        @csrf   
+                        <div class="row">
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">JUMLAH EMPLOYEE</label>
+                                    <input type="number" name="jumlah_employee" class="form-control border-primary" placeholder="Jumlah Employee" required>
+                                    <input type="hidden" name="project_id" value="{{ $project->id }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="" class="form-label">POLA</label>
+                                    <input type="text" name="pola" class="form-control border-primary" placeholder="5:2" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button type="button" class="btn btn-outline-primary mb-3" id="submitBtn">
+                                    <i class="icon-sm" data-feather="save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="pola_table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>JUMLAH EMPLOYEE</th>
+                                    <th>POLA</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>

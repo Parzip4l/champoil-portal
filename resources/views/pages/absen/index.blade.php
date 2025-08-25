@@ -161,11 +161,7 @@
                                         
                                     @endphp
 
-                                    @if(!empty($shift))
-                                        @php
-                                            
-                                        @endphp
-                                    @endif
+                                   
                                 
                                     @if ($schedule || $shift)
                                         @php
@@ -194,7 +190,7 @@
                                                         ->where('schedule_backups.tanggal', $date)
                                                         ->limit(1)
                                                         ->get();
-                                                        if ($cekScheduleBackup->count() > 0) {
+                                                    if ($cekScheduleBackup->count() > 0) {
                                                         $btn = "(<a href='#exampleModal-{$date}-{$employee->nik}' class=' mt-3' data-bs-toggle='modal'>
                                                                     BACKUP
                                                                 </a>)
@@ -230,7 +226,7 @@
                                                         </div>
                                                     </div>";
                                                     }else{
-                                                        $btn = "(<a href='#' class='text-danger mt-3 disabled'>BUTUH PERBAIKAN</a>)";
+                                                        $btn = "(<a href='#' class='text-danger mt-3 disabled'>BUTUH PERBAIKAN {{$absen}}</a>)";
                                                     }
                                                 }else{
                                                     $bgColor = '#d1e7dd'; // Green pastel if attended

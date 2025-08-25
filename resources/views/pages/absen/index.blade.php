@@ -98,7 +98,13 @@
                                     {{ \Carbon\Carbon::parse($date)->format('d M') }}
                                 </th>
                             @endforeach
-                            <th>Details</th>
+                            <th>PG</th>
+                            <th>MD</th>
+                            <th>ML</th>
+                            <th>OFF</th>
+                            <th>Masuk</th>
+                            <th>Tidak Masuk</th>
+                            <th>Total Schedule</th>
                             
                         </tr>
                     </thead>
@@ -189,9 +195,9 @@
                                                         ->limit(1)
                                                         ->get();
                                                         if ($cekScheduleBackup->count() > 0) {
-                                                        $btn = "<button type='button' class='btn btn-sm btn-outline-primary mt-3' data-bs-toggle='modal' data-bs-target='#exampleModal-{$date}-{$employee->nik}'>
-                                                                    Check Backup
-                                                                </button>
+                                                        $btn = "<a href='#exampleModal-{$date}-{$employee->nik}' class=' mt-3' data-bs-toggle='modal'>
+                                                                    Backup
+                                                                </a>
                                                                 <!-- Modal -->
                                                                 <div class='modal fade' id='exampleModal-{$date}-{$employee->nik}' tabindex='-1' aria-labelledby='exampleModalLabel-{$date}-{$employee->nik}' aria-hidden='true'>
                                                                     <div class='modal-dialog'>
@@ -224,7 +230,7 @@
                                                         </div>
                                                     </div>";
                                                     }else{
-                                                        $btn = "<button class='btn btn-sm btn-outline-danger mt-3' disabled>Butuh Perbaikan</button>";
+                                                        $btn = "<a href='#' class='text-danger mt-3 disabled'>Butuh Perbaikan</a>";
                                                     }
                                                 }else{
                                                     $bgColor = '#d1e7dd'; // Green pastel if attended
@@ -235,9 +241,10 @@
                                         @endphp
 
                                     <td class="p-1" style="background-color: {{ $bgColor ?? '' }};">
-                                        <p class="text-muted">{{ $shift->shift_code ?? $shift->code ?? 'OFF' }} <br>
-                                        (<span class="text-success">{{ $absen->clock_in ?? '-' }}</span> - <span class="text-danger">{{ $absen->clock_out ?? '-' }}</span> - <span class="text-danger">{{ $absen->status ?? '-' }}</span>)</p>
-                                        {!! $btn !!}
+                                        <p class="text-muted">
+                                            {{ $shift->shift_code ?? $shift->code ?? 'OFF' }} <br>
+                                            {!! $btn ?: '(<span class="text-success">' . ($absen->clock_in ?? '-') . '</span> - <span class="text-danger">' . ($absen->clock_out ?? '-') . '</span> - <span class="text-danger">' . ($absen->status ?? '-') . '</span>)' !!}
+                                        </p>
                                     </td>
                                     @else
                                     <td class="p-1">
@@ -249,17 +256,14 @@
                                 
 
                                 @endforeach
-                                <td>
-                                    <ul class="list-unstyled text-start m-0">
-                                        <li><strong>PG:</strong> {{ $total_pg }}</li>
-                                        <li><strong>MD:</strong> {{ $total_md }}</li>
-                                        <li><strong>ML:</strong> {{ $total_ml }}</li>
-                                        <li><strong>Off:</strong> {{ $total_off }}</li>
-                                        <li><strong>Masuk:</strong> {{ $total_masuk }}</li>
-                                        <li><strong>Tidak Masuk:</strong> {{ $total_tidak_masuk }}</li>
-                                        <li><strong>Total Schedule:</strong> {{ $total_pg + $total_md + $total_ml + $total_off }}</li>
-                                    </ul>
-                                </td>
+                                <td>{{ $total_pg }}</td>
+                                <td>{{ $total_md }}</td>
+                                <td>{{ $total_ml }}</td>
+                                <td>{{ $total_off }}</td>
+                                <td>{{ $total_masuk }}</td>
+                                <td>{{ $total_tidak_masuk }}</td>
+                                <td>{{ $total_pg + $total_md + $total_ml + $total_off }}</td>
+                                
                             </tr>
                             
                         @endforeach

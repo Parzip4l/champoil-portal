@@ -36,6 +36,7 @@ use App\Backup\AbsenBackup;
 use App\Payrol\Component;
 use App\Urbanica\PayrolUrbanica;
 use App\ModelCG\Datamaster\ProjectShift;
+use App\Models\log\LogAbsen;
 
 class ApiLoginController extends Controller
 {
@@ -153,7 +154,7 @@ class ApiLoginController extends Controller
             if ($existingAbsenBackup) {
                 DB::rollBack();
                 return response()->json([
-                    'message' => 'Absen Ditolak, sudah ada absensi hari ini! ddd',
+                    'message' => 'Absen Ditolak, sudah ada absensi hari ini!',
                     'success' => false,
                 ], 200);
             }
@@ -338,6 +339,14 @@ class ApiLoginController extends Controller
             ]);
         } else {
             DB::rollBack();
+
+            LogAbsen::create([
+                'nik' => $nik,
+                'longitude' => $long,
+                'latitude' => $lat,
+                'description' => $cek
+            ]);
+
             return response()->json([
                 'message' => 'Absen Masuk Gagal, Diluar Radius!',
                 'success' => false,

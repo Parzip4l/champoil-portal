@@ -94,7 +94,10 @@
                         <tbody>
                             @foreach($project as $row)
                                 <tr>
-                                    <td>{{ strtoupper($row->name) }}</td>
+                                    <td>
+                                        {{ strtoupper($row->name) }}<br/>
+                                        <small>{{ $row->tanggal_deploy ? \Carbon\Carbon::parse($row->tanggal_deploy)->translatedFormat('l, d F Y') : '-' }}</small>
+                                    </td>
                                     <td>{{ $row->periode }}</td>
                                     <td>{{ $row->total_mp }}</td>
                                     <td>{{ $row->jumlah_schedule }}</td>
@@ -105,10 +108,12 @@
                                             $expectedSchedules = $row->jumlah_hari * $row->total_mp;
                                             if ($row->jumlah_schedule > $expectedSchedules) {
                                                 $status = '<span class="badge bg-danger">SCHEDULE OVER</span>';
-                                            } elseif ($row->jumlah_schedule < $expectedSchedules) {
+                                            } elseif ($row->jumlah_schedule > 0 && $row->jumlah_schedule < $expectedSchedules) {
                                                 $status = '<span class="badge bg-warning text-dark">SCHEDULE UNDER</span>';
-                                            } else {
+                                            } elseif ($row->jumlah_schedule == $expectedSchedules) {
                                                 $status = '<span class="badge bg-success">SCHEDULE COMPLETE</span>';
+                                            }elseif ($row->jumlah_schedule == 0){
+                                                $status = '<span class="badge bg-secondary text-white">NEED UPLOAD</span>';
                                             }
                                         @endphp
                                         {!! $status !!}

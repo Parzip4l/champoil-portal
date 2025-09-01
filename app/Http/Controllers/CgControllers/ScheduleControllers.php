@@ -62,7 +62,7 @@ class ScheduleControllers extends Controller
             $expectedSchedules = $row->jumlah_hari * $row->total_mp;
             if ($row->jumlah_schedule > $expectedSchedules) {
                 $over +=1;
-            } elseif ($row->jumlah_schedule < $expectedSchedules) {
+            } elseif ($row->jumlah_schedule > 0 && $row->jumlah_schedule < $expectedSchedules) {
                 $under +=1;
             } else  if($row->jumlah_schedule == $expectedSchedules) {
                 $completed +=1;

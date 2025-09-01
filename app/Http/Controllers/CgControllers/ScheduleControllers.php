@@ -60,11 +60,11 @@ class ScheduleControllers extends Controller
             $endDate = $periodeDate->copy()->day(20);
             $row->jumlah_hari = $startDate->diffInDays($endDate) + 1;
             $expectedSchedules = $row->jumlah_hari * $row->total_mp;
-            if ($row->jumlah_schedule > $expectedSchedules) {
+            if ($row->jumlah_schedule > 0 && $row->jumlah_schedule > $expectedSchedules) {
                 $over +=1;
             } elseif ($row->jumlah_schedule > 0 && $row->jumlah_schedule < $expectedSchedules) {
                 $under +=1;
-            } else  if($row->jumlah_schedule == $expectedSchedules) {
+            } else  if($row->jumlah_schedule > 0 && $row->jumlah_schedule == $expectedSchedules) {
                 $completed +=1;
             }else if($row->jumlah_schedule == 0){
                 $need_upload +=1;

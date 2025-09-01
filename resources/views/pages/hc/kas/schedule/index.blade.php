@@ -17,30 +17,26 @@
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">
             <div class="card-header bg-success text-white" style="font-size:20px;font-weight: bold;text-align:center">Complete Schedule</div>
-            <div class="card-body text-center" style="font-size:50px;">{{ $schComplete }}</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ $completed }}</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-warning text-white" style="font-size:20px;font-weight: bold;text-align:center">Incomplete Schedule</div>
-            <div class="card-body text-center" style="font-size:50px;">{{ $schIncomplete }}</div>
+            <div class="card-header bg-warning text-white" style="font-size:20px;font-weight: bold;text-align:center">Under Schedule</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ $under }}</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-danger text-white" style="font-size:20px;font-weight: bold;text-align:center">Incomplete Schedule</div>
-            <div class="card-body text-center" style="font-size:50px;">{{ $schLebih }}</div>
+            <div class="card-header bg-danger text-white" style="font-size:20px;font-weight: bold;text-align:center">Over Schedule</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ $over }}</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-info text-white" style="font-size:20px;font-weight: bold;text-align:center">Average Rate</div>
+            <div class="card-header bg-info text-white" style="font-size:20px;font-weight: bold;text-align:center">Need Upload</div>
             <div class="card-body text-center" style="font-size:50px;">
-                @php
-                    $totalSchedules = $schComplete + $schIncomplete + $schLebih;
-                    $averageRate = $totalSchedules > 0 ? round(($schComplete / $totalSchedules) * 100, 2) : 0;
-                @endphp
-                {{ $averageRate }}%
+                {{ $need_upload }}
             </div>
         </div>
     </div>
@@ -119,7 +115,7 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('schedule.details', ['project' => $row->id, 'periode' => $row->periode]) }}" 
-                                           class="btn btn-primary btn-sm">Details</a>
+                                           class="btn btn-outline-primary btn-xs">Details</a>
                                     </td>
                                 </tr>
                             @endforeach

@@ -31,9 +31,15 @@ class ScheduleControllers extends Controller
      */
     public function index(Request $request)
     {
-        $project = Project::where('company',Auth::user()->company)->get();
+        $project = Project::where('company', Auth::user()->company)
+                          ->whereNull('deleted_at')
+                          ->get();
         $filterPeriode = $request->input('periode')??date('M-Y');
         $currentYear = date('Y');
+        $need_upload =0;
+        $completed =0;
+        $over =0;
+        $under =0;
         foreach($project as $row){
             $count = Schedule::where('project', $row->id)
                 ->where('periode', $filterPeriode)
@@ -52,11 +58,25 @@ class ScheduleControllers extends Controller
             $startDate = $periodeDate->copy()->subMonth()->day(21);
             $endDate = $periodeDate->copy()->day(20);
             $row->jumlah_hari = $startDate->diffInDays($endDate) + 1;
+            $expectedSchedules = $row->jumlah_hari * $row->total_mp;
+            if ($row->jumlah_schedule > $expectedSchedules) {
+                $over +=1;
+            } elseif ($row->jumlah_schedule < $expectedSchedules) {
+                $under +=1;
+            } else  if($row->jumlah_schedule == $expectedSchedules) {
+                $completed +=1;
+            }else if($row->jumlah_schedule == 0){
+                $need_upload +=1;
+            }
         }
 
         $data['project']=$project;
         $data['currentYear'] = $currentYear;
         $data['selectedPeriod'] = $filterPeriode;
+        $data['need_upload'] = $need_upload;
+        $data['completed'] = $completed;
+        $data['over'] = $over;
+        $data['under'] = $under;
         
         return view('pages.hc.kas.schedule.index',$data);
     }

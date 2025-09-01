@@ -31,6 +31,7 @@ class ProjectControllers extends Controller
         $project = DB::connection('mysql_secondary')
                         ->table('projects')
                         ->where('company', $company->unit_bisnis)
+                        ->whereNull('deleted_at')
                         ->get();
         
         return view('pages.hc.kas.project.index', compact('project'));

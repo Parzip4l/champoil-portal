@@ -211,17 +211,19 @@ class ProjectControllers extends Controller
     {
         try {
             $project = Project::findOrFail($id);
+
+            Project::where('id', $project->id)->update(['deleted_at' => now()]);
             
-            // Find ProjectDetails by project_code
-            $projectDetails = ProjectDetails::where('project_code', $id)->first();
+            // // Find ProjectDetails by project_code
+            // $projectDetails = ProjectDetails::where('project_code', $id)->first();
 
-            // If ProjectDetails exists, delete it
-            if ($projectDetails) {
-                $projectDetails->delete();
-            }
+            // // If ProjectDetails exists, delete it
+            // if ($projectDetails) {
+            //     $projectDetails->delete();
+            // }
 
-            // Delete the project
-            $project->delete();
+            // // Delete the project
+            // $project->delete();
 
             return redirect()->route('project.index')->with('success', 'Project Successfully Deleted');
         } catch (ModelNotFoundException $e) {

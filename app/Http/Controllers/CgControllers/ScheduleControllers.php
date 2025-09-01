@@ -33,6 +33,7 @@ class ScheduleControllers extends Controller
     {
         $project = Project::where('company', Auth::user()->company)
                           ->whereNull('deleted_at')
+                          ->where('name', 'not like', '%test%')
                           ->get();
         $filterPeriode = $request->input('periode')??date('M-Y');
         $currentYear = date('Y');

@@ -31,68 +31,34 @@ class ScheduleControllers extends Controller
      */
     public function index(Request $request)
     {
+        $project = Project::where('company',Auth::user()->company)->get();
+        $filterPeriode = $request->input('periode')??date('M-Y');
         $currentYear = date('Y');
-        $selectedPeriod = $request->input('periode', null);
+        foreach($project as $row){
+            $count = Schedule::where('project', $row->id)
+                ->where('periode', $filterPeriode)
+                ->whereNotIn('employee', function ($query) use ($row, $filterPeriode) {
+                    $query->select('employee_code')
+                          ->from('scheule_parents')
+                          ->where('project_id', $row->id)
+                          ->where('periode', $filterPeriode);
+                })
+                ->count();
+            $row->jumlah_schedule = $count;
+            $row->total_mp = ProjectDetails::where('project_code',$row->id)->sum('kebutuhan');
+            $row->periode = $filterPeriode;
 
-        $get_data = Schedule::with('project')
-            ->select('project', 'periode', DB::raw('count(*) as schedule_count'))
-            // ->where('company', Auth::user()->company)
-            ->groupBy('project', 'periode')
-            ->orderBy(DB::raw("DATE_FORMAT(STR_TO_DATE(periode, '%Y-%m'), '%M-%Y')"), 'ASC'); // Ordering by month in the format MMM-YYYY
-
-        $getProject = Project::where('company', Auth::user()->company)
-            ->whereNull('deleted_at')
-            ->pluck('id')->toArray(); // Retrieve multiple IDs as an array
-
-
-        if (Auth::user()->project_id == NULL) {
-            $get_data->whereIn('project', $getProject);
-            if ($selectedPeriod) {
-                $get_data->where('periode', $selectedPeriod);
-                
-            }
-            $schedulesByProject = $get_data->get();
-        } else {
-            $get_data = $get_data->where('project', Auth::user()->project_id);
-            if ($selectedPeriod) {
-                $get_data->where('periode', $selectedPeriod);
-            }
-            $schedulesByProject = $get_data->get();
-        }
-        $jumlahHari=0;
-        if ($selectedPeriod) {
-            // Pisahkan BULAN dan TAHUN
-            [$monthName, $year] = explode('-', strtoupper($selectedPeriod));
-        
-            // Ubah nama bulan ke angka (contoh: JULY -> 7)
-            $monthNumber = date('n', strtotime($monthName));
-        
-            // Hitung tanggal mulai: 21 bulan sebelumnya
-            $start = Carbon::createFromDate($year, $monthNumber, 1)->subMonth()->day(21);
-        
-            // Hitung tanggal akhir: 20 bulan sekarang
-            $end = Carbon::createFromDate($year, $monthNumber, 20);
-        
-            $jumlahHari = $start->diffInDays($end) + 1; // +1 agar inklusif
-    
+            $periodeDate = Carbon::createFromFormat('M-Y', $filterPeriode);
+            $startDate = $periodeDate->copy()->subMonth()->day(21);
+            $endDate = $periodeDate->copy()->day(20);
+            $row->jumlah_hari = $startDate->diffInDays($endDate) + 1;
         }
 
-        if($schedulesByProject){
-            foreach($schedulesByProject as $row){
-                $row->schedule_count = $row->schedule_count;
-                $get_mp = ProjectDetails::where('project_code',$row->project)->get();
-                $row->total_mp = 0;
-                if($get_mp){
-                    foreach($get_mp as $mp){
-                        $row->total_mp += $mp->kebutuhan;
-                    }
-                }
-                $row->jumlahHari = $jumlahHari;
-                $row->totalSeharusnya = $row->total_mp * $jumlahHari;
-            }
-        }
-
-        return view('pages.hc.kas.schedule.index', compact('schedulesByProject', 'currentYear', 'selectedPeriod'));
+        $data['project']=$project;
+        $data['currentYear'] = $currentYear;
+        $data['selectedPeriod'] = $filterPeriode;
+        
+        return view('pages.hc.kas.schedule.index',$data);
     }
 
 

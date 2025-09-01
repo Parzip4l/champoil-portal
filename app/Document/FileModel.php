@@ -11,7 +11,7 @@ class FileModel extends Model
     use HasFactory;
     use LogsActivity;
     protected $table = 'document_files';
-    protected $fillable = ['name', 'path', 'folder_id','company','uploader'];
+    protected $fillable = ['name', 'path', 'folder_id', 'company', 'uploader', 'due_date', 'reminder'];
 
     public function files()
     {

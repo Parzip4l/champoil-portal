@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\OcrController;
 use App\Http\Controllers\Api\AllData\DeveloperController;
 use App\Http\Controllers\Api\CoverMe\CovermeController;
 use App\Http\Controllers\Api\Menu\MobileController;
+use App\Http\Controllers\Api\Document\DocumentController;
 
 
 Route::prefix('v1')->group(function () {
@@ -330,6 +331,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [MobileController::class, 'show']);
         Route::put('/{id}', [MobileController::class, 'update']);
         Route::delete('/{id}', [MobileController::class, 'destroy']);
+    });
+
+    Route::prefix('documents')->group(function () {
+        Route::get('/folders/{id}', [DocumentController::class, 'index']);
+        Route::post('/root-folder', [DocumentController::class, 'rootFolder']);
+        Route::post('/uploads', [DocumentController::class, 'uploadFiles']);
+        Route::get('/recents/{id}', [DocumentController::class, 'recent']);
     });
     
     

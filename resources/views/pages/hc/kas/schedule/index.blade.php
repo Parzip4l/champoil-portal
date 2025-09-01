@@ -4,21 +4,7 @@
     $schIncomplete =  0;
     $schLebih = 0;
     @endphp
-    @foreach ($schedulesByProject as $a)
-        @php
-            $project = \App\ModelCG\Project::find($a->project);
-            $projectname = $project->name ?? 'Project not found';
-
-            // Update schedule completion counters
-            if ($a->schedule_count == $a->totalSeharusnya) {
-                $schComplete++;
-            } else if ($a->schedule_count < $a->totalSeharusnya) {
-                $schIncomplete++;
-            }else{
-                $schLebih++;
-            }
-        @endphp
-    @endforeach
+    
 
 
 @push('plugin-styles')
@@ -110,40 +96,35 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php  
-                                $totalMp = 0;
-                            @endphp
-                            @foreach ($schedulesByProject as $scheduleByProject)
-                            <tr>
-                                @php
-                                    $project = \App\ModelCG\Project::find($scheduleByProject->project);
-                                    $projectname = $project->name ?? 'Project not found';
-                                    $totalMp += $scheduleByProject->total_mp;
-
-                                   
-                                @endphp
-                                <td>{{ $projectname }}</td>
-                                <td>{{ $scheduleByProject->periode }}</td>
-                                <td>{{ $scheduleByProject->total_mp }}</td>
-                                <td>{{ $scheduleByProject->schedule_count }}</td>
-                                <td>{{ $scheduleByProject->jumlahHari }}</td>
-                                <td>{{ $scheduleByProject->totalSeharusnya }}</td>
-                                <td>
-                                    @if ($scheduleByProject->schedule_count == $scheduleByProject->totalSeharusnya)
-                                        <span class="badge bg-success">Complete</span>
-                                    @elseif ($scheduleByProject->schedule_count < $scheduleByProject->totalSeharusnya)
-                                        <span class="badge bg-warning">Incomplete</span>
-                                    @else
-                                        <span class="badge bg-danger">Exceed</span>
-                                    @endif
-                                </td>
-
-                                <td>
-                                    <a href="{{ route('schedule.details', ['project' => $scheduleByProject->project, 'periode' => $scheduleByProject->periode]) }}" class="btn btn-primary btn-sm">Details</a>
-                                </td>
-                            </tr>
+                            @foreach($project as $row)
+                                <tr>
+                                    <td>{{ strtoupper($row->name) }}</td>
+                                    <td>{{ $row->periode }}</td>
+                                    <td>{{ $row->total_mp }}</td>
+                                    <td>{{ $row->jumlah_schedule }}</td>
+                                    <td>{{ $row->jumlah_hari }}</td>
+                                    <td>{{ $row->jumlah_hari * $row->total_mp }}</td>
+                                    <td>
+                                        @php
+                                            $expectedSchedules = $row->jumlah_hari * $row->total_mp;
+                                            if ($row->jumlah_schedule > $expectedSchedules) {
+                                                $status = '<span class="badge bg-danger">SCHEDULE OVER</span>';
+                                            } elseif ($row->jumlah_schedule < $expectedSchedules) {
+                                                $status = '<span class="badge bg-warning text-dark">SCHEDULE UNDER</span>';
+                                            } else {
+                                                $status = '<span class="badge bg-success">SCHEDULE COMPLETE</span>';
+                                            }
+                                        @endphp
+                                        {!! $status !!}
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('schedule.details', ['project' => $row->id, 'periode' => $row->periode]) }}" 
+                                           class="btn btn-primary btn-sm">Details</a>
+                                    </td>
+                                </tr>
                             @endforeach
-                        </tbody>
+                        </tbody>    
+                            
                     </table>
                 </div>
             </div>

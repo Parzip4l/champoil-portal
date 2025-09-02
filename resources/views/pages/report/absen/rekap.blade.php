@@ -25,87 +25,81 @@
             <div class="head-card d-flex justify-content-between">
                 <div class="header-title align-self-center">
                     <h6 class="card-title align-self-center mb-2">Rekap Report</h6>
-                   
-                    
                 </div>
-                
             </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-            <table style="width:100%;paddng:3px">
-                <tr>
-                    <td style="background-color:#ff6f74" width="15"></td>
-                    <td>Danger</td>
-                    <td style="background-color:#fff199" width="15"></td>
-                    <td>Warning</td>
-                    <td style="background-color:#9ecb8c" width="15"></td>
-                    <td>Good</td>
-                    <td style="background-color:green" width="15"></td>
-                    <td>Excelent</td>
-                    <td style="background-color:#2a2af95e" width="15"></td>
-                    <td>On Progress</td>
-                    <td style="background-color:#474747" width="15"></td>
-                    <td>Schedule Not Found</td>
-                </tr>
-            </table><hr/>
-            <table id="dataTableExample" class="table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Project Name</th>
-                    @if(bulan())
-                        @foreach(bulan() as $bln)
-                            <th>{{ $bln }}</th>
-                        @endforeach
-                    @endif
-                    
-                </tr>
-                </thead>
-                <tbody>
-                    @if($project)
-                    @php 
-                        $no=1;
-                    @endphp
-                        @foreach($project as $row)
-                            
-                            <tr>
-                                <td width="5">{{ $no }}</td>
-                                <td>{{ $row->name }}</td>
-                                @if(bulan())
-                                    @foreach(bulan() as $bln_r)
-                                        @php 
-                                            if($row['persentase_absen'.$bln_r] <= 50 ){
-                                                $color="background-color:#ff6f74";
-                                            }else if($row['persentase_absen'.$bln_r] >50 && $row['persentase_absen'.$bln_r] <= 80 ){
-                                                $color="background-color:#fff199";
-                                            }else if($row['persentase_absen'.$bln_r] >80 && $row['persentase_absen'.$bln_r] < 100 ){
-                                                $color="background-color:#9ecb8c";
-                                            }else if($row['persentase_absen'.$bln_r] >=100 ){
-                                                $color="background-color:green";
-                                            }
+                <!-- Legend Table -->
+                <table class="table table-bordered table-sm">
+                    <tr>
+                        <td style="background-color:#ffb3ba; width:15px;"></td>
+                        <td>Danger</td>
+                        <td style="background-color:#ffdfba; width:15px;"></td>
+                        <td>Warning</td>
+                        <td style="background-color:#baffc9; width:15px;"></td>
+                        <td>Good</td>
+                        <td style="background-color:#bae1ff; width:15px;"></td>
+                        <td>Excellent</td>
+                        <td style="background-color:#d5a6ff; width:15px;"></td>
+                        <td>On Progress</td>
+                        <td style="background-color:#d9d9d9; width:15px;"></td>
+                        <td>Schedule Not Found</td>
+                    </tr>
+                </table>
+                <hr/>
 
-                                            if(empty($row['persentase_absen'.$bln_r])){
-                                                $color="background-color:#474747";
-                                            }
+                <!-- Data Table -->
+                <table id="dataTableExample" class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Project Name</th>
+                            @if(bulan())
+                                @foreach(bulan() as $bln)
+                                    <th>{{ $bln }}</th>
+                                @endforeach
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if($project)
+                            @php $no = 1; @endphp
+                            @foreach($project as $row)
+                                <tr>
+                                    <td width="5">{{ $no }}</td>
+                                    <td>{{ $row->name }}</td>
+                                    @if(bulan())
+                                        @foreach(bulan() as $bln_r)
+                                            @php 
+                                                // Determine cell background color based on conditions
+                                                if ($row['persentase_absen'.$bln_r] <= 50) {
+                                                    $color = "background-color:#ffb3ba";
+                                                } elseif ($row['persentase_absen'.$bln_r] > 50 && $row['persentase_absen'.$bln_r] <= 80) {
+                                                    $color = "background-color:#ffdfba";
+                                                } elseif ($row['persentase_absen'.$bln_r] > 80 && $row['persentase_absen'.$bln_r] < 100) {
+                                                    $color = "background-color:#baffc9";
+                                                } elseif ($row['persentase_absen'.$bln_r] >= 100) {
+                                                    $color = "background-color:#bae1ff";
+                                                }
 
-                                            if($row['on_periode'.$bln_r]==1){
-                                                $color="background-color:#2a2af95e";
-                                            }
-                                            
-                                        @endphp
-                                        <td style="text-align:right;{{$color}}">{{ $row['persentase_absen'.$bln_r] }} %</td>
-                                    @endforeach
-                                @endif
-                                
-                            </tr>
-                            @php 
-                                $no++;
-                            @endphp
-                        @endforeach
-                    @endif
-                </tbody>
-            </table>
+                                                if (empty($row['persentase_absen'.$bln_r])) {
+                                                    $color = "background-color:#d9d9d9";
+                                                }
+
+                                                if ($row['on_periode'.$bln_r] == 1) {
+                                                    $color = "background-color:#d5a6ff";
+                                                }
+                                            @endphp
+                                            <td style="text-align:right; {{ $color }}">{{ $row['persentase_absen'.$bln_r] }} %</td>
+                                        @endforeach
+                                    @endif
+                                </tr>
+                                @php $no++; @endphp
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

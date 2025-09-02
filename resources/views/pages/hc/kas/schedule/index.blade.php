@@ -143,7 +143,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('import.schedule') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('upload-schedule') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <input type="file" class="form-control mb-2" name="csv_file" required accept=".xlsx">
                     <button type="submit" class="btn btn-primary w-100">Import Excel</button>

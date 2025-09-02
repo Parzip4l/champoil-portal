@@ -487,6 +487,7 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
         // Get manpower Backup
         Route::get('/get-employees/{projectId}',[ App\Http\Controllers\CgControllers\ScheduleBackupControllers::class, 'getManPower']);
         Route::post('/import-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'importSchedule'])->name('import.schedule');
+        Route::post('/upload-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'uploadSchedule'])->name('upload-schedule');
         Route::get('export-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'exportSchedule'])->name('export.schedule');
         Route::post('/read-excel', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'readExcel'])->name('read.excel');
         Route::post('/post-data-schedule', [App\Http\Controllers\CgControllers\ScheduleControllers::class, 'post_data_schedule'])->name('post-data-schedule');

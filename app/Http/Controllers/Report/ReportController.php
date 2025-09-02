@@ -174,47 +174,57 @@ class ReportController extends Controller
     }
 
     public function rekap_report(){
-        $project = Project::where('deleted_at',NULL)->where('company','Kas')->get();
-        if($project){
-            foreach($project as $row){
-                $row->persentase_backup=0;
-                $row->persentase_absen=0;
-                $row->persentase_tanpa_clockout = 0;
-                foreach(bulan() as $bln){
-                    $month = strtoupper($bln."-".date('Y'));
-                    $periode_min_1_month = date('m', strtotime("-1 month", strtotime($bln)));
+        $project = Project::where('deleted_at', NULL)
+                          ->where('company', 'Kas')
+                          ->where('name', 'not like', 'test') // Exclude projects with name "test"
+                          ->get();
 
-                    // Ambil bulan dari periode yang sudah ditambahkan satu bulan
+        if ($project) {
+            foreach ($project as $row) {
+                $row->persentase_backup = 0;
+                $row->persentase_absen = 0;
+                $row->persentase_tanpa_clockout = 0;
+
+                $bulanData = bulan();
+                $currentMonth = date('m', strtotime("+1 month"));
+
+                foreach ($bulanData as $bln) {
+                    $periodeMin1Month = date('m', strtotime("-1 month", strtotime($bln)));
                     $bulan = date('m', strtotime($bln));
 
-                    $start = date('Y').'-'.$periode_min_1_month.'-'.'21';
-                    $end = date('Y').'-'.$bulan.'-'.'20';
+                    $start = date('Y') . '-' . $periodeMin1Month . '-21';
 
-                    $row['schedule'.$bln] = Schedule::where('project',$row->id)
-                    ->whereBetween('tanggal', [$start, $end])
-                    ->where('shift','!=','OFF')
-                    ->count();
-
-                    if(date('m', strtotime("+1 month")) == date('m',strtotime($bln))){
-                        $row['on_periode'.$bln]=1;
-                    }else{
-                        $row['on_periode'.$bln]=0;
+                    if ($bulan == date('m')) {
+                        $end = date('Y-m-d', strtotime('yesterday')); // Use yesterday's date if the month is the current month
+                    } else {
+                        $end = date('Y') . '-' . $bulan . '-20';
                     }
-               
-                    $row['absen'.$bln] = Absen::where('project', $row->id)
-                                        ->whereBetween('tanggal', [$start, $end])
-                                        ->count();
-                
-                    if($row['absen'.$bln] > 0 && $row['schedule'.$bln] > 0){
-                        $row['persentase_absen'.$bln] = round(($row['absen'.$bln] / $row['schedule'.$bln]) * 100,2);
+
+                    $scheduleCount = Schedule::where('project', $row->id)
+                                             ->whereBetween('tanggal', [$start, $end])
+                                             ->where('shift', '!=', 'OFF')
+                                             ->count();
+
+                    $absenCount = Absen::where('project', $row->id)
+                                       ->whereBetween('tanggal', [$start, $end])
+                                       ->count();
+
+                    $row['schedule' . $bln] = $scheduleCount;
+                    $row['absen' . $bln] = $absenCount;
+                    $row['on_periode' . $bln] = (date('m', strtotime($bln)) == $currentMonth) ? 1 : 0;
+
+                    if ($scheduleCount > 0 && $absenCount > 0) {
+                        $row['persentase_absen' . $bln] = round(($absenCount / $scheduleCount) * 100, 2);
+                        if ($row['persentase_absen' . $bln] > 100) {
+                            $row['persentase_absen' . $bln] = 100;
+                        }
                     }
                 }
-                
-              
             }
         }
-        $data['project']=$project;
-        return view('pages.report.absen.rekap',$data);
+
+        $data['project'] = $project;
+        return view('pages.report.absen.rekap', $data);
     }
 
     
@@ -315,7 +325,7 @@ class ReportController extends Controller
                     $clockIns = explode(',', $row->clock_ins);
                     $clockOuts = explode(',', $row->clock_outs);
                     $dateIndexMap = array_flip($dates);
-    
+
                     foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
                         $formattedDate = $date->format('Y-m-d');
                         if (isset($dateIndexMap[$formattedDate])) {

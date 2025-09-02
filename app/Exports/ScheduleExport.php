@@ -25,7 +25,6 @@ class ScheduleExport implements FromCollection, WithHeadings
     {
         // Specify the headers for your exported data
         return [
-            'schedule_code',
             'project',
             'employee',
             'tanggal',

@@ -498,5 +498,88 @@ class ScheduleControllers extends Controller
         }
     }
 
+    public function uploadSchedule(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|mimes:xlsx,csv,txt',
+        ]);
+
+        $data = $request->file('csv_file');
+        $namaFIle = $data->getClientOriginalName();
+        $data->move('ScheduleImport', $namaFIle);
+
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(public_path('ScheduleImport/' . $namaFIle));
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+            // Use row 7 as the key for the data
+            $keys = $sheetData[7];
+            $formattedData = [];
+
+            foreach ($sheetData as $index => $row) {
+                if ($index > 7 && array_filter($row)) { // Skip rows before row 8 and empty rows
+                    $entry = array_combine($keys, $row);
+
+                    // Transform the data into the desired format
+                    $transformedEntry = [
+                        "NAMA" => $entry["NAMA"],
+                        "NIK" => $entry["NIK"],
+                        "PROJECT" => $entry["PROJECT "],
+                    ];
+
+                    foreach ($entry as $key => $value) {
+                        if (preg_match('/\d{1,2}\/\d{1,2}\/\d{4}/', $key)) { // Match date columns
+                            $transformedEntry[$key] = $value;
+                        }
+                    }
+
+                    $formattedData[] = $transformedEntry;
+                }
+            }
+
+            // Insert formatted data into the Schedule model
+            foreach ($formattedData as $data) {
+                $dateKeys = array_keys(array_filter($data, fn($key) => preg_match('/\d{1,2}\/\d{1,2}\/\d{4}/', $key), ARRAY_FILTER_USE_KEY));
+                $lastDate = end($dateKeys); // Get the last date key
+                $periode = Carbon::createFromFormat('m/d/Y', $lastDate)->format('F-Y'); // Convert to MM-Y format
+
+                foreach ($dateKeys as $key) {
+                    $tanggal = Carbon::createFromFormat('m/d/Y', $key)->format('Y-m-d');
+                    $tomorrow = Carbon::now()->addDay()->format('Y-m-d'); // Get tomorrow's date
+
+                    // Check if the record already exists
+                    $existingSchedule = Schedule::where('employee', $data['NIK'])
+                                                ->where('project', $data['PROJECT'])
+                                                ->where('tanggal', $tanggal)
+                                                ->first();
+
+                    if ($existingSchedule) {
+                        // Update only if the date is tomorrow or later
+                        if ($tanggal >= $tomorrow) {
+                            $existingSchedule->shift = $data[$key];
+                            $existingSchedule->periode = strtoupper($periode);
+                            $existingSchedule->updated_at = now();
+                            $existingSchedule->save();
+                        }
+                    } else {
+                        // Insert a new record
+                        Schedule::insert([
+                            'employee' => $data['NIK'],
+                            'project' => $data['PROJECT'],
+                            'tanggal' => $tanggal,
+                            'shift' => $data[$key],
+                            'periode' => strtoupper($periode),
+                            'created_at' => now(),
+                        ]);
+                    }
+                }
+            }
+
+            return redirect()->route('schedule.index')->with('success', 'Data successfully uploaded and inserted.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Import gagal. ' . $e->getMessage());
+        }
+    }
+
     
 }

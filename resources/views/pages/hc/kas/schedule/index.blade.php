@@ -84,6 +84,7 @@
                                 <th>Project</th>
                                 <th>Periode</th>
                                 <th>Jumlah MP</th>
+                                <th>Total MP</th>
                                 <th>Total Schedule</th>
                                 <th>Jumlah Hari</th>
                                 <th>Total Seharusnya</th>
@@ -100,6 +101,7 @@
                                     </td>
                                     <td>{{ $row->periode }}</td>
                                     <td>{{ $row->total_mp }}</td>
+                                    <td>{{ $row->jumlah_schedule / $row->jumlah_hari }}</td>
                                     <td>{{ $row->jumlah_schedule }}</td>
                                     <td>{{ $row->jumlah_hari }}</td>
                                     <td>{{ $row->jumlah_hari * $row->total_mp }}</td>

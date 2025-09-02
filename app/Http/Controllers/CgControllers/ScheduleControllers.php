@@ -279,8 +279,13 @@ class ScheduleControllers extends Controller
 
     public function exportSchedule() 
     {
-        return Excel::download(new ScheduleExport, 'schedule.xlsx');
-        return redirect()->back()->with('success', 'Download Berhasil !');
+        $filePath = public_path('template/template_schedule.xlsx'); // Correct path to the file
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, 'template_schedule.xlsx');
+        } else {
+            return redirect()->back()->with('error', 'File not found.');
+        }
     }
 
     /**

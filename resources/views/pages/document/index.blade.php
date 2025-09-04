@@ -490,6 +490,39 @@
                     $('#uploadDocumentModal').modal('hide');
                     $('#uploadDocumentForm')[0].reset(); // Clear form values
                     $('.dropify').dropify(); // Reinitialize Dropify to clear file input
+
+                    // Dynamically add the uploaded file to the recentDocuments section
+                    const fileExtension = response.path.split('.').pop().toLowerCase();
+                    let preview;
+
+                    if (/\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(response.path)) {
+                        preview = `<img src="${response.full_url}" class="card-img-top" alt="Preview of ${response.name}">`;
+                    } else if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(fileExtension)) {
+                        preview = `<iframe src="${response.full_url}" class="card-img-top" style="width: 100%; height: 200px;" frameborder="0" sandbox></iframe>`;
+                    } else {
+                        preview = `<div class="card-img-top text-center" style="font-size: 50px; padding: 20px; color: #1f4598;">
+                                       <i data-feather="file-text"></i>
+                                   </div>`;
+                    }
+
+                    const documentCard = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;">
+                                <div style="height: 200px; overflow: hidden; background-color: #f4f4f4;">
+                                    ${preview}
+                                </div>
+                                <div class="card-body" style="padding: 15px;">
+                                    <h6 class="card-title" style="font-weight: bold; color: #1f4598;">${response.name}</h6>
+                                    <p class="card-text" style="font-size: 14px; color: #555;">
+                                        <strong>Uploaded By:</strong> ${response.uploader || 'Unknown'}<br>
+                                    </p>
+                                    <a href="${response.full_url}" class="btn btn-primary btn-sm mt-3" target="_blank" style="background: linear-gradient(to right, #1f4598, #fbaf44); border: none;">Download</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $('#recentDocuments').prepend(documentCard); // Add the new document at the top
+                    feather.replace(); // Re-render Feather icons
                 },
                 error: function() {
                     Swal.close(); // Close the loading indicator

@@ -162,7 +162,7 @@ class DocumentController extends Controller
     }
 
     public function filesList($id){
-        $files = FileModel::where('folder_id', $id)->get();
+        $files = FileModel::where('folder_id', $id)->orderBy('name','desc')->get();
 
         foreach ($files as $file) {
             $file->full_url = asset('storage/' . $file->path); // Gunakan asset() untuk URL publik

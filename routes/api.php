@@ -335,9 +335,12 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('documents')->group(function () {
         Route::get('/folders/{id}', [DocumentController::class, 'index']);
+        Route::get('/files/{id}', [DocumentController::class, 'filesList']);
         Route::post('/root-folder', [DocumentController::class, 'rootFolder']);
         Route::post('/uploads', [DocumentController::class, 'uploadFiles']);
         Route::get('/recents/{id}', [DocumentController::class, 'recent']);
+        Route::post('/tags', [DocumentController::class, 'addTags']);
+        Route::get('/tags-list/{id}', [DocumentController::class, 'tags']);
     });
     
     

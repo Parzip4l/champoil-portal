@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Storage;
 use App\Document\FolderModel;
 use App\Document\FileModel;
 use App\Models\Document\Recent;
+use App\Models\Document\Tags;
 use App\Employee;
 use App\User;
+use App\ModelCG\Project;
 
 class DocumentController extends Controller
 {
@@ -36,6 +38,7 @@ class DocumentController extends Controller
             
             $folder->name = strtoupper($folder->name);
             $fileCounts[$folder->id] = FileModel::where('folder_id', $folder->id)->count();
+            $folder->tags = $this->tags($folder->id);
         }
 
         $recentFile = FileModel::where('company', $company->unit_bisnis)
@@ -47,7 +50,7 @@ class DocumentController extends Controller
         return response()->json([
             'folders' => $folders,
             'fileCounts' => $fileCounts,
-            'recentFiles' => $recentFile
+            'recentFiles' => $recentFile,
         ]);
     }
 
@@ -115,6 +118,7 @@ class DocumentController extends Controller
 
     public function recent($id){
         $company = User::where('id', $id)->first();
+        
 
         $recentFiles = Recent::join('document_files', 'recents.file_id', '=', 'document_files.id')
                             ->where('document_files.company', $company->company)
@@ -157,6 +161,68 @@ class DocumentController extends Controller
         return response()->json($recentFiles);
     }
 
+    public function filesList($id){
+        $files = FileModel::where('folder_id', $id)->get();
+
+        foreach ($files as $file) {
+            $file->full_url = asset('storage/' . $file->path); // Gunakan asset() untuk URL publik
+            $file->uploader = User::join('karyawan','karyawan.nik','=','users.name')->where('users.id', $file->uploader)->value('nama'); // Ambil nama uploader
+
+            if ($file->due_date) {
+                $remainingDays = (new \DateTime($file->due_date))->diff(new \DateTime())->days;
+                $file->remaining = strtotime($file->due_date) > time() 
+                    ? $remainingDays . ' days remaining' 
+                    : 'Past due';
+
+                if (strtotime($file->due_date) > time()) {
+                    if ($remainingDays <= 30) {
+                        $file->color = "text-danger";
+                    } elseif ($remainingDays > 30 && $remainingDays < 60) {
+                        $file->color = "text-warning";
+                    } else {
+                        $file->color = "text-success";
+                    }
+                }
+
+                $file->due_date = date('l, d M Y', strtotime($file->due_date));
+            } else {
+                $file->remaining = null;
+                $file->color = null;
+                $file->due_date = null;
+            }
+        }
+
+        return response()->json($files);
+    }
+
+
+    public function tags($id){
+        $tags = Tags::where('folder_id', $id)->get();
+        if($id ==28){
+            $tags = Project::all();
+        }
+        return $tags;
+    }
+
+    public function addTags(Request $request){
+        $request->validate([
+            'folder_id' => 'required|integer|exists:document_folder,id',
+            'tags' => 'required|string|max:255',
+        ]);
+
+        $tag = Tags::create([
+            'folder_id' => $request->folder_id,
+            'tags' => $request->tags,
+        ]);
+
+        return response()->json([
+            'id' => $tag->id,
+            'folder_id' => $tag->folder_id,
+            'tags' => $tag->tags,
+            'created_at' => $tag->created_at,
+            'updated_at' => $tag->updated_at,
+        ], 201);
+    }
 
 
 }

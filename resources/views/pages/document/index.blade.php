@@ -14,16 +14,18 @@
 
 @section('content')
 <div class="row">
+    
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card">
+            <div class="card-header">
+                    DOCUMENT CONTROL
+                    <i data-feather="folder-plus" class="icon-lg folder-icon" style="float:right; color: black; cursor: pointer;"></i>
+            </div>  
             <div class="card-body">
-                <h6 class="card-title">
-                    Document Control 
-                    <i data-feather="folder-plus" class="icon-sm folder-icon" style="float:right; color: black; cursor: pointer;"></i>
-                </h6>
                 <div id="folderTreeView"></div>
             </div>
         </div>
+        
     </div>
     <div class="col-md-9 grid-margin stretch-card">
         <div class="card">
@@ -34,11 +36,22 @@
                 </h6>
             </div>
             <div class="card-body" style="background-color: #f9fafb; border:1px solid #1f4598">
-                
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <select class="form-control select2" 
+                                id="documentTags" 
+                                name="tags[]" 
+                                multiple="multiple" 
+                                data-width="100%"
+                                placeholder="Filter by tags">
+                                   
+                        </select>
+                </div>
                 <input type="hidden" id="selectedFolderId" value="">
-                <div class="row" id="recentDocuments">
+                <div class="row mt-3" id="recentDocuments">
                     <!-- Recent documents will be dynamically loaded here -->
                 </div>
+                
             </div>
         </div>
     </div>
@@ -111,6 +124,7 @@
     <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables-net-bs5/dataTables.bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
     <script src="{{ asset('assets/plugins/dropify/js/dropify.min.js') }}"></script>
 @endpush
@@ -319,6 +333,96 @@
 
             // Update the hidden folder ID
             $('#selectedFolderId').val(data.node.id);
+
+            // Fetch tags for the selected folder
+            $.ajax({
+                url: `/api/v1/documents/tags-list/${data.node.id}`,
+                method: 'GET',
+                beforeSend: function() {
+                    $('#documentTags').html('<option value="all">Loading...</option>'); // Show loading state
+                },
+                success: function(response) {
+                    $('#documentTags').empty(); // Clear existing options
+                    $('#documentTags').append('<option value="all">All Tags</option>'); // Add default option
+
+                    // Iterate through the response and populate the dropdown
+                    response.forEach(tag => {
+                        $('#documentTags').append(`<option value="${tag.id}">${tag.name}</option>`);
+                    });
+
+                    // Destroy previous Select2 instance and reinitialize
+                    if ($('#documentTags').data('select2')) {
+                        $('#documentTags').select2('destroy');
+                    }
+                    $('#documentTags').select2({
+                        placeholder: 'Select tags',
+                        allowClear: true
+                    });
+                },
+                error: function() {
+                    $('#documentTags').html('<option value="all">Failed to load tags</option>'); // Show error state
+                }
+            });
+
+            // Fetch files for the selected folder
+            const recentDocumentsContainer = $('#recentDocuments');
+            $.ajax({
+                url: `/api/v1/documents/files/${data.node.id}`,
+                method: 'GET',
+                beforeSend: function() {
+                    recentDocumentsContainer.html(`
+                        <div class="d-flex justify-content-center align-items-center" style="height: 100px;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `); // Show spinner
+                },
+                success: function(response) { 
+                    recentDocumentsContainer.empty();
+                    if (response.length > 0) {
+                        response.forEach(document => {
+                            const fileExtension = document.path.split('.').pop().toLowerCase();
+                            let preview;
+
+                            if (/\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(document.path)) {
+                                preview = `<img src="${document.full_url}" class="card-img-top" alt="Preview of ${document.name}">`;
+                            } else if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(fileExtension)) {
+                                preview = `<iframe src="${document.full_url}" class="card-img-top" style="width: 100%; height: 200px;" frameborder="0" sandbox></iframe>`;
+                            } else {
+                                preview = `<div class="card-img-top text-center" style="font-size: 50px; padding: 20px; color: #1f4598;">
+                                               <i data-feather="file-text"></i>
+                                           </div>`;
+                            }
+
+                            const documentCard = `
+                                <div class="col-md-4 mb-4">
+                                    <div class="card shadow-sm" style="border-radius: 10px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;">
+                                        <div style="height: 200px; overflow: hidden; background-color: #f4f4f4;">
+                                            ${preview}
+                                        </div>
+                                        <div class="card-body" style="padding: 15px;">
+                                            <h6 class="card-title" style="font-weight: bold; color: #1f4598;">${document.name}</h6>
+                                            <p class="card-text" style="font-size: 14px; color: #555;">
+                                                <strong>Uploaded By:</strong> ${document.uploader || 'Unknown'}<br>
+                                            </p>
+                                            <a href="${document.full_url}" class="btn btn-primary btn-sm mt-3" target="_blank" style="background: linear-gradient(to right, #1f4598, #fbaf44); border: none;">Download</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            recentDocumentsContainer.append(documentCard);
+                        });
+                        feather.replace(); // Re-render Feather icons
+                    } else {
+                        recentDocumentsContainer.html('<p>No files found in this folder.</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching files:', error);
+                    recentDocumentsContainer.html('<p>Failed to load files. Please try again later.</p>');
+                }
+            });
         });
 
         $('#folderTreeView').on('click', '.newFolderOption', function(e) {
@@ -476,6 +580,12 @@
 
         // Call the function to fetch recent documents
         fetchRecentDocuments();
+
+        // Initialize Select2 for the tags field
+        $('#documentTags').select2({
+            placeholder: 'Select tags',
+            allowClear: true
+        });
 
         feather.replace();
     });

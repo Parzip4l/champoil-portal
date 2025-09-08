@@ -215,7 +215,6 @@ class PatroliProojectController extends Controller
 
     public function storeActivity(Request $request){
         // Validate the incoming request
-        // Validate the incoming request
         $validated = $request->validate([
             'images' => 'required|image|mimes:jpg,jpeg,png', // Adjust image validation rules as necessary
             'unix_code' => 'required|string',
@@ -242,31 +241,25 @@ class PatroliProojectController extends Controller
             return response()->json(['message' => 'Patroli project not found'], 404);
         }
 
-        // Resize the image using Intervention Image
-        $resizedImage = Image::make($image->getRealPath())
-            ->resize(1024, 768, function ($constraint) {
-                $constraint->aspectRatio(); // Maintain aspect ratio
-                $constraint->upsize();     // Prevent upsizing smaller images
-            })
-            ->encode('jpg', 75); // Encode as JPEG with 75% quality
-
         // Generate a unique file name
-        $fileName = uniqid('patroli_') . '.jpg';
+        $fileName = uniqid('patroli_') . '.' . $image->getClientOriginalExtension();
 
-        // Save the resized image to the 'public' disk
-        $filePath = 'project_patroli/' . $fileName;
-        Storage::disk('public')->put($filePath, $resizedImage);
+        // Define the S3 folder path
+        $path = 'truest-storage/storage/app/public/images/patroli/patroli-' . date('m-Y');
+
+        // Upload the image to S3
+        $url = uploadToS3($image, $path, $fileName);
 
         // Create a new PatroliProjectAct record
         $patroliProjectAct = PatroliProjectAct::create([
             'patroli_atc_id' => $patroli->id, // Assuming PatroliProject's id is the foreign key
             'employee_id' => $validated['employee_id'], // Employee ID from the request
-            'images' => $filePath, // Path to the resized image
+            'images' => $url, // S3 URL of the uploaded image
             'remarks' => $validated['remarks'] ?? null, // Optional remarks, if provided
         ]);
 
         // Respond with success
-        return response()->json(['message' => 'Activity submitted successfully!', 'file_path' => $filePath], 200);
+        return response()->json(['message' => 'Activity submitted successfully!', 'file_path' => $url], 200);
     }
 
     public function download_file_patrol(Request $request){

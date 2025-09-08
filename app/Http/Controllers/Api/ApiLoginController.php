@@ -244,7 +244,7 @@ class ApiLoginController extends Controller
                 $filename = time() . '.' . $image->getClientOriginalExtension();
 
                 // Folder tujuan (tanpa .keep)
-                $path = 'public-test/images/absen/absen-' . date('m-Y');
+                $path = 'truest-storage/storage/app/public/images/absen/absen-' . date('m-Y');
 
                 $url = uploadToS3($image, $path, $filename);
 

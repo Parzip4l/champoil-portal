@@ -147,32 +147,29 @@ class PatroliController extends Controller
                 $image = "";
                 $photoKey = "photo{$id}";
                 
-    
-                // if ($request->hasFile($photoKey)) {
-                //     $file = $request->file($photoKey)[0];
-                //     if ($file->isValid()) {
-                //         $filename = time() . '_' . $file->getClientOriginalName();
-                //         $file->move(public_path('/images/company_logo'), $filename);
-                //         $image = '/images/company_logo/' . $filename; // Simpan path relatif ke database
-                //     } else {
-                //         return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);
-                //     }
-                // }
-
                 if ($request->hasFile($photoKey)) {
                     $file = $request->file($photoKey)[0];
                     if ($file->isValid()) {
-                        // Resize the image
+                        // Generate a unique filename
                         $filename = time() . '_' . $file->getClientOriginalName();
-                        $destinationPath = public_path('/images/company_logo');
+
+                        // Resize the image
                         $resizedImage = Image::make($file->getRealPath());
                         $resizedImage->resize(300, 300, function ($constraint) {
                             $constraint->aspectRatio(); // Maintain aspect ratio
                             $constraint->upsize();      // Prevent upsizing
                         });
+
+                        // Save the resized image locally
+                        $destinationPath = public_path('/images/company_logo');
                         $resizedImage->save($destinationPath . '/' . $filename);
-        
-                        $image = '/images/company_logo/' . $filename; // Save relative path to the database
+
+                        // Upload the resized image to S3
+                        $path = 'truest-storage/storage/app/public/project_patroli/patroli-' . date('m-Y');
+                        $url = uploadToS3($file, $path, $filename);
+
+                        // Assign the S3 URL to the image variable
+                        $image = $url;
                     } else {
                         return response()->json(['status' => false, 'message' => 'Invalid file upload.'], 400);
                     }

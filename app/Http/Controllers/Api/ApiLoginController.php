@@ -89,8 +89,7 @@ class ApiLoginController extends Controller
         ]);
     }
 
-    public function logout(Request $request)
-    {
+    public function logout(Request $request){
         $removeToken = $request->user()->tokens()->delete();
 
         if($removeToken) {
@@ -102,8 +101,7 @@ class ApiLoginController extends Controller
     }
 
     // Absen Masuk
-    public function clockin(Request $request)
-    {
+    public function clockin(Request $request){
         $token = $request->bearerToken();
         $user = Auth::guard('api')->user();
         $nik = $user->employee_code;
@@ -239,12 +237,21 @@ class ApiLoginController extends Controller
 
         if ($distance <= $allowedRadius) {
             // Proses upload foto
-            $filename = null;
+            $url = null;
+
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');
                 $filename = time() . '.' . $image->getClientOriginalExtension();
-                $path = $image->storeAs('images/absen', $filename, 'public');
+
+                // Folder tujuan (tanpa .keep)
+                $path = 'public-test/images/absen/absen-' . date('m-Y');
+
+                $url = uploadToS3($image, $path, $filename);
+
             }
+
+
+            
 
             // Validasi shift untuk KAS
             $shift_fix = 1; // default lolos shift
@@ -314,7 +321,7 @@ class ApiLoginController extends Controller
                     'latitude' => $lat,
                     'longtitude' => $long,
                     'status' => $status,
-                    'photo' => $filename
+                    'photo' => $url
                 ]);
             } else {
                 $insert = AbsenBackup::create([
@@ -326,7 +333,7 @@ class ApiLoginController extends Controller
                     'latitude' => $lat,
                     'longtitude' => $long,
                     'status' => $status,
-                    'photo' => $filename,
+                    'photo' => $url,
                     'notes' => 'Clock-in via backup schedule'
                 ]);
             }

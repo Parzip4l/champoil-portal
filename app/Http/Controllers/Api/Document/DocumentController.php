@@ -28,6 +28,8 @@ class DocumentController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
+        $query->whereNull('parent_id'); // Only get root folders
+
         $folders = $query->get();
 
         // Initialize an array to store file counts
@@ -37,8 +39,7 @@ class DocumentController extends Controller
         foreach ($folders as $folder) {
             
             $folder->name = strtoupper($folder->name);
-            $fileCounts[$folder->id] = FileModel::where('folder_id', $folder->id)->count();
-            $folder->tags = $this->tags($folder->id);
+            $folder->children = FolderModel::where('parent_id', $folder->id)->get();
         }
 
         $recentFile = FileModel::where('company', $company->unit_bisnis)
@@ -167,7 +168,7 @@ class DocumentController extends Controller
         foreach ($files as $file) {
             $file->full_url = asset('storage/' . $file->path); // Gunakan asset() untuk URL publik
             $file->uploader = User::join('karyawan','karyawan.nik','=','users.name')->where('users.id', $file->uploader)->value('nama'); // Ambil nama uploader
-
+            $file->name = strtoupper(substr($file->name, 0, 40));
             if ($file->due_date) {
                 $remainingDays = (new \DateTime($file->due_date))->diff(new \DateTime())->days;
                 $file->remaining = strtotime($file->due_date) > time() 

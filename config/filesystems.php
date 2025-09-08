@@ -59,10 +59,14 @@ return [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
+            'region' => env('AWS_DEFAULT_REGION', 'is3'),
             'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT', 'https://is3.cloudhost.id'),
+            'use_path_style_endpoint' => true, // WAJIB untuk IDCloudHost
+            'visibility' => 'public',
         ],
+
+
 
     ],
 

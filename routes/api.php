@@ -342,6 +342,23 @@ Route::prefix('v1')->group(function () {
         Route::post('/tags', [DocumentController::class, 'addTags']);
         Route::get('/tags-list/{id}', [DocumentController::class, 'tags']);
     });
+
+    Route::get('/list-s3', function () {
+        // Ambil semua file di root bucket
+        $files = Storage::disk('s3')->files();
+    
+        // Ambil semua file recursive (termasuk folder dalam folder)
+        $allFiles = Storage::disk('s3')->allFiles();
+    
+        // Ambil daftar folder (directories)
+        $directories = Storage::disk('s3')->directories();
+    
+        return [
+            'files' => $files,
+            'all_files' => $allFiles,
+            'directories' => $directories,
+        ];
+    });
     
     
 });

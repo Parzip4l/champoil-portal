@@ -48,9 +48,9 @@
                     $img = '';
                     if (!empty($row->image) && $row->status == 0) {
                         if (strpos($row->image, 'https://') === 0) {
-                            $img = "<img src='" . $row->image . "'>";
+                            $img = "<img src='" . $row->image . "' style='width:30px;'>";
                         } else {
-                            $img = "<img src='https://hris.truest.co.id" . $row->image . "'>";
+                            $img = "<img src='https://hris.truest.co.id" . $row->image . "' style='width:30px;'>";
                         }
                     }
 

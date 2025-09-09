@@ -313,10 +313,14 @@ class LeaderController extends Controller
 
             // Generate the PDF
             $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);
-            $pdf->setOption('no-outline', true);
+
+            // Pastikan orientasi kertas diatur ke 'portrait'
+            $pdf->setPaper('legal', 'portrait');
+
+            // Tambahkan CSS untuk memastikan layout tetap potret
             $pdf->setOption('isHtml5ParserEnabled', true);
             $pdf->setOption('isPhpEnabled', true);
-            $pdf->setPaper('legal', 'portrait');
+            $pdf->setOption('isRemoteEnabled', true); // Pastikan remote assets seperti gambar dapat diakses
 
             // Create unique file name for the PDF
             $fileName = 'report_' . date('Ymd') . ".pdf";

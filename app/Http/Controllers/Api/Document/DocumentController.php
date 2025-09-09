@@ -28,7 +28,7 @@ class DocumentController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $query->whereNull('parent_id'); // Only get root folders
+        // $query->whereNull('parent_id'); // Only get root folders
 
         $folders = $query->get();
 
@@ -39,7 +39,7 @@ class DocumentController extends Controller
         foreach ($folders as $folder) {
             
             $folder->name = strtoupper($folder->name);
-            $folder->children = FolderModel::where('parent_id', $folder->id)->get();
+            // $folder->children = FolderModel::where('parent_id', $folder->id)->get();
         }
 
         $recentFile = FileModel::where('company', $company->unit_bisnis)

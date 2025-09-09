@@ -290,7 +290,7 @@ class LeaderController extends Controller
             $records = Lapsit::select('lapsits.judul','lapsit_activities.*')
                 ->join('lapsit_activities', 'lapsit_activities.lapsit_id', '=', 'lapsits.id')
                 ->whereBetween('lapsit_activities.created_at', [$start, $end])
-                ->where('lapsits.category',0)
+                ->where('lapsits.category',1)
                 ->where('lapsits.project_id', $project_id)
                 ->orderBy('lapsit_activities.created_at','asc')
                 ->get();

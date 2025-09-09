@@ -295,6 +295,10 @@ class LeaderController extends Controller
                 ->orderBy('lapsit_activities.created_at','asc')
                 ->get();
 
+            foreach ($records as $row) {
+                $row->image = $row->images;
+            }
+
            
             $data = [
                 'patroli' => $records,

@@ -294,6 +294,9 @@ class LapsitController extends Controller
                 ->where('lapsits.project_id', $project_id)
                 ->orderBy('lapsit_activities.created_at','asc')
                 ->get();
+            foreach ($records as $row) {
+                $row->image = $row->images;
+            }
 
            
             $data = [

@@ -255,102 +255,107 @@ class LeaderController extends Controller
         return response()->json(['message' => 'Activity submitted successfully!', 'file_path' => $url], 200);
     }
 
-    public function download_file_patrol(Request $request){
-        try {
-            ini_set('memory_limit', '4096M');
-            set_time_limit(0);
-            // Parse request inputs
-            $tanggal = $request->input('tanggal');
-            $project_id =  $request->input('project_id');
-            $jam1 = $request->input('jam1');
-            $jam2 = $request->input('jam2');
+    public function download_file_patrol(Request $request)
+{
+    try {
+        ini_set('memory_limit', '4096M');
+        set_time_limit(0);
 
-            $explode = explode(' to ', $tanggal);
-            $jml_tgl = count($explode);
+        // Parse request inputs
+        $tanggal    = $request->input('tanggal');
+        $project_id = $request->input('project_id');
+        $jam1       = $request->input('jam1');
+        $jam2       = $request->input('jam2');
 
-            if ($jml_tgl > 1) {
-                $date1 = Carbon::parse($explode[0]);
-                $date2 = Carbon::parse($explode[1]);
-            } else {
-                $date1 = Carbon::parse($explode[0]);
-                $date2 = Carbon::parse($explode[0]);
-            }
+        $explode = explode(' to ', $tanggal);
+        $jml_tgl = count($explode);
 
-            $start = $date1->format('Y-m-d') . " $jam1";
-            $end = $date2->format('Y-m-d') . " $jam2";
-
-            // Fetch project details
-            $project = Project::find($project_id);
-
-            if (!$project) {
-                return response()->json(['error' => 'Project not found'], 404);
-            }
-
-            // Fetch patrol records
-            $records = Lapsit::select('lapsits.judul','lapsit_activities.*')
-                ->join('lapsit_activities', 'lapsit_activities.lapsit_id', '=', 'lapsits.id')
-                ->whereBetween('lapsit_activities.created_at', [$start, $end])
-                ->where('lapsits.category',1)
-                ->where('lapsits.project_id', $project_id)
-                ->orderBy('lapsit_activities.created_at','asc')
-                ->get();
-
-            foreach ($records as $row) {
-                $row->image = $row->images;
-            }
-
-           
-            $data = [
-                'patroli' => $records,
-                'jam' => "$jam1 - $jam2",
-                'filter' => "$date1 $jam1 - $date2 $jam2",
-                'project' => $project->name ?? 'Unknown Project',
-                'tanggal' => $tanggal ?? '',
-                'title'=>"LAPSIT",
-                'code'=>'lapsit'
-            ];
-            
-
-            // Generate the PDF
-            $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data);
-
-            // Pastikan orientasi kertas diatur ke 'portrait'
-            $pdf->setPaper('legal', 'portrait');
-
-            // Tambahkan CSS untuk memastikan layout tetap potret
-            $pdf->setOption('isHtml5ParserEnabled', true);
-            $pdf->setOption('isPhpEnabled', true);
-            $pdf->setOption('isRemoteEnabled', true); // Pastikan remote assets seperti gambar dapat diakses
-
-            // Create unique file name for the PDF
-            $fileName = 'report_' . date('Ymd') . ".pdf";
-            $publicPath = public_path('reports');
-
-            // Ensure the directory exists
-            if (!is_dir($publicPath)) {
-                mkdir($publicPath, 0755, true);
-            }
-
-            $filePath = $publicPath . '/' . $fileName;
-
-            // Save the PDF
-            $pdf->save($filePath);
-
-            $fileUrl = asset('reports/' . $fileName);
-
-            // Return JSON response with file details
-            return response()->json([
-                'message' => 'PDF file generated successfully',
-                'path' => $fileUrl,
-                'file_name' => $fileName,
-                'project' => $project->name
-            ]);
-        } catch (\Exception $e) {
-            // Handle exceptions and return error response
-            return response()->json([
-                'error' => 'Failed to generate PDF',
-                'details' => $e->getMessage()
-            ], 500);
+        if ($jml_tgl > 1) {
+            $date1 = Carbon::parse($explode[0]);
+            $date2 = Carbon::parse($explode[1]);
+        } else {
+            $date1 = Carbon::parse($explode[0]);
+            $date2 = Carbon::parse($explode[0]);
         }
+
+        $start = $date1->format('Y-m-d') . " $jam1";
+        $end   = $date2->format('Y-m-d') . " $jam2";
+
+        // Fetch project details
+        $project = Project::find($project_id);
+        if (!$project) {
+            return response()->json(['error' => 'Project not found'], 404);
+        }
+
+        // Fetch patrol records
+        $records = Lapsit::select('lapsits.judul', 'lapsit_activities.*')
+            ->join('lapsit_activities', 'lapsit_activities.lapsit_id', '=', 'lapsits.id')
+            ->whereBetween('lapsit_activities.created_at', [$start, $end])
+            ->where('lapsits.category', 1)
+            ->where('lapsits.project_id', $project_id)
+            ->orderBy('lapsit_activities.created_at', 'asc')
+            ->get();
+
+        foreach ($records as $row) {
+            $img = Image::make($row->images)->orientate();
+
+            // cek rasio (kalau lebih lebar daripada tinggi, berarti landscape → rotate)
+            if ($img->width() > $img->height()) {
+                $img->rotate(-90);
+            }
+
+            $img = $img->encode('jpg');
+            $row->image = 'data:image/jpeg;base64,' . base64_encode($img);
+
+        }
+
+        $data = [
+            'patroli' => $records,
+            'jam'     => "$jam1 - $jam2",
+            'filter'  => "$date1 $jam1 - $date2 $jam2",
+            'project' => $project->name ?? 'Unknown Project',
+            'tanggal' => $tanggal ?? '',
+            'title'   => "LAPSIT",
+            'code'    => 'lapsit'
+        ];
+
+        // Generate the PDF
+        $pdf = Pdf::loadView('pages.operational.patroli_project.patrol_pdf_dt', $data)
+            ->setPaper('legal', 'landscape'); // ✅ pakai legal landscape
+
+        // DOMPDF options
+        $pdf->setOption('isRemoteEnabled', true);   // remote assets
+        $pdf->setOption('isHtml5ParserEnabled', true);
+        $pdf->setOption('isPhpEnabled', false);
+
+        // Create unique file name
+        $fileName   = 'report_' . date('Ymd_His') . ".pdf";
+        $publicPath = public_path('reports');
+
+        // Ensure directory exists
+        if (!is_dir($publicPath)) {
+            mkdir($publicPath, 0755, true);
+        }
+
+        $filePath = $publicPath . '/' . $fileName;
+
+        // Save PDF
+        $pdf->save($filePath);
+
+        $fileUrl = asset('reports/' . $fileName);
+
+        return response()->json([
+            'message'   => 'PDF file generated successfully',
+            'path'      => $fileUrl,
+            'file_name' => $fileName,
+            'project'   => $project->name
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error'   => 'Failed to generate PDF',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
+
 }

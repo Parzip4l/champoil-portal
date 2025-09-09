@@ -42,7 +42,7 @@
 <div class="row">
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-info text-white">Kurang Dari 100 %</div>
+            <div class="card-header bg-danger text-white">Kurang Dari 100 %</div>
             <div class="card-body text-center" style="font-size:50px;">{{ round((($percent[0] + $percent[1] + $percent[2])  / count($project)) * 100, 2) }} %</div>
         </div>
     </div>

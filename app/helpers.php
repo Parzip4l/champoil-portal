@@ -287,28 +287,17 @@ function whatsapp_message($data, $nomor) {
 
     // Construct the payload dynamically
     try {
-        // $response = $client->request('POST', 'https://gate.whapi.cloud/messages/text', [
-        //     'body' => json_encode([
-        //         'to' => $nomor,
-        //         'body' => $data,
-        //     ]),
-        //     'headers' => [
-        //         'accept' => 'application/json',
-        //         'authorization' => 'Bearer S02iEU5vqCA0QdttXov3Pdxmh3BKiOsU',
-        //         'content-type' => 'application/json',
-        //     ],
-        // ]);
         $response = $client->request('POST', 'https://waapi.app/api/v1/instances/82333/client/action/send-message', [
-          'body' => json_encode([
-              'chatId' => $nomor . '@c.us', // Use the formatted WhatsApp number
-              'message' => $data
-          ]),
-          'headers' => [
-              'accept' => 'application/json',
-              'authorization' => 'Bearer QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08',
-              'content-type' => 'application/json',
-          ],
-      ]);
+                'body' => json_encode([
+                    'chatId' => $nomor . '@c.us', // Use the formatted WhatsApp number
+                    'message' => $data
+                ]),
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => 'Bearer QB3r7rcz8AhMyvMiYMeP4VAhf0R996eQBmnFLrs627a36a08',
+                    'content-type' => 'application/json',
+                ],
+            ]);
 
         return $response->getBody()->getContents();
     } catch (\Exception $e) {

@@ -581,6 +581,17 @@ Route::middleware(['auth', 'permission:superadmin_access'])->group(function () {
             return view('pages.operational.lapsit.form_activity', ['id' => $id]);
         })->name('activity-lapsit');
 
+        // Define a static view route for 'lapsit-project'
+        Route::view('leader-project', 'pages.operational.leader.index')->name('leader-project');
+
+        // Define a static view route for 'scan-lapsit'
+        Route::view('scan-leader', 'pages.operational.leader.scan_project')->name('scan-leader');
+
+        // Use Route::get for the route with a dynamic parameter
+        Route::get('activity-leader/{id}', function ($id) {
+            return view('pages.operational.leader.form_activity', ['id' => $id]);
+        })->name('activity-leader');
+
         
         
 

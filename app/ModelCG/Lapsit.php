@@ -13,6 +13,7 @@ class Lapsit extends Model
         'judul',
         'unix_code',
         'created_at',
+        'category',
         // Add any other fields you want to be fillable
     ];
 }

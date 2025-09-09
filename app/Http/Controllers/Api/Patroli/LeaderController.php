@@ -17,14 +17,14 @@ use App\ModelCG\LapsitActivity;
 use App\ModelCG\Project;
 use Intervention\Image\Facades\Image;
 
-class LapsitController extends Controller
+class LeaderController extends Controller
 {
     // List all records
     public function index($project="")
     {
         
         
-        $records = Lapsit::where('project_id',$project)->where('category',0)->get();
+        $records = Lapsit::where('project_id',$project)->where('category',1)->get();
         if ($records) {
             foreach ($records as $row) {
                 $row->url_file = url('storage/images/' . $row->unix_code . '.png');
@@ -48,7 +48,7 @@ class LapsitController extends Controller
             $unixCode = Str::random(10); // 10-character random string
             $validated['unix_code'] = $unixCode;
             $validated['created_at'] = now();
-            $validated['category'] = 0; // Set category to 0 for Lapsit
+            $validated['category'] = 1; // Set category to 1 for Leader
 
             // Create a QR Code using the unix_code
             $qrCode = new QrCode($unixCode);
@@ -201,7 +201,7 @@ class LapsitController extends Controller
 
     public function project_lapsit($unixCode)
     {
-        $url = route('activity-lapsit', ['id' => $unixCode]);
+        $url = route('activity-leader', ['id' => $unixCode]);
         $return = [
             "url" => $url
         ];

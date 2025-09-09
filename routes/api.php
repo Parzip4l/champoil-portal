@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\VoiceOfController;
 use App\Http\Controllers\Api\Recruitments\TrainingController;
 use App\Http\Controllers\Api\Patroli\PatroliProojectController;
 use App\Http\Controllers\Api\Patroli\LapsitController;
+use App\Http\Controllers\Api\Patroli\LeaderController;
 use App\Http\Controllers\Api\LogbookController;
 use App\Http\Controllers\Api\AllData\BackupRecordsController;
 
@@ -260,30 +261,27 @@ Route::prefix('v1')->group(function () {
     Route::post('patroli-activity', [PatroliProojectController::class, 'storeActivity']);
     Route::get('patroli-activity-download', [PatroliProojectController::class, 'download_file_patrol']);
 
-    // Fetch all Lapsit projects
+    //lapsit project
     Route::get('lapsit-projects-get/{id}', [LapsitController::class, 'index']); // Fetch all resources
-
-    // Create a new Lapsit project
     Route::post('lapsit-projects-insert', [LapsitController::class, 'store']); // Create a new resource
-
-    // Fetch a single Lapsit project by ID
     Route::get('lapsit-projects/{id}', [LapsitController::class, 'show']); // Fetch a single resource
-
-    // Update a Lapsit project by ID
     Route::put('lapsit-projects/{id}', [LapsitController::class, 'update']); // Update a resource
-
-    // Delete a Lapsit project by ID
     Route::delete('lapsit-projects/{id}', [LapsitController::class, 'destroy']); // Delete a resource
-
-    // Download QR code for a specific Lapsit project using its Unix code
     Route::get('lapsit-projects/{unixCode}/download', [LapsitController::class, 'download'])->name('lapsit-projects.download');
-
-    // Get URL for a specific Lapsit activity
     Route::get('project-lapsit/{unixCode}', [LapsitController::class, 'project_lapsit'])->name('project-lapsit');
-
-    // Store a Lapsit activity (with an image)
     Route::post('lapsit-activity', [LapsitController::class, 'storeActivity']); // Store activity
     Route::get('lapsit-activity-download', [LapsitController::class, 'download_file_patrol']);
+    
+    //leader project
+    Route::get('leader-projects-get/{id}', [LeaderController::class, 'index']); // Fetch all resources
+    Route::post('leader-projects-insert', [LeaderController::class, 'store']); // Create a new resource
+    Route::get('leader-projects/{id}', [LeaderController::class, 'show']); // Fetch a single resource
+    Route::put('leader-projects/{id}', [LeaderController::class, 'update']); // Update a resource
+    Route::delete('lapsit-projects/{id}', [LeaderController::class, 'destroy']); // Delete a resource
+    Route::get('leader-projects/{unixCode}/download', [LeaderController::class, 'download'])->name('lapsit-projects.download');
+    Route::get('project-leader/{unixCode}', [LeaderController::class, 'project_lapsit'])->name('project-lapsit');
+    Route::post('leader-activity', [LeaderController::class, 'storeActivity']); // Store activity
+    Route::get('leader-activity-download', [LeaderController::class, 'download_file_patrol']);
 
     Route::post('voltage', [AllDataController::class, 'storeVoltage']);
     Route::get('voltages', [AllDataController::class, 'getVoltageData']);

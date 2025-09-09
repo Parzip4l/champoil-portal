@@ -42,20 +42,8 @@
 <div class="row">
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-danger text-white">Dibawah 50 %</div>
-            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[0] / count($project)) * 100, 2) }} %</div>
-        </div>
-    </div>
-    <div class="col-md-3 grid-margin stretch-card">
-        <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-warning text-dark">Absensi 50 s/d 80 %</div>
-            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[1] / count($project)) * 100, 2) }} %</div>
-        </div>
-    </div>
-    <div class="col-md-3 grid-margin stretch-card">
-        <div class="card custom-card2 shadow-sm">
-            <div class="card-header bg-info text-white">Absensi 80 s/d 99 %</div>
-            <div class="card-body text-center" style="font-size:50px;">{{ round(($percent[2] / count($project)) * 100, 2) }} %</div>
+            <div class="card-header bg-info text-white">Kurang Dari 100 %</div>
+            <div class="card-body text-center" style="font-size:50px;">{{ round((($percent[0] + $percent[1] + $percent[2])  / count($project)) * 100, 2) }} %</div>
         </div>
     </div>
     <div class="col-md-3 grid-margin stretch-card">
@@ -112,9 +100,9 @@
                                     if($row->persentase_absen <= 50 ){
                                         $color="table-danger";
                                     }else if($row->persentase_absen >50 && $row->persentase_absen <= 80 ){
-                                        $color="table-warning";
+                                        $color="table-danger";
                                     }else if($row->persentase_absen >80 && $row->persentase_absen < 100){
-                                        $color="table-info";
+                                        $color="table-danger";
                                     }else{
                                         $color="table-success";
                                     }

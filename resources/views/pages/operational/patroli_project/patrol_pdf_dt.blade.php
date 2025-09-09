@@ -46,8 +46,12 @@
             @foreach($patroli as $row)
                 @php 
                     $img = '';
-                    if (!empty($row->images)) {
-                        $img = "<img src='https://hris.truest.co.id/storage/app/public/" . $row->images. "' style='width:60px;'>";
+                    if (!empty($row->image) && $row->status == 0) {
+                        if (strpos($row->image, 'https://') === 0) {
+                            $img = "<img src='" . $row->image . "' style='width:30px;'>";
+                        } else {
+                            $img = "<img src='https://hris.truest.co.id" . $row->image . "' style='width:30px;'>";
+                        }
                     }
 
                     if($code == 'lapsit'){

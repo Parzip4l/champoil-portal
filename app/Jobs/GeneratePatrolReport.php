@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\ReportJob;
 use App\ModelCG\Task;
+use App\ModelCG\Project;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -126,7 +127,7 @@ class GeneratePatrolReport implements ShouldQueue
                 'jam' => "$jam1-$jam2",
                 'filter' => "$date1 $jam1 - $date2 $jam2",
                 'project_id' => $project->id ?? 0,
-                'project' => $project->name ?? 'Unknown Project',
+                'project' => Project::find($project_id)->name ?? 'Unknown Project',
                 'tanggal' => $tanggal ?? '',
             ]);
 

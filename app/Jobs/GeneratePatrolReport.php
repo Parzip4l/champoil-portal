@@ -121,7 +121,7 @@ class GeneratePatrolReport implements ShouldQueue
         set_time_limit(0);
 
         try {
-            $pdf = Pdf::loadView('pages.report.patrol_pdf', [
+            $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', [
                 'patroli' => $final_list,
                 'tanggal' => $tanggal,
                 'jam' => "$jam1-$jam2",

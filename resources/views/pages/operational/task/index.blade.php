@@ -559,7 +559,8 @@
                             .catch(function(err) {
                                 clearInterval(interval);
                                 $('#loadingBackdrop').hide();
-                                alert('Error checking job status');
+                                console.error('Error:', err); // Log the error for debugging
+                                alert('An error occurred while checking job status. Please try again.');
                             });
                     }, 60000); // setiap 1 menit
                 })

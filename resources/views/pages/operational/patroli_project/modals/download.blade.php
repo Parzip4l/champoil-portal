@@ -16,6 +16,12 @@
     }
 @endphp
 
+<div id="loadingBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;">
+        Loading...
+    </div>
+</div>
+
 <div class="modal fade" id="download" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -24,7 +30,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="download_file">
+                <form id="download_file_form">
                     @csrf
                     <input type="hidden" name="project_id" id="project_id" value="{{ $project_id }}">
                     <div class="row">
@@ -51,12 +57,7 @@
     </div>
 </div>
 
-<div id="loadingBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1050;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;">
-        Loading...
-    </div>
-</div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#loadingBackdrop').hide(); // Ensure the loading backdrop is hidden initially

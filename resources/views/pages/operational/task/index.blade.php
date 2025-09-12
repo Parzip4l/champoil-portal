@@ -523,18 +523,30 @@
                                     clearInterval(interval);
                                     $('#loadingBackdrop').hide();
 
-                                    // Download semua file
-                                    const files = res.data.files; // Array file paths
-                                    files.forEach((path) => {
+                                    const files = res.data.files; // Array or single file path
+                                    if (Array.isArray(files)) {
+                                        // Handle multiple files
+                                        files.forEach((path) => {
+                                            const link = document.createElement('a');
+                                            link.href = path;
+                                            link.target = '_blank';
+                                            const fileName = path.split('/').pop();
+                                            link.setAttribute('download', fileName);
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        });
+                                    } else {
+                                        // Handle single file
                                         const link = document.createElement('a');
-                                        link.href = path;
+                                        link.href = files;
                                         link.target = '_blank';
-                                        const fileName = path.split('/').pop();
+                                        const fileName = files.split('/').pop();
                                         link.setAttribute('download', fileName);
                                         document.body.appendChild(link);
                                         link.click();
                                         document.body.removeChild(link);
-                                    });
+                                    }
 
                                     alert('File downloaded successfully');
                                 } else if (status === 'failed') {

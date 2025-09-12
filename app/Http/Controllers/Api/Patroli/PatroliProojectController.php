@@ -299,6 +299,14 @@ class PatroliProojectController extends Controller
                 ->orderBy('patroli_project_acts.created_at','asc')
                 ->get();
 
+            if ($records->isEmpty()) {
+                return response()->json(['error' => 'No patrol records found for the specified criteria'], 404);
+            }
+
+            foreach ($records as $row) {
+                $row->image = $row->images;
+            }
+
            
             $data = [
                 'patroli' => $records,

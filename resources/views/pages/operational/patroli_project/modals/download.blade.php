@@ -51,48 +51,86 @@
     </div>
 </div>
 
+<div id="loadingBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1050;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;">
+        Loading...
+    </div>
+</div>
+
 <script>
-    function downloadFile() {
-        const formData = new FormData(document.getElementById('download_file'));
-        const params = new URLSearchParams();
+    $(document).ready(function() {
+        $('#loadingBackdrop').hide(); // Ensure the loading backdrop is hidden initially
 
-        formData.forEach((value, key) => {
-            params.append(key, value);
+        $('#download_file_patrol').on('click', function() {
+            $('#loadingBackdrop').show(); // Show the loading backdrop only when the button is clicked
+            
+            var project = "{{ $project_id ?? '' }}";
+            let project_id = project || $("#project_id").val();
+
+            const params = {
+                tanggal: $("#tanggal_report").val(),
+                project_id: project_id,
+                jam1: $("#jam1").val(),
+                jam2: $("#jam2").val()
+            };
+
+            axios.get('/api/v1/patroli-activity-download', { params })
+                .then(function(response) {
+                    const jobId = response.data.job_id;
+
+                    // Start polling to check job status every 1 minute
+                    const interval = setInterval(() => {
+                        axios.get('/api/v1/report_job_status/' + jobId)
+                            .then(function(res) {
+                                const status = res.data.status;
+
+                                if (status === 'done') {
+                                    clearInterval(interval);
+                                    $('#loadingBackdrop').hide();
+
+                                    const files = res.data.files; // Array or single file path
+                                    if (files) {
+                                        if (typeof files === 'string') {
+                                            // Handle single file
+                                            downloadFile(files);
+                                        } else if (Array.isArray(files)) {
+                                            // Handle multiple files
+                                            files.forEach((path) => downloadFile(path));
+                                        }
+                                        alert('File downloaded successfully');
+                                    } else {
+                                        alert('No files available for download.');
+                                    }
+                                } else if (status === 'failed') {
+                                    clearInterval(interval);
+                                    $('#loadingBackdrop').hide();
+                                    alert('Failed to generate report: ' + res.data.error);
+                                }
+                                // If pending/processing, continue polling
+                            })
+                            .catch(function(err) {
+                                clearInterval(interval);
+                                $('#loadingBackdrop').hide();
+                                console.error('Error:', err); // Log the error for debugging
+                                alert('An error occurred while checking job status. Please try again.');
+                            });
+                    }, 60000); // Every 1 minute
+                })
+                .catch(function(error) {
+                    alert('Request Timeout');
+                    $('#loadingBackdrop').hide();
+                });    
         });
+    });
 
-        // Add project_id parameter
-        const projectId = document.querySelector('#project_id')?.value || '';
-        if (projectId) {
-            params.append('project_id', projectId);
-        }
-
-        fetch(`/api/v1/patroli-activity-download?${params.toString()}`, { // Changed to GET with query parameters
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json(); // Expect JSON response
-        })
-        .then(data => {
-            if (data.path) {
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = data.path; // Use the file path from the response
-                a.download = data.file_name || 'patrol_file.xlsx'; // Use the file name from the response
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(data.path);
-            } else {
-                console.error('File path not found in the response');
-            }
-        })
-        .catch(error => {
-            console.error('There was a problem with the download request:', error);
-        });
+    function downloadFile(filePath) {
+        const link = document.createElement('a');
+        link.href = filePath;
+        link.target = '_blank';
+        const fileName = filePath.split('/').pop();
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 </script>

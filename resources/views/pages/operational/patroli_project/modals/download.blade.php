@@ -42,7 +42,7 @@
                         </div>
                         <div id="project_list"></div>
                         <div class="col-md-12 mt-2">
-                            <button type="button" class="btn btn-primary w-100" id="download_file_patrol" onclick="downloadFile()">Download</button>
+                            <button type="button" class="btn btn-primary w-100" id="download_file_patrol">Download</button>
                         </div>
                     </div>
                 </form>

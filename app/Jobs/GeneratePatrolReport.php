@@ -123,8 +123,11 @@ class GeneratePatrolReport implements ShouldQueue
         try {
             $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', [
                 'patroli' => $final_list,
-                'tanggal' => $tanggal,
                 'jam' => "$jam1-$jam2",
+                'filter' => "$date1 $jam1 - $date2 $jam2",
+                'project_id' => $project->id ?? 0,
+                'project' => $project->name ?? 'Unknown Project',
+                'tanggal' => $tanggal ?? '',
             ]);
 
             $fileName = 'report_' . date('YmdHis') . ".pdf";

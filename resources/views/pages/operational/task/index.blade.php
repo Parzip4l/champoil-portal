@@ -524,31 +524,18 @@
                                     $('#loadingBackdrop').hide();
 
                                     const files = res.data.files; // Array or single file path
-                                    if (typeof files === 'string') {
-                                        // Handle single file
-                                        const link = document.createElement('a');
-                                        link.href = files;
-                                        link.target = '_blank';
-                                        const fileName = files.split('/').pop();
-                                        link.setAttribute('download', fileName);
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                    } else if (Array.isArray(files)) {
-                                        // Handle multiple files
-                                        files.forEach((path) => {
-                                            const link = document.createElement('a');
-                                            link.href = path;
-                                            link.target = '_blank';
-                                            const fileName = path.split('/').pop();
-                                            link.setAttribute('download', fileName);
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        });
+                                    if (files) {
+                                        if (typeof files === 'string') {
+                                            // Handle single file
+                                            downloadFile(files);
+                                        } else if (Array.isArray(files)) {
+                                            // Handle multiple files
+                                            files.forEach((path) => downloadFile(path));
+                                        }
+                                        alert('File downloaded successfully');
+                                    } else {
+                                        alert('No files available for download.');
                                     }
-
-                                    alert('File downloaded successfully');
                                 } else if (status === 'failed') {
                                     clearInterval(interval);
                                     $('#loadingBackdrop').hide();
@@ -570,6 +557,17 @@
                 });    
         });
     });
+
+    function downloadFile(filePath) {
+        const link = document.createElement('a');
+        link.href = filePath;
+        link.target = '_blank';
+        const fileName = filePath.split('/').pop();
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     flatpickr("#tanggal_report", {
         mode: "range",

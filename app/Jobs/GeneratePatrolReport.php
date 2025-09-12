@@ -141,8 +141,9 @@ class GeneratePatrolReport implements ShouldQueue
             $pdf->save($filePath);
 
             // Update job
+            $fileUrl = 'https://hris.truest.co.id/public/reports/' . $fileName; // Construct the full URL
             $reportJob->status = 'done';
-            $reportJob->file_paths = $filePath; // Update file_path with the generated file path
+            $reportJob->file_paths = $fileUrl; // Update file_paths with the full URL
             $reportJob->save();
         } catch (\Exception $e) {
             $reportJob->status = 'failed';

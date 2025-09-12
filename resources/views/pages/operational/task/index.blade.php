@@ -549,7 +549,7 @@
                                 $('#loadingBackdrop').hide();
                                 alert('Error checking job status');
                             });
-                    }, 1800000); // setiap 30 menit
+                    }, 60000); // setiap 1 menit
                 })
                 .catch(function(error) {
                     alert('Request Timeout');

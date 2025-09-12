@@ -124,10 +124,9 @@ class GenerateProjectReport implements ShouldQueue
             $filePath = $publicPath . '/' . $fileName;
             $pdf->save($filePath);
 
-            $fileUrl = asset('reports/' . $fileName);
-
-            $reportJob->status = 'completed';
-            $reportJob->file_path = $fileUrl;
+            $fileUrl = 'https://hris.truest.co.id/public/reports/' . $fileName; // Construct the full URL
+            $reportJob->status = 'done';
+            $reportJob->file_paths = $fileUrl; // Update file_paths with the full URL
             $reportJob->save();
         } catch (\Exception $e) {
             $reportJob->status = 'failed';

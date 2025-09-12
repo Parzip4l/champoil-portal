@@ -33,6 +33,9 @@ use Illuminate\Support\Collection;
 use PDF;
 use Intervention\Image\Facades\Image;
 
+use App\Models\ReportJob;
+use App\Jobs\GeneratePatrolReport;
+
 class PatroliController extends Controller
 {
     /**
@@ -377,6 +380,7 @@ class PatroliController extends Controller
                 
             }
         }
+        
         if(!empty($periode_filter)){
             $periode = strtoupper($periode_filter);
         }else{
@@ -531,343 +535,45 @@ class PatroliController extends Controller
         return response()->json(['success' => true, 'path' => $filePath]);
     }
 
-    public function download_file_patrol(Request $request){
-        // Parse request inputs
+    public function download_file_patrol(Request $request)
+    {
         $tanggal = $request->input('tanggal');
-        $project = $request->input('project_id');
-        $jam1 = $request->input('jam1');
-        $jam2 = $request->input('jam2');
-        $explode = explode(' to ', $tanggal);
-        $jml_tgl =count($explode);
+        $project_id = $request->input('project_id');
+        $jam1 = $request->input('jam1', '00:00');
+        $jam2 = $request->input('jam2', '23:59');
 
-        if ($jml_tgl > 1) {
-            $date1 = $explode[0];
-            $date2 = $explode[1];
-        } else {
-            $date1 = $explode[0];
-            $date2 = $explode[0];
-        }
-        
-        $jml = 0;
-        $result = [];
-        $start = Carbon::parse($date1)->startOfDay();
-        $end = Carbon::parse($date2)->endOfDay();
+        $project = Project::find($project_id);
 
-        // Create the date period with daily intervals
-        $dates = CarbonPeriod::create($start, '1 day', $end);
-
-        if($project==582307 || $project==455823){
-           
-            $data_patrol = Task::select(
-                'master_tasks.id', 
-                'master_tasks.judul', 
-                'patrolis.employee_code', 
-                'patrolis.created_at as jam_patrol',
-                DB::raw('MIN(patrolis.image) as image'),
-                DB::raw('MIN(patrolis.description) as description'),
-                DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.image ELSE NULL END) as image'),
-                DB::raw('MAX(CASE WHEN patrolis.image IS NOT NULL AND patrolis.image != "" THEN patrolis.description ELSE NULL END) as description')
-            )
-            ->leftJoin('patrolis', function($join) use ($date1, $jam1, $date2, $jam2) {
-                $join->on('patrolis.unix_code', '=', 'master_tasks.unix_code')
-                     ->whereBetween('patrolis.created_at', ["$date1 $jam1:00", "$date2 $jam2:00"]);
-            })
-            ->where('master_tasks.project_id', $project)
-            ->groupBy(
-                'master_tasks.id',
-                'master_tasks.judul',
-                'patrolis.employee_code',
-                'patrolis.created_at'
-            )
-            ->orderBy('master_tasks.id', 'asc') // Primary order by master_tasks.id
-            ->orderBy('patrolis.created_at', 'asc') // Secondary order by patrolis.created_at
-            ->get();
-        
-            // Re-structure data to handle date logic
-            $organized_patrols = [];
-            foreach ($data_patrol as $record) {
-                $patrol_date = date('Y-m-d H:i:s', strtotime($record->jam_patrol));
-                $organized_patrols[$patrol_date][] = $record;
-            }
-
-            $final_list = [];
-            foreach ($organized_patrols as $patrol_date => $patrols) {
-                foreach ($patrols as $patrol) {
-                    $final_list[] = $patrol; // Append original record
-                }
-
-                // Repeat for next day if created_at spans multiple days
-                if (strtotime($patrol_date) < strtotime($date2)) {
-                    foreach ($patrols as $patrol) {
-                        $new_record = clone $patrol; // Clone the record object
-                        $new_record->jam_patrol = date('Y-m-d H:i:s', strtotime($patrol_date . ' +1 day'));
-                        $final_list[] = $new_record; // Append the cloned record
-                    }
-                }
-            }
-
-            // Sort the final list by `created_at` (jam_patrol) ascending
-            usort($final_list, function ($a, $b) {
-                return strtotime($a->jam_patrol) <=> strtotime($b->jam_patrol);
-            });
-            $project  = Project::where('id',$project)->first();
-            
-            // Prepare final data
-            $data = [
-                'patroli' => $final_list,
-                'jam' => "$jam1-$jam2",
-                'filter' => "$date1 $jam1 - $date2 $jam2",
-                'project_id' => $project->id ?? 0,
-                'project' => $project->name ?? 'Unknown Project',
-                'tanggal' => $tanggal ?? '',
-            ];
-                 
-            ini_set('max_execution_time', '0');
-            set_time_limit(0);
-
-            // Ambil data tasks dan bagi ke dalam chunks
-            $tasksArray = $data['patroli'];
-            $chunks = array_chunk($tasksArray, 150);
-            $files = []; // Array untuk menyimpan semua file yang dihasilkan
-            
-            foreach ($chunks as $index => $chunk) {
-                // Data khusus untuk setiap kelompok
-                $chunkedData = $data; // Salin data asli
-                $chunkedData['patroli'] = $chunk; // Ganti 'tasks' dengan data bagian
-            
-                // Generate PDF
-                $pdf = Pdf::loadView('pages.report.patrol_pdf_dt', $chunkedData);
-                $pdf->setOption('no-outline', true);
-                $pdf->setOption('isHtml5ParserEnabled', true);
-                $pdf->setOption('isPhpEnabled', true);
-                $pdf->setPaper('legal', 'portrait');
-
-                // Add background image
-                if ($project->id == 455823){
-                    $pdf->setOption('background', public_path('images/background.png'));
-                }
-
-                // Add header and footer images
-                $pdf->setOption('header-html', public_path('images/header.html'));
-                $pdf->setOption('footer-html', public_path('images/footer.html'));
-                
-            
-                // Nama file unik untuk setiap PDF
-                $fileName = 'report_' . date('Ymd') . "_part_{$index}.pdf";
-                $publicPath = public_path('reports');
-            
-                // Buat folder jika belum ada
-                if (!is_dir($publicPath)) {
-                    mkdir($publicPath, 0755, true);
-                }
-            
-                $filePath = $publicPath . '/' . $fileName;
-            
-                // Simpan PDF
-                $pdf->save($filePath);
-            
-                // Tambahkan path file ke dalam array hasil
-                $files[] = asset('reports/' . $fileName);
-            }
-            
-                    
-            // Return semua path file dalam JSON response
-            return response()->json([
-                'message' => 'PDF files saved successfully',
-                'path' => $files,
-                'file_name'=>$fileName,
-                'project_detail'=>$project,
-                'project'=>$project->name,
-                'jml'=>count($final_list)
-            ]);
-            // return view('pages.report.html_view',$data);
-            // return response()->json(['message' => $data]);
-        }else{
-            if($jml_tgl > 1){
-                $date1 = $explode[0] . ' 00:00:00';
-                $date2 = $explode[1] . ' 23:59:59';
-            }else{
-                $date1 = $explode[0] . ' 00:00:00';
-                $date2 = $explode[0] . ' 23:59:59';
-            }
-            // Get the shift data
-            $shift = $request->input('shift');
-            $shift_records = Shift::where('name', 'like', '%' . $shift . '%')->get();
-            $result_shift = $shift_records->pluck('code')->toArray();
-
-            // Format dates into an array
-            $dateList = [];
-            foreach ($dates as $date) {
-                $dateList[] = $date->format('Y-m-d');
-            }
-
-            // Store tasks with points and patrol data
-            $allTasks = [];
-            foreach ($dateList as $date) {
-                $tasks = Task::select('id', 'judul')->where('project_id', $project)->get();
-                
-                foreach ($tasks as $task) {
-                    $task->filter_tanggal = $date;
-                    
-                    // Get the points for each task
-                    $task->points = List_task::select('id', 'id_master', 'task')
-                                            ->where('id_master', $task->id)
-                                            ->get();
-                    
-                    // Get patrol data for each point
-                    foreach ($task->points as $row) {
-                        $row->list_data = Patroli::select('employee_code', 'status', 'description', 'image', 'created_at')
-                                                ->where('id_task', $row->id)
-                                                ->whereDate('patrolis.created_at', '=', $date) // Ensure filtering by the specific date
-                                                ->limit(3)
-                                                ->get();
-                    }
-
-                    // Add tasks to the allTasks array
-                    $allTasks[] = $task;
-                }
-            }
-
-            // Prepare data to return
-            $data = [
-                'tanggal' => $tanggal,
-                'jam'=>$jam1.'-'.$jam2,
-                'tasks' => $allTasks,
-            ];
-
-            if($request->input('jenis_file') == "pdf"){
-                ini_set('memory_limit', '4096M');
-                $tasksArray = $data['tasks'];
-                $chunks = array_chunk($tasksArray, 500);
-                $files = []; // Array untuk menyimpan semua file yang dihasilkan
-                
-                foreach ($chunks as $index => $chunk) {
-                    // Data khusus untuk kelompok ini
-                    $chunkedData = $data['tasks'] ; // Salin data asli
-                    $chunkedData= ["tasks"=>$chunk,"tanggal"=>$tanggal]; // Ganti 'tasks' dengan data bagian
-                    // Generate PDF
-                    $pdf = Pdf::loadView('pages.report.patrol_pdf', $chunkedData);
-                    $pdf->setOption('no-outline', true);
-                    $pdf->setOption('isHtml5ParserEnabled', true);
-                    $pdf->setOption('isPhpEnabled', true);
-                    $pdf->setPaper('legal', 'portrait');
-
-                    // Nama file unik untuk setiap PDF
-                    $fileName = 'report_' . date('YmdHis') . "_part_{$index}.pdf";
-                    $publicPath = public_path('reports');
-
-                    // Buat folder jika belum ada
-                    if (!is_dir($publicPath)) {
-                        mkdir($publicPath, 0755, true);
-                    }
-
-                    $filePath = $publicPath . '/' . $fileName;
-
-                    // Simpan PDF
-                    $pdf->save($filePath);
-
-                    // Tambahkan path file ke dalam array hasil
-                    $files[] = asset('reports/' . $fileName);
-                }
-
-                
-
-                // Return semua path file dalam JSON response
-                return response()->json([
-                    'message' => 'PDF files saved successfully',
-                    'path' => $files, // Semua file PDF yang dihasilkan
-                    'tasks' => $data['tasks'] // Data asli untuk referensi
-                ]);
-            }else{
-                $spreadsheet = new Spreadsheet();
-                $sheet = $spreadsheet->getActiveSheet();
-
-                
-                
-
-                $sheet->getStyle('A1:H1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
-                ]);
-
-                // Output project name
-                $sheet->setCellValue('A1','REPORT PATROLI ( '.$tanggal.' )');
-                $sheet->mergeCells('A1:H1');
-
-                // Set table headers
-                $sheet->setCellValue('A2', 'Tanggal');
-                $sheet->setCellValue('B2', 'Status');
-                $sheet->setCellValue('C2', 'Description');
-                $sheet->setCellValue('D2', 'Task');
-                $sheet->setCellValue('E2', 'Point');
-                $sheet->setCellValue('F2', 'Petugas');
-
-                    // Example data writing
-                    $rowNumber = 3;
-                    $no = 1;
-                
-                    foreach ($task as $row) {
-                        if ($row->point) {
-                            $no2 = 1;
-                            foreach ($row->point as $rs) {
-                                $rowNumber++;
-                                if ($rs->list) {
-                                    foreach ($rs->list as $det) {
-                                        $nama = karyawan_bynik($det->employee_code);
-                                        if(!empty($nama)){
-                                            $employee =  $nama->nama;
-                                        }else{
-                                            $employee = $det->employee_code;
-                                        }
-                                        
-
-                                        $sheet->setCellValue('A' . $rowNumber, $det->created_at); // No need for number again
-                                        $sheet->setCellValue('B' . $rowNumber, $det->status); // No need for task again
-                                        $sheet->setCellValue('C' . $rowNumber, $det->description); // No need for date again
-                                        $sheet->setCellValue('D' . $rowNumber, $rs->task);
-                                        $sheet->setCellValue('E' . $rowNumber, $row->judul); // Replace with actual status
-                                        $sheet->setCellValue('F' . $rowNumber, $employee); // Replace with actual keterangan
-                                        
-                                        $rowNumber++;
-                                    }
-                                }
-                                $no2++;
-                            }
-                        }
-                        $rowNumber++;
-                        $no++;
-                    }
-                // Set the header for the file download
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment; filename="project_582307_report241104110534.xlsx"');
-                header('Cache-Control: max-age=0');
-                $writer = new Xlsx($spreadsheet);
-                Storage::makeDirectory('reports');
-                $fileName = 'report_'.date('ymdhis').'.xlsx'; // Example file name
-                $filePath = storage_path('app/reports/' . $fileName); // Example storage path
-
-                try {
-                    $writer->save($filePath);
-                    $publicPath = public_path('reports');
-                    if (!file_exists($publicPath)) {
-                        mkdir($publicPath, 0755, true); // Create the public directory if it doesn't exist
-                    }
-
-                    // Move the file to the public directory
-                    $newFilePath = $publicPath . '/' . $fileName;
-                    rename($filePath, $newFilePath); // Move the fil
-                } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
-                    return response()->json(['error' => 'Failed to save Excel file: ' . $e->getMessage()], 500);
-                }
-            }
-
-
-            // // // Return response with file path
-            // return response()->json(['message' => 'Excel file saved successfully', 'path' => asset('reports/' . $fileName)]);
-            return response()->json(['message' => $data]);
+        if (!$project) {
+            return response()->json(['message' => 'Project not found'], 404);
         }
 
-    } 
+        // Simpan job ke DB
+        $reportJob = ReportJob::create([
+            'type' => $request->input('jenis_file', 'pdf'),
+            'project_name' => $project->name,
+            'params' => json_encode($request->all(), JSON_THROW_ON_ERROR), // gunakan opsi ini
+            'status' => 'pending',
+        ]);
+
+        // Dispatch job ke queue
+        GeneratePatrolReport::dispatch($reportJob->id);
+
+        return response()->json([
+            'message' => 'Proses report sedang berjalan di background.',
+            'job_id' => $reportJob->id,
+        ]);
+    }
+
+    public function report_job_status($id) {
+        $job = ReportJob::find($id);
+        if (!$job) return response()->json(['status' => 'not_found']);
+    
+        return response()->json([
+            'status' => $job->status,
+            'files' => json_decode($job->file_paths ?? '[]')
+        ]);
+    }
 
     function groupBy($collection, $key = 'name') {
         $grouped = [];

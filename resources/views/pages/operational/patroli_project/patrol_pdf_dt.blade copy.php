@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,9 +48,9 @@
                     $img = '';
                     if (!empty($row->image) && $row->status == 0) {
                         if (strpos($row->image, 'https://') === 0) {
-                            $img = "<img src='" . $row->image . "' style='max-height:250px; width:auto; display:block; margin:auto; object-fit:contain;'>";
+                            $img = "<img src='" . $row->image . "' style='width:30px; height:30px; object-fit:cover;'>";
                         } else {
-                            $img = "<img src='https://hris.truest.co.id" . $row->image . "' style='max-height:250px; width:auto; display:block; margin:auto; object-fit:contain;'>";
+                            $img = "<img src='https://hris.truest.co.id" . $row->image . "' style='width:30px; height:30px; object-fit:cover;'>";
                         }
                     }
 

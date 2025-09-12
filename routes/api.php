@@ -182,6 +182,11 @@ Route::prefix('v1')->group(function () {
     Route::post('/save-chart-image', [PatroliController::class, 'saveChartImage']);
 
     Route::get('/download_file_patrol', [PatroliController::class, 'download_file_patrol']);
+    Route::get('/download-status/{processId}', [PatroliController::class, 'check_download_status']);
+    Route::get('/download-file/{filename}', [PatroliController::class, 'download_file']);
+    Route::get('/my-downloads', [PatroliController::class, 'list_downloads']);
+    Route::get('report_job_status/{id}', [PatroliController::class, 'report_job_status']);
+
 
 
 

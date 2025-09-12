@@ -489,63 +489,69 @@
     @endif
 
     $(document).ready(function() {
-        $('#loadingBackdrop').hide();
+        $('#loadingBackdrop').hide(); // Ensure the loading backdrop is hidden initially
+
         $('#download_file_patrol').on('click', function() {
-            // Define any parameters you want to send
-            $('#loadingBackdrop').show();
+            $('#loadingBackdrop').show(); // Show the loading backdrop only when the button is clicked
+            
             var project = "{{ $project_id ?? '' }}";
-            let project_id='';
-            if(project ===''){
-                project_id  = $("#project_id_filter").val();
-            }else{
-                project_id  = project;
-            }
+            let project_id = project || $("#project_id_filter").val();
 
             var jenis_file = $('input[name="filter_type"]:checked').val() || "pdf";
             var shift = $('input[name="shift"]:checked').val();
-            
+
             const params = {
-                tanggal: $("#tanggal_report").val(), // Example parameter
-                project_id:  project_id, // Another example parameter
-                jenis_file:jenis_file,
-                shift:shift,
+                tanggal: $("#tanggal_report").val(),
+                project_id: project_id,
+                jenis_file: jenis_file,
+                shift: shift,
                 jam1: $("#jam").val(),
                 jam2: $("#jam2").val()
             };
 
-            // Send GET request using Axios
             axios.get('/api/v1/download_file_patrol', { params })
                 .then(function(response) {
-                    // Handle success response
-                    const paths = response.data.path; // Pastikan backend mengirimkan key `paths` berisi array
-        
-                    paths.forEach((path) => {
-                        // Buat elemen link sementara untuk setiap file
-                        const link = document.createElement('a');
-                        link.href = path; // Set path untuk file
-                        link.target = '_blank'; // Buka di tab baru jika diperlukan
+                    const jobId = response.data.job_id;
 
-                        // Tambahkan atribut download (opsional jika ingin memberikan nama default)
-                        const fileName = path.split('/').pop(); // Ambil nama file dari URL
-                        link.setAttribute('download', fileName);
+                    // Mulai polling untuk cek status job setiap 3 detik
+                    const interval = setInterval(() => {
+                        axios.get('/api/v1/report_job_status/' + jobId)
+                            .then(function(res) {
+                                const status = res.data.status;
 
-                        // Tambahkan ke body
-                        document.body.appendChild(link);
+                                if (status === 'done') {
+                                    clearInterval(interval);
+                                    $('#loadingBackdrop').hide();
 
-                        // Klik link untuk memulai unduhan
-                        link.click();
+                                    // Download semua file
+                                    const files = res.data.files; // Array file paths
+                                    files.forEach((path) => {
+                                        const link = document.createElement('a');
+                                        link.href = path;
+                                        link.target = '_blank';
+                                        const fileName = path.split('/').pop();
+                                        link.setAttribute('download', fileName);
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    });
 
-                        // Hapus link setelah digunakan
-                        document.body.removeChild(link);
-                    });
-
-                    $('#loadingBackdrop').hide();
-                    alert('File downloaded successfully');
-                    // Optionally, you can handle the response, like redirecting to a download URL
-                    // window.location.href = response.data.downloadUrl; 
+                                    alert('File downloaded successfully');
+                                } else if (status === 'failed') {
+                                    clearInterval(interval);
+                                    $('#loadingBackdrop').hide();
+                                    alert('Failed to generate report: ' + res.data.error);
+                                }
+                                // Jika pending / processing, terus polling
+                            })
+                            .catch(function(err) {
+                                clearInterval(interval);
+                                $('#loadingBackdrop').hide();
+                                alert('Error checking job status');
+                            });
+                    }, 1800000); // setiap 30 menit
                 })
                 .catch(function(error) {
-                    // Handle error response
                     alert('Request Timeout');
                     $('#loadingBackdrop').hide();
                 });    

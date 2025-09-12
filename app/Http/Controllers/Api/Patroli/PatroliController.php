@@ -380,7 +380,7 @@ class PatroliController extends Controller
                 
             }
         }
-        
+
         if(!empty($periode_filter)){
             $periode = strtoupper($periode_filter);
         }else{
@@ -567,13 +567,24 @@ class PatroliController extends Controller
 
     public function report_job_status($id) {
         $job = ReportJob::find($id);
-        if (!$job) return response()->json(['status' => 'not_found']);
-    
+        if (!$job) {
+            return response()->json(['status' => 'not_found']);
+        }
+
+        $files = $job->file_paths;
+
+        // Coba decode
+        $decoded = json_decode($files, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $files = $decoded;
+        }
+
         return response()->json([
             'status' => $job->status,
-            'files' => json_decode($job->file_paths ?? '[]')
+            'files'  => $files
         ]);
     }
+
 
     function groupBy($collection, $key = 'name') {
         $grouped = [];

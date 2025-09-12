@@ -5,7 +5,7 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\ReportJob;
-use App\Models\Task;
+use App\ModelCG\Task;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -142,7 +142,7 @@ class GeneratePatrolReport implements ShouldQueue
 
             // Update job
             $reportJob->status = 'done';
-            $reportJob->file_path = $filePath; // Update file_path with the generated file path
+            $reportJob->file_paths = $filePath; // Update file_path with the generated file path
             $reportJob->save();
         } catch (\Exception $e) {
             $reportJob->status = 'failed';

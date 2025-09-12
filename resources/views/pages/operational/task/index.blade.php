@@ -524,7 +524,17 @@
                                     $('#loadingBackdrop').hide();
 
                                     const files = res.data.files; // Array or single file path
-                                    if (Array.isArray(files)) {
+                                    if (typeof files === 'string') {
+                                        // Handle single file
+                                        const link = document.createElement('a');
+                                        link.href = files;
+                                        link.target = '_blank';
+                                        const fileName = files.split('/').pop();
+                                        link.setAttribute('download', fileName);
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    } else if (Array.isArray(files)) {
                                         // Handle multiple files
                                         files.forEach((path) => {
                                             const link = document.createElement('a');
@@ -536,16 +546,6 @@
                                             link.click();
                                             document.body.removeChild(link);
                                         });
-                                    } else {
-                                        // Handle single file
-                                        const link = document.createElement('a');
-                                        link.href = files;
-                                        link.target = '_blank';
-                                        const fileName = files.split('/').pop();
-                                        link.setAttribute('download', fileName);
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
                                     }
 
                                     alert('File downloaded successfully');
